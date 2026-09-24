@@ -212,21 +212,37 @@ export function voicedEndMs(pcm: Uint8Array): number {
 
 // ------------------------------------------------------------------------------------------------ waiting
 
+/**
+ * ReplyTracker has a single `onReplyDone` slot; chaining waiters through it breaks when they resolve out of order
+ * (found in the first T-D1-1/2 run). Multiplex it once per session instead.
+ */
+const replyDoneListeners = new WeakMap<VoiceAgentSession, Set<(r: ReplyInfo) => void>>();
+export function onReplyDone(s: VoiceAgentSession, fn: (r: ReplyInfo) => void): () => void {
+  let set = replyDoneListeners.get(s);
+  if (!set) {
+    const listeners = new Set<(r: ReplyInfo) => void>();
+    set = listeners;
+    replyDoneListeners.set(s, listeners);
+    s.replies.onReplyDone = (r) => {
+      for (const l of [...listeners]) l(r);
+    };
+  }
+  set.add(fn);
+  return () => set.delete(fn);
+}
+
 export function waitReplyDone(s: VoiceAgentSession, timeoutMs: number, pred: (r: ReplyInfo) => boolean = () => true): Promise<ReplyInfo | null> {
   return new Promise((resolveP) => {
-    const prev = s.replies.onReplyDone;
+    const off = onReplyDone(s, (r) => {
+      if (!pred(r)) return;
+      clearTimeout(t);
+      off();
+      resolveP(r);
+    });
     const t = setTimeout(() => {
-      s.replies.onReplyDone = prev;
+      off();
       resolveP(null);
     }, timeoutMs);
-    s.replies.onReplyDone = (r) => {
-      prev?.(r);
-      if (pred(r)) {
-        clearTimeout(t);
-        s.replies.onReplyDone = prev;
-        resolveP(r);
-      }
-    };
   });
 }
 
