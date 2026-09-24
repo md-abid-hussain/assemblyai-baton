@@ -202,8 +202,9 @@ describe("normalizeField: other kinds", () => {
 
   it("effective dates normalize even out of range; the range helper flags them", () => {
     expect(n("effective_date", "December 1st")).toBe("2026-12-01");
-    expect(effectiveDateInRange("2026-12-01", "2026-09-25")).toBe(false);
-    expect(effectiveDateInRange("2026-11-24", "2026-09-25")).toBe(true);
+    expect(effectiveDateInRange("2026-12-25", "2026-09-25")).toBe(false); // 91 days
+    expect(effectiveDateInRange("2026-12-18", "2026-09-25")).toBe(true); // s07's designed VERIFIED date (84 days)
+    expect(effectiveDateInRange("2026-12-01", "2026-09-25", 60)).toBe(false);
     expect(effectiveDateInRange("2026-09-24", "2026-09-25")).toBe(false);
     expect(effectiveDateInRange("junk", "2026-09-25")).toBe(true);
   });

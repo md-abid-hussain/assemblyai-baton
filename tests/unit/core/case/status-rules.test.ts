@@ -187,10 +187,10 @@ describe("deriveField status rules (DESIGN §5.4.2, table)", () => {
     expect([q.status, q.reason, q.updatedAtMs]).toEqual(["MISSING", "absent", 1000]);
   });
 
-  it("effective_date outside callDate..+60 → PENDING (out_of_range), flagged", () => {
+  it("effective_date outside callDate..+90 → PENDING (out_of_range), flagged", () => {
     const E = "effective_date" as const;
-    const s = ev({ field: E, kind: "stated", party: "customer", value: "2026-12-01", t: 1000 });
-    const f = field([s, ev({ field: E, kind: "readback", party: "rep", value: "2026-12-01", t: 2000 })], E);
+    const s = ev({ field: E, kind: "stated", party: "customer", value: "2027-01-05", t: 1000 });
+    const f = field([s, ev({ field: E, kind: "readback", party: "rep", value: "2027-01-05", t: 2000 })], E);
     expect(f).toMatchObject({ status: "PENDING", reason: "out_of_range", flags: ["out_of_range"] });
   });
 

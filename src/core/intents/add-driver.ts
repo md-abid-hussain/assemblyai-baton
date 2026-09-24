@@ -30,8 +30,13 @@ export interface Normalized {
   display: string;
 }
 
-/** §5.4.1: `callDate ≤ effective_date ≤ callDate + EFFECTIVE_DATE_MAX_DAYS`, otherwise PENDING `out_of_range`. */
-export const EFFECTIVE_DATE_MAX_DAYS = 60;
+/**
+ * §5.4.1: `callDate ≤ effective_date ≤ callDate + EFFECTIVE_DATE_MAX_DAYS`, otherwise PENDING `out_of_range`.
+ * DESIGN says 60; WP1 uses 90 because the kit's own ground truth has a VERIFIED start date 84 days out (s07,
+ * 2026-12-18 on a 2026-09-25 call), and a 60-day guard would make the pipeline disagree with its labels. The AI
+ * half keeps its own 30-day guardrail in `confirm_effective_date` (§5.8, WP6). See docs/notes/wp1.md.
+ */
+export const EFFECTIVE_DATE_MAX_DAYS = 90;
 /** Youngest plausible new driver (DOB year guard, §5.4.1). */
 export const MIN_DRIVER_AGE = 14;
 export const MIN_DOB_YEAR = 1920;
@@ -109,7 +114,7 @@ export function relationWord(value: string, raw?: string | null): string {
   return RELATION_WORD[value as Relation] ?? value.replace(/_/g, " ");
 }
 
-/** Is an effective date inside `callDate … callDate + 60` (§5.4.1)? Non-dates are "in range" (nothing to flag). */
+/** Is an effective date inside `callDate … callDate + EFFECTIVE_DATE_MAX_DAYS` (§5.4.1)? Non-dates are "in range" (nothing to flag). */
 export function effectiveDateInRange(norm: string, callDate: string, maxDays = EFFECTIVE_DATE_MAX_DAYS): boolean {
   if (dayNumber(norm) === null || dayNumber(callDate) === null) return true;
   const d = diffDays(callDate, norm);
