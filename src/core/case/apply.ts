@@ -67,8 +67,7 @@ export function locateQuote(quote: string, text: string): { start: number; end: 
   for (let s = 0; s < tt.length; s++) {
     for (let L = minLen; L <= maxLen && s + L <= tt.length; L++) {
       const win = tt.slice(s, s + L);
-      const lcs = lcsLength(qt, win.map((x) => x.t));
-      const ratio = lcs / Math.max(qt.length, L);
+      const ratio = lcsLength(qt, win.map((x) => x.t)) / qt.length; // share of the quote's tokens found, in order
       if (ratio >= QUOTE_LCS_MIN_RATIO && (!best || ratio > best.ratio || (ratio === best.ratio && L < best.len))) {
         best = { start: win[0]!.start, end: win[L - 1]!.end, ratio, len: L };
       }
