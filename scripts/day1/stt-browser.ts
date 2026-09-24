@@ -38,7 +38,9 @@ async function launch(name: string): Promise<Browser> {
   if (name === "chromium") {
     // --channel chromium = the full browser in new-headless mode (tabs get real visibility changes); default = headless shell.
     const channel = arg("channel");
-    return t.launch({ headless: !has("headed"), ...(channel ? { channel } : {}), args: ["--autoplay-policy=no-user-gesture-required", "--use-fake-ui-for-media-stream", "--use-fake-device-for-media-stream"] });
+    // Playwright disables Chrome's background throttling by default; a real background-tab test must not.
+    const ignoreDefaultArgs = ["--disable-background-timer-throttling", "--disable-backgrounding-occluded-windows", "--disable-renderer-backgrounding"];
+    return t.launch({ headless: !has("headed"), ignoreDefaultArgs, ...(channel ? { channel } : {}), args: ["--autoplay-policy=no-user-gesture-required", "--use-fake-ui-for-media-stream", "--use-fake-device-for-media-stream"] });
   }
   if (name === "firefox") {
     return t.launch({ headless: !has("headed"), firefoxUserPrefs: { "media.navigator.streams.fake": true, "media.navigator.permission.disabled": true, "media.autoplay.default": 0 } });

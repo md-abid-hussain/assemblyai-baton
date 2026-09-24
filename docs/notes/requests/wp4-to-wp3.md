@@ -15,6 +15,10 @@
    `startMs` and `endMs` are fractional call-clock ms (8 kHz → 0.125 ms steps). Never round them.
 5. **#3 `cachedTurnsUrl`** should be `/data/cached-turns/<callId>.json` when WP9 published one, else `null`. The
    client prefetches it at run start and falls back to it when STT is denied or fails.
-6. **Express:** the client starts the recording at `prefillUntilMs` and seeds the customer session's `agent_context`
-   with the last cached rep final before that point. It needs that text: either return it in `CreateCaseResponse`
-   (an additive `ext/` field) or the client reads it from the cached-turns file (the current plan, no change needed).
+6. **Express prefill cut (please implement exactly this):** insert the cached finals (and their cached fact events)
+   with **`recvMs ≤ prefillUntilMs`**, on both channels. The client computes the start with
+   `expressStart()` (`src/client/stt/express.ts`). It snaps back from `decisionPointMs − 25 s` to the cut with no
+   cached final "in flight" (first word before the cut, arrival after it), so that every cached turn is either
+   prefilled or re-transcribed live, and none is split. It then starts the live sessions at exactly
+   `prefillUntilMs`. The client also reads the customer's `agent_context` seed (the last cached rep final with
+   `recvMs ≤ prefillUntilMs`) from the cached-turns file, so #3 needs no new field.
