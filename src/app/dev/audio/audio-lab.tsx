@@ -11,7 +11,7 @@ import type { PolicyRecord } from "@/core/contracts/case";
 import type { CachedTurnsFile } from "@/core/contracts/eval";
 import type { BatonEvent } from "@/core/contracts/events";
 import type { RunPlan } from "@/core/contracts/run";
-import type { CallManifestEntry } from "@/core/contracts/scenario";
+import type { CallManifestEntry, Peaks } from "@/core/contracts/scenario";
 import type { CallPlayback, MicSource, PacedFeeder, VaOutputPlayer } from "@/core/contracts/services";
 import type { TurnInput } from "@/core/contracts/turns";
 import type { CallPlayer } from "@/client/audio/call-player";
@@ -21,6 +21,7 @@ import { createPageLifecycle, type BrowserPageLifecycle } from "@/client/platfor
 import { CachedReplay } from "@/client/replay/cached-replay";
 import { HttpSttApi } from "@/client/stt/api";
 import { LiveSttChannelManager } from "@/client/stt/channel-manager";
+import { expressStart } from "@/client/stt/express";
 import { loopbackStt, type LoopbackSession } from "@/client/stt/loopback";
 
 type Mode = "loopback" | "cached" | "live";
@@ -275,10 +276,22 @@ export function AudioLab() {
       const c = call.current;
       const pol = policy.current;
       if (!p || !c || !pol) return err("load a call first");
-      const startOffsetMs = express && c.decisionPointMs !== null ? Math.max(0, c.decisionPointMs - 25_000) : 0;
-      d.current.startOffsetMs = startOffsetMs;
       const caseId = live.current?.create.caseId ?? "case_dev_audio";
       const cachedUrl = mode === "live" ? live.current?.create.cachedTurnsUrl ?? null : `/fixtures/dialog/cached-turns.${fixture}.json`;
+      // Express (§5.1.6): snapped cut + the customer's agent_context seed, from the cached turns and peaks.
+      let startOffsetMs = 0;
+      let seedAgentContext: string | undefined;
+      if (express && cachedUrl && c.assets) {
+        const [ct, pk] = await Promise.all([
+          fetch(cachedUrl).then((r) => (r.ok ? (r.json() as Promise<CachedTurnsFile>) : null)).catch(() => null),
+          fetch(c.assets.peaks).then((r) => (r.ok ? (r.json() as Promise<Peaks>) : null)).catch(() => null),
+        ]);
+        const ex = expressStart(c, ct, pk);
+        startOffsetMs = ex.startOffsetMs;
+        seedAgentContext = ex.seedAgentContext ?? undefined;
+        err(`express: target ${ex.targetMs} → start ${ex.startOffsetMs} (${ex.snappedTo}, in flight ${ex.inFlight}), seed "${ex.seedAgentContext ?? ""}"`);
+      }
+      d.current.startOffsetMs = startOffsetMs;
       caseSync.current =
         mode === "live" && live.current
           ? new HttpCaseSync({ caseToken: live.current.create.caseToken, ...(live.current.create.visitorToken ? { visitorToken: live.current.create.visitorToken } : {}), sink: sink.current, now: () => now() - t0.current })
@@ -311,7 +324,7 @@ export function AudioLab() {
         });
         const r = await mgr.current.open({
           caseId, caseToken: live.current?.create.caseToken ?? "-", runId: live.current?.run.runId ?? "run_dev_audio", call: c, policy: pol, startOffsetMs,
-          ctxCarry: "last_rep_turn",
+          ctxCarry: "last_rep_turn", ...(seedAgentContext ? { seedAgentContext } : {}),
         });
         if (r !== "live") err(`stt open: ${r}`);
       }

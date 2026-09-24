@@ -65,7 +65,7 @@ async function boot(page: Page, fixture: "8k" | "16k", mode = "loopback"): Promi
   await sleep(500);
   await page.click('[data-testid="load"]');
   await page.waitForFunction(() => (window.__wp4 as { loaded?: boolean } | undefined)?.loaded === true, null, { timeout: 20_000 });
-  await page.click('[data-testid="start"]');
+  await page.click(has("express") ? '[data-testid="express"]' : '[data-testid="start"]');
   (page as unknown as { __errors: string[] }).__errors = errors;
 }
 
