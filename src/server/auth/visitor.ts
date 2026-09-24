@@ -22,7 +22,7 @@ import { hmacB64url, safeEqual } from "./crypto";
 export const VISITOR_COOKIE = "bvid";
 export const VISITOR_HEADER = "x-baton-visitor";
 export const VISITOR_COOKIE_MAX_AGE_S = 30 * 24 * 3600;
-const ID_RE = /^[A-Za-z0-9_-]{10,64}$/;
+const ID_RE = /^[A-Za-z0-9_-]{1,64}$/;
 
 export interface Visitor {
   visitorId: string;
