@@ -50,9 +50,11 @@ export const TUNING_8K_GRID: readonly TurnTuning[] = [
 
 /**
  * The 8 kHz µ-law turn tuning (DAY-1 TEST T-D1-6). PROVISIONAL: chosen from the reduced proxy grid on the TTS
- * fixture's µ-law derivative (docs/notes/wp4.md, "T-D1-6"); re-decided on the real takes (D1 afternoon).
+ * fixture's µ-law derivative (docs/notes/wp4.md, "T-D1-6", 2026-09-25): 160/1000 kept 19/19 entities, 0 merged turns
+ * and p50 final ≈ 0.73 s; the 400 ms points missed p50 ≤ 1 s and 160/2400 merged turns (p90 2.9 s). Re-decided on
+ * the real takes (D1 afternoon) with `scripts/day1/stt-grid.ts`.
  */
-export const TUNING_8K: TurnTuning = { min_turn_silence: 400, max_turn_silence: 1000 };
+export const TUNING_8K: TurnTuning = { min_turn_silence: 160, max_turn_silence: 1000 };
 
 /**
  * Scenarios where the REP also speaks Hinglish (the kit's `language_notes`: s19 = customer only, s20 = both).

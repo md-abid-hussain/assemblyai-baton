@@ -180,6 +180,11 @@ export class BrowserAudioEngine implements AudioEngine {
   /** Loads every Baton processor once (one Blob URL). */
   ensureWorklets(): Promise<void> {
     if (!this.workletsReady) {
+      if (!this.ctx.audioWorklet) {
+        // AudioWorklet exists only in secure contexts (https or localhost): a LAN http URL on a phone has none.
+        this.diag.workletError = "AudioWorklet unavailable (needs a secure context: https or localhost)";
+        return Promise.reject(new Error(this.diag.workletError));
+      }
       this.workletUrl = URL.createObjectURL(new Blob([ALL_WORKLETS_SOURCE], { type: "application/javascript" }));
       this.workletsReady = this.ctx.audioWorklet.addModule(this.workletUrl).catch((e: unknown) => {
         this.diag.workletError = e instanceof Error ? `${e.name}: ${e.message}` : String(e);

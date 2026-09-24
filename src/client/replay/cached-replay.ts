@@ -95,6 +95,10 @@ export class CachedReplay {
   get loaded(): boolean {
     return this.file !== null;
   }
+  /** The parsed file (null until loaded). */
+  get data(): CachedTurnsFile | null {
+    return this.file;
+  }
   get transcribedAt(): string | null {
     return this.file?.transcribedAt ?? null;
   }

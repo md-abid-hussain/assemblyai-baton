@@ -328,7 +328,8 @@ export class LiveSttChannelManager implements SttChannelManager {
     const bytesPerMs = (this.call.format.sampleRate * bytesPerSampleOf(this.call.format)) / 1000;
     for (const ch of CHANNELS) {
       const c = this.chs[ch];
-      if (c.status !== "open" || !c.session) continue;
+      // Nothing is fed once Terminate is on its way (end of recording, pause): the session would drop it anyway.
+      if (c.status !== "open" || !c.session || c.closingByUs) continue;
       const bytes = ch === "rep" ? t.rep : t.customer;
       if (c.base === null) c.base = t.callMs - bytes.byteLength / bytesPerMs;
       for (const frame of c.batcher.push(bytes)) {
