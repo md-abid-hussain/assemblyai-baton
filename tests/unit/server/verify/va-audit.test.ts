@@ -130,6 +130,14 @@ d("F6 VA audit (DB)", () => {
     expect(h.rest.calls).toEqual([]);
   });
 
+  it("a session deleted between list and get is skipped (not cached), not fatal", async () => {
+    h.rest.pages = [{ sessions: [{ id: "sess_gone", status: "completed", created_at: ago(10 * 60_000) }], hasMore: false, nextCursor: null }];
+    const r = await runVaAudit(h.ports);
+    expect(r).toMatchObject({ ok: true, scanned: 1, ours: 0 });
+    h.rest.sessions.set("sess_gone", running("sess_gone", "zp-prod"));
+    expect((await runVaAudit(h.ports)).ours).toBe(1);
+  });
+
   it("without a flag store it still reports the anomaly (and logs), never throws", async () => {
     h.rest.sessions.set("sess_rogue3", running("sess_rogue3", "zp-prod"));
     const r = await runVaAudit({ ...h.ports, tripReplayOnly: null });

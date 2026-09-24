@@ -78,7 +78,15 @@ async function markerFor(p: Wp8Ports, s: SessionRecord): Promise<string | null> 
   const c = cache().markers;
   if (c.has(s.id)) return c.get(s.id) ?? null;
   let prompt = systemPromptOf(s);
-  if (prompt === undefined) prompt = systemPromptOf(await p.vaRest().getSession(s.id));
+  if (prompt === undefined) {
+    try {
+      prompt = systemPromptOf(await p.vaRest().getSession(s.id));
+    } catch (err) {
+      // Deleted between list and get (404), or a transient error: skip it this round, retry next audit (not cached).
+      alog.warn("audit could not read a session config", { sessionId: s.id, err });
+      return null;
+    }
+  }
   const m = markerOf(prompt);
   c.set(s.id, m);
   if (c.size > 5000) c.delete(c.keys().next().value!);
