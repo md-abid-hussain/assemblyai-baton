@@ -2,7 +2,7 @@ import "server-only";
 
 import type { PolicyRecord } from "../../core/contracts/case";
 import { BatonError } from "../../core/contracts/errors";
-import type { PaymentViewExt, StagePayload } from "../../core/contracts/ext/wp6-payments";
+import type { EsignSummary, PaymentViewExt, StagePayload } from "../../core/contracts/ext/wp6-payments";
 import type { SendEsignAndPayLinkFinalResult } from "../../core/contracts/tools";
 import { newId as defaultNewId } from "../../lib/ids";
 import { log as rootLog, type Logger } from "../log";
@@ -38,6 +38,8 @@ export interface PaymentServiceDeps {
   mode(): Promise<PaymentsMode>;
   /** Moves the takeover to `close` and returns the stage payload once a payment succeeded (the tool layer). */
   stagePayloadFor?: (p: PaymentRecord) => Promise<StagePayload | null>;
+  /** The SMS text and the e-sign summary for the phone (the tool layer knows the case and the disclosure). */
+  extrasFor?: (p: PaymentRecord, origin: string | null) => Promise<{ sms?: string; summary?: EsignSummary } | null>;
   now?: () => number;
   sleep?: (ms: number) => Promise<void>;
   newId?: () => string;
@@ -131,10 +133,20 @@ export class PaymentService {
    * #15: the server-authoritative view. While a Polar payment is `open`/`confirmed`/`timeout` it GETs the checkout
    * from Polar first when the last server check is older than 8 s, or on `reconcile` (at most every 1.5 s).
    */
-  async view(id: string, opts: { reconcile?: boolean } = {}): Promise<PaymentViewExt> {
+  async view(id: string, opts: { reconcile?: boolean; extras?: boolean; origin?: string | null } = {}): Promise<PaymentViewExt> {
     let p = await this.get(id);
     if (this.shouldPoll(p, !!opts.reconcile)) p = await this.pollPolar(p);
-    return this.toView(p);
+    const v = await this.toView(p);
+    if (opts.extras && this.deps.extrasFor) {
+      try {
+        const x = await this.deps.extrasFor(p, opts.origin ?? null);
+        if (x?.sms) v.sms = x.sms;
+        if (x?.summary) v.summary = x.summary;
+      } catch (err) {
+        this.log.warn("payment extras failed", { paymentId: p.id, err: errName(err) });
+      }
+    }
+    return v;
   }
 
   private shouldPoll(p: PaymentRecord, reconcile: boolean): boolean {

@@ -32,11 +32,30 @@ export type StagePayload = z.infer<typeof StagePayloadSchema>;
  * - `esignedAt`: when the e-sign sheet was signed (null before);
  * - `sms`: the SMS text of the pay link (the phone can re-render after a reload).
  */
+/** The e-sign sheet's summary of the change (S6), server-built from the case state and the disclosure read. */
+export const EsignSummarySchema = z.object({
+  policyNumber: z.string(),
+  agencyName: z.string(),
+  /** Prefill of the typed-name field (the policyholder; editable). */
+  policyholderName: z.string(),
+  phoneLast4: z.string(),
+  driver: z.string().nullable(),
+  relation: z.string().nullable(),
+  vehicle: z.string().nullable(),
+  effectiveDate: z.string().nullable(),
+  /** "142.00" (the disclosure's figure). */
+  monthlyUsd: z.string().nullable(),
+  /** "23.40" (the disclosure's figure; the pay sheet shows Polar's total_amount). */
+  dueTodayUsd: z.string().nullable(),
+});
+export type EsignSummary = z.infer<typeof EsignSummarySchema>;
+
 export const PaymentViewExtSchema = PaymentViewSchema.extend({
   stagePayload: StagePayloadSchema.optional(),
   label: z.string().optional(),
   esignedAt: z.string().nullable().optional(),
   sms: z.string().optional(),
+  summary: EsignSummarySchema.optional(),
 });
 export type PaymentViewExt = z.infer<typeof PaymentViewExtSchema>;
 

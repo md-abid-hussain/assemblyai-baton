@@ -2,7 +2,7 @@ import "server-only";
 
 import type { CaseState, CaseStatus, ConflictCard, FieldId, PolicyRecord, Stage } from "../../core/contracts/case";
 import { BatonError } from "../../core/contracts/errors";
-import type { StagePayload } from "../../core/contracts/ext/wp6-payments";
+import type { EsignSummary, StagePayload } from "../../core/contracts/ext/wp6-payments";
 import type { NewFactEvent } from "../../core/contracts/case";
 import type { CaseRepository, ToolContext, ToolOutcome, ToolService } from "../../core/contracts/services";
 import type { TranscriptionMode } from "../../core/contracts/takeover";
@@ -152,6 +152,33 @@ export class Wp6ToolService implements ToolService {
       const link = payLinkOf(ctx.origin, x.pay.id);
       out.ui = { sms: smsPayLink(x.policy, link), link, paymentId: x.pay.id };
     }
+    return out;
+  }
+
+  /** The phone's SMS text and e-sign summary for a payment (PaymentView `sms`, `summary`). */
+  async extrasFor(p: PaymentRecord, origin: string | null): Promise<{ sms?: string; summary?: EsignSummary } | null> {
+    const tko = await this.deps.store.getTakeover(p.takeoverId);
+    if (!tko) return null;
+    const c = await this.deps.cases.load(tko.caseId);
+    if (!c) return null;
+    const f = c.state.fields;
+    const disp = (k: keyof typeof f) => f[k]?.display ?? f[k]?.value ?? null;
+    const d = tko.disclosures.premium_change ?? tko.disclosures.esign_consent;
+    const pol = c.policy;
+    const summary: EsignSummary = {
+      policyNumber: pol.policyNumber,
+      agencyName: pol.agencyName,
+      policyholderName: `${pol.policyholder.firstName} ${pol.policyholder.lastName}`,
+      phoneLast4: pol.phoneOnFileLast4,
+      driver: disp("driver_full_name"),
+      relation: disp("driver_relation"),
+      vehicle: disp("vehicle_assignment"),
+      effectiveDate: disp("effective_date"),
+      monthlyUsd: d?.monthlyUsd ?? null,
+      dueTodayUsd: d?.dueTodayUsd ?? null,
+    };
+    const out: { sms?: string; summary?: EsignSummary } = { summary };
+    if (origin) out.sms = smsPayLink(pol, payLinkOf(origin, p.id));
     return out;
   }
 

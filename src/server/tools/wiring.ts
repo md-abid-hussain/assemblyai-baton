@@ -92,6 +92,7 @@ export function wp6(): Wp6 {
       : null,
     mode: async () => (await cfg.paymentsModeOverride?.().catch(() => null)) ?? e.PAYMENTS_MODE,
     stagePayloadFor: (p) => (tools ? tools.stagePayloadFor(p) : Promise.resolve(null)),
+    extrasFor: (p, origin) => (tools ? tools.extrasFor(p, origin) : Promise.resolve(null)),
   });
   tools = new Wp6ToolService({
     cases: cfg.cases ?? notWiredCases,

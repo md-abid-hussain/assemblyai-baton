@@ -25,14 +25,17 @@ async function authorizedPayment(req: Request, id: string | undefined) {
   return { w, p };
 }
 
-/** #15 GET /api/payments/[id][?reconcile=1] → PaymentView (+ WP6 extras). Rate: 3 per 2 s per payment. */
+/** #15 GET /api/payments/[id][?reconcile=1][&extras=1] → PaymentView (+ WP6 extras). Rate: 4 per 2 s per payment. */
 export const getPayment = route<{ id: string }>("payments.get", async (req, ctx: Params<{ id: string }>) => {
   const { id } = await ctx.params;
   const { w, p } = await authorizedPayment(req, id);
-  const rl = await w.rateLimiter.hit("payment_get", p.id, 3, 2);
+  const rl = await w.rateLimiter.hit("payment_get", p.id, 4, 2);
   if (!rl.ok) rateLimited(rl.retryAfterSec);
-  const reconcile = new URL(req.url).searchParams.get("reconcile") === "1";
-  return json(await w.payments.view(p.id, { reconcile }));
+  const q = new URL(req.url).searchParams;
+  const reconcile = q.get("reconcile") === "1";
+  // `?extras=1` (the phone, once): the SMS text and the e-sign summary.
+  const extras = q.get("extras") === "1";
+  return json(await w.payments.view(p.id, { reconcile, extras, origin: req.headers.get("origin") ?? w.appUrl }));
 });
 
 /** #16 POST /api/payments/[id]/esign {consent:true, typedName} → {ok, signedAt}. Rate: 5 per payment. */
