@@ -9,6 +9,7 @@ import { TAKEOVER_TIMING as T } from "../../../../src/core/contracts/takeover";
 import {
   armView,
   clampLead,
+  CLIP_SCHEDULE_MAX_MS,
   CLOSE_BACKSTOP_MS,
   DRAIN_BACKSTOP_GRACE_MS,
   isRetryableVaCode,
@@ -364,6 +365,23 @@ describe("CONNECTING → GREETING at tSend = max(now, repLineEnd − leadMs)", (
     const fx = m.send({ type: "va_open", now: (m.now += 400), attempt: 0 });
     expect(m.phase).toBe("greeting");
     expect(m.effects("start_va", fx)).toHaveLength(1);
+  });
+
+  it("stops waiting for a clip that never reports its schedule (CLIP_SCHEDULE_MAX_MS after the seal)", () => {
+    const m = new M();
+    m.sample({ quiet: true });
+    m.arm();
+    const sealedAt = m.p.sealedAt!;
+    m.armOk();
+    m.send({ type: "drained", now: (m.now += 100), completedTurnIds: [], pendingTurnIds: [], waitedMs: 100 });
+    m.send({ type: "compiled", now: (m.now += 100), compiled: compiledFixture(), by: "server" });
+    m.send({ type: "va_token", now: (m.now += 100), attempt: 0, liveSessionId: "l" });
+    m.send({ type: "va_open", now: (m.now += 100), attempt: 0 });
+    expect(m.phase).toBe("connecting");
+    expect(m.deadline).toBe(sealedAt + CLIP_SCHEDULE_MAX_MS);
+    const fx = m.at(sealedAt + CLIP_SCHEDULE_MAX_MS);
+    expect(m.phase).toBe("greeting");
+    expect(m.effects("start_va", fx)[0]!.holdAudioUntilCtxMs).toBe(sealedAt + CLIP_SCHEDULE_MAX_MS);
   });
 
   it("waits for the clip end to be known (manual pass)", () => {

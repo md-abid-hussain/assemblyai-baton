@@ -62,6 +62,8 @@ export const REP_BACK_MAX_MS = 10_000;
 export const AUTO_SEAL_BACKSTOP_MS = 1000;
 /** Auto-baton without a labelled acceptance: seal at lineEndMs + this (§5.5.4 rule 6). */
 export const AUTO_NO_ACCEPT_WAIT_MS = 1500;
+/** Manual pass: if the handoff clip was not scheduled this long after the seal, stop waiting for it (repLineEnd = now). */
+export const CLIP_SCHEDULE_MAX_MS = 3000;
 
 /** Codes that never earn the one retry (the same config would fail again, or the platform refused a new slot). */
 export const NON_RETRYABLE_VA_CODES: ReadonlySet<ErrorCode> = new Set<ErrorCode>([
@@ -300,6 +302,10 @@ export function nextDeadline(s: TakeoverMachineState): number | null {
       break;
     case "compiling":
       if (p.compile.status === "server" && p.compile.startedAt !== null) ds.push(p.compile.startedAt + T.COMPILE_TIMEOUT_MS);
+      break;
+    case "connecting":
+    case "retrying":
+      if (p.repLineEnd === null && p.sealedAt !== null) ds.push(p.sealedAt + CLIP_SCHEDULE_MAX_MS);
       break;
     case "closing":
       if (p.closing) ds.push(p.closing.startedAt + (p.closing.step === "rep_back" ? REP_BACK_MAX_MS : T.SESSION_ENDED_WAIT_MS + CLOSE_BACKSTOP_MS));
@@ -640,6 +646,13 @@ function onTick(c: Ctx, now: number): void {
       if (p.compile.status === "server" && p.compile.startedAt !== null && now >= p.compile.startedAt + T.COMPILE_TIMEOUT_MS && p.drain) {
         p.compile.status = "local";
         c.fx({ type: "compile_local", drain: p.drain });
+      }
+      break;
+    case "connecting":
+    case "retrying":
+      if (p.repLineEnd === null && p.sealedAt !== null && now >= p.sealedAt + CLIP_SCHEDULE_MAX_MS) {
+        p.repLineEnd = now; // the clip never reported its schedule: nothing left to mask
+        maybeStart(c, now);
       }
       break;
     case "closing":

@@ -141,10 +141,10 @@ function world(o: { aiHalf?: "live" | "recorded"; recorded?: boolean; autoBaton?
       },
     },
     api,
-    createVa: (attempt) => {
+    createVa: (attempt, ctx) => {
       const v = new FakeVa(attempt);
       vas.push(v);
-      calls.push(`createVa:${attempt}`);
+      calls.push(`createVa:${attempt}:${ctx.takeoverId}:${ctx.takeoverToken}`);
       return v;
     },
     localCompile: () => {
@@ -236,7 +236,7 @@ describe("TakeoverController: the manual pass end to end (fakes)", () => {
     expect(idxs.every((i) => i >= 0)).toBe(true);
     expect([...idxs].sort((a, b) => a - b)).toEqual(idxs);
     expect(w.idx("vaToken:0")).toBeGreaterThan(w.idx("arm:"));
-    expect(w.idx("createVa:0")).toBeLessThan(w.idx("compile:"));
+    expect(w.idx("createVa:0:tko_1:tt_1")).toBeLessThan(w.idx("compile:"));
     const va = w.vas[0]!;
     expect(va.log).toEqual(["connect:vt0", "start"]);
     const repLineEnd = w.ctl.state.pass!.repLineEnd!;

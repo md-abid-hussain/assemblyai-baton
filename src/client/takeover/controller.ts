@@ -286,8 +286,9 @@ export class TakeoverControllerImpl implements TakeoverControllerExt {
       }
       case "open_va": {
         const tok = this.vaTokens[e.attempt];
-        if (!tok) return;
-        const session = d.createVa(e.attempt);
+        const takeoverId = this.s.pass?.arm.takeoverId;
+        if (!tok || !takeoverId || !this.takeoverToken) return;
+        const session = d.createVa(e.attempt, { takeoverId, takeoverToken: this.takeoverToken });
         const off = session.onEvent((ev) => this.onVaEvent(e.attempt, ev));
         this.vas[e.attempt] = { session, off };
         session

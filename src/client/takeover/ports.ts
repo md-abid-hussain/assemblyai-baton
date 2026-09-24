@@ -92,8 +92,11 @@ export interface TakeoverControllerDeps {
   stt: Pick<SttChannelManager, "hasOpenPartial" | "forceEndpoint" | "terminateAll">;
   caseSync: Pick<CaseSync, "drain">;
   api: TakeoverApi;
-  /** A fresh Voice Agent controller per attempt (WP5b `createVoiceAgentController`). */
-  createVa(attempt: 0 | 1): VaSession;
+  /**
+   * A fresh Voice Agent controller per attempt (WP5b `createVoiceAgentController`). `ctx` carries the takeover id and
+   * its token for the controller's own calls (#12 heartbeats, #14 tools, #15 payment polls).
+   */
+  createVa(attempt: 0 | 1, ctx: { takeoverId: string; takeoverToken: string }): VaSession;
   /** COMPILING + 1500 ms fallback: WP1 `compileTakeover(caseSync.state, policy, {compiledBy:"client", …})`. Throws E_VA_CONFIG. */
   localCompile(drain: DrainReport): CompiledTakeover;
   /** The labelled recorded AI session (rule 7 and FALLBACK); null when the call has none. */
