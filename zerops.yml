@@ -33,6 +33,11 @@ zerops:
         ENABLE_INPROC_WORKER: "1"
         LIMITS_ROLE: authority
         BATON_DEPLOY_ID: zp-prod
+        APP_URL: ${zeropsSubdomain}   # system var of the app service: https://app-<id>-3000.prg1.zerops.app
+        POLAR_SERVER: sandbox
+        # Secrets (ASSEMBLYAI_API_KEY, OPENAI_API_KEY, POLAR_ACCESS_TOKEN, CASE_TOKEN_SECRET, VISITOR_SECRET, ADMIN_KEY,
+        # CRON_SECRET, AAI_WEBHOOK_SECRET, AGENT_TOOL_SECRET, LIMITS_AUTHORITY_KEY) are service *secret* variables set
+        # at import time / in the GUI, never here. Note: envVariables here win over secret variables of the same name.
       initCommands:
         - node bundle/migrate.mjs  # idempotent drizzle migrator (advisory-locked); runs on every container start
       start: node bundle/server.js # standalone server.js chdir()s to its own dir
