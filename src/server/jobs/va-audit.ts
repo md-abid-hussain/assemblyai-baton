@@ -10,8 +10,9 @@
  *  - `unknown_session`: a marker-bearing session unknown to `live_sessions` (by provider id) and `takeovers`;
  *  - `running_but_closed`: still running while its row is `closed`/`stale`/`released`;
  *  - `over_concurrency`: more running marker-bearing sessions than `VA_MAX_CONCURRENT`.
- * Any anomaly → `mode=replay_only`, reason `va_audit_anomaly`, and (only when T-D1-0b showed that
- * `DELETE /v1/sessions/{id}` ends a live session) the anomalous running sessions are deleted.
+ * Any anomaly → `mode=replay_only`, reason `va_audit_anomaly`. It never deletes a running session: T-D1-0b showed
+ * that `DELETE /v1/sessions/{id}` does not end a live one (see `DELETE_ENDS_LIVE_SESSION`).
+ * A running session reads `status:"created"`, `ended_at:null`, `duration_seconds:null`, no artifacts (T-D1-0b).
  * The audit also settles the VA ledger entries of ended sessions with their actual duration.
  */
 import "server-only";
@@ -39,8 +40,11 @@ export const AUDIT = {
 } as const;
 
 /**
- * T-D1-0b result (scripts/day1/session-delete.ts; docs/notes/wp8.md): does `DELETE /v1/sessions/{id}` end a LIVE
- * session? Until it is measured true, F6 only flips the mode, and the privacy copy says "requests deletion".
+ * T-D1-0b (2026-09-25, scripts/day1/session-delete.ts; docs/notes/wp8.md): `DELETE /v1/sessions/{id}` on a LIVE
+ * session answers 204 but does NOT end it (the socket stayed open and a reply.create was answered after the delete);
+ * it only hides the session from GET (404) and the list. So F6 never deletes a running session (that would blind the
+ * next audit without stopping the spend): it only flips the mode. On an ENDED session the delete is immediate: GET →
+ * 404 and the pre-signed audio/timeline URLs → 404 at once.
  */
 export const DELETE_ENDS_LIVE_SESSION = false;
 
