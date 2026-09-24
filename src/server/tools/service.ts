@@ -140,6 +140,21 @@ export class Wp6ToolService implements ToolService {
     return outcome;
   }
 
+  /**
+   * A replayed `(takeoverId, callId)` (the browser retried): the stored `tool.result`, plus the CURRENT stage payload
+   * (re-sending the same stage is harmless) and, for the pay tool, the payment's `ui`.
+   */
+  async replay(name: ToolName, stored: Record<string, unknown>, ctx: ToolContext): Promise<ToolOutcome> {
+    const x = await this.load(ctx);
+    const out: ToolOutcome = { result: stored };
+    if (x.state.stage) Object.assign(out, this.stagePayload(x, x.state, x.state.stage));
+    if (name === "send_esign_and_pay_link" && x.pay) {
+      const link = payLinkOf(ctx.origin, x.pay.id);
+      out.ui = { sms: smsPayLink(x.policy, link), link, paymentId: x.pay.id };
+    }
+    return out;
+  }
+
   /** The close-stage payload for a succeeded payment (PaymentView.stagePayload; request wp5b-to-wp6 item 2). */
   async stagePayloadFor(p: PaymentRecord): Promise<StagePayload | null> {
     if (p.status !== "succeeded") return null;

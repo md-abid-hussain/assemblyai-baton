@@ -65,6 +65,8 @@ export interface ToolStore {
   beginCall(i: { id: string; takeoverId: string; callId: string; name: string; args: Record<string, unknown> }): Promise<BeginCall>;
   getCall(takeoverId: string, callId: string): Promise<{ id: string; result: Record<string, unknown> | null; status: string | null } | null>;
   finishCall(id: string, result: Record<string, unknown>, status: "ok" | "error" | "rejected"): Promise<void>;
+  /** Drop an in-progress call whose handler threw, so a retry of the same call_id runs again. */
+  abortCall(id: string): Promise<void>;
   latestPayment(takeoverId: string): Promise<PaymentRecord | null>;
 }
 
@@ -160,6 +162,10 @@ export class DbToolStore implements ToolStore {
 
   async finishCall(id: string, result: Record<string, unknown>, status: "ok" | "error" | "rejected"): Promise<void> {
     await this.db.update(toolCalls).set({ result, status, finishedAt: sql`now()` }).where(and(eq(toolCalls.id, id), isNull(toolCalls.finishedAt)));
+  }
+
+  async abortCall(id: string): Promise<void> {
+    await this.db.delete(toolCalls).where(and(eq(toolCalls.id, id), isNull(toolCalls.finishedAt)));
   }
 
   async latestPayment(takeoverId: string): Promise<PaymentRecord | null> {

@@ -72,7 +72,8 @@ export class MemoryPaymentStore implements PaymentStore {
     return { ...r };
   }
   async recordWebhook(id: string, type: string, payload: Record<string, unknown>) {
-    if (this.webhooks.has(id)) return false;
+    const cur = this.webhooks.get(id);
+    if (cur && cur.error === null) return false;
     this.webhooks.set(id, { type, payload, error: null, processed: false });
     return true;
   }
@@ -143,6 +144,9 @@ export class MemoryToolStore implements ToolStore {
   }
   async finishCall(id: string, result: Record<string, unknown>, status: "ok" | "error" | "rejected") {
     for (const c of this.calls.values()) if (c.id === id && c.result === null) Object.assign(c, { result, status });
+  }
+  async abortCall(id: string) {
+    for (const [k, c] of this.calls) if (c.id === id && c.result === null) this.calls.delete(k);
   }
   async latestPayment(takeoverId: string) {
     return this.payments.latestForTakeover(takeoverId);

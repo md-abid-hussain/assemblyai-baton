@@ -34,6 +34,8 @@ export class PolarPaymentProvider implements PaymentProvider {
         policy: i.policy,
         embedOrigin,
         metadata: { paymentId: i.paymentId, caseId: i.caseId, takeoverId: i.takeoverId },
+        // For the hosted new-tab variant only: the embed's `success` is default-prevented, so it never navigates.
+        successUrl: embedOrigin ? `${embedOrigin}/pay/done?checkout_id={CHECKOUT_ID}` : null,
       }),
     );
     return {

@@ -1,6 +1,6 @@
 import "server-only";
 
-import { and, desc, eq, inArray, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, isNotNull, sql } from "drizzle-orm";
 
 import type { PaymentStatus } from "../../core/contracts/case";
 import type { PaymentStatusSource } from "../../core/contracts/api";
@@ -183,10 +183,12 @@ export class DbPaymentStore implements PaymentStore {
   }
 
   async recordWebhook(id: string, type: string, payload: Record<string, unknown>): Promise<boolean> {
+    // New id → true. Seen before → false (a replay), unless the earlier delivery failed while processing (error set):
+    // then it is claimed again, so Polar's retry of a 500 is processed instead of being swallowed as a duplicate.
     const r = await this.db
       .insert(webhookEvents)
       .values({ id, provider: "polar", type, payload })
-      .onConflictDoNothing({ target: webhookEvents.id })
+      .onConflictDoUpdate({ target: webhookEvents.id, set: { error: null, receivedAt: sql`now()` }, setWhere: isNotNull(webhookEvents.error) })
       .returning({ id: webhookEvents.id });
     return r.length === 1;
   }
