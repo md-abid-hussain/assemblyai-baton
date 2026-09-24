@@ -97,7 +97,7 @@ export function NarratorStrip() {
   return (
     <div className="flex items-center gap-3 border-b border-(--bt-line) bg-(--bt-panel-2) px-4 py-1.5">
       <span className="bt-display rounded bg-(--bt-ink) px-1.5 py-0.5 text-[10px] font-bold tracking-[0.14em] text-(--bt-panel)">NOW</span>
-      <p className={cn("bt-display min-w-0 flex-1 truncate text-[14px] font-semibold", TONE[n.tone])} aria-live="polite">
+      <p className={cn("bt-display line-clamp-2 min-w-0 flex-1 text-[14px] leading-tight font-semibold sm:truncate", TONE[n.tone])} aria-live="polite">
         {n.text}
       </p>
       {started && dur ? (

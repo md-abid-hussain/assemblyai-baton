@@ -13,7 +13,7 @@ import type { TranscriptLine } from "@/core/contracts/ext/wp7-ui";
 import { cn } from "@/lib/utils";
 
 import { Eyebrow, LiveDot } from "../common/bits";
-import { useActions } from "../common/console-context";
+import { useActions, useConsoleEnv } from "../common/console-context";
 
 const LANE = {
   rep: { cls: "border-(--rep) ", name: "text-(--rep-fg)", Icon: HeadsetIcon },
@@ -63,12 +63,14 @@ function Partial({ lane, text, who }: { lane: "rep" | "customer"; text: string; 
   );
 }
 
-const Caption = memo(function Caption({ l }: { l: TranscriptLine }) {
+const Caption = memo(function Caption({ l, elapsedAtMount }: { l: TranscriptLine; elapsedAtMount: number }) {
   const words = l.words ?? l.text.split(/\s+/).map((text, i) => ({ text, atMs: i * 250 }));
+  // Words are scheduled from the caption's own arrival (line.t): a negative delay shows words already spoken at once
+  // (after a seek, a reload of a recorded run, or a late mount), the rest reveal on the reply's timing (§5.10).
   return (
     <p className="text-[14px] leading-snug">
       {words.map((w, i) => (
-        <span key={i} className="bt-word" style={{ animationDelay: `${Math.min(w.atMs, 30_000)}ms` }}>
+        <span key={i} className="bt-word" style={{ animationDelay: `${Math.min(w.atMs, 30_000) - elapsedAtMount}ms` }}>
           {w.text}{" "}
         </span>
       ))}
@@ -79,6 +81,8 @@ const Caption = memo(function Caption({ l }: { l: TranscriptLine }) {
 
 function AiLine({ l, who }: { l: TranscriptLine; who: string }) {
   const ai = l.lane === "ai";
+  const env = useConsoleEnv();
+  const [elapsed] = useState(() => Math.max(0, env.clockNow() - l.t));
   return (
     <li className={cn("flex", ai ? "pr-8" : "justify-end pl-8")}>
       <div className={cn("max-w-full rounded-lg border-l-[3px] px-3 py-1.5", ai ? "border-(--ai) bg-(--ai-bg)" : "border-(--customer) bg-(--bt-panel) shadow-[0_1px_0_var(--bt-line)]")}>
@@ -87,7 +91,7 @@ function AiLine({ l, who }: { l: TranscriptLine; who: string }) {
           {who}
           {l.source === "recorded" ? <span className="rounded border border-current/40 px-1 text-[10px] font-normal">recorded</span> : null}
         </div>
-        {ai ? <Caption l={l} /> : <p className="text-[13.5px] leading-snug">{l.text}</p>}
+        {ai ? <Caption l={l} elapsedAtMount={elapsed} /> : <p className="text-[13.5px] leading-snug">{l.text}</p>}
       </div>
     </li>
   );

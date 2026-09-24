@@ -93,7 +93,7 @@ export function CallTimeline({ className }: { className?: string }) {
         )}
         {handoff && !handoff.declined ? (
           <div className="absolute inset-y-0 w-px bg-(--rep-fg)/60" style={{ left: pct(handoff.lineStartMs) }} aria-hidden="true">
-            <span className="absolute top-0.5 left-1 whitespace-nowrap text-[9px] font-semibold text-(--rep-fg)">{rep}&apos;s handoff</span>
+            <span className="absolute bottom-0.5 left-1 whitespace-nowrap text-[9px] font-semibold text-(--rep-fg)">{rep}&apos;s handoff</span>
           </div>
         ) : null}
         {markers.map((m) => (
@@ -107,7 +107,7 @@ export function CallTimeline({ className }: { className?: string }) {
         {tArm !== null ? (
           <div className="absolute inset-y-0 w-0.5 bg-(--ai)" style={{ left: pct(tArm) }} aria-hidden="true">
             <span className="bt-display absolute -top-px left-1 rounded-b bg-(--ai) px-1 text-[9px] font-bold whitespace-nowrap text-white">PASS {formatCallClock(tArm)}</span>
-            <span className="absolute right-[-60px] bottom-0.5 text-[9px] font-semibold text-(--ai-fg)">AI half →</span>
+
           </div>
         ) : null}
         <div className="absolute inset-y-0 w-0.5 bg-(--bt-ink) transition-[left] duration-200 ease-linear" style={{ left: pct(clock) }} aria-hidden="true">

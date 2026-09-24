@@ -84,7 +84,10 @@ function PassSection() {
   const recorded = !st.manualPassAllowed;
   return (
     <div className="space-y-3">
-      <PassButton />
+      {/* On phones the Pass button lives in the sticky bottom bar instead. */}
+      <div className="hidden md:block">
+        <PassButton />
+      </div>
       {recorded ? (
         <p className="rounded-lg border border-(--bt-cached)/40 bg-(--bt-cached-bg) px-3 py-2 text-xs text-(--bt-cached)">{st.reason}</p>
       ) : (
@@ -238,7 +241,7 @@ function ToolRail() {
               </div>
               {summarize(x.args) ? <div className="bt-mono mt-0.5 truncate text-[11px] text-(--bt-muted)" title={summarize(x.args)}>→ {summarize(x.args)}</div> : null}
               {!x.pending && summarize(x.result) ? <div className="bt-mono truncate text-[11px] text-(--verified-fg)" title={summarize(x.result)}>← {summarize(x.result)}</div> : null}
-              {x.pending && x.hold ? <HoldCountdown item={x} /> : null}
+              {x.pending && x.hold ? <div className="mt-0.5 text-[11px] text-(--ai-fg)">hold · waiting for payment (Polar sandbox)</div> : null}
             </li>
           );
         })}
@@ -363,28 +366,122 @@ export function ReplyControls() {
   );
 }
 
-export function AiHalfPanel() {
+function HoldCard() {
+  const item = useBaton((s) => s.tools.find((x) => x.hold && x.pending) ?? null);
+  const customer = useBaton((s) => names(s).customer);
+  if (!item) return null;
+  return (
+    <div className="rounded-xl border border-(--ai)/40 bg-(--ai-bg) p-3" role="status">
+      <div className="flex items-center gap-1.5 text-sm font-semibold text-(--ai-fg)">
+        <FileSignatureIcon className="size-4" aria-hidden="true" /> Waiting for {customer} to sign and pay
+      </div>
+      <p className="mt-0.5 text-xs text-(--bt-ink)">The AI holds the line while the payment runs; only the Polar webhook marks it paid.</p>
+      <HoldCountdown item={item} />
+    </div>
+  );
+}
+
+function ProtocolSummary() {
   const proto = useBaton((s) => s.takeover.steps.length > 0 && !s.takeover.steps.some((x) => x.detail?.recorded === 1));
   const protoMs = useBaton((s) => {
     const g = s.takeover.steps.find((x) => x.phase === "greeting" || x.phase === "active");
     return g && s.takeover.armedT !== null ? g.t - s.takeover.armedT : null;
   });
+  if (!proto) return null;
+  return (
+    <details className="group rounded-lg border border-(--bt-line) px-3 py-2">
+      <summary className="flex cursor-pointer list-none items-center justify-between text-xs">
+        <span className="bt-eyebrow">Takeover protocol</span>
+        <span className="bt-mono text-(--bt-muted)">
+          {protoMs !== null ? `${formatDuration(protoMs)} total` : ""} <span aria-hidden="true">▾</span>
+        </span>
+      </summary>
+      <div className="pt-2">
+        <ProtocolStepper />
+      </div>
+    </details>
+  );
+}
+
+export function AiHalfPanel() {
+  const paying = useBaton((s) => s.flowPhase === "paying");
   return (
     <div className="space-y-5">
-      {proto ? (
-        <details className="group rounded-lg border border-(--bt-line) px-3 py-2">
-          <summary className="flex cursor-pointer list-none items-center justify-between text-xs">
-            <span className="bt-eyebrow">Takeover protocol</span>
-            <span className="bt-mono text-(--bt-muted)">{protoMs !== null ? `${formatDuration(protoMs)} total` : ""} ▾</span>
-          </summary>
-          <div className="pt-2">
-            <ProtocolStepper />
-          </div>
-        </details>
-      ) : null}
       <StageTracker />
+      {paying ? <HoldCard /> : null}
       <ToolRail />
       <ReplyControls />
+      <ProtocolSummary />
+    </div>
+  );
+}
+
+function CompletedCard() {
+  const cs = useBaton((s) => s.caseState);
+  const pay = useBaton((s) => s.payment);
+  const env = useConsoleEnv();
+  const paid = pay?.status === "succeeded";
+  return (
+    <div className="space-y-4">
+      <div className="rounded-xl border border-(--verified)/40 bg-(--verified-bg) p-4">
+        <div className="bt-display flex items-center gap-2 text-lg font-bold text-(--verified-fg)">
+          <CheckIcon className="size-5" aria-hidden="true" /> Call complete
+        </div>
+        <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-sm">
+          <dt className="text-(--bt-muted)">Facts verified</dt>
+          <dd className="bt-num font-semibold">
+            {cs?.readiness.verified ?? 0} / {cs?.readiness.requiredTotal ?? 10}
+          </dd>
+          <dt className="text-(--bt-muted)">Payment</dt>
+          <dd className="font-semibold">{paid ? (pay?.source === "mock" ? "Simulated" : "Paid · Polar webhook") : (pay?.status ?? "none")}</dd>
+          {cs?.confirmationNumber ? (
+            <>
+              <dt className="text-(--bt-muted)">Confirmation</dt>
+              <dd className="bt-mono font-semibold">{cs.confirmationNumber}</dd>
+            </>
+          ) : null}
+        </dl>
+      </div>
+      <ProtocolSummary />
+      <div className="flex flex-wrap gap-2 text-sm">
+        <a href={env.links.explorer} className="font-semibold text-(--rep-fg) underline underline-offset-2">
+          Takeover Explorer: pass at any second →
+        </a>
+        <a href={env.links.evals} className="font-semibold text-(--rep-fg) underline underline-offset-2">
+          Evals →
+        </a>
+      </div>
+    </div>
+  );
+}
+
+function SessionStatus() {
+  const stt = useBaton((s) => s.stt);
+  const ids = useBaton((s) => s.sessionIds, shallowEqual);
+  const mode = useBaton((s) => s.mode);
+  const who = useBaton((s) => names(s), shallowEqual);
+  const rows = [
+    { ch: "rep" as const, label: `Rep · ${who.rep}`, id: ids.rep },
+    { ch: "customer" as const, label: `Customer · ${who.customer}`, id: ids.customer },
+  ];
+  return (
+    <div className="rounded-lg border border-(--bt-line) px-3 py-2">
+      <Eyebrow as="h3" className="mb-1.5">
+        {mode === "cached_replay" ? "Transcription (cached replay)" : "Live transcription"}
+      </Eyebrow>
+      <ul className="space-y-1">
+        {rows.map((r) => {
+          const st = mode === "cached_replay" ? "cached" : stt[r.ch].status;
+          return (
+            <li key={r.ch} className="flex items-center gap-2 text-xs">
+              <span className={cn("bt-dot", st === "open" ? "text-(--bt-live)" : st === "cached" ? "text-(--bt-cached)" : st === "error" ? "text-(--conflict)" : "text-(--missing)")} aria-hidden="true" />
+              <span className="font-medium">{r.label}</span>
+              <span className="text-(--bt-muted)">{st === "idle" ? "not started" : st}</span>
+              {r.id && st === "open" ? <span className="bt-mono ml-auto truncate text-[10px] text-(--bt-faint)" title={`AssemblyAI session ${r.id}`}>{r.id.slice(0, 8)}…</span> : null}
+            </li>
+          );
+        })}
+      </ul>
     </div>
   );
 }
@@ -395,5 +492,11 @@ export function ControlPanelBody() {
     return <ProtocolStepper />;
   }
   if (phase.startsWith("ai-") || phase === "paying" || phase === "fallback") return <AiHalfPanel />;
-  return <PassSection />;
+  if (phase === "completed") return <CompletedCard />;
+  return (
+    <div className="space-y-4">
+      <PassSection />
+      {phase === "shadowing" ? <SessionStatus /> : null}
+    </div>
+  );
 }

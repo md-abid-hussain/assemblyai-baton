@@ -221,8 +221,8 @@
 
 /* Recorded / greyed shadow lanes. */
 .bt-greyed {
-  filter: grayscale(0.85);
-  opacity: 0.6;
+  filter: grayscale(0.9);
+  opacity: 0.8;
 }
 
 /* Diagonal hatch for the AI-half segment of the timeline and the recorded badge. */
@@ -234,4 +234,10 @@
   .bt-dot-pulse, .bt-pass-sheen, .bt-attention, .bt-think span { animation: none; }
   .bt-word { animation-duration: 1ms; }
   .bt-rise { animation: none; }
+}
+
+/* next dev's floating indicator would cover the timeline in screenshots (dev only; nothing to hide in production). */
+.bt-console ~ nextjs-portal,
+body:has(.bt-console) nextjs-portal {
+  display: none;
 }

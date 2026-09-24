@@ -151,9 +151,16 @@ export function FloatingPhone() {
   const customer = useBaton((s) => names(s).customer);
   const [open, setOpen] = useState(true);
   const yourTurn = state === "sms-received";
+  const terminal = state === "paid" || state === "failed" || state === "expired";
   useEffect(() => {
     if (yourTurn) setOpen(true);
   }, [yourTurn]);
+  useEffect(() => {
+    // Once the payment is settled the overlay steps aside (it stays one tap away as a pill).
+    if (!terminal) return;
+    const id = setTimeout(() => setOpen(false), 5000);
+    return () => clearTimeout(id);
+  }, [terminal]);
   if (!hasSms) return null;
   if (!open) {
     return (
@@ -167,7 +174,7 @@ export function FloatingPhone() {
     );
   }
   return (
-    <aside aria-label={`${customer}'s phone`} className="bt-rise fixed right-4 bottom-4 z-40 flex h-[min(540px,calc(100dvh-7rem))] w-[272px] flex-col">
+    <aside aria-label={`${customer}'s phone`} className="bt-rise fixed right-4 bottom-4 z-40 flex h-[min(500px,calc(100dvh-18rem))] min-h-[360px] w-[260px] flex-col">
       <div className="mb-1.5 flex items-center justify-between gap-2">
         {yourTurn ? (
           <span className="bt-attention rounded-full bg-(--ai) px-3 py-1 text-xs font-bold text-white">Your turn: tap the text</span>

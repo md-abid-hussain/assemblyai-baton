@@ -138,7 +138,7 @@ export function CallConsole() {
   const xl = useMinWidth(1280, true);
   return (
     <TooltipProvider delayDuration={150}>
-      <div className={cn("bt-console flex min-h-dvh flex-col", xl && "h-dvh")}>
+      <div className={cn("bt-console flex min-h-dvh flex-col", !isMobile && "h-dvh")}>
         <TopBar />
         <NarratorStrip />
         <Banners />
@@ -149,7 +149,7 @@ export function CallConsole() {
             <div
               className={cn(
                 "grid min-h-0 flex-1 gap-3",
-                xl ? "grid-cols-[minmax(0,38fr)_minmax(0,36fr)_minmax(0,26fr)]" : "grid-cols-[minmax(0,1fr)_minmax(290px,340px)]",
+                xl ? "grid-cols-[minmax(0,38fr)_minmax(0,36fr)_minmax(0,26fr)]" : "grid-cols-[minmax(0,1fr)_minmax(320px,400px)]",
               )}
             >
               {xl ? (
@@ -166,17 +166,17 @@ export function CallConsole() {
                 </>
               ) : (
                 <>
-                  <div className="flex min-w-0 flex-col gap-3">
-                    <div className="bt-panel overflow-hidden">
-                      <CaseCard />
-                    </div>
-                    <div className="bt-panel h-[520px] overflow-hidden">
+                  <div className="bt-panel min-h-0 overflow-hidden">
+                    <CaseCard />
+                  </div>
+                  <div className="flex min-h-0 min-w-0 flex-col gap-3">
+                    <aside aria-label="Controls" className="bt-panel bt-scroll max-h-[55%] shrink-0 p-4">
+                      <ControlColumn showDockedPhone={false} />
+                    </aside>
+                    <div className="bt-panel min-h-[220px] flex-1 overflow-hidden">
                       <TranscriptLanes />
                     </div>
                   </div>
-                  <aside aria-label="Controls" className="bt-panel sticky top-3 self-start p-4">
-                    <ControlColumn showDockedPhone={false} />
-                  </aside>
                 </>
               )}
             </div>

@@ -30,8 +30,8 @@ export function ReadinessGauge({ fields }: { fields: Record<FieldId, FieldState>
   const seg = C / segs.length;
   const gap = 3.2;
   return (
-    <div className="flex items-center gap-4">
-      <svg viewBox="0 0 88 88" className="size-[84px] shrink-0 -rotate-90" role="img" aria-label={`Readiness: ${v} of ${segs.length} required facts verified, ${p} pending, ${m} missing`}>
+    <div className="flex items-center gap-3">
+      <svg viewBox="0 0 88 88" className="size-[76px] shrink-0 -rotate-90" role="img" aria-label={`Readiness: ${v} of ${segs.length} required facts verified, ${p} pending, ${m} missing`}>
         <circle cx="44" cy="44" r={R} fill="none" stroke="var(--bt-line)" strokeWidth="9" />
         {segs.map((k, i) => (
           <circle
@@ -51,23 +51,24 @@ export function ReadinessGauge({ fields }: { fields: Record<FieldId, FieldState>
           {v}/{segs.length}
         </text>
       </svg>
-      <dl className="grid grid-cols-3 gap-x-4 gap-y-0.5 text-sm">
-        <Count label="Verified" n={v} color="var(--verified-fg)" />
-        <Count label="Pending" n={p} color="var(--pending-fg)" />
-        <Count label="Missing" n={m} color="var(--missing-fg)" />
-      </dl>
+      <ul className="space-y-0.5 text-xs" aria-hidden="true">
+        <Count label="verified" n={v} color="var(--verified-fg)" dot="var(--verified)" />
+        <Count label="pending" n={p} color="var(--pending-fg)" dot="var(--pending)" />
+        <Count label="missing" n={m} color="var(--missing-fg)" dot="var(--missing)" />
+      </ul>
     </div>
   );
 }
 
-function Count({ label, n, color }: { label: string; n: number; color: string }) {
+function Count({ label, n, color, dot }: { label: string; n: number; color: string; dot: string }) {
   return (
-    <div className="flex flex-col">
-      <dt className="bt-eyebrow">{label}</dt>
-      <dd className="bt-display bt-num text-2xl leading-none font-bold" style={{ color }}>
+    <li className="flex items-baseline gap-1.5">
+      <span className="bt-display bt-num w-5 text-right text-lg leading-5 font-bold" style={{ color }}>
         {n}
-      </dd>
-    </div>
+      </span>
+      <span aria-hidden="true" className="size-2 self-center rounded-full" style={{ background: dot }} />
+      <span className="text-(--bt-muted)">{label}</span>
+    </li>
   );
 }
 
@@ -77,7 +78,7 @@ const FieldRow = memo(function FieldRow({ f, ai, disagree, agrees, who }: { f: F
   const required = (REQUIRED_FIELDS as readonly string[]).includes(f.field);
   const reason = reasonText(f, who);
   return (
-    <li className="group relative flex items-stretch gap-3 rounded-lg px-2 py-1.5 hover:bg-(--bt-panel-2)" data-field={f.field} data-status={kind}>
+    <li className="group relative flex items-stretch gap-2.5 rounded-lg px-2 py-1 hover:bg-(--bt-panel-2)" data-field={f.field} data-status={kind}>
       <span aria-hidden="true" className={cn("w-1 shrink-0 rounded-full", railColor[kind])} />
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1.5 text-[11px] text-(--bt-muted)">
@@ -99,8 +100,15 @@ const FieldRow = memo(function FieldRow({ f, ai, disagree, agrees, who }: { f: F
           </div>
         ) : null}
       </div>
-      <div className="flex shrink-0 flex-col items-end justify-center gap-1">
-        <div className="flex items-center gap-1">
+      <div className="flex shrink-0 flex-wrap-reverse items-center justify-end gap-1">
+        {evs.length ? (
+          <div className="flex gap-1">
+            {evs.slice(0, 2).map((ev) => (
+              <EvidenceChip key={`${ev.turnId}-${ev.startMs}`} ev={ev} field={f.field} />
+            ))}
+          </div>
+        ) : null}
+        <div className="flex w-[92px] items-center justify-end gap-1">
           {agrees && kind === "VERIFIED" ? (
             <span className="text-(--verified-fg)" title="The async verifier (sol) agrees">
               <ShieldCheckIcon className="size-3.5" aria-label="verifier agrees" />
@@ -115,13 +123,6 @@ const FieldRow = memo(function FieldRow({ f, ai, disagree, agrees, who }: { f: F
             <TooltipContent side="left">{reason}</TooltipContent>
           </Tooltip>
         </div>
-        {evs.length ? (
-          <div className="flex flex-wrap justify-end gap-1">
-            {evs.map((ev) => (
-              <EvidenceChip key={`${ev.turnId}-${ev.startMs}`} ev={ev} field={f.field} />
-            ))}
-          </div>
-        ) : null}
       </div>
     </li>
   );
@@ -171,7 +172,7 @@ export function CaseCard() {
           {p ? (
             <div className="mt-0.5 text-xs text-(--bt-muted)">
               <span className="bt-mono">{p.policyNumber}</span> · {p.policyholder.firstName} {p.policyholder.lastName}{" "}
-              <span className="rounded border border-(--bt-line) px-1 text-[10px]">policy record</span>
+              <span className="rounded border border-(--bt-line) px-1 text-[10px] whitespace-nowrap">policy record</span>
             </div>
           ) : null}
         </div>
