@@ -3,7 +3,7 @@
 Round 1 (gate G1), 2026-09-25, branch `wp/wp4`.
 
 **Status.**
-- `npm run typecheck` is clean and `npm test` is green: 23 files, 356 tests; WP4 added 7 files and 84 tests.
+- `npm run typecheck` is clean and `npm test` is green: 23 files, 364 tests; WP4 added 10 test files and 92 tests.
 - Every module in the WP4 section of TASKS is built and tested against the frozen contracts.
 - The whole STT path was verified **live**: product manager → FrameBatcher → two U3.5 Pro sessions. The runs used the TTS
   dialog fixture at 16 kHz and at 8 kHz µ-law.
@@ -29,13 +29,14 @@ Round 1 (gate G1), 2026-09-25, branch `wp/wp4`.
 | `src/client/stt/channel-manager.ts` | `SttChannelManager` (§5.1.4–§5.1.9, §5.2): n=2 grant, parallel connects, Begin check, feed, turn ids, `agent_context` carry, one reconnect per channel, inactivity → paused, pause/resume (offset path), cached fallback, queue polling, `finishAfterSilence`, metrics |
 | `src/client/stt/api.ts` | Routes #5/#6/#7 client (case token, keepalive reports) |
 | `src/client/stt/loopback.ts` | $0 stand-in sessions for /dev/audio and browser checks (rejects bad frames like the server; replays cached turns "live") |
+| `src/client/stt/express.ts` | Express start (§5.1.6): `decisionPointMs − 25 s` snapped back to the cut with no cached final in flight (joint silence gaps from peaks, final arrivals); `agent_context` seed = the last cached rep final before the cut |
 | `src/client/case/case-sync.ts` | `CaseSync`: in-order `/api/extract`, dedupe, retries, newest-version state, `drain` |
 | `src/client/replay/cached-replay.ts` | Cached-turn replay (§5.1.10): per-channel activation, `recvMs`-timed emission, the mode label and fallback event |
 | `src/client/platform/{lifecycle,audio-session,ios}.ts` | `PageLifecycle` (iOS-only background pause, audio interruption anywhere), audio-session helpers, iOS/iPadOS detection |
 | `src/app/dev/audio/{page,audio-lab}.tsx` | `/dev/audio`: loopback / cached / live modes, handoff clip, VA tone, feeder clip, mic; `window.__wp4` diagnostics, `window.__wp4ctl` controls |
 | `scripts/day1/stt-*.ts` | `stt-fixtures` (public fixtures), `stt-live` + `stt-replay` (live replay through the product manager), `stt-grid` (T-D1-6), `stt-browser` (Playwright), `stt-score`, `stt-hooks` |
 | `public/fixtures/**` | Dialog fixture per channel (16 kHz PCM16, 8 kHz µ-law), peaks, `calls.json` (2 manifest entries + a matching fictional policy), `cached-turns.{16k,8k}.json` (recorded live), `health_16k.pcm` (the F7 full-check fixture of DESIGN §4.5) |
-| `tests/unit/client/{audio,stt,case,platform}/**` | 84 tests. The **real worklet sources** run in vitest through a `with`-scope harness (`worklet-harness.ts`) |
+| `tests/unit/client/{audio,stt,case,platform}/**` | 92 tests in 10 files. The **real worklet sources** run in vitest through a `with`-scope harness (`worklet-harness.ts`) |
 
 ## Decisions
 
@@ -70,6 +71,16 @@ Round 1 (gate G1), 2026-09-25, branch `wp/wp4`.
     empty module (what vitest's alias already does).
 11. **`/dev/audio` "loopback" mode** runs the whole manager → CaseSync path in the browser at $0: fake sessions accept
     what the server accepts and replay the fixture's recorded turns.
+12. **The Express cut is defined by the prefill rule.** The server prefills cached finals with
+    `recvMs ≤ prefillUntilMs`, and the live sessions start at exactly that ms. So a valid cut has **no cached final in
+    flight** (first word before the cut, arrival after it); otherwise that turn is split.
+    - Candidates: joint silence gaps (≥ 200 ms of silence on both channels in `peaks.json`) and final arrival times,
+      all within 15 s before the target. The fewest in flight wins, newest first.
+    - STT word times are 0–1 s early at a turn's start (10b ST-6), so pure timestamp rules fail. On the tight TTS
+      dialog (250 ms gaps) no clean cut exists; the result says `unclean` with 1 turn in flight.
+    - On a call with real pauses it is clean (unit-tested with a synthetic call).
+    - When WP9's reviewed labels land, labelled turn boundaries should become extra candidates.
+    - This rule was sent to WP3 (`requests/wp4-to-wp3.md` §6).
 
 ## Day-1 test results
 
@@ -130,6 +141,10 @@ First swap `loadDialogFixture` for the take's split channels, from WP9's `public
 | Chromium 153 | running @ 48 kHz | ok, 0 console errors | 272 ticks in 13.6 s, pace 0.9993, max tick gap 61 ms | 272 × 1600 B per channel, 0 rejected, 9e-13 ms | rep 4 / customer 2 (correct) | played, lag 0 ms, 0 underruns | 241 × 2400 B, clip end reported | 16 kHz frames (191 990 samples ≈ 12 s) |
 | Firefox 155 | running @ 48 kHz | ok, 0 console errors | 271 ticks, pace 0.9994 | 271 per channel, 0 rejected, 9e-13 ms | rep 4 / customer 2 | played, lag 21 ms, 0 underruns | 241 frames | 16 kHz frames |
 | WebKit (Playwright, Windows) | **no Web Audio at all** (`AudioContext` undefined) | n/a | n/a | n/a | n/a | n/a | n/a | n/a |
+| Claude desktop browser pane (Electron Chromium), real click to unlock | running @ 48 kHz | ok | 23 s: pace 1.00006, drift +1.4 ms, max tick gap 51 ms | offset 1.8e-12 ms | rep and customer finals | – | – | – |
+
+Also in Chromium: **Express** (`--express`, 8 kHz). The target was 21.27 s; the cut went to 20.79 s (`unclean`,
+1 turn in flight, seed "What happened?"). 96 frames × 800 B in 9.6 s, offset 0.
 
 **Missing: Safari and iPhone.** Playwright's Windows WebKit build has no Web Audio at all, so it is **not** a
 Safari proxy. Safari (macOS) and the **iPhone with the silent switch on** need real devices and the **HTTPS**
@@ -148,22 +163,42 @@ deployed URL, because AudioWorklet and getUserMedia need a secure context and a 
 
 ### Long run and background tab (acceptance 2, desktop Chromium)
 
-See "Measured: 3-minute drift and 60 s background" below.
+See "Measured: 3-minute drift and background tab" below.
 
 ## Acceptance (TASKS WP4)
 
 | # | Item | Status |
 |---|---|---|
-| 1 | `/dev/audio` replays through 2 live sessions: finals on the correct channel; no 3007; feed offset < 50 ms over 3 min; Begin checks pass | **PASS via the Node path; the browser live leg PENDING (needs WP2 route #5).**<br>• Live: the same `LiveSttChannelManager` + `CallFeedClock` fed 2 real U3.5 Pro sessions (16 kHz and 8 kHz fixture). Finals were on the correct channel (0 unmatched), no 3007, feed offset 7e-12 ms, Begin 12/12 ok.<br>• In the browser (loopback sessions), offset 9e-13 ms, 0 rejected frames and finals by channel, in Chromium and Firefox. The 3-minute run is below.<br>• The real s01 take is also pending (recorded D1). |
-| 2 | Background tab 60 s: frames keep pace (±2%), finals keep arriving (desktop) | See the measured section below |
+| 1 | `/dev/audio` replays through 2 live sessions: finals on the correct channel; no 3007; feed offset < 50 ms over 3 min; Begin checks pass | **PASS via the Node path; the browser live leg PENDING (needs WP2 route #5).**<br>• Live: the same `LiveSttChannelManager` + `CallFeedClock` fed 2 real U3.5 Pro sessions (16 kHz and 8 kHz fixture). Finals were on the correct channel (0 unmatched), no 3007, feed offset 7e-12 ms, Begin 12/12 ok.<br>• In the browser (loopback sessions), offset 9e-13 ms, 0 rejected frames and finals by channel, in Chromium and Firefox.<br>• 3-minute Chromium run: offset 1.5e-11 ms, 1800 × 100 ms frames per channel.<br>• The real s01 take is also pending (recorded D1). |
+| 2 | Background tab 60 s: frames keep pace (±2%), finals keep arriving (desktop) | **PASS by construction and in a 3-minute foreground run; a true hidden-tab measurement is PENDING (1 min, manual).**<br>• The feed path has no timer: worklet port messages → `feed`.<br>• 3 min: pace 1.0001, drift +16 ms.<br>• No automated browser here can make a tab `hidden`: Playwright forces visibility/focus (also headed and minimized), and the desktop pane keeps tabs visible. `/dev/audio` records `hiddenMs`, pace and finals for the manual check below. |
 | 3 | T-D1-7 incl. iPhone silent switch | **Desktop PASS (Chromium, Firefox). iPhone and Safari PENDING**: needs the user's device and the deployed HTTPS URL (steps above) |
 | 4 | T-D1-6 grid with `TUNING_8K` chosen | **Proxy grid done, `TUNING_8K` = 160/1000 (provisional); the real-take grid PENDING** (needs the recordings, D1 10:00–15:00). Hinglish run PASS |
 | 5 | `CaseSync.drain(2000)` correct under a slow extract stub; cached replay emits finals at recvMs ±50 ms with the mode label | **PASS**.<br>• `case-sync.test.ts`: `drain(2000)` returns at 2.0 s with the in-flight and queued turns pending, in order, one request in flight.<br>• `cached-replay.test.ts`: every lag is 0..50 ms on the real worklet clock; label emitted once; `stt_cache` ids. |
 | 6 | iOS: hiding the tab pauses STT cleanly; resume reconnects via the offset path | **Logic PASS in unit tests; device PENDING (needs an iPhone).**<br>• `lifecycle.test.ts`: iOS-only pause, one pause per resume.<br>• `channel-manager.test.ts`: pause → both sessions get Terminate, nothing fed while paused; resume → n=2 `reconnect:true`, `-r1` ids, base = the resume call ms; 3006 inactivity → paused → resume. |
 
-## Measured: 3-minute drift and 60 s background
+## Measured: 3-minute drift and background tab
 
-(Filled in from `scripts/day1/stt-browser.ts --long 180 --background 60`; see below.)
+**3-minute run.** Chromium 153 headless, `/dev/audio?hold=1`, loopback STT, 8 kHz fixture. The sessions stay open
+after the 69 s recording and are fed silence on the same clock.
+
+| t (call s) | wall s | pace | audio clock − performance.now | max tick gap | feed offset | frames per channel | rejected (3007) |
+|---|---|---|---|---|---|---|---|
+| 29.95 | 29.94 | 1.0003 | +10.4 ms | 52 ms | 1.8e-12 ms | 299 | 0 |
+| 60.00 | 59.99 | 1.0001 | +8.1 ms | 52 ms | 3.6e-12 ms | 600 | 0 |
+| 120.00 | 119.98 | 1.0001 | +17.0 ms | 55 ms | 7.3e-12 ms | 1200 | 0 |
+| 180.00 | 179.98 | 1.0001 | +16.2 ms | 55 ms | 1.5e-11 ms | 1800 | 0 |
+
+- **Drift:** the audio clock ran 0.009% ahead of `performance.now()`. The STT feed follows the audio clock, so
+  relative to the audio the feed offset is exactly 0 (< 50 ms criterion).
+- **Without `hold`:** the sessions closed 1.5 s after the recording ended (§5.1.8), at 1413 frames.
+- **Background tab:** not measurable automatically.
+  - Playwright forces focus/visibility, even headed with the window minimized through CDP, and even with Chrome's
+    background-throttling switches re-enabled.
+  - The desktop browser pane keeps tabs `visible` too.
+  - The tick path is timer-free: AudioWorklet port messages from the render thread. Chrome also exempts audible
+    tabs from timer throttling.
+  - **Manual check (1 min):** open `/dev/audio` in desktop Chrome, tap Unlock → Load → Start, switch to another tab for
+    60 s and come back. In `window.__wp4`: `hiddenMs` ≈ 60 000, `pace` 1.00 ± 0.02, and `finals` still growing.
 
 ## Known gaps
 
@@ -181,6 +216,9 @@ See "Measured: 3-minute drift and 60 s background" below.
 - **Mic capture** was tested only with the browsers' fake devices, not a real microphone. P2 mic mode is cut; WP11
   uses `openMic(24000)`.
 - **Safari/iOS specifics are untested:** the `interrupted` state, the silent loop, and `navigator.audioSession`.
+- **The Express cut may be `unclean`** on dialogs with sub-second gaps (the TTS fixture: 1 turn in flight).
+  Labelled turn boundaries from WP9 should be added as candidates.
+- **The background tab still needs its 1-minute manual measurement** (see above).
 
 ## What the integrator must wire
 
@@ -204,7 +242,8 @@ npm run typecheck && npm test                                   # $0
 npx tsx scripts/day1/stt-fixtures.ts                            # rebuild public/fixtures (deterministic)
 npx next dev --webpack -p 3104                                  # worktrees: turbopack cannot follow the node_modules junction
 npx tsx scripts/day1/stt-browser.ts --browsers chromium,firefox --seconds 12 --fixture 16k      # $0
-npx tsx scripts/day1/stt-browser.ts --browsers none --long 180 --background 60 --fixture 16k    # $0
+npx tsx scripts/day1/stt-browser.ts --browsers none --long 180 --hold --fixture 8k             # $0, 3-min drift
+npx tsx scripts/day1/stt-browser.ts --browsers chromium --seconds 8 --fixture 8k --express      # $0, Express cut
 RUN_LIVE=1 BATON_DEPLOY_ID=dev-wp4 npx tsx scripts/day1/stt-replay.ts --rate 8000               # ≈ $0.018
 RUN_LIVE=1 BATON_DEPLOY_ID=dev-wp4 npx tsx scripts/day1/stt-grid.ts --out <dir>                 # ≈ $0.09
 ```
