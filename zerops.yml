@@ -12,9 +12,10 @@ zerops:
         - npm run build            # next build → .next/standalone; esbuild migrate/cron → dist/; assemble → bundle/
       deployFiles:
         - bundle                   # lands at /var/www/bundle
+      # Only node_modules is cached. A restored `.next/cache` left `.next/` unwritable for the build user on the second
+      # build (EACCES on /build/source/.next/trace); Turbopack compiles this app in ~17 s, so it is not worth caching.
       cache:
         - node_modules
-        - .next/cache
     deploy:
       readinessCheck:
         httpGet: { port: 3000, path: /api/health }
