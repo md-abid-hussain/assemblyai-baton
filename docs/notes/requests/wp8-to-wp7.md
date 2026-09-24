@@ -10,7 +10,7 @@
   - `failed`: `qa` is null and `reason` is a plain sentence. **Keep the provisional numbers** and show the reason
     small.
   - 404: there is no verification (no VA session). Keep the provisional numbers.
-- **Measured locally, poll-only** (docs/notes/wp8.md): about 15–20 s from the session end to `completed`. S1 starts
+- **Measured live, poll-only** (docs/notes/wp8.md): about 22 s from the session end to `completed` (2 runs: 22.0 s and 21.9 s). S1 starts
   7 s after the end. With the webhook on Zerops, S3 does not wait for its 3 s poll.
 - **Audio** (evidence chips / replay): `GET /api/va-sessions/[vaSessionId]/audio?t=<seconds>` with the takeover token
   → 302 to a pre-signed OGG (1 h TTL). `?t=12.5` becomes the media fragment `#t=12.5` on the redirect, because a query
