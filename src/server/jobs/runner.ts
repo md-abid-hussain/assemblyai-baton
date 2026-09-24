@@ -40,11 +40,16 @@ const jobLog = log.child({ component: "jobs" });
 export class DbJobRunner implements JobRunner {
   private ticking = false;
 
+  /** `db` may be a getter, so the process-wide runner follows `getDb()` (the pool can be recreated). */
   constructor(
-    private readonly db: Db,
+    private readonly dbOrGetter: Db | (() => Db),
     private readonly now: () => number = Date.now,
     private readonly steps: Map<JobKind, JobStep> = registry.steps,
   ) {}
+
+  private get db(): Db {
+    return typeof this.dbOrGetter === "function" ? this.dbOrGetter() : this.dbOrGetter;
+  }
 
   register(kind: JobKind, step: JobStep): void {
     this.steps.set(kind, step);
@@ -195,7 +200,7 @@ export class DbJobRunner implements JobRunner {
 
 /** The process-wide runner on `getDb()` (steps shared through globalThis). */
 export function getJobRunner(): DbJobRunner {
-  g.__batonJobRunner ??= new DbJobRunner(getDb());
+  g.__batonJobRunner ??= new DbJobRunner(() => getDb());
   return g.__batonJobRunner;
 }
 

@@ -160,7 +160,8 @@ export async function caseAuthHeaders(
   return { ...visitorHeaders(visitorId, o), authorization: `Bearer ${token}`, "content-type": "application/json" };
 }
 
-type Handler = (req: Request, ctx: { params: Promise<Record<string, string>> }) => Promise<Response>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Handler = (req: Request, ctx: { params: Promise<any> }) => Promise<Response>;
 
 /** Call a route handler in-process. */
 export async function call(
