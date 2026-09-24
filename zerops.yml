@@ -39,6 +39,7 @@ zerops:
         # CRON_SECRET, AAI_WEBHOOK_SECRET, AGENT_TOOL_SECRET, LIMITS_AUTHORITY_KEY) are service *secret* variables set
         # at import time / in the GUI, never here. Note: envVariables here win over secret variables of the same name.
       initCommands:
+        - echo "[boot] public URL (APP_URL from zeropsSubdomain) = $APP_URL"   # zcli prints no URL; read it from `zcli service log`
         - node bundle/migrate.mjs  # idempotent drizzle migrator (advisory-locked); runs on every container start
       # HOSTNAME is a reserved Zerops system variable (the container hostname), so it cannot be set in envVariables.
       # Next's standalone server binds to $HOSTNAME, so override it for the node process only (env execs node).
