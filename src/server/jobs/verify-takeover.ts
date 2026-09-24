@@ -334,7 +334,9 @@ async function finalizeFailure(p: Wp8Ports, s: VerifyState, reason: string): Pro
   vlog.warn("verification failed", { takeoverId: s.takeoverId, step: s.step, reason, err: s.lastError });
 }
 
-const errText = (err: unknown): string => scrub(err instanceof Error ? `${err.name}: ${err.message}` : String(err)).slice(0, 300);
+/** Strip query strings from URLs: an AssemblyAI download error can echo the pre-signed S3 URL (a 1 h credential). */
+export const stripUrlQueries = (s: string): string => s.replace(/(https?:\/\/[^\s?#"'<>]+)[?#][^\s"'<>]*/g, "$1?…");
+const errText = (err: unknown): string => stripUrlQueries(scrub(err instanceof Error ? `${err.name}: ${err.message}` : String(err))).slice(0, 300);
 
 /** The `verify_takeover` step (register with WP2's runner). `ports` defaults to the live `wp8()` registry. */
 export function createVerifyStep(ports: () => Wp8Ports = wp8): Parameters<JobRunner["register"]>[1] {

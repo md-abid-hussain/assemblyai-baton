@@ -12,7 +12,7 @@ import {
   utterancesByChannel,
 } from "@/server/qa/build-input";
 import { artifactUrl, listSessionsSince } from "@/server/aai/va-rest";
-import { webhookTarget } from "@/server/jobs/verify-takeover";
+import { stripUrlQueries, webhookTarget } from "@/server/jobs/verify-takeover";
 import { endedSession, FakeVaRest, field, POLICY, snapshot, TIMELINE_FIXTURE, transcriptFixture } from "./helpers";
 
 describe("timeline → tool calls", () => {
@@ -156,5 +156,15 @@ describe("webhookTarget", () => {
       url: "https://baton.zerops.app/api/webhooks/assemblyai?job=j%201",
       secret: "s",
     });
+  });
+});
+
+describe("stripUrlQueries", () => {
+  it("drops pre-signed query strings from error text (never store or log an S3 signature)", () => {
+    const e = "Download error, unable to download https://bucket.s3.amazonaws.com/sess_1/audio.ogg?AWSAccessKeyId=AK&Signature=abc%2B&x-amz-security-token=tok. Try again";
+    const out = stripUrlQueries(e);
+    expect(out).toBe("Download error, unable to download https://bucket.s3.amazonaws.com/sess_1/audio.ogg?… Try again");
+    expect(out).not.toMatch(/Signature|security-token/);
+    expect(stripUrlQueries("POST https://api.assemblyai.com/v2/transcript -> 400: bad")).toBe("POST https://api.assemblyai.com/v2/transcript -> 400: bad");
   });
 });

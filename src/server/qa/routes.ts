@@ -18,7 +18,7 @@ import { artifactUrl, VaRestError } from "../aai/va-rest";
 import { jobs, takeovers, webhookEvents } from "../db/schema";
 import { EnvError } from "../env";
 import { log, scrub } from "../log";
-import { normalizeVerifyState, reasonText, WEBHOOK_HEADER } from "../jobs/verify-takeover";
+import { normalizeVerifyState, reasonText, stripUrlQueries, WEBHOOK_HEADER } from "../jobs/verify-takeover";
 import { bearerToken } from "./auth";
 import { wp8, type Wp8Ports } from "./deps";
 import { failureReason, findVerifyJob, loadVerification, markVerificationFailed } from "./verification";
@@ -179,7 +179,7 @@ export function handleAaiWebhook(req: Request, defer: Defer, ports?: Wp8Ports): 
         if (runner) await runner.advance(jobId);
         else error = "no job runner wired";
       } catch (e) {
-        error = scrub(e instanceof Error ? e.message : String(e)).slice(0, 300);
+        error = stripUrlQueries(scrub(e instanceof Error ? e.message : String(e))).slice(0, 300);
       }
       await db.update(webhookEvents).set({ processedAt: new Date(p.now()), error }).where(eq(webhookEvents.id, eventId));
     });

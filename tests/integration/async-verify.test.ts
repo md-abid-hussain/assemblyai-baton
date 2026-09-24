@@ -94,10 +94,11 @@ async function runScriptedSession(deployId: string): Promise<{ sid: string; seco
   const agent: string[] = [];
   const toolCalls: string[] = [];
   s.on("transcript.agent", (e) => agent.push(e.text));
-  s.on("tool.call", (e) => {
-    toolCalls.push(`${e.name}(${JSON.stringify(e.arguments)})`);
-    const result = e.name === "get_disclosure" ? { ok: true, text: DISCLOSURE, instruction: "Read this exactly, then wait for the answer." } : { ok: false };
-    s.send({ type: "tool.result", call_id: e.call_id, result: JSON.stringify(result) });
+  // Through the session's ToolDispatcher: it answers unknown tools with an error by itself, so a hand-rolled
+  // tool.result would arrive second (the first live run read "I am having trouble accessing that information").
+  s.tools.register("get_disclosure", (args) => {
+    toolCalls.push(`get_disclosure(${JSON.stringify(args)})`);
+    return { ok: true, text: DISCLOSURE, instruction: "Read this exactly, then wait for the answer." };
   });
   const replyDone = (timeoutMs = 30_000) => s.waitFor("reply.done", { timeoutMs }).catch(() => null);
   let sid = "";
@@ -126,7 +127,7 @@ async function runScriptedSession(deployId: string): Promise<{ sid: string; seco
     feeder.start();
     await replyDone(); // greeting
     const turn = async (clip: Uint8Array, then: string | null) => {
-      await sleep(600);
+      await sleep(300);
       const auto = replyDone(20_000);
       await feeder.play(clip);
       await auto; // "Thank you."
@@ -143,11 +144,10 @@ async function runScriptedSession(deployId: string): Promise<{ sid: string; seco
     s.replyNow("Now give the premium disclosure: call get_disclosure with kind premium_change and read the returned text exactly.");
     await tool;
     // The disclosure reply (auto-fired after tool.result) can be preceded by a short preamble reply.
-    for (let i = 0; i < 3; i++) {
-      const r = await replyDone(40_000);
-      if (!r || agent.some((a) => /171/.test(a) && /23/.test(a))) break;
+    for (let i = 0; i < 3 && !agent.some((a) => /171/.test(a)); i++) {
+      if (!(await replyDone(25_000))) break;
     }
-    await sleep(1000);
+    await sleep(500);
     await feeder.stop();
   } finally {
     await handle.close("wp8 async-verify done");
