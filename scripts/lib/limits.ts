@@ -1,0 +1,42 @@
+/**
+ * limits.ts - `getLimitsAuthority()` for Node scripts and live tests (DESIGN §2.3, TASKS §0.5).
+ *
+ *   LIMITS_AUTHORITY_URL unset            → the laptop file guard (scripts/lib/local-open-guard.ts)
+ *   LIMITS_ROLE=remote + URL + KEY        → WP2's RemoteLimitsAuthority against the Zerops app (wired at G1)
+ *
+ * Tests and harnesses can inject an authority with `setLimitsAuthority()`.
+ */
+import type { GetLimitsAuthority, LimitsAuthority } from "../../src/core/contracts/services";
+import { getLocalOpenGuard } from "./local-open-guard";
+
+let injected: LimitsAuthority | null = null;
+
+/** Override the authority for this process (tests, fake-upstream harnesses). Pass null to restore. */
+export function setLimitsAuthority(a: LimitsAuthority | null): void {
+  injected = a;
+}
+
+/**
+ * Remote client factory. WP2 provides `RemoteLimitsAuthority` (`src/server/limits/remote-authority.ts`); the
+ * integrator registers it here at G1 with `registerRemoteAuthorityFactory(...)` in the scripts that need it,
+ * or replaces this seam with a direct import.
+ */
+let remoteFactory: ((url: string, key: string) => LimitsAuthority) | null = null;
+export function registerRemoteAuthorityFactory(f: (url: string, key: string) => LimitsAuthority): void {
+  remoteFactory = f;
+}
+
+export const getLimitsAuthority: GetLimitsAuthority = () => {
+  if (injected) return injected;
+  const url = process.env.LIMITS_AUTHORITY_URL?.trim();
+  if (!url) return getLocalOpenGuard();
+  const key = process.env.LIMITS_AUTHORITY_KEY?.trim();
+  if (!key) throw new Error("[limits] LIMITS_AUTHORITY_URL is set but LIMITS_AUTHORITY_KEY is missing (value never printed)");
+  if (!remoteFactory) {
+    throw new Error(
+      "[limits] LIMITS_AUTHORITY_URL is set but no remote authority client is registered in this process " +
+        "(WP2 RemoteLimitsAuthority). Unset LIMITS_AUTHORITY_URL to use the laptop file guard.",
+    );
+  }
+  return remoteFactory(url, key);
+};

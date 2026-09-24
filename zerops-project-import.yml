@@ -1,0 +1,17 @@
+# One-time provisioning (DESIGN §10.1 step 2):
+#   zcli project project-import zerops-project-import.yml --org-id <ORG_ID>
+# (or paste into the Zerops GUI → Import). Secrets are entered in the GUI afterwards, never committed.
+project:
+  name: baton
+  description: "Baton: reps diagnose, AI finishes the call (AssemblyAI hackathon)"
+  corePackage: LIGHT
+  tags: [hackathon, assemblyai]
+services:
+  - hostname: app
+    type: nodejs@22
+    enableSubdomainAccess: true
+    minContainers: 1          # always on: no cold starts during judging (Zerops runtimes never scale to zero)
+    maxContainers: 1          # single container: the in-process ticker is fine; DB leases keep it safe anyway
+    verticalAutoscaling: { cpuMode: SHARED, minCpu: 1, maxCpu: 2, minRam: 1, maxRam: 2, minDisk: 2, maxDisk: 6 }
+  - hostname: db
+    type: postgresql:single@17   # mode is fixed at creation; single is enough for the demo

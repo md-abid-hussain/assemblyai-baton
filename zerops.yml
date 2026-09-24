@@ -1,0 +1,44 @@
+# Zerops build + runtime for the `app` service (DESIGN §10.1). Deploy: `zcli push app` from the repo root.
+# The runtime gets only ./bundle (Next standalone server + static + public + drizzle + migrate/cron bundles).
+zerops:
+  - setup: app
+    build:
+      base: nodejs@22
+      envVariables:
+        NEXT_TELEMETRY_DISABLED: "1"
+        NODE_OPTIONS: --max-old-space-size=6144
+      buildCommands:
+        - npm ci
+        - npm run build            # next build → .next/standalone; esbuild migrate/cron → dist/; assemble → bundle/
+      deployFiles:
+        - bundle                   # lands at /var/www/bundle
+      cache:
+        - node_modules
+        - .next/cache
+    deploy:
+      readinessCheck:
+        httpGet: { port: 3000, path: /api/health }
+        failureTimeout: 120
+        retryPeriod: 5
+    run:
+      base: nodejs@22
+      ports:
+        - port: 3000
+          httpSupport: true
+      envVariables:
+        NODE_ENV: production
+        PORT: "3000"
+        HOSTNAME: 0.0.0.0
+        DATABASE_URL: ${db_connectionString}
+        ENABLE_INPROC_WORKER: "1"
+        LIMITS_ROLE: authority
+        BATON_DEPLOY_ID: zp-prod
+      initCommands:
+        - node bundle/migrate.mjs  # idempotent drizzle migrator (advisory-locked); runs on every container start
+      start: node bundle/server.js # standalone server.js chdir()s to its own dir
+      healthCheck:
+        httpGet: { port: 3000, path: /api/health }
+      crontab:
+        - { timing: "7 * * * *", command: "node bundle/cron.mjs light" }
+        - { timing: "17 */6 * * *", command: "node bundle/cron.mjs full" }
+        - { timing: "37 3 * * *", command: "node bundle/cron.mjs purge" }

@@ -1,0 +1,9 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "npm run build:vercel",
+  "functions": {
+    "src/app/api/extract/route.ts": { "maxDuration": 30 },
+    "src/app/api/internal/cron/route.ts": { "maxDuration": 60 }
+  },
+  "crons": [{ "path": "/api/internal/cron?kind=tick", "schedule": "0 5 * * *" }]
+}

@@ -26,3 +26,12 @@ research/*
 
 # Build bundle (scripts/assemble-bundle.mjs)
 bundle/
+
+# Next / test artefacts (WP0b)
+next-env.d.ts
+*.tsbuildinfo
+playwright-report/
+test-results/
+
+# Per-work-package git worktrees for parallel agents
+.wt/

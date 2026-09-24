@@ -1,0 +1,38 @@
+# External monitor (DESIGN §7.7): the synthetic checks run inside the app container, so they cannot report
+# their own death. This hourly job fetches $APP_URL/api/status and FAILS (GitHub emails the owner) when the
+# request fails, mode != "live", or the last full synthetic check is missing, failed, or older than 7 h.
+#
+# Disabled until the deploy exists: the job is skipped while the repository variable APP_URL is unset
+# (Settings → Secrets and variables → Actions → Variables → APP_URL = https://app-….zerops.app).
+name: monitor
+
+on:
+  schedule:
+    - cron: "23 * * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  status:
+    if: ${{ vars.APP_URL != '' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check /api/status
+        env:
+          APP_URL: ${{ vars.APP_URL }}
+        run: |
+          set -euo pipefail
+          body="$(curl -fsS --max-time 20 --retry 2 --retry-delay 10 "${APP_URL%/}/api/status")"
+          echo "$body" | jq '{mode, reason, notice, deployId, lastChecks}'
+          echo "$body" | jq -e '.mode == "live"' > /dev/null || { echo "::error::mode is not live"; exit 1; }
+          echo "$body" | jq -e '.lastChecks.full != null and .lastChecks.full.ok == true and .lastChecks.full.ageSec < 25200' > /dev/null \
+            || { echo "::error::last full synthetic check missing, failed, or older than 7 h"; exit 1; }
+      - name: Check /api/health
+        env:
+          APP_URL: ${{ vars.APP_URL }}
+        run: |
+          set -euo pipefail
+          curl -fsS --max-time 20 --retry 2 --retry-delay 10 "${APP_URL%/}/api/health" | jq -e '.ok == true and .db == true'
