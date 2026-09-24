@@ -184,6 +184,8 @@ export class VoiceAgentControllerImpl implements VoiceAgentControllerExt {
   private endedEmitted = false;
   private ending: Promise<void> | null = null;
   private lastError: SessionErrorEvent | null = null;
+  /** Errors/closes that raced in between session.ready and start() resuming. */
+  private deferred: (() => void)[] = [];
 
   constructor(deps: VoiceAgentControllerDeps) {
     this.d = deps;
@@ -316,6 +318,7 @@ export class VoiceAgentControllerImpl implements VoiceAgentControllerExt {
     this.wireLifecycle();
     this.setPhase("ready");
     this.emit({ type: "ready", sessionId, ctxMs: now });
+    for (const fn of this.deferred.splice(0)) fn();
     return { sessionId };
   }
 
@@ -845,7 +848,11 @@ export class VoiceAgentControllerImpl implements VoiceAgentControllerExt {
 
   private onSessionError(e: SessionErrorEvent): void {
     this.lastError = e;
-    if (!this.ready) return; // start() reports first-update failures
+    if (!this.ready) {
+      // session.ready already arrived but start() has not resumed yet (same tick): handle it right after "ready"
+      if (this.session?.ready) this.deferred.push(() => this.onSessionError(e));
+      return; // otherwise start() reports first-update failures
+    }
     const code = errorCode(e);
     if (NON_FATAL_CONFIG_ERROR_CODES.has(code)) {
       // §5.9.6: log E_VA_CONFIG, keep the session, continue without that update
@@ -858,7 +865,11 @@ export class VoiceAgentControllerImpl implements VoiceAgentControllerExt {
   }
 
   private onClose(code: number, reason: string): void {
-    if (this.endedByUs || !this.ready) return; // our end(), or start() handles pre-ready failures
+    if (this.endedByUs) return; // our end()
+    if (!this.ready) {
+      if (this.session?.ready) this.deferred.push(() => this.onClose(code, reason));
+      return; // start() handles pre-ready failures
+    }
     const mapped: ErrorCode = this.lastError ? vaErrorToErrorCode(this.lastError) : "E_VA_TRANSIENT";
     this.emitSink({ t: this.t(), type: "va.status", status: "error", code: String(code) });
     this.emit({ type: "error", code: mapped, retryable: mapped !== "E_AAI_BALANCE", message: `socket closed ${code} ${reason}`, afterFirstUpdate: false });

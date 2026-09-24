@@ -107,7 +107,13 @@ export interface OpenedVa {
  * Open a Voice Agent session through aai-open, waiting for the shared single VA slot (E_VA_CAPACITY) up to
  * `maxWaitMs`. Socket only: send the first session.update next.
  */
-export async function openVaQueued(o: { name: string; capMs: number; maxWaitMs?: number }): Promise<OpenedVa> {
+export async function openVaQueued(o: {
+  name: string;
+  capMs: number;
+  maxWaitMs?: number;
+  /** Extra raw-event hook (tests assert the order of client events on the wire). */
+  onEvent?: (dir: "in" | "out", ev: ServerEvent | ClientEvent, atMs: number) => void;
+}): Promise<OpenedVa> {
   const log = makeLog(o.name);
   const t0 = nowMs();
   const deadline = Date.now() + (o.maxWaitMs ?? 15 * 60_000);
@@ -118,7 +124,12 @@ export async function openVaQueued(o: { name: string; capMs: number; maxWaitMs?:
         capMs: o.capMs,
         label: `wp5b_${o.name}`,
         source: "script",
-        connect: { onEvent: (d, ev, at) => log.onEvent(d, ev, at) },
+        connect: {
+          onEvent: (d, ev, at) => {
+            log.onEvent(d, ev, at);
+            o.onEvent?.(d, ev, at);
+          },
+        },
       });
       const waitedMs = Math.round(nowMs() - t0);
       log.write({ note: "opened", liveSessionId: handle.liveSessionId, waitedMs });
