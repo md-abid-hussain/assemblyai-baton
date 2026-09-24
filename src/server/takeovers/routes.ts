@@ -49,7 +49,8 @@ export const TAKEOVER_RATE = {
   end: { bucket: "takeover_end", limit: 2, windowSec: 3600 },
 } as const;
 
-type RouteCtx = { params: Promise<Record<string, string>> };
+/** Next 16 passes dynamic params as a Promise (the `[id]` routes). */
+export type IdRouteCtx = { params: Promise<{ id: string }> };
 
 export function jsonResponse(body: unknown, init: ResponseInit = {}): Response {
   const headers = new Headers(init.headers);
@@ -91,8 +92,8 @@ async function readBody<S extends z.ZodType>(req: Request, schema: S): Promise<z
   return r.data;
 }
 
-async function takeoverIdOf(ctx: RouteCtx | undefined): Promise<string> {
-  const id = ctx ? (await ctx.params)?.id : undefined;
+async function takeoverIdOf(ctx: IdRouteCtx): Promise<string> {
+  const id = (await ctx.params)?.id;
   if (!id) throw new BatonError("E_NOT_FOUND", "Unknown takeover.");
   return id;
 }
@@ -109,12 +110,12 @@ async function limit(d: TakeoverRouteDeps, spec: { bucket: string; limit: number
   if (!r.ok) throw new BatonError("E_RATE_LIMITED", message, { retryAfterMs: Math.max(1, r.retryAfterSec) * 1000 });
 }
 
-function wrap(name: string, deps: () => TakeoverRouteDeps, fn: (req: Request, ctx: RouteCtx | undefined, d: TakeoverRouteDeps) => Promise<Response>) {
-  return async (req: Request, ctx?: RouteCtx): Promise<Response> => {
+function wrap<A extends unknown[]>(name: string, deps: () => TakeoverRouteDeps, fn: (d: TakeoverRouteDeps, req: Request, ...rest: A) => Promise<Response>) {
+  return async (req: Request, ...rest: A): Promise<Response> => {
     let d: TakeoverRouteDeps | null = null;
     try {
       d = deps();
-      return await fn(req, ctx, d);
+      return await fn(d, req, ...rest);
     } catch (e) {
       if (isBatonError(e)) return errorResponse(e);
       d?.log?.("error", "takeover route failed", { route: name, err: e instanceof Error ? e.message : String(e) });
@@ -125,7 +126,7 @@ function wrap(name: string, deps: () => TakeoverRouteDeps, fn: (req: Request, ct
 
 /** #9 POST /api/takeovers. */
 export function armHandler(deps: () => TakeoverRouteDeps) {
-  return wrap("takeovers.arm", deps, async (req, _ctx, d) => {
+  return wrap<[]>("takeovers.arm", deps, async (d, req) => {
     const body = await readBody(req, ArmRequestSchema);
     const auth = await d.requireCase(req, { caseId: body.caseId });
     await limit(d, TAKEOVER_RATE.arm, body.caseId, "Too many passes of the baton on this call; wait a moment.");
@@ -136,7 +137,7 @@ export function armHandler(deps: () => TakeoverRouteDeps) {
 
 /** #11 POST /api/takeovers/[id]/compile → CompiledTakeover (validated by validateFirstUpdate). */
 export function compileHandler(deps: () => TakeoverRouteDeps) {
-  return wrap("takeovers.compile", deps, async (req, ctx, d) => {
+  return wrap<[IdRouteCtx]>("takeovers.compile", deps, async (d, req, ctx) => {
     const id = await takeoverIdOf(ctx);
     const body = await readBody(req, CompileRequestSchema);
     await d.requireCase(req, { takeoverId: id });
@@ -147,7 +148,7 @@ export function compileHandler(deps: () => TakeoverRouteDeps) {
 
 /** #12 POST /api/takeovers/[id]/events → {ok:true}. */
 export function eventsHandler(deps: () => TakeoverRouteDeps) {
-  return wrap("takeovers.events", deps, async (req, ctx, d) => {
+  return wrap<[IdRouteCtx]>("takeovers.events", deps, async (d, req, ctx) => {
     const id = await takeoverIdOf(ctx);
     const body = await readBody(req, TakeoverEventsRequestSchema);
     await d.requireCase(req, { takeoverId: id });
@@ -159,7 +160,7 @@ export function eventsHandler(deps: () => TakeoverRouteDeps) {
 
 /** #13 POST /api/takeovers/[id]/end → {ok:true, verificationJobId}. */
 export function endHandler(deps: () => TakeoverRouteDeps) {
-  return wrap("takeovers.end", deps, async (req, ctx, d) => {
+  return wrap<[IdRouteCtx]>("takeovers.end", deps, async (d, req, ctx) => {
     const id = await takeoverIdOf(ctx);
     const body = await readBody(req, EndTakeoverRequestSchema);
     await d.requireCase(req, { takeoverId: id });
