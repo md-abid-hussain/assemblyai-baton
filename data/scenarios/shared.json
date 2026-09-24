@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "intent": "add_driver",
+  "fictional_notice": "All people, agencies, carriers, policy numbers, addresses and prices in these scenarios are fictional. Any resemblance to real people or businesses is coincidental.",
+  "call_date_default": "2026-09-25",
+  "required_fields": [
+    "driver_full_name",
+    "driver_dob",
+    "driver_relation",
+    "license_state",
+    "license_status",
+    "vehicle_assignment",
+    "operator_type",
+    "garaging_zip",
+    "effective_date",
+    "premium_new_monthly_usd"
+  ],
+  "status_rules": {
+    "VERIFIED": "Stated by one party and acknowledged by the other, or read back, before the hand-off line.",
+    "PENDING": "Stated once, in the last turn(s) before the hand-off, without acknowledgement or read-back.",
+    "MISSING": "Required but not established before the hand-off (see missing_reason)."
+  },
+  "rep_recorded_line_notice_example": "Thanks for calling Harborview Insurance, this is Daniel. This call is recorded for quality and training. How can I help?",
+  "handoff_line_default": "OK if my assistant finishes the paperwork? I'll stay on the line.",
+  "twilio_recording_notice": "This practice call is being recorded for the Baton hackathon project. Connecting you to your role-play partner now.",
+  "tail_change_summary_template_sample": "SAMPLE, fictional, not legal advice: Before I finalize: adding {driver_full_name} changes your premium to {premium_new_monthly_usd} a month, prorated for the rest of your policy term, starting {effective_date}. The change becomes part of your policy on that date. I'll text a secure link to the number on file so you can review and e-sign the change and pay {amount_due_today_usd} today. Is it OK to send that text?"
+}

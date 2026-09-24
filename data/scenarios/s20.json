@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "id": "s20",
+  "title": "Hinglish both sides: husband adds wife Kavya; 'permit' corrected to full license",
+  "intent": "add_driver",
+  "language": "hinglish",
+  "language_notes": "BOTH people speak Hinglish. The rep opens in English (including 'this call is recorded'), then follows the customer into Hinglish. Keep names, numbers, dates, ZIP, policy number and dollar amounts in English, e.g. customer: 'Kavya ka date of birth hai fourteenth February, nineteen ninety-five'; rep: 'Theek hai, toh uske paas Texas ka full license hai ya abhi permit?'.",
+  "difficulty": "hard",
+  "tags": ["hinglish", "bilingual_rep", "spouse", "correction", "driver_training"],
+  "call_date": "2026-09-25",
+  "target_duration_s": { "min": 75, "max": 120 },
+  "casting": { "rep": "any", "customer": "man", "hindi_needed": true },
+  "rep": {
+    "name": "Aman Kapoor",
+    "agency": "Brazos Point Insurance Agency",
+    "agency_city": "Plano",
+    "agency_state": "TX",
+    "style": "bilingual, switches to Hindi when the customer does"
+  },
+  "customer": {
+    "name": "Rohan Mehta",
+    "persona": "Software engineer, friendly, switches between Hindi and English. Your wife Kavya moved from India this year; she drove in India for 8 years and got her Texas license last month.",
+    "policy_number": "BSC-5518026",
+    "policy_number_say_it": "B-S-C, five-five-one-eight, zero-two-six",
+    "carrier": "Bluestem Casualty",
+    "address": { "street": "6224 Crooked Creek Drive", "city": "Plano", "state": "TX", "zip": "75024" },
+    "existing_drivers": [
+      { "name": "Rohan Mehta", "relation": "named_insured" }
+    ],
+    "vehicles": [
+      { "id": "veh1", "year": 2023, "make": "Kia", "model": "Telluride", "primary_driver": "Rohan" },
+      { "id": "veh2", "year": 2019, "make": "Honda", "model": "Civic", "primary_driver": "Rohan" }
+    ],
+    "current_premium_monthly_usd": 148
+  },
+  "facts": {
+    "driver_full_name": { "value": "Kavya Mehta", "say_it": "Kavya, K-A-V-Y-A, Mehta", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_dob": { "value": "1995-02-14", "say_it": "fourteenth February, nineteen ninety-five", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_age": { "value": 31, "say_it": "thirty-one", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_relation": { "value": "spouse", "say_it": "meri wife", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "license_state": { "value": "TX", "say_it": "Texas", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "license_status": {
+      "value": "full",
+      "say_it": "full license mil gaya last month",
+      "stated_by": "customer",
+      "status_at_handoff": "VERIFIED",
+      "correction": { "initial_value": "learner_permit", "said_wrong_by": "customer", "how": "'abhi permit hai... nahi, sorry, full license mil gaya last month.'" }
+    },
+    "incidents_3y": { "value": "none", "say_it": "koi ticket nahi, US mein koi history nahi", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "vehicle_assignment": { "value": "veh2", "say_it": "Civic, woh uski car hogi", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "operator_type": { "value": "primary", "say_it": "roz office jayegi usse", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "garaging_zip": { "value": "75024", "say_it": "ghar pe, seven-five-zero-two-four", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_training_discount": { "value": "pending_proof", "say_it": "haan, woh defensive driving course kar legi", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "effective_date": { "value": "2026-09-28", "say_it": "Monday se, twenty-eighth", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "premium_new_monthly_usd": { "value": 205, "say_it": "$205 a month", "stated_by": "rep", "status_at_handoff": "VERIFIED" },
+    "premium_change_monthly_usd": { "value": 57, "say_it": "$57 zyada", "stated_by": "rep", "status_at_handoff": "VERIFIED" }
+  },
+  "advice": [
+    {
+      "topic": "other",
+      "rep_says": "With no US driving history she's rated as a newly licensed driver; experience abroad usually doesn't count.",
+      "customer_decision": "Understood"
+    },
+    {
+      "topic": "driver_training_discount",
+      "rep_says": "If she completes an approved defensive-driving course, send the certificate for a discount.",
+      "customer_decision": "She'll take the course",
+      "sets": ["driver_training_discount"]
+    },
+    {
+      "topic": "operator_assignment",
+      "rep_says": "If the Civic is her daily car, list her as its primary driver.",
+      "customer_decision": "Kavya is primary on the 2019 Civic",
+      "sets": ["vehicle_assignment", "operator_type"]
+    }
+  ],
+  "talk_track": [
+    { "n": 1, "who": "rep", "beat": "Greet in English: name, agency, 'this call is recorded', how can I help." },
+    { "n": 2, "who": "customer", "beat": "Hinglish: you want to add your wife to the insurance.", "facts": ["driver_relation"] },
+    { "n": 3, "who": "rep", "beat": "Switch to Hinglish; ask name and policy number." },
+    { "n": 4, "who": "customer", "beat": "Give your name and the policy number (in English)." },
+    { "n": 5, "who": "rep", "beat": "Hinglish: ask her full name and date of birth." },
+    { "n": 6, "who": "customer", "beat": "Kavya Mehta (spell it), fourteenth February nineteen ninety-five, 31.", "facts": ["driver_full_name", "driver_dob", "driver_age"] },
+    { "n": 7, "who": "rep", "beat": "Read back; ask whether she has a Texas license or a permit, and any tickets.", "facts": ["driver_full_name", "driver_dob"] },
+    { "n": 8, "who": "customer", "beat": "Say 'permit' first, then correct: full Texas license since last month; no tickets, no US history, drove in India 8 years.", "facts": ["license_state", "license_status", "incidents_3y"], "direction": "The permit slip should sound natural." },
+    { "n": 9, "who": "rep", "beat": "Read back 'full license'. Explain in Hinglish that with no US history she's rated as newly licensed; suggest a defensive-driving course for a discount.", "advice": true, "facts": ["license_status"] },
+    { "n": 10, "who": "customer", "beat": "OK, she'll do the course. She'll drive the Civic daily; it's kept at home.", "facts": ["driver_training_discount", "vehicle_assignment", "operator_type", "garaging_zip"] },
+    { "n": 11, "who": "rep", "beat": "Recommend primary on the Civic; ask start date.", "advice": true, "facts": ["vehicle_assignment", "operator_type", "garaging_zip"] },
+    { "n": 12, "who": "customer", "beat": "Monday se, the 28th.", "facts": ["effective_date"] },
+    { "n": 13, "who": "rep", "beat": "Read back the date; quote $205 a month, $57 more; discount once the certificate comes.", "facts": ["effective_date", "premium_new_monthly_usd", "premium_change_monthly_usd", "driver_training_discount"] },
+    { "n": 14, "who": "customer", "beat": "Theek hai." },
+    { "n": 15, "who": "rep", "beat": "Offer the hand-off (Hinglish or English).", "handoff": true },
+    { "n": 16, "who": "customer", "beat": "Agree." },
+    { "n": 17, "who": "rep", "beat": "Say one moment; end the call." }
+  ],
+  "handoff": {
+    "at_beat": 15,
+    "line": "Theek hai. OK if my assistant finishes the paperwork? Main line pe hi hoon.",
+    "customer_response": "accepts",
+    "customer_says": "Haan, sure, go ahead.",
+    "after": "end_call",
+    "approx_at_s": 90
+  },
+  "conditions": {},
+  "directions": {
+    "rep": ["Follow the customer into Hinglish after the English greeting; keep numbers and dates in English."],
+    "customer": ["Code-switch naturally; numbers, dates and names in English."]
+  },
+  "eval": {
+    "traps": [
+      "license_status was corrected from learner's permit to FULL: the AI must use full license.",
+      "Both channels code-switch: the rep channel is Hinglish too (tests cross-channel agent_context carryover in Hinglish).",
+      "driver_training_discount is pending proof: the AI must not say it is applied."
+    ]
+  }
+}

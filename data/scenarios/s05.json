@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "id": "s05",
+  "title": "Add 18-year-old son Owen; rep never asks the license state (it's Wisconsin)",
+  "intent": "add_driver",
+  "language": "en",
+  "difficulty": "medium",
+  "tags": ["teen", "out_of_state_license", "missing_fact"],
+  "call_date": "2026-09-25",
+  "target_duration_s": { "min": 60, "max": 100 },
+  "casting": { "rep": "any", "customer": "man", "hindi_needed": false },
+  "rep": {
+    "name": "Kevin Walsh",
+    "agency": "Prairie Lantern Insurance Agency",
+    "agency_city": "Naperville",
+    "agency_state": "IL",
+    "style": "friendly, a little rushed"
+  },
+  "customer": {
+    "name": "Greg Palmer",
+    "persona": "Practical dad who talks in short sentences. Your son Owen (18) just moved in with you full time after living with his mom in Wisconsin.",
+    "policy_number": "PCI-6081733",
+    "policy_number_say_it": "P-C-I, six-zero-eight-one, seven-three-three",
+    "carrier": "Prairie Crest Insurance",
+    "address": { "street": "2715 Brookdale Court", "city": "Naperville", "state": "IL", "zip": "60540" },
+    "existing_drivers": [
+      { "name": "Greg Palmer", "relation": "named_insured" }
+    ],
+    "vehicles": [
+      { "id": "veh1", "year": 2019, "make": "Chevrolet", "model": "Silverado", "primary_driver": "Greg" },
+      { "id": "veh2", "year": 2012, "make": "Toyota", "model": "Camry", "primary_driver": "Greg" }
+    ],
+    "current_premium_monthly_usd": 133
+  },
+  "facts": {
+    "driver_full_name": { "value": "Owen Palmer", "say_it": "Owen Palmer", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_dob": { "value": "2008-02-09", "say_it": "February 9th, 2008", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_age": { "value": 18, "say_it": "he's eighteen", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_relation": { "value": "child", "say_it": "my son", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "license_status": { "value": "full", "say_it": "he's had his license about two years", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "incidents_3y": { "value": "none", "say_it": "no tickets", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "license_state": { "value": "WI", "say_it": "Wisconsin", "stated_by": "customer", "status_at_handoff": "MISSING", "missing_reason": "not_asked" },
+    "vehicle_assignment": { "value": "veh2", "say_it": "the Camry", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "operator_type": { "value": "primary", "say_it": "it's basically his now", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "garaging_zip": { "value": "60540", "say_it": "in my driveway, 60540", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "effective_date": { "value": "2026-10-01", "say_it": "October 1st", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "premium_new_monthly_usd": { "value": 204, "say_it": "$204 a month", "stated_by": "rep", "status_at_handoff": "VERIFIED" },
+    "premium_change_monthly_usd": { "value": 71, "say_it": "up $71", "stated_by": "rep", "status_at_handoff": "VERIFIED" },
+    "amount_due_today_usd": { "value": 34.1, "say_it": "$34.10 due today", "stated_by": "rep", "status_at_handoff": "VERIFIED" }
+  },
+  "advice": [
+    {
+      "topic": "household_listing",
+      "rep_says": "Anyone who lives with you and drives needs to be on the policy, so it's good you called.",
+      "customer_decision": "Add Owen"
+    },
+    {
+      "topic": "operator_assignment",
+      "rep_says": "If the Camry is basically his, list him as its primary driver.",
+      "customer_decision": "Owen is primary on the 2012 Camry",
+      "sets": ["vehicle_assignment", "operator_type"]
+    }
+  ],
+  "talk_track": [
+    { "n": 1, "who": "rep", "beat": "Greet: name, agency, 'this call is recorded', how can I help." },
+    { "n": 2, "who": "customer", "beat": "Your son moved in with you and needs to be on the insurance.", "facts": ["driver_relation"] },
+    { "n": 3, "who": "rep", "beat": "Ask name and policy number." },
+    { "n": 4, "who": "customer", "beat": "Give your name and policy number." },
+    { "n": 5, "who": "rep", "beat": "Explain anyone living with him who drives must be listed; ask Owen's full name and date of birth.", "advice": true },
+    { "n": 6, "who": "customer", "beat": "Owen Palmer, February 9th 2008, 18.", "facts": ["driver_full_name", "driver_dob", "driver_age"] },
+    { "n": 7, "who": "rep", "beat": "Read back name and date of birth; ask how long he's been licensed and about tickets (do NOT ask which state).", "facts": ["driver_full_name", "driver_dob"] },
+    { "n": 8, "who": "customer", "beat": "About two years, no tickets.", "facts": ["license_status", "incidents_3y"] },
+    { "n": 9, "who": "rep", "beat": "Ask which car and where it's kept; suggest primary on the car he drives most.", "advice": true },
+    { "n": 10, "who": "customer", "beat": "The Camry, basically his; in the driveway (ZIP).", "facts": ["vehicle_assignment", "operator_type", "garaging_zip"] },
+    { "n": 11, "who": "rep", "beat": "Confirm primary on the Camry; ask when to start.", "facts": ["vehicle_assignment", "garaging_zip"] },
+    { "n": 12, "who": "customer", "beat": "October 1st.", "facts": ["effective_date"] },
+    { "n": 13, "who": "rep", "beat": "Read back the date; quote $204 a month (up $71) and $34.10 due today.", "facts": ["effective_date", "premium_new_monthly_usd", "premium_change_monthly_usd", "amount_due_today_usd"] },
+    { "n": 14, "who": "customer", "beat": "Grumble a little about the price, then say OK." },
+    { "n": 15, "who": "rep", "beat": "Offer the hand-off.", "handoff": true },
+    { "n": 16, "who": "customer", "beat": "Agree." },
+    { "n": 17, "who": "rep", "beat": "Say one moment; end the call." }
+  ],
+  "handoff": {
+    "at_beat": 15,
+    "line": "OK if my assistant finishes the paperwork? I'll stay on the line.",
+    "customer_response": "accepts",
+    "customer_says": "Yep, fine.",
+    "after": "end_call",
+    "approx_at_s": 75
+  },
+  "conditions": {},
+  "directions": {
+    "rep": ["Assume in your head that it's an Illinois license and don't ask; skipping it is the test."],
+    "customer": ["Short answers. Don't mention Wisconsin at all."]
+  },
+  "eval": {
+    "traps": [
+      "license_state is MISSING: the AI must ask for it (a 'newly asked' question, not a re-ask). Answer: Wisconsin (WI).",
+      "The AI must not assume Illinois from the policy address.",
+      "An out-of-state license may need follow-up; explaining license-transfer rules is advice, so the AI should note it for the rep, not advise."
+    ]
+  }
+}

@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "id": "s09",
+  "title": "Add 15-year-old Ethan on a learner's permit; noisy living room; price unchanged",
+  "intent": "add_driver",
+  "language": "en",
+  "difficulty": "medium",
+  "tags": ["teen", "permit", "no_premium_change", "background_noise", "relative_date"],
+  "call_date": "2026-09-25",
+  "target_duration_s": { "min": 60, "max": 100 },
+  "casting": { "rep": "any", "customer": "woman", "hindi_needed": false },
+  "rep": {
+    "name": "Hannah Cole",
+    "agency": "Narrows Point Insurance",
+    "agency_city": "Tacoma",
+    "agency_state": "WA",
+    "style": "cheerful"
+  },
+  "customer": {
+    "name": "Rachel Nguyen",
+    "persona": "Mom of three, calling from a busy living room. Your son Ethan (15) just got his learner's permit and you want to be sure he's covered while practicing.",
+    "policy_number": "PCI-4470385",
+    "policy_number_say_it": "P-C-I, four-four-seven-zero, three-eight-five",
+    "carrier": "Prairie Crest Insurance",
+    "address": { "street": "2614 North Alder Street", "city": "Tacoma", "state": "WA", "zip": "98406" },
+    "existing_drivers": [
+      { "name": "Rachel Nguyen", "relation": "named_insured" },
+      { "name": "Tuan Nguyen", "relation": "spouse" }
+    ],
+    "vehicles": [
+      { "id": "veh1", "year": 2018, "make": "Subaru", "model": "Outback", "primary_driver": "Rachel" },
+      { "id": "veh2", "year": 2020, "make": "Honda", "model": "Pilot", "primary_driver": "Tuan" }
+    ],
+    "current_premium_monthly_usd": 134
+  },
+  "facts": {
+    "driver_full_name": { "value": "Ethan Nguyen", "say_it": "Ethan Nguyen, N-G-U-Y-E-N", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_dob": { "value": "2011-01-26", "say_it": "January 26th, 2011", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_age": { "value": 15, "say_it": "he's fifteen", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_relation": { "value": "child", "say_it": "my son", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "license_state": { "value": "WA", "say_it": "Washington", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "license_status": { "value": "learner_permit", "say_it": "just the learner's permit, he got it Tuesday", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "incidents_3y": { "value": "none", "say_it": "no", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "vehicle_assignment": { "value": "veh1", "say_it": "the Outback, with me in the passenger seat", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "operator_type": { "value": "occasional", "say_it": "just practice drives on weekends", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "garaging_zip": { "value": "98406", "say_it": "at home, 98406", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "effective_date": { "value": "2026-09-25", "say_it": "today, he wants to practice this weekend", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "premium_new_monthly_usd": { "value": 134, "say_it": "stays at $134 a month", "stated_by": "rep", "status_at_handoff": "VERIFIED" },
+    "premium_change_monthly_usd": { "value": 0, "say_it": "no change while he's on the permit", "stated_by": "rep", "status_at_handoff": "VERIFIED" }
+  },
+  "advice": [
+    {
+      "topic": "permit_listing",
+      "rep_says": "With Prairie Crest, permit drivers are listed at no charge until they're fully licensed; call us the day he passes and we'll re-rate.",
+      "customer_decision": "List Ethan as a permit driver now",
+      "sets": ["premium_change_monthly_usd"]
+    },
+    {
+      "topic": "driver_training_discount",
+      "rep_says": "When he takes driver's ed, keep the certificate: it earns a discount once he's licensed.",
+      "customer_decision": "Will do driver's ed in the spring"
+    }
+  ],
+  "talk_track": [
+    { "n": 1, "who": "rep", "beat": "Greet: name, agency, 'this call is recorded', how can I help." },
+    { "n": 2, "who": "customer", "beat": "Your son got his learner's permit; you want him covered for practice. (Shush the kids once.)", "facts": ["driver_relation", "license_status"] },
+    { "n": 3, "who": "rep", "beat": "Ask name and policy number." },
+    { "n": 4, "who": "customer", "beat": "Give your name and policy number." },
+    { "n": 5, "who": "rep", "beat": "Ask his full name and date of birth." },
+    { "n": 6, "who": "customer", "beat": "Ethan Nguyen (spell the last name), January 26th 2011, he's 15.", "facts": ["driver_full_name", "driver_dob", "driver_age"] },
+    { "n": 7, "who": "rep", "beat": "Read back (ask her to repeat one thing because of the noise). Ask the permit state.", "facts": ["driver_full_name", "driver_dob"] },
+    { "n": 8, "who": "customer", "beat": "Washington permit, got it Tuesday.", "facts": ["license_state", "license_status", "incidents_3y"] },
+    { "n": 9, "who": "rep", "beat": "Explain permit drivers are listed at no charge until licensed; ask which car he practices in and where it's kept.", "advice": true },
+    { "n": 10, "who": "customer", "beat": "The Outback, weekends with you; at home.", "facts": ["vehicle_assignment", "operator_type", "garaging_zip"] },
+    { "n": 11, "who": "rep", "beat": "Mention the driver's-ed discount for later. Ask when to add him.", "advice": true, "facts": ["vehicle_assignment", "garaging_zip"] },
+    { "n": 12, "who": "customer", "beat": "Today; he wants to practice this weekend.", "facts": ["effective_date"] },
+    { "n": 13, "who": "rep", "beat": "Read back: Ethan, permit driver, occasional on the Outback, from today; premium stays $134, no change.", "facts": ["effective_date", "premium_new_monthly_usd", "premium_change_monthly_usd"] },
+    { "n": 14, "who": "customer", "beat": "Great." },
+    { "n": 15, "who": "rep", "beat": "Offer the hand-off.", "handoff": true },
+    { "n": 16, "who": "customer", "beat": "Agree (over the noise)." },
+    { "n": 17, "who": "rep", "beat": "Say one moment; end the call." }
+  ],
+  "handoff": {
+    "at_beat": 15,
+    "line": "OK if my assistant finishes the paperwork? I'll stay on the line.",
+    "customer_response": "accepts",
+    "customer_says": "Yes, please.",
+    "after": "end_call",
+    "approx_at_s": 80
+  },
+  "conditions": {
+    "background_noise": "Customer side: TV on at medium volume and kids talking or playing near the phone for the whole call."
+  },
+  "directions": {
+    "rep": ["Ask her to repeat something once because of the noise; that's realistic."],
+    "customer": ["Turn a TV or a video on at medium volume near you, or have someone chat nearby. Don't shout; talk normally."]
+  },
+  "eval": {
+    "traps": [
+      "Premium does not change ($134, +$0): the AI must not invent an increase.",
+      "Background TV and kids on the customer channel: facts must still be extracted, and TV speech must not create phantom facts.",
+      "Learner's permit: the AI must not describe Ethan as licensed."
+    ]
+  }
+}

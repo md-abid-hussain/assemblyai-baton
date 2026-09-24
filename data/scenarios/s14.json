@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "id": "s14",
+  "title": "Add mother Carmen (Florida license); she chimes in; customer refuses the AI",
+  "intent": "add_driver",
+  "language": "en",
+  "difficulty": "hard",
+  "tags": ["parent", "out_of_state_license", "declined_handoff", "interruptions", "background_voice"],
+  "call_date": "2026-09-25",
+  "target_duration_s": { "min": 100, "max": 150 },
+  "casting": { "rep": "any", "customer": "woman", "hindi_needed": false },
+  "rep": {
+    "name": "Tom Becker",
+    "agency": "Sugar Creek Crossing Insurance",
+    "agency_city": "Charlotte",
+    "agency_state": "NC",
+    "style": "polite and steady"
+  },
+  "customer": {
+    "name": "Rosa Martinez",
+    "persona": "Direct and a bit impatient; you don't like automated systems. Your mother Carmen (61) moved in from Florida and is sitting next to you, chiming in.",
+    "policy_number": "NBM-7719304",
+    "policy_number_say_it": "N-B-M, seven-seven-one-nine, three-zero-four",
+    "carrier": "Northbeam Mutual",
+    "address": { "street": "3916 Park Road", "city": "Charlotte", "state": "NC", "zip": "28209" },
+    "existing_drivers": [
+      { "name": "Rosa Martinez", "relation": "named_insured" }
+    ],
+    "vehicles": [
+      { "id": "veh1", "year": 2019, "make": "Honda", "model": "Pilot", "primary_driver": "Rosa" },
+      { "id": "veh2", "year": 2015, "make": "Toyota", "model": "Corolla", "primary_driver": "Rosa" }
+    ],
+    "current_premium_monthly_usd": 127
+  },
+  "facts": {
+    "driver_full_name": { "value": "Carmen Diaz", "say_it": "Carmen Diaz, D-I-A-Z", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_dob": { "value": "1965-05-05", "say_it": "May 5th, 1965 (your mom may shout it first)", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_age": { "value": 61, "say_it": "sixty-one", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_relation": { "value": "parent", "say_it": "my mother", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "license_state": { "value": "FL", "say_it": "still her Florida license", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "license_status": { "value": "full", "say_it": "full license", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "incidents_3y": { "value": "none", "say_it": "no tickets (your mom: 'never!')", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "vehicle_assignment": { "value": "veh2", "say_it": "the Corolla", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "operator_type": { "value": "primary", "say_it": "it's basically hers now", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "garaging_zip": { "value": "28209", "say_it": "here, 28209", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "effective_date": { "value": "2026-09-26", "say_it": "Saturday, the 26th", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "premium_new_monthly_usd": { "value": 158, "say_it": "$158 a month", "stated_by": "rep", "status_at_handoff": "VERIFIED" },
+    "premium_change_monthly_usd": { "value": 31, "say_it": "up $31", "stated_by": "rep", "status_at_handoff": "VERIFIED" },
+    "amount_due_today_usd": { "value": 27.85, "say_it": "$27.85 due today", "stated_by": "rep", "status_at_handoff": "VERIFIED" }
+  },
+  "advice": [
+    {
+      "topic": "license_transfer",
+      "rep_says": "She should get a North Carolina license soon (new residents have a deadline); call with the new number when she does.",
+      "customer_decision": "She'll switch to a North Carolina license"
+    },
+    {
+      "topic": "operator_assignment",
+      "rep_says": "If the Corolla is basically hers, list her as its primary driver.",
+      "customer_decision": "Carmen is primary on the 2015 Corolla",
+      "sets": ["vehicle_assignment", "operator_type"]
+    }
+  ],
+  "talk_track": [
+    { "n": 1, "who": "rep", "beat": "Greet: name, agency, 'this call is recorded', how can I help." },
+    { "n": 2, "who": "customer", "beat": "Your mother moved in from Florida and needs to be on your policy.", "facts": ["driver_relation"] },
+    { "n": 3, "who": "rep", "beat": "Ask name and policy number." },
+    { "n": 4, "who": "customer", "beat": "Give your name and policy number." },
+    { "n": 5, "who": "rep", "beat": "Ask her full name and date of birth." },
+    { "n": 6, "who": "customer", "beat": "Carmen Diaz (spell the last name); your mom calls out 'May 5th!'; you repeat: May 5th 1965, she's 61.", "facts": ["driver_full_name", "driver_dob", "driver_age"], "direction": "The background voice answers first; you repeat it clearly." },
+    { "n": 7, "who": "rep", "beat": "Read back; ask license state and type, tickets.", "facts": ["driver_full_name", "driver_dob"] },
+    { "n": 8, "who": "customer", "beat": "Still her Florida license; no tickets (mom: 'never!').", "facts": ["license_state", "license_status", "incidents_3y"] },
+    { "n": 9, "who": "rep", "beat": "Advise getting a North Carolina license soon. Ask which car and where it's kept.", "advice": true },
+    { "n": 10, "who": "customer", "beat": "The Corolla, basically hers; kept here.", "facts": ["vehicle_assignment", "operator_type", "garaging_zip"] },
+    { "n": 11, "who": "rep", "beat": "Recommend primary on the Corolla; ask when to start.", "advice": true, "facts": ["vehicle_assignment", "garaging_zip"] },
+    { "n": 12, "who": "customer", "beat": "Saturday, the 26th.", "facts": ["effective_date"] },
+    { "n": 13, "who": "rep", "beat": "Read back the date; quote $158 a month (up $31) and $27.85 due today.", "facts": ["effective_date", "premium_new_monthly_usd", "premium_change_monthly_usd", "amount_due_today_usd"] },
+    { "n": 14, "who": "customer", "beat": "Fine." },
+    { "n": 15, "who": "rep", "beat": "Offer the hand-off.", "handoff": true },
+    { "n": 16, "who": "customer", "beat": "Refuse: you don't like automated things; ask the rep to just finish.", "tail": true },
+    { "n": 17, "who": "rep", "beat": "No problem. Read the change summary: 'adding Carmen changes your premium to $158 a month, prorated for the rest of your term, from Saturday the 26th; it becomes part of your policy on that date.'", "tail": true, "facts": ["premium_new_monthly_usd", "effective_date"] },
+    { "n": 18, "who": "rep", "beat": "Ask: OK to text a secure link to e-sign and pay the $27.85?", "tail": true, "facts": ["amount_due_today_usd"] },
+    { "n": 19, "who": "customer", "beat": "Yes; pretend you got it and paid.", "tail": true },
+    { "n": 20, "who": "rep", "beat": "Confirm it's done; remind about the NC license; close.", "tail": true },
+    { "n": 21, "who": "customer", "beat": "Thanks; mom says bye in the background; hang up.", "tail": true }
+  ],
+  "handoff": {
+    "at_beat": 15,
+    "line": "OK if my assistant finishes the paperwork? I'll stay on the line.",
+    "customer_response": "declines",
+    "customer_says": "Honestly, I'd rather you just finish it. I don't like those automated things.",
+    "after": "rep_finishes_tail",
+    "approx_at_s": 85
+  },
+  "conditions": {
+    "interruptions": "The customer's mother sits next to the phone and calls out answers (the date of birth, 'never!') as a third voice on the customer channel."
+  },
+  "directions": {
+    "rep": ["Stay polite when she refuses the assistant; then do the tail yourself at a normal pace."],
+    "customer": ["If someone can sit with you and play your mom (a few words), great; otherwise do the mom's lines in a different voice from a bit further away."]
+  },
+  "eval": {
+    "traps": [
+      "Declined hand-off: no AI takeover; full human call for tail-share and after-call baselines.",
+      "A third voice (the mother) answers some questions on the customer channel; those facts still belong to the customer side.",
+      "Takeover sweep before the decline: all facts VERIFIED, re-asked must be 0."
+    ]
+  }
+}

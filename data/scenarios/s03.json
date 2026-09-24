@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "id": "s03",
+  "title": "Add 19-year-old daughter Hannah; customer declines the AI and the rep finishes",
+  "intent": "add_driver",
+  "language": "en",
+  "difficulty": "medium",
+  "tags": ["college", "good_student", "declined_handoff"],
+  "call_date": "2026-09-25",
+  "target_duration_s": { "min": 100, "max": 150 },
+  "casting": { "rep": "any", "customer": "woman", "hindi_needed": false },
+  "rep": {
+    "name": "Marcus Bell",
+    "agency": "Ironbridge Insurance Agency",
+    "agency_city": "Pittsburgh",
+    "agency_state": "PA",
+    "style": "calm and thorough"
+  },
+  "customer": {
+    "name": "Janet Kowalski",
+    "persona": "Retired schoolteacher, polite but wary of technology; you prefer dealing with a person. Your daughter Hannah (19) moved back home and will drive the Accord.",
+    "policy_number": "SRI-7730158",
+    "policy_number_say_it": "S-R-I, seven-seven-three-zero, one-five-eight",
+    "carrier": "Summit Rock Insurance",
+    "address": { "street": "5816 Northumberland Street", "city": "Pittsburgh", "state": "PA", "zip": "15217" },
+    "existing_drivers": [
+      { "name": "Janet Kowalski", "relation": "named_insured" },
+      { "name": "Stan Kowalski", "relation": "spouse" }
+    ],
+    "vehicles": [
+      { "id": "veh1", "year": 2020, "make": "Subaru", "model": "Forester", "primary_driver": "Janet" },
+      { "id": "veh2", "year": 2016, "make": "Honda", "model": "Accord", "primary_driver": "Stan" }
+    ],
+    "current_premium_monthly_usd": 131
+  },
+  "facts": {
+    "driver_full_name": { "value": "Hannah Kowalski", "say_it": "Hannah, H-A-N-N-A-H, Kowalski", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_dob": { "value": "2007-05-21", "say_it": "May 21st, 2007", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_age": { "value": 19, "say_it": "she's nineteen", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_relation": { "value": "child", "say_it": "my daughter", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "license_state": { "value": "PA", "say_it": "Pennsylvania", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "license_status": { "value": "full", "say_it": "a regular license, she's had it since seventeen", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "incidents_3y": { "value": "none", "say_it": "no, never", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "vehicle_assignment": { "value": "veh2", "say_it": "the Accord", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "operator_type": { "value": "primary", "say_it": "she'll be driving it most days", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "garaging_zip": { "value": "15217", "say_it": "here at the house, 15217", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "effective_date": { "value": "2026-09-28", "say_it": "Monday, the 28th", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "good_student_discount": { "value": "not_eligible", "say_it": "she's part-time at community college", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "premium_new_monthly_usd": { "value": 188, "say_it": "$188 a month", "stated_by": "rep", "status_at_handoff": "VERIFIED" },
+    "premium_change_monthly_usd": { "value": 57, "say_it": "up $57", "stated_by": "rep", "status_at_handoff": "VERIFIED" },
+    "amount_due_today_usd": { "value": 18.4, "say_it": "$18.40 due today for the rest of this billing period", "stated_by": "rep", "status_at_handoff": "VERIFIED" }
+  },
+  "advice": [
+    {
+      "topic": "household_listing",
+      "rep_says": "Everyone of driving age living in the household needs to be listed, so adding Hannah is the right call.",
+      "customer_decision": "Add Hannah"
+    },
+    {
+      "topic": "good_student_discount",
+      "rep_says": "The good-student discount needs a full-time student with a B average; part-time doesn't qualify, but call us if she goes full-time.",
+      "customer_decision": "Not eligible for now",
+      "sets": ["good_student_discount"]
+    },
+    {
+      "topic": "operator_assignment",
+      "rep_says": "If she drives the Accord most days she should be its primary driver.",
+      "customer_decision": "Hannah is primary on the 2016 Accord",
+      "sets": ["vehicle_assignment", "operator_type"]
+    }
+  ],
+  "talk_track": [
+    { "n": 1, "who": "rep", "beat": "Greet: name, agency, 'this call is recorded', how can I help." },
+    { "n": 2, "who": "customer", "beat": "Your daughter moved back home and needs to be on the car insurance.", "facts": ["driver_relation"] },
+    { "n": 3, "who": "rep", "beat": "Ask name and policy number; confirm the address." },
+    { "n": 4, "who": "customer", "beat": "Give your name and policy number; confirm the address." },
+    { "n": 5, "who": "rep", "beat": "Ask Hannah's full name, date of birth, license state and type, tickets or accidents." },
+    { "n": 6, "who": "customer", "beat": "Hannah Kowalski (spell it), May 21st 2007, 19, Pennsylvania license since 17, no tickets.", "facts": ["driver_full_name", "driver_dob", "driver_age", "license_state", "license_status", "incidents_3y"] },
+    { "n": 7, "who": "rep", "beat": "Read back name and date of birth. Explain everyone of driving age in the household must be listed. Ask which car and where it's kept.", "advice": true, "facts": ["driver_full_name", "driver_dob"] },
+    { "n": 8, "who": "customer", "beat": "The Accord, most days; kept at the house.", "facts": ["vehicle_assignment", "operator_type", "garaging_zip"] },
+    { "n": 9, "who": "rep", "beat": "Ask if she's a full-time student with a B average (good-student discount).", "advice": true },
+    { "n": 10, "who": "customer", "beat": "She's part-time at community college.", "facts": ["good_student_discount"] },
+    { "n": 11, "who": "rep", "beat": "Explain part-time doesn't qualify but to call if that changes. Ask when to start.", "advice": true, "facts": ["good_student_discount"] },
+    { "n": 12, "who": "customer", "beat": "Monday the 28th.", "facts": ["effective_date"] },
+    { "n": 13, "who": "rep", "beat": "Read back: Hannah, primary on the Accord, from Monday September 28th. Quote $188 a month (up $57) and $18.40 due today.", "facts": ["effective_date", "vehicle_assignment", "premium_new_monthly_usd", "premium_change_monthly_usd", "amount_due_today_usd"] },
+    { "n": 14, "who": "customer", "beat": "OK, that's fine." },
+    { "n": 15, "who": "rep", "beat": "Offer the hand-off.", "handoff": true },
+    { "n": 16, "who": "customer", "beat": "Decline politely; you'd rather finish with a person.", "tail": true },
+    { "n": 17, "who": "rep", "beat": "No problem. Read the change summary: 'adding Hannah changes your premium to $188 a month, prorated for the rest of your term, from Monday September 28th; it becomes part of your policy on that date.'", "tail": true, "facts": ["premium_new_monthly_usd", "effective_date"] },
+    { "n": 18, "who": "rep", "beat": "Ask: OK to text a secure link to the number on file to e-sign and pay the $18.40?", "tail": true, "facts": ["amount_due_today_usd"] },
+    { "n": 19, "who": "customer", "beat": "Yes, that's fine; say you got the text and paid (pretend).", "tail": true },
+    { "n": 20, "who": "rep", "beat": "Confirm it's done, updated ID cards by email, anything else? Close the call.", "tail": true },
+    { "n": 21, "who": "customer", "beat": "Thank the rep and hang up.", "tail": true }
+  ],
+  "handoff": {
+    "at_beat": 15,
+    "line": "OK if my assistant finishes the paperwork? I'll stay on the line.",
+    "customer_response": "declines",
+    "customer_says": "Oh, I'd rather just finish with you, if that's all right.",
+    "after": "rep_finishes_tail",
+    "approx_at_s": 85
+  },
+  "conditions": {},
+  "directions": {
+    "rep": ["After she declines, do the admin tail yourself at a normal pace; this call measures how long the tail takes a human."],
+    "customer": ["Be kind but firm about wanting a person."]
+  },
+  "eval": {
+    "traps": [
+      "Declined hand-off: there is no AI takeover. Use as a full human-call baseline (tail share and after-call comparison).",
+      "For the takeover sweep before beat 15, all facts are VERIFIED: re-asked must be 0.",
+      "good_student_discount is not_eligible: the AI must not say a good-student discount applies."
+    ]
+  }
+}

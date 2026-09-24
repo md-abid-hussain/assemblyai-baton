@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "id": "s04",
+  "title": "Add new wife Jasmine; husband corrects her birthday; premium goes down",
+  "intent": "add_driver",
+  "language": "en",
+  "difficulty": "medium",
+  "tags": ["spouse", "correction", "premium_decrease", "relative_date"],
+  "call_date": "2026-09-25",
+  "target_duration_s": { "min": 60, "max": 100 },
+  "casting": { "rep": "any", "customer": "man", "hindi_needed": false },
+  "rep": {
+    "name": "Nicole Adams",
+    "agency": "Magnolia Bend Insurance Agency",
+    "agency_city": "Atlanta",
+    "agency_state": "GA",
+    "style": "upbeat and chatty"
+  },
+  "customer": {
+    "name": "Tyler Brooks",
+    "persona": "Just married last month, cheerful, a bit scatterbrained with dates. Your wife Jasmine is at work, so you're calling for her.",
+    "policy_number": "NBM-5102846",
+    "policy_number_say_it": "N-B-M, five-one-zero-two, eight-four-six",
+    "carrier": "Northbeam Mutual",
+    "address": { "street": "1193 Rosedale Road NE", "city": "Atlanta", "state": "GA", "zip": "30306" },
+    "existing_drivers": [
+      { "name": "Tyler Brooks", "relation": "named_insured" }
+    ],
+    "vehicles": [
+      { "id": "veh1", "year": 2022, "make": "Toyota", "model": "RAV4", "primary_driver": "Tyler" },
+      { "id": "veh2", "year": 2020, "make": "Hyundai", "model": "Elantra", "primary_driver": "Tyler" }
+    ],
+    "current_premium_monthly_usd": 152
+  },
+  "facts": {
+    "driver_full_name": { "value": "Jasmine Brooks", "say_it": "Jasmine Brooks", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_relation": { "value": "spouse", "say_it": "my wife, we just got married", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_dob": {
+      "value": "1996-08-21",
+      "say_it": "August 21st, 1996",
+      "stated_by": "customer",
+      "status_at_handoff": "VERIFIED",
+      "correction": { "initial_value": "1996-08-12", "said_wrong_by": "customer", "how": "a moment later: 'wait, no, the 21st. August 21st. She'd kill me.'" }
+    },
+    "driver_age": { "value": 30, "say_it": "she's thirty", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "license_state": { "value": "GA", "say_it": "Georgia", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "license_status": { "value": "full", "say_it": "regular license", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "incidents_3y": { "value": "none", "say_it": "clean record", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "vehicle_assignment": { "value": "veh2", "say_it": "the Elantra, that's going to be her car", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "operator_type": { "value": "primary", "say_it": "she'll drive it to work every day", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "garaging_zip": { "value": "30306", "say_it": "same address, 30306", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "effective_date": { "value": "2026-09-25", "say_it": "as of today", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "premium_new_monthly_usd": { "value": 149, "say_it": "$149 a month", "stated_by": "rep", "status_at_handoff": "VERIFIED" },
+    "premium_change_monthly_usd": { "value": -3, "say_it": "actually $3 less than now", "stated_by": "rep", "status_at_handoff": "VERIFIED" }
+  },
+  "advice": [
+    {
+      "topic": "household_listing",
+      "rep_says": "A spouse should always be listed; married couples often get a slightly better rate.",
+      "customer_decision": "Add Jasmine"
+    },
+    {
+      "topic": "operator_assignment",
+      "rep_says": "If the Elantra is her daily car, list her as its primary driver.",
+      "customer_decision": "Jasmine is primary on the 2020 Elantra",
+      "sets": ["vehicle_assignment", "operator_type"]
+    }
+  ],
+  "talk_track": [
+    { "n": 1, "who": "rep", "beat": "Greet: name, agency, 'this call is recorded', how can I help." },
+    { "n": 2, "who": "customer", "beat": "You just got married and need to add your wife.", "facts": ["driver_relation"] },
+    { "n": 3, "who": "rep", "beat": "Congratulate; get the policyholder name and policy number." },
+    { "n": 4, "who": "customer", "beat": "Give your name and policy number." },
+    { "n": 5, "who": "rep", "beat": "Ask her full name and date of birth." },
+    { "n": 6, "who": "customer", "beat": "Jasmine Brooks; give her birthday (wrong at first, then correct it); she's 30.", "facts": ["driver_full_name", "driver_dob", "driver_age"], "direction": "Say August 12th first, then correct to the 21st a second later." },
+    { "n": 7, "who": "rep", "beat": "Read back the corrected date of birth. Ask license state and type, and any tickets.", "facts": ["driver_dob"] },
+    { "n": 8, "who": "customer", "beat": "Georgia, regular license, clean record.", "facts": ["license_state", "license_status", "incidents_3y"] },
+    { "n": 9, "who": "rep", "beat": "Explain spouses should always be listed and married couples often rate better; ask which car she'll drive and where it's kept.", "advice": true },
+    { "n": 10, "who": "customer", "beat": "The Elantra, to work every day; same address.", "facts": ["vehicle_assignment", "operator_type", "garaging_zip"] },
+    { "n": 11, "who": "rep", "beat": "Suggest listing her as primary on the Elantra. Ask when to start.", "advice": true, "facts": ["vehicle_assignment"] },
+    { "n": 12, "who": "customer", "beat": "As of today.", "facts": ["effective_date"] },
+    { "n": 13, "who": "rep", "beat": "Read back: Jasmine, primary on the Elantra, effective today. Quote $149 a month, $3 less than now.", "facts": ["effective_date", "premium_new_monthly_usd", "premium_change_monthly_usd"] },
+    { "n": 14, "who": "customer", "beat": "Pleasantly surprised it went down; say great.", "direction": "React: 'Wait, it goes down? Nice.'" },
+    { "n": 15, "who": "rep", "beat": "Offer the hand-off.", "handoff": true },
+    { "n": 16, "who": "customer", "beat": "Agree." },
+    { "n": 17, "who": "rep", "beat": "Say they'll hear the assistant now; end the call." }
+  ],
+  "handoff": {
+    "at_beat": 15,
+    "line": "OK if my assistant finishes the paperwork? I'll stay on the line.",
+    "customer_response": "accepts",
+    "customer_says": "Sure, sounds good.",
+    "after": "end_call",
+    "approx_at_s": 80
+  },
+  "conditions": {},
+  "directions": {
+    "rep": ["When he corrects the date, read back only the corrected one."],
+    "customer": ["The birthday slip should sound natural, like you genuinely mixed it up."]
+  },
+  "eval": {
+    "traps": [
+      "driver_dob was corrected from 1996-08-12 to 1996-08-21: the AI must use 1996-08-21 and must not ask again.",
+      "The premium goes DOWN by $3: the AI must state $149 and must not call it an increase.",
+      "'As of today' = Friday, September 25, 2026."
+    ]
+  }
+}

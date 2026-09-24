@@ -1,0 +1,31 @@
+{
+  "name": "assembly-ai-spikes",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Spike harness for AssemblyAI Voice Agent / Streaming STT / LLM Gateway / Async experiments",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "selftest": "tsx scripts/selftest-lib.ts",
+    "models": "tsx scripts/list-openai-models.ts",
+    "fixtures": "tsx scripts/gen-fixtures.ts",
+    "validate": "tsx scripts/validate-fixtures.ts",
+    "validate:content": "tsx scripts/validate-fixtures.ts --transcribe",
+    "probe:codeswitch": "tsx scripts/probe-codeswitch-digits.ts"
+  },
+  "dependencies": {
+    "assemblyai": "^4.41.2",
+    "dotenv": "^18.0.3",
+    "openai": "^7.23.0",
+    "ws": "^8.21.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.4",
+    "@types/ws": "^8.18.1",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "name": "baton-recording-kit",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Day-1 call recording kit for Baton: Twilio dual-channel role-play calls -> per-role 8 kHz WAVs + sidecar JSON (eval ground truth lives in data/scenarios)",
+  "scripts": {
+    "kit": "tsx src/cli.ts",
+    "typecheck": "tsc --noEmit",
+    "selftest": "tsx src/cli.ts selftest",
+    "check": "tsx src/cli.ts check",
+    "scenarios": "tsx src/cli.ts scenarios",
+    "cards": "tsx src/cli.ts cards",
+    "list": "tsx src/cli.ts list",
+    "report": "tsx src/cli.ts report"
+  },
+  "dependencies": {
+    "tsx": "^4.23.15"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.4",
+    "typescript": "^7.0.2"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

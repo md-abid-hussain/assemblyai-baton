@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "id": "s08",
+  "title": "Add 78-year-old father Walter; rep forgets to ask the start date",
+  "intent": "add_driver",
+  "language": "en",
+  "difficulty": "medium",
+  "tags": ["parent", "mature_driver", "missing_fact"],
+  "call_date": "2026-09-25",
+  "target_duration_s": { "min": 60, "max": 110 },
+  "casting": { "rep": "any", "customer": "woman", "hindi_needed": false },
+  "rep": {
+    "name": "Luis Romero",
+    "agency": "Palmetto Key Insurance Agency",
+    "agency_city": "Tampa",
+    "agency_state": "FL",
+    "style": "warm, speaks slowly and clearly"
+  },
+  "customer": {
+    "name": "Denise Carter",
+    "persona": "Caring daughter, a bit worried the price will jump. Your dad Walter (78) moved in last month and sold his car; he'll borrow your Altima for church and errands.",
+    "policy_number": "NBM-2267519",
+    "policy_number_say_it": "N-B-M, two-two-six-seven, five-one-nine",
+    "carrier": "Northbeam Mutual",
+    "address": { "street": "15209 Amberly Drive", "city": "Tampa", "state": "FL", "zip": "33647" },
+    "existing_drivers": [
+      { "name": "Denise Carter", "relation": "named_insured" }
+    ],
+    "vehicles": [
+      { "id": "veh1", "year": 2022, "make": "Toyota", "model": "RAV4", "primary_driver": "Denise" },
+      { "id": "veh2", "year": 2015, "make": "Nissan", "model": "Altima", "primary_driver": "Denise" }
+    ],
+    "current_premium_monthly_usd": 147
+  },
+  "facts": {
+    "driver_full_name": { "value": "Walter Hughes", "say_it": "Walter Hughes, H-U-G-H-E-S", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_dob": { "value": "1948-01-17", "say_it": "January 17th, 1948", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_age": { "value": 78, "say_it": "he's seventy-eight", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_relation": { "value": "parent", "say_it": "my father", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "license_state": { "value": "FL", "say_it": "Florida, he's lived here thirty years", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "license_status": { "value": "full", "say_it": "regular license", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "incidents_3y": { "value": "none", "say_it": "no, he's a careful driver", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "vehicle_assignment": { "value": "veh2", "say_it": "the Altima", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "operator_type": { "value": "occasional", "say_it": "a couple of times a week, church and errands", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "garaging_zip": { "value": "33647", "say_it": "here at my house, 33647", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "mature_driver_discount": { "value": "pending_proof", "say_it": "he took a senior driver safety course last year; I'd have to find the certificate", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "premium_new_monthly_usd": { "value": 171, "say_it": "$171 a month", "stated_by": "rep", "status_at_handoff": "VERIFIED" },
+    "premium_change_monthly_usd": { "value": 24, "say_it": "up $24", "stated_by": "rep", "status_at_handoff": "VERIFIED" },
+    "effective_date": { "value": "2026-09-28", "say_it": "Monday, the 28th", "stated_by": "customer", "status_at_handoff": "MISSING", "missing_reason": "not_asked" }
+  },
+  "advice": [
+    {
+      "topic": "household_listing",
+      "rep_says": "Anyone living with you who has a license and may drive your cars should be listed, even occasionally.",
+      "customer_decision": "Add Walter"
+    },
+    {
+      "topic": "operator_assignment",
+      "rep_says": "Since he'll use the Altima a couple of times a week, list him as an occasional driver on it.",
+      "customer_decision": "Occasional on the 2015 Altima",
+      "sets": ["vehicle_assignment", "operator_type"]
+    },
+    {
+      "topic": "mature_driver_discount",
+      "rep_says": "A state-approved mature-driver course can earn a discount; send the certificate and it comes off the $171.",
+      "customer_decision": "Will send the certificate",
+      "sets": ["mature_driver_discount"]
+    }
+  ],
+  "talk_track": [
+    { "n": 1, "who": "rep", "beat": "Greet: name, agency, 'this call is recorded', how can I help." },
+    { "n": 2, "who": "customer", "beat": "Your father moved in with you and will sometimes drive your car.", "facts": ["driver_relation"] },
+    { "n": 3, "who": "rep", "beat": "Ask name and policy number." },
+    { "n": 4, "who": "customer", "beat": "Give your name and policy number." },
+    { "n": 5, "who": "rep", "beat": "Explain household drivers should be listed; ask his full name and date of birth.", "advice": true },
+    { "n": 6, "who": "customer", "beat": "Walter Hughes (spell the last name), January 17th 1948, he's 78.", "facts": ["driver_full_name", "driver_dob", "driver_age"] },
+    { "n": 7, "who": "rep", "beat": "Read back; ask license state and type and any tickets or accidents.", "facts": ["driver_full_name", "driver_dob"] },
+    { "n": 8, "who": "customer", "beat": "Florida license for thirty years, no tickets.", "facts": ["license_state", "license_status", "incidents_3y"] },
+    { "n": 9, "who": "rep", "beat": "Ask which car, how often, where it's kept; suggest occasional on that car.", "advice": true },
+    { "n": 10, "who": "customer", "beat": "The Altima, a couple of times a week; at home.", "facts": ["vehicle_assignment", "operator_type", "garaging_zip"] },
+    { "n": 11, "who": "rep", "beat": "Confirm occasional on the Altima; ask if he took a mature-driver course (discount).", "advice": true, "facts": ["vehicle_assignment", "operator_type", "garaging_zip"] },
+    { "n": 12, "who": "customer", "beat": "Yes, last year; you'd have to find the certificate.", "facts": ["mature_driver_discount"] },
+    { "n": 13, "who": "rep", "beat": "Quote $171 a month, up $24; the discount comes off once the certificate is in. (Do NOT ask when to start.)", "facts": ["premium_new_monthly_usd", "premium_change_monthly_usd", "mature_driver_discount"] },
+    { "n": 14, "who": "customer", "beat": "Relieved it's not more; OK." },
+    { "n": 15, "who": "rep", "beat": "Offer the hand-off.", "handoff": true },
+    { "n": 16, "who": "customer", "beat": "Agree." },
+    { "n": 17, "who": "rep", "beat": "Say one moment; end the call." }
+  ],
+  "handoff": {
+    "at_beat": 15,
+    "line": "OK if my assistant finishes the paperwork? I'll stay on the line.",
+    "customer_response": "accepts",
+    "customer_says": "That's fine, thank you.",
+    "after": "end_call",
+    "approx_at_s": 80
+  },
+  "conditions": {},
+  "directions": {
+    "rep": ["Forget to ask for the start date: that's the test."],
+    "customer": ["Don't bring up when it should start."]
+  },
+  "eval": {
+    "traps": [
+      "effective_date is MISSING: the AI must ask for it. Answer: Monday, September 28, 2026.",
+      "mature_driver_discount is pending proof: the AI must not say it's applied; it may mention sending the certificate.",
+      "The customer is anxious about price: the AI must not offer discounts or advice on its own."
+    ]
+  }
+}

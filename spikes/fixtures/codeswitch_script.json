@@ -1,0 +1,21 @@
+{
+  "description": "Hinglish (Hindi-English) code-switched customer utterance.",
+  "file": "codeswitch_16k.wav",
+  "sample_rate": 16000,
+  "duration_ms": 12010,
+  "transcript_romanized": "Mera order abhi tak nahi aaya, can you please check the status? Order number hai 4 8 1 5 2 9. Aur haan, delivery kal tak ho jayegi kya?",
+  "spoken_digits": "four eight one five two nine (English)",
+  "tts_input": "मेरा order अभी तक नहीं आया, can you please check the status? Order number है four, eight, one, five, two, nine. और हाँ, delivery कल तक हो जाएगी क्या?",
+  "tts": {
+    "model": "gpt-4o-mini-tts-2025-12-15",
+    "voice": "coral",
+    "instructions": "A native Hindi-English bilingual speaker from Delhi, India, talking to a customer support agent. Natural Indian accent, code-switching fluidly between Hindi and English as in everyday Hinglish. Say the order number digits in English, clearly and one at a time: four, eight, one, five, two, nine."
+  },
+  "languages": [
+    "hi",
+    "en"
+  ],
+  "facts": {
+    "order_number": "481529"
+  }
+}

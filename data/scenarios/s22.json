@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "id": "s22",
+  "title": "Add the family's nanny Gabriela (doesn't live there); two facts never asked",
+  "intent": "add_driver",
+  "language": "en",
+  "difficulty": "hard",
+  "tags": ["non_relative", "out_of_state_license", "missing_fact"],
+  "call_date": "2026-09-25",
+  "target_duration_s": { "min": 60, "max": 110 },
+  "casting": { "rep": "any", "customer": "woman", "hindi_needed": false },
+  "rep": {
+    "name": "Chris Donovan",
+    "agency": "Pine Bush Crossing Insurance",
+    "agency_city": "Albany",
+    "agency_state": "NY",
+    "style": "friendly, a little rushed at the end of the day"
+  },
+  "customer": {
+    "name": "Allison Wright",
+    "persona": "Busy parent. Your new nanny Gabriela starts Monday and will drive the kids in the minivan on weekdays. She doesn't live with you.",
+    "policy_number": "NBM-6045128",
+    "policy_number_say_it": "N-B-M, six-zero-four-five, one-two-eight",
+    "carrier": "Northbeam Mutual",
+    "address": { "street": "212 Winthrop Avenue", "city": "Albany", "state": "NY", "zip": "12203" },
+    "existing_drivers": [
+      { "name": "Allison Wright", "relation": "named_insured" },
+      { "name": "Ben Wright", "relation": "spouse" }
+    ],
+    "vehicles": [
+      { "id": "veh1", "year": 2023, "make": "Honda", "model": "Odyssey", "primary_driver": "Allison" },
+      { "id": "veh2", "year": 2020, "make": "Subaru", "model": "Legacy", "primary_driver": "Ben" }
+    ],
+    "current_premium_monthly_usd": 161
+  },
+  "facts": {
+    "driver_full_name": { "value": "Gabriela Santos", "say_it": "Gabriela Santos, G-A-B-R-I-E-L-A", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_dob": { "value": "1991-06-27", "say_it": "June 27th, 1991", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_age": { "value": 35, "say_it": "thirty-five", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_relation": { "value": "non_relative_nonresident", "say_it": "our nanny, she doesn't live with us", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "license_status": { "value": "full", "say_it": "full license, she's been driving fifteen years", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "incidents_3y": { "value": "none", "say_it": "clean, I checked", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "license_state": { "value": "VT", "say_it": "Vermont, she just moved down", "stated_by": "customer", "status_at_handoff": "MISSING", "missing_reason": "not_asked" },
+    "vehicle_assignment": { "value": "veh1", "say_it": "the minivan, the Odyssey", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "operator_type": { "value": "occasional", "say_it": "weekdays, school runs", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "garaging_zip": { "value": "12203", "say_it": "it stays at our house, 12203", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "premium_new_monthly_usd": { "value": 186, "say_it": "$186 a month", "stated_by": "rep", "status_at_handoff": "VERIFIED" },
+    "premium_change_monthly_usd": { "value": 25, "say_it": "up $25", "stated_by": "rep", "status_at_handoff": "VERIFIED" },
+    "effective_date": { "value": "2026-09-28", "say_it": "Monday, the 28th, her first day", "stated_by": "customer", "status_at_handoff": "MISSING", "missing_reason": "not_asked" }
+  },
+  "advice": [
+    {
+      "topic": "household_listing",
+      "rep_says": "Even though she doesn't live with you, someone who drives your car regularly should be listed as a regular operator.",
+      "customer_decision": "Add Gabriela"
+    },
+    {
+      "topic": "operator_assignment",
+      "rep_says": "You stay primary on the Odyssey; she's listed as an occasional driver on it.",
+      "customer_decision": "Occasional on the 2023 Odyssey",
+      "sets": ["vehicle_assignment", "operator_type"]
+    },
+    {
+      "topic": "other",
+      "rep_says": "She should also let her own insurance company know she drives for work.",
+      "customer_decision": "Will tell her"
+    }
+  ],
+  "talk_track": [
+    { "n": 1, "who": "rep", "beat": "Greet: name, agency, 'this call is recorded', how can I help." },
+    { "n": 2, "who": "customer", "beat": "Your new nanny will drive the kids in your minivan; does she need to be on your policy?", "facts": ["driver_relation"] },
+    { "n": 3, "who": "rep", "beat": "Yes: explain regular drivers should be listed even if they don't live there. Ask name and policy number.", "advice": true },
+    { "n": 4, "who": "customer", "beat": "Give your name and policy number." },
+    { "n": 5, "who": "rep", "beat": "Ask her full name and date of birth." },
+    { "n": 6, "who": "customer", "beat": "Gabriela Santos (spell the first name), June 27th 1991, 35.", "facts": ["driver_full_name", "driver_dob", "driver_age"] },
+    { "n": 7, "who": "rep", "beat": "Read back; ask how long she's been driving and about tickets (do NOT ask which state).", "facts": ["driver_full_name", "driver_dob"] },
+    { "n": 8, "who": "customer", "beat": "Full license, fifteen years, clean.", "facts": ["license_status", "incidents_3y"] },
+    { "n": 9, "who": "rep", "beat": "Ask which car and where it's kept; she's occasional on it, you stay primary; suggest she tells her own insurer.", "advice": true },
+    { "n": 10, "who": "customer", "beat": "The Odyssey, weekday school runs; it stays at your house.", "facts": ["vehicle_assignment", "operator_type", "garaging_zip"] },
+    { "n": 11, "who": "rep", "beat": "Confirm occasional on the Odyssey at your address. Quote $186 a month, up $25. (Do NOT ask when to start.)", "facts": ["vehicle_assignment", "operator_type", "garaging_zip", "premium_new_monthly_usd", "premium_change_monthly_usd"] },
+    { "n": 12, "who": "customer", "beat": "OK, that's fine." },
+    { "n": 13, "who": "rep", "beat": "Offer the hand-off.", "handoff": true },
+    { "n": 14, "who": "customer", "beat": "Agree." },
+    { "n": 15, "who": "rep", "beat": "Say one moment; end the call." }
+  ],
+  "handoff": {
+    "at_beat": 13,
+    "line": "OK if my assistant finishes the paperwork? I'll stay on the line.",
+    "customer_response": "accepts",
+    "customer_says": "Great, thanks.",
+    "after": "end_call",
+    "approx_at_s": 70
+  },
+  "conditions": {},
+  "directions": {
+    "rep": ["End-of-day rush: skip the license state and the start date on purpose."],
+    "customer": ["Don't mention Vermont or Monday."]
+  },
+  "eval": {
+    "traps": [
+      "TWO facts are MISSING: license_state (answer Vermont, VT) and effective_date (answer Monday, September 28, 2026). The AI must ask exactly these two (newly asked = 2, re-asked = 0).",
+      "Non-resident regular driver: the AI must not describe her as a household member.",
+      "The AI must not assume a New York license from the policy address."
+    ]
+  }
+}

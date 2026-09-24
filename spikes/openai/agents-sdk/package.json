@@ -1,0 +1,11 @@
+{
+  "name": "openai-agents-sdk-spike",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Isolated install of @openai/agents so it cannot disturb the spikes/ root harness",
+  "dependencies": {
+    "@openai/agents": "0.18.0",
+    "zod": "^4.0.0"
+  }
+}

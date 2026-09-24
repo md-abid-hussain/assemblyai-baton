@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "id": "s02",
+  "title": "Add 16-year-old son Lucas; start date blurted right before the hand-off",
+  "intent": "add_driver",
+  "language": "en",
+  "difficulty": "easy",
+  "tags": ["teen", "driver_training", "pending_fact", "relative_date"],
+  "call_date": "2026-09-25",
+  "target_duration_s": { "min": 60, "max": 100 },
+  "casting": { "rep": "any", "customer": "man", "hindi_needed": false },
+  "rep": {
+    "name": "Carmen Ortiz",
+    "agency": "Mesa Ridge Insurance Group",
+    "agency_city": "Mesa",
+    "agency_state": "AZ",
+    "style": "brisk and friendly"
+  },
+  "customer": {
+    "name": "Mark Delgado",
+    "persona": "Dad calling on your lunch break, in a hurry, wants it done today. Your son Lucas passed his road test this morning.",
+    "policy_number": "BSC-2290316",
+    "policy_number_say_it": "B-S-C, two-two-nine-zero, three-one-six",
+    "carrier": "Bluestem Casualty",
+    "address": { "street": "2240 East Quartz Street", "city": "Mesa", "state": "AZ", "zip": "85213" },
+    "existing_drivers": [
+      { "name": "Mark Delgado", "relation": "named_insured" },
+      { "name": "Elena Delgado", "relation": "spouse" }
+    ],
+    "vehicles": [
+      { "id": "veh1", "year": 2019, "make": "Ford", "model": "F-150", "primary_driver": "Mark" },
+      { "id": "veh2", "year": 2014, "make": "Toyota", "model": "Corolla", "primary_driver": "Elena" }
+    ],
+    "current_premium_monthly_usd": 118
+  },
+  "facts": {
+    "driver_full_name": { "value": "Lucas Delgado", "say_it": "Lucas, L-U-C-A-S, Delgado", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_dob": { "value": "2010-06-02", "say_it": "June 2nd, 2010", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_age": { "value": 16, "say_it": "he's sixteen", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_relation": { "value": "child", "say_it": "my son", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "license_state": { "value": "AZ", "say_it": "Arizona", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "license_status": { "value": "provisional", "say_it": "the graduated license, he passed this morning", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "incidents_3y": { "value": "none", "say_it": "nothing, he's brand new", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "vehicle_assignment": { "value": "veh2", "say_it": "the Corolla", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "operator_type": { "value": "primary", "say_it": "that'll be his car, every day", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "garaging_zip": { "value": "85213", "say_it": "in our garage, 85213", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_training_discount": { "value": "eligible", "say_it": "he did the driver's ed course at school in May", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "premium_new_monthly_usd": { "value": 171, "say_it": "$171 a month", "stated_by": "rep", "status_at_handoff": "VERIFIED" },
+    "premium_change_monthly_usd": { "value": 53, "say_it": "up $53", "stated_by": "rep", "status_at_handoff": "VERIFIED" },
+    "effective_date": { "value": "2026-09-26", "say_it": "starting tomorrow", "stated_by": "customer", "status_at_handoff": "PENDING", "note": "'Tomorrow' relative to the call date (Friday Sept 25) = Saturday, September 26, 2026. Say 'tomorrow', not the date." }
+  },
+  "advice": [
+    {
+      "topic": "operator_assignment",
+      "rep_says": "Since the Corolla will be his daily car, list Lucas as its primary driver; Elena becomes an occasional driver on it.",
+      "customer_decision": "Lucas is primary on the 2014 Corolla",
+      "sets": ["vehicle_assignment", "operator_type"]
+    },
+    {
+      "topic": "driver_training_discount",
+      "rep_says": "A completed driver's-ed course earns a driver-training discount; keep the certificate handy in case the carrier asks for it.",
+      "customer_decision": "Applies (course finished in May)",
+      "sets": ["driver_training_discount"]
+    }
+  ],
+  "talk_track": [
+    { "n": 1, "who": "rep", "beat": "Greet: name, agency, 'this call is recorded', how can I help." },
+    { "n": 2, "who": "customer", "beat": "You need to add your son, he passed his road test this morning; you're on lunch so quick please.", "facts": ["driver_relation"] },
+    { "n": 3, "who": "rep", "beat": "Ask for the policyholder name and policy number." },
+    { "n": 4, "who": "customer", "beat": "Give your name and the policy number." },
+    { "n": 5, "who": "rep", "beat": "Found it. Ask your son's full name and date of birth." },
+    { "n": 6, "who": "customer", "beat": "Lucas Delgado (spell it), June 2nd 2010, he's 16.", "facts": ["driver_full_name", "driver_dob", "driver_age"] },
+    { "n": 7, "who": "rep", "beat": "Read back name and date of birth. Ask license state and type, and any tickets.", "facts": ["driver_full_name", "driver_dob"] },
+    { "n": 8, "who": "customer", "beat": "Arizona graduated license from this morning, no tickets.", "facts": ["license_state", "license_status", "incidents_3y"] },
+    { "n": 9, "who": "rep", "beat": "Ask which car he'll drive and explain listing him as primary on it; ask where it's parked; ask about driver's ed (discount).", "advice": true },
+    { "n": 10, "who": "customer", "beat": "The Corolla, every day; parked at home (ZIP); he finished driver's ed in May.", "facts": ["vehicle_assignment", "operator_type", "garaging_zip", "driver_training_discount"] },
+    { "n": 11, "who": "rep", "beat": "Confirm: primary on the Corolla, parked at home, driver-training discount applied. Quote $171 a month, up $53.", "facts": ["vehicle_assignment", "garaging_zip", "driver_training_discount", "premium_new_monthly_usd", "premium_change_monthly_usd"] },
+    { "n": 12, "who": "customer", "beat": "Fine. Then, as the last thing, say it has to start tomorrow because he's driving to his game.", "facts": ["effective_date"], "direction": "Say 'tomorrow' quickly as an afterthought, not an exact date." },
+    { "n": 13, "who": "rep", "beat": "Go straight to the hand-off line without repeating or confirming the date.", "handoff": true, "direction": "Don't say 'tomorrow' or the date back - that is the point of this call." },
+    { "n": 14, "who": "customer", "beat": "Agree." },
+    { "n": 15, "who": "rep", "beat": "Say one second, then end the call." }
+  ],
+  "handoff": {
+    "at_beat": 13,
+    "line": "Got it. OK if my assistant wraps up the paperwork? I'm right here.",
+    "customer_response": "accepts",
+    "customer_says": "Yeah, go ahead.",
+    "after": "end_call",
+    "approx_at_s": 70
+  },
+  "conditions": {},
+  "directions": {
+    "rep": ["Keep the pace quick; he's in a hurry."],
+    "customer": ["You're a bit rushed but polite."]
+  },
+  "eval": {
+    "traps": [
+      "effective_date is PENDING ('tomorrow', said right before the hand-off): the AI must CONFIRM it, not ask from scratch, and resolve it to Saturday, September 26, 2026.",
+      "Everything else is VERIFIED: re-asked must be 0."
+    ]
+  }
+}

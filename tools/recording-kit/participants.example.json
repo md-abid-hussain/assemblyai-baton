@@ -1,0 +1,24 @@
+{
+  "_readme": "Copy this file to participants.json (git-ignored) and fill in real numbers in E.164 format (+91 then 10 digits, no spaces). consent.recording must be true before the kit will dial someone. consent.scope: 'public' = their voice/transcript may appear in the public demo, video and repo; 'metrics_only' = audio and transcript stay private, only aggregate numbers are published.",
+  "participants": {
+    "me": {
+      "name": "Abid",
+      "phone": "+91XXXXXXXXXX",
+      "speaks_hindi": true,
+      "consent": { "recording": true, "scope": "public", "date": "2026-09-25", "how": "organizer (self)" }
+    },
+    "volunteer1": {
+      "name": "Volunteer One",
+      "phone": "+91XXXXXXXXXX",
+      "speaks_hindi": true,
+      "consent": { "recording": false, "scope": "metrics_only", "date": "", "how": "WhatsApp reply to the consent message" }
+    },
+    "volunteer2": {
+      "name": "Volunteer Two",
+      "phone": "+91XXXXXXXXXX",
+      "speaks_hindi": false,
+      "consent": { "recording": false, "scope": "metrics_only", "date": "", "how": "WhatsApp reply to the consent message" }
+    }
+  },
+  "defaults": { "rep": "me", "customer": "volunteer1" }
+}

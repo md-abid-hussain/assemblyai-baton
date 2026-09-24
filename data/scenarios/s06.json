@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "id": "s06",
+  "title": "Add 16-year-old Zoe; eager mom talks over the rep, blurts a discount at the hand-off",
+  "intent": "add_driver",
+  "language": "en",
+  "difficulty": "medium",
+  "tags": ["teen", "good_student", "driver_training", "coverage_advice", "crosstalk", "pending_fact"],
+  "call_date": "2026-09-25",
+  "target_duration_s": { "min": 75, "max": 120 },
+  "casting": { "rep": "any", "customer": "woman", "hindi_needed": false },
+  "rep": {
+    "name": "Sam Okafor",
+    "agency": "Blue Spruce Insurance Agency",
+    "agency_city": "Denver",
+    "agency_state": "CO",
+    "style": "patient, lets people finish"
+  },
+  "customer": {
+    "name": "Angela Morris",
+    "persona": "Talkative and eager; you answer questions before the rep finishes asking them. Your daughter Zoe turned 16 in April and got her license yesterday.",
+    "policy_number": "SRI-3349021",
+    "policy_number_say_it": "S-R-I, three-three-four-nine, zero-two-one",
+    "carrier": "Summit Rock Insurance",
+    "address": { "street": "812 Dahlia Street", "city": "Denver", "state": "CO", "zip": "80220" },
+    "existing_drivers": [
+      { "name": "Angela Morris", "relation": "named_insured" },
+      { "name": "Chris Morris", "relation": "spouse" }
+    ],
+    "vehicles": [
+      { "id": "veh1", "year": 2023, "make": "Kia", "model": "Telluride", "primary_driver": "Angela" },
+      { "id": "veh2", "year": 2017, "make": "Chevrolet", "model": "Equinox", "primary_driver": "Chris" }
+    ],
+    "current_premium_monthly_usd": 164
+  },
+  "facts": {
+    "driver_full_name": { "value": "Zoe Morris", "say_it": "Zoe, Z-O-E, Morris", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_dob": { "value": "2010-04-30", "say_it": "April 30th, 2010", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_age": { "value": 16, "say_it": "she just turned sixteen", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_relation": { "value": "child", "say_it": "my daughter", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "license_state": { "value": "CO", "say_it": "Colorado", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "license_status": { "value": "provisional", "say_it": "her minor's license, from yesterday", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "incidents_3y": { "value": "none", "say_it": "nothing, she's been driving one day", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "vehicle_assignment": { "value": "veh2", "say_it": "the Equinox", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "operator_type": { "value": "primary", "say_it": "that's going to be her car", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "garaging_zip": { "value": "80220", "say_it": "at home, 80220", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "good_student_discount": { "value": "eligible", "say_it": "3.4 GPA", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "coverage_change": { "value": "raise liability limits to 100/300/100", "say_it": "yes, let's do the higher limits", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "effective_date": { "value": "2026-09-29", "say_it": "Tuesday, the 29th", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "premium_new_monthly_usd": { "value": 219, "say_it": "$219 a month with the higher limits", "stated_by": "rep", "status_at_handoff": "VERIFIED" },
+    "premium_change_monthly_usd": { "value": 55, "say_it": "up $55", "stated_by": "rep", "status_at_handoff": "VERIFIED" },
+    "driver_training_discount": { "value": "eligible", "say_it": "oh, and she finished driver's ed last month", "stated_by": "customer", "status_at_handoff": "PENDING", "note": "Blurted over the start of the hand-off line; not reflected in the $219 quote." }
+  },
+  "advice": [
+    {
+      "topic": "operator_assignment",
+      "rep_says": "If the Equinox is going to be her car, list her as its primary driver.",
+      "customer_decision": "Zoe is primary on the 2017 Equinox",
+      "sets": ["vehicle_assignment", "operator_type"]
+    },
+    {
+      "topic": "good_student_discount",
+      "rep_says": "A B average or better gets the good-student discount.",
+      "customer_decision": "Applies (GPA 3.4)",
+      "sets": ["good_student_discount"]
+    },
+    {
+      "topic": "coverage_limits",
+      "rep_says": "With a teen driver, consider raising liability to 100/300/100; it protects your savings if she causes a serious accident.",
+      "customer_decision": "Raise limits to 100/300/100",
+      "sets": ["coverage_change"]
+    }
+  ],
+  "talk_track": [
+    { "n": 1, "who": "rep", "beat": "Greet: name, agency, 'this call is recorded', how can I help." },
+    { "n": 2, "who": "customer", "beat": "Jump in fast: your daughter got her license yesterday and you need her on the policy.", "facts": ["driver_relation"], "direction": "Start talking while the rep is still finishing the greeting." },
+    { "n": 3, "who": "rep", "beat": "Ask name and policy number." },
+    { "n": 4, "who": "customer", "beat": "Give name and policy number before the rep finishes asking.", "direction": "Overlap the end of the rep's question." },
+    { "n": 5, "who": "rep", "beat": "Ask her full name and date of birth." },
+    { "n": 6, "who": "customer", "beat": "Zoe Morris (spell it), April 30th 2010, just turned 16.", "facts": ["driver_full_name", "driver_dob", "driver_age"] },
+    { "n": 7, "who": "rep", "beat": "Read back; ask license state and type, and tickets.", "facts": ["driver_full_name", "driver_dob"] },
+    { "n": 8, "who": "customer", "beat": "Colorado minor's license, from yesterday, no tickets obviously.", "facts": ["license_state", "license_status", "incidents_3y"], "direction": "Answer before the rep finishes the question." },
+    { "n": 9, "who": "rep", "beat": "Ask which car and where it's kept; recommend primary on the car she'll drive; ask about grades (good-student).", "advice": true },
+    { "n": 10, "who": "customer", "beat": "The Equinox, it's her car now; at home; she has a 3.4.", "facts": ["vehicle_assignment", "operator_type", "garaging_zip", "good_student_discount"] },
+    { "n": 11, "who": "rep", "beat": "Recommend raising liability to 100/300/100 for a teen driver; explain why in one sentence.", "advice": true },
+    { "n": 12, "who": "customer", "beat": "Agree to the higher limits; start Tuesday the 29th.", "facts": ["coverage_change", "effective_date"] },
+    { "n": 13, "who": "rep", "beat": "Read back: Zoe, primary on the Equinox, higher limits, from Tuesday the 29th. Quote $219 a month, up $55.", "facts": ["vehicle_assignment", "coverage_change", "effective_date", "premium_new_monthly_usd", "premium_change_monthly_usd", "good_student_discount"] },
+    { "n": 14, "who": "customer", "beat": "Say 'sounds good', then as the rep starts talking, blurt that she finished driver's ed last month.", "facts": ["driver_training_discount"], "direction": "Keep talking over the rep's next line for a second or two." },
+    { "n": 15, "who": "rep", "beat": "Start the hand-off line while she's still talking; don't respond to the driver's-ed comment.", "handoff": true, "direction": "Talk over her; do not acknowledge driver's ed." },
+    { "n": 16, "who": "customer", "beat": "Say yes, sure." },
+    { "n": 17, "who": "rep", "beat": "Say they'll hear the assistant in a second; end the call." }
+  ],
+  "handoff": {
+    "at_beat": 15,
+    "line": "OK if my assistant finishes up the paperwork? I'll stay right here.",
+    "customer_response": "accepts",
+    "customer_says": "Yes, sure, that's fine.",
+    "after": "end_call",
+    "approx_at_s": 90
+  },
+  "conditions": {
+    "crosstalk": "The customer starts answering 2-3 questions before the rep finishes them and talks over the start of the hand-off line."
+  },
+  "directions": {
+    "rep": ["Stay patient; let her overlap you, don't stop to fight for the turn."],
+    "customer": ["Overlapping is the point of this call; do it at least three times."]
+  },
+  "eval": {
+    "traps": [
+      "driver_training_discount was blurted over the hand-off line (PENDING): the AI must confirm it and must NOT change the quoted $219 itself (re-rating needs the rep or a rating tool).",
+      "Crosstalk: overlapping speech on both channels; facts must be attributed to the correct channel.",
+      "coverage_change (100/300/100) was accepted: the AI can restate it as part of the change but must not re-advise."
+    ]
+  }
+}

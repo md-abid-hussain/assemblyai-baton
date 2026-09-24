@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "id": "s01",
+  "title": "Add 17-year-old daughter Maya to the Civic (golden demo path)",
+  "intent": "add_driver",
+  "language": "en",
+  "difficulty": "easy",
+  "tags": ["golden", "baseline", "teen", "good_student", "coverage_advice"],
+  "call_date": "2026-09-25",
+  "target_duration_s": { "min": 75, "max": 120 },
+  "casting": { "rep": "any", "customer": "woman", "hindi_needed": false },
+  "rep": {
+    "name": "Daniel Reyes",
+    "agency": "Harborview Insurance Agency",
+    "agency_city": "Cleveland",
+    "agency_state": "OH",
+    "style": "warm, unhurried, explains things simply"
+  },
+  "customer": {
+    "name": "Priya Raman",
+    "persona": "Working parent calling from home on a weekday evening. Friendly and organized, a little nervous about the price. Your daughter Maya just passed her driving test.",
+    "policy_number": "NBM-4418207",
+    "policy_number_say_it": "N-B-M, four-four-one-eight, two-zero-seven",
+    "carrier": "Northbeam Mutual",
+    "address": { "street": "1427 Belle Avenue", "city": "Lakewood", "state": "OH", "zip": "44107" },
+    "existing_drivers": [
+      { "name": "Priya Raman", "relation": "named_insured" },
+      { "name": "Arun Raman", "relation": "spouse" }
+    ],
+    "vehicles": [
+      { "id": "veh1", "year": 2021, "make": "Honda", "model": "Civic", "primary_driver": "Priya" },
+      { "id": "veh2", "year": 2018, "make": "Toyota", "model": "Highlander", "primary_driver": "Arun" }
+    ],
+    "current_premium_monthly_usd": 96
+  },
+  "facts": {
+    "driver_full_name": { "value": "Maya Raman", "say_it": "Maya Raman, M-A-Y-A", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_dob": { "value": "2009-03-14", "say_it": "March 14th, 2009", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_age": { "value": 17, "say_it": "she's seventeen", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_relation": { "value": "child", "say_it": "my daughter", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "license_state": { "value": "OH", "say_it": "Ohio", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "license_status": { "value": "provisional", "say_it": "her probationary license, she passed last Tuesday", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "incidents_3y": { "value": "none", "say_it": "no tickets, nothing", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "vehicle_assignment": { "value": "veh1", "say_it": "the Civic", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "operator_type": { "value": "primary", "say_it": "she'll drive it every day to school", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "garaging_zip": { "value": "44107", "say_it": "it's parked at home, 44107", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "effective_date": { "value": "2026-10-02", "say_it": "next Friday, October 2nd", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "good_student_discount": { "value": "eligible", "say_it": "she has a 3.6 GPA", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "coverage_change": { "value": "none - keeps current 50/100/50 liability limits", "say_it": "let's keep the limits as they are for now", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "premium_new_monthly_usd": { "value": 142, "say_it": "$142 a month", "stated_by": "rep", "status_at_handoff": "VERIFIED" },
+    "premium_change_monthly_usd": { "value": 46, "say_it": "that's up $46 from your $96", "stated_by": "rep", "status_at_handoff": "VERIFIED" }
+  },
+  "advice": [
+    {
+      "topic": "operator_assignment",
+      "rep_says": "List Maya as the primary driver on the car she will actually drive most; rating her on the wrong car can cause trouble at claim time.",
+      "customer_decision": "Maya is primary on the 2021 Civic",
+      "sets": ["vehicle_assignment", "operator_type"]
+    },
+    {
+      "topic": "good_student_discount",
+      "rep_says": "With a B average (3.0 GPA) or better she qualifies for the good-student discount; send a report card within 30 days.",
+      "customer_decision": "Applies (GPA 3.6)",
+      "sets": ["good_student_discount"]
+    },
+    {
+      "topic": "coverage_limits",
+      "rep_says": "With a new teen driver many families raise liability limits from 50/100 to 100/300; that would add about $11 a month.",
+      "customer_decision": "Keep current limits for now",
+      "sets": ["coverage_change"]
+    }
+  ],
+  "talk_track": [
+    { "n": 1, "who": "rep", "beat": "Greet: your name, the agency, 'this call is recorded for quality and training', ask how you can help." },
+    { "n": 2, "who": "customer", "beat": "Say you want to add your daughter to your car insurance; she just got her license.", "facts": ["driver_relation"] },
+    { "n": 3, "who": "rep", "beat": "Congratulate her; ask for the policyholder's name and the policy number so you can pull it up." },
+    { "n": 4, "who": "customer", "beat": "Give your name and policy number." },
+    { "n": 5, "who": "rep", "beat": "Confirm you found the policy (read back the street address). Ask the daughter's full name and date of birth." },
+    { "n": 6, "who": "customer", "beat": "Give Maya's full name (spell the first name) and her date of birth; mention she's 17.", "facts": ["driver_full_name", "driver_dob", "driver_age"] },
+    { "n": 7, "who": "rep", "beat": "Read the name and date of birth back. Ask which state issued her license, what kind, and any tickets or accidents.", "facts": ["driver_full_name", "driver_dob"] },
+    { "n": 8, "who": "customer", "beat": "Ohio, probationary license, passed last week, no tickets.", "facts": ["license_state", "license_status", "incidents_3y"] },
+    { "n": 9, "who": "rep", "beat": "Ask which car she'll drive most and explain why she should be listed as primary on that car. Ask where it's parked overnight.", "advice": true },
+    { "n": 10, "who": "customer", "beat": "The Civic, every day to school; it's parked at home (give the ZIP).", "facts": ["vehicle_assignment", "operator_type", "garaging_zip"] },
+    { "n": 11, "who": "rep", "beat": "Mention the good-student discount (B average or better, report card within 30 days) and suggest raising liability limits for a teen driver (about $11 more a month).", "advice": true },
+    { "n": 12, "who": "customer", "beat": "She has a 3.6 GPA. Keep the limits as they are for now.", "facts": ["good_student_discount", "coverage_change"] },
+    { "n": 13, "who": "rep", "beat": "Ask when Maya should be added to the policy." },
+    { "n": 14, "who": "customer", "beat": "Next Friday, October 2nd; that's when she starts driving to school.", "facts": ["effective_date"] },
+    { "n": 15, "who": "rep", "beat": "Read back: Maya, primary on the Civic, from Friday October 2nd. Quote the new premium ($142 a month, up $46, good-student discount included).", "facts": ["effective_date", "premium_new_monthly_usd", "premium_change_monthly_usd"] },
+    { "n": 16, "who": "customer", "beat": "React to the price (a bit much, but OK) and say go ahead.", "direction": "A small 'oof' at the price is perfect." },
+    { "n": 17, "who": "rep", "beat": "Offer the hand-off.", "handoff": true },
+    { "n": 18, "who": "customer", "beat": "Agree." },
+    { "n": 19, "who": "rep", "beat": "Say they'll hear the assistant in a second, then end the call." }
+  ],
+  "handoff": {
+    "at_beat": 17,
+    "line": "OK if my assistant finishes the paperwork? I'll stay on the line.",
+    "customer_response": "accepts",
+    "customer_says": "Sure, go ahead.",
+    "after": "end_call",
+    "approx_at_s": 95
+  },
+  "conditions": {},
+  "directions": {
+    "rep": ["This is the call the demo video is built around: relaxed pace, clear numbers.", "Say the premium and the date clearly once; don't rush the read-back."],
+    "customer": ["Sound like a real parent; you don't have to use the exact words on the card."]
+  },
+  "eval": {
+    "traps": [
+      "Baseline: every required fact is VERIFIED, so the AI must re-ask nothing (re-asked = 0).",
+      "The AI opening should state Maya, the 2021 Civic, Friday October 2, 2026 and $142/month from case state only.",
+      "The liability increase was declined; the AI must not re-offer it (that is advice)."
+    ]
+  }
+}

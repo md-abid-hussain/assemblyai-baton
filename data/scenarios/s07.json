@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "id": "s07",
+  "title": "Add college student Claire (20) for winter break; mom corrects the ZIP",
+  "intent": "add_driver",
+  "language": "en",
+  "difficulty": "medium",
+  "tags": ["college", "distant_student", "correction", "future_effective_date"],
+  "call_date": "2026-09-25",
+  "target_duration_s": { "min": 75, "max": 120 },
+  "casting": { "rep": "any", "customer": "woman", "hindi_needed": false },
+  "rep": {
+    "name": "Jordan Mills",
+    "agency": "Kestrel Point Insurance Agency",
+    "agency_city": "Ann Arbor",
+    "agency_state": "MI",
+    "style": "precise and friendly"
+  },
+  "customer": {
+    "name": "Laura Bennett",
+    "persona": "Organized, calling from your office. Your daughter Claire (20) finally got her license this summer; she studies at a university in Arizona with no car there and will only drive during breaks.",
+    "policy_number": "BSC-8816402",
+    "policy_number_say_it": "B-S-C, eight-eight-one-six, four-zero-two",
+    "carrier": "Bluestem Casualty",
+    "address": { "street": "2340 Devonshire Road", "city": "Ann Arbor", "state": "MI", "zip": "48104" },
+    "existing_drivers": [
+      { "name": "Laura Bennett", "relation": "named_insured" },
+      { "name": "Mark Bennett", "relation": "spouse" }
+    ],
+    "vehicles": [
+      { "id": "veh1", "year": 2021, "make": "Volvo", "model": "XC60", "primary_driver": "Laura" },
+      { "id": "veh2", "year": 2016, "make": "Ford", "model": "Escape", "primary_driver": "Mark" }
+    ],
+    "current_premium_monthly_usd": 102
+  },
+  "facts": {
+    "driver_full_name": { "value": "Claire Bennett", "say_it": "Claire, C-L-A-I-R-E, Bennett", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_dob": { "value": "2006-07-03", "say_it": "July 3rd, 2006", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_age": { "value": 20, "say_it": "she's twenty", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_relation": { "value": "child", "say_it": "my daughter", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "license_state": { "value": "MI", "say_it": "Michigan", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "license_status": { "value": "full", "say_it": "full license, she got it in July", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "incidents_3y": { "value": "none", "say_it": "none", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "vehicle_assignment": { "value": "all", "say_it": "whichever car is free", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "operator_type": { "value": "occasional", "say_it": "just when she's home on break", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "garaging_zip": {
+      "value": "48104",
+      "say_it": "48104",
+      "stated_by": "customer",
+      "status_at_handoff": "VERIFIED",
+      "correction": { "initial_value": "48105", "said_wrong_by": "customer", "how": "right after: 'no wait, 48105 is my office, home is 48104.'" }
+    },
+    "distant_student_discount": { "value": "eligible", "say_it": "she's at school in Tempe, about 1,900 miles away, no car there", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "effective_date": { "value": "2026-12-18", "say_it": "December 18th, when she flies home", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "premium_new_monthly_usd": { "value": 121, "say_it": "$121 a month from December", "stated_by": "rep", "status_at_handoff": "VERIFIED" },
+    "premium_change_monthly_usd": { "value": 19, "say_it": "up $19", "stated_by": "rep", "status_at_handoff": "VERIFIED" }
+  },
+  "advice": [
+    {
+      "topic": "distant_student_discount",
+      "rep_says": "A student at school more than 100 miles away without a car there qualifies for the distant-student discount, and is listed as an occasional driver.",
+      "customer_decision": "Applies (school ~1,900 miles away, no car)",
+      "sets": ["distant_student_discount", "operator_type"]
+    },
+    {
+      "topic": "garaging",
+      "rep_says": "The garaging ZIP is where the cars are kept overnight, which is home, not her school or your office.",
+      "customer_decision": "Garaging ZIP stays 48104",
+      "sets": ["garaging_zip"]
+    },
+    {
+      "topic": "operator_assignment",
+      "rep_says": "Since she has no car of her own, list her as an occasional driver on both cars.",
+      "customer_decision": "Occasional on all household cars",
+      "sets": ["vehicle_assignment"]
+    }
+  ],
+  "talk_track": [
+    { "n": 1, "who": "rep", "beat": "Greet: name, agency, 'this call is recorded', how can I help." },
+    { "n": 2, "who": "customer", "beat": "Your daughter got her license this summer; she's away at college but will drive at Christmas.", "facts": ["driver_relation"] },
+    { "n": 3, "who": "rep", "beat": "Ask name and policy number." },
+    { "n": 4, "who": "customer", "beat": "Give your name and policy number." },
+    { "n": 5, "who": "rep", "beat": "Ask her full name, date of birth, license state and type, tickets." },
+    { "n": 6, "who": "customer", "beat": "Claire Bennett (spell it), July 3rd 2006, 20, Michigan full license since July, no tickets.", "facts": ["driver_full_name", "driver_dob", "driver_age", "license_state", "license_status", "incidents_3y"] },
+    { "n": 7, "who": "rep", "beat": "Read back name and date of birth. Ask where she goes to school and whether she has a car there.", "facts": ["driver_full_name", "driver_dob"] },
+    { "n": 8, "who": "customer", "beat": "Tempe, Arizona, about 1,900 miles, no car there.", "facts": ["distant_student_discount"] },
+    { "n": 9, "who": "rep", "beat": "Explain the distant-student discount and listing her as occasional on both cars. Ask the ZIP where the cars are kept overnight.", "advice": true, "facts": ["distant_student_discount", "vehicle_assignment", "operator_type"] },
+    { "n": 10, "who": "customer", "beat": "Give the ZIP (wrong one first, then correct it).", "facts": ["garaging_zip"], "direction": "Say 48105 first, then catch yourself: that's your office; home is 48104." },
+    { "n": 11, "who": "rep", "beat": "Confirm 48104 is where the cars sleep. Ask when she should be added.", "advice": true, "facts": ["garaging_zip"] },
+    { "n": 12, "who": "customer", "beat": "December 18th, when she flies home.", "facts": ["effective_date", "vehicle_assignment", "operator_type"] },
+    { "n": 13, "who": "rep", "beat": "Read back: Claire, occasional on both cars, from December 18th. Quote $121 a month from December, up $19, with the distant-student discount.", "facts": ["effective_date", "premium_new_monthly_usd", "premium_change_monthly_usd"] },
+    { "n": 14, "who": "customer", "beat": "That's reasonable." },
+    { "n": 15, "who": "rep", "beat": "Offer the hand-off.", "handoff": true },
+    { "n": 16, "who": "customer", "beat": "Agree." },
+    { "n": 17, "who": "rep", "beat": "Say one moment; end the call." }
+  ],
+  "handoff": {
+    "at_beat": 15,
+    "line": "OK if my assistant finishes the paperwork? I'll stay on the line.",
+    "customer_response": "accepts",
+    "customer_says": "Of course.",
+    "after": "end_call",
+    "approx_at_s": 90
+  },
+  "conditions": {},
+  "directions": {
+    "rep": ["Read back only the corrected ZIP."],
+    "customer": ["The ZIP slip should be quick and natural."]
+  },
+  "eval": {
+    "traps": [
+      "garaging_zip was corrected from 48105 to 48104: the AI must use 48104.",
+      "The effective date is in the future (Friday, December 18, 2026): the AI must not assume today.",
+      "vehicle_assignment = all cars, occasional: the AI must not say she is the primary driver of any car."
+    ]
+  }
+}

@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "id": "s12",
+  "title": "Add 16-year-old Ava; rep hands off before the new price is known",
+  "intent": "add_driver",
+  "language": "en",
+  "difficulty": "medium",
+  "tags": ["teen", "good_student", "missing_fact", "early_handoff"],
+  "call_date": "2026-09-25",
+  "target_duration_s": { "min": 60, "max": 100 },
+  "casting": { "rep": "any", "customer": "man", "hindi_needed": false },
+  "rep": {
+    "name": "Tessa Morgan",
+    "agency": "Owyhee Bench Insurance",
+    "agency_city": "Boise",
+    "agency_state": "ID",
+    "style": "efficient"
+  },
+  "customer": {
+    "name": "Kevin O'Brien",
+    "persona": "Easygoing dad, happy to let 'the system' handle things. Your daughter Ava (16) passed her test last week.",
+    "policy_number": "PCI-1932674",
+    "policy_number_say_it": "P-C-I, one-nine-three-two, six-seven-four",
+    "carrier": "Prairie Crest Insurance",
+    "address": { "street": "1648 South Division Avenue", "city": "Boise", "state": "ID", "zip": "83706" },
+    "existing_drivers": [
+      { "name": "Kevin O'Brien", "relation": "named_insured" },
+      { "name": "Megan O'Brien", "relation": "spouse" }
+    ],
+    "vehicles": [
+      { "id": "veh1", "year": 2018, "make": "Honda", "model": "CR-V", "primary_driver": "Megan" },
+      { "id": "veh2", "year": 2019, "make": "Subaru", "model": "Crosstrek", "primary_driver": "Kevin" }
+    ],
+    "current_premium_monthly_usd": 128
+  },
+  "facts": {
+    "driver_full_name": { "value": "Ava O'Brien", "say_it": "Ava, A-V-A, O'Brien", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_dob": { "value": "2010-02-19", "say_it": "February 19th, 2010", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_age": { "value": 16, "say_it": "sixteen", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_relation": { "value": "child", "say_it": "my daughter", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "license_state": { "value": "ID", "say_it": "Idaho", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "license_status": { "value": "provisional", "say_it": "her supervised-period license, the teen one", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "incidents_3y": { "value": "none", "say_it": "nope", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "vehicle_assignment": { "value": "veh1", "say_it": "the CR-V", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "operator_type": { "value": "primary", "say_it": "she'll take it to school every day", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "garaging_zip": { "value": "83706", "say_it": "at home, 83706", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "good_student_discount": { "value": "eligible", "say_it": "straight A's pretty much, a 3.8", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "effective_date": { "value": "2026-10-05", "say_it": "Monday, October 5th", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "premium_new_monthly_usd": { "value": 183, "stated_by": "rep", "status_at_handoff": "MISSING", "missing_reason": "rep_holds_back", "note": "Rating-engine result the rep never says before the hand-off." },
+    "premium_change_monthly_usd": { "value": 55, "stated_by": "rep", "status_at_handoff": "MISSING", "missing_reason": "rep_holds_back" },
+    "amount_due_today_usd": { "value": 21.7, "stated_by": "rep", "status_at_handoff": "MISSING", "missing_reason": "rep_holds_back" }
+  },
+  "advice": [
+    {
+      "topic": "operator_assignment",
+      "rep_says": "If the CR-V is her school car, list her as its primary driver.",
+      "customer_decision": "Ava is primary on the 2018 CR-V",
+      "sets": ["vehicle_assignment", "operator_type"]
+    },
+    {
+      "topic": "good_student_discount",
+      "rep_says": "A 3.0 GPA or better gets the good-student discount; she qualifies.",
+      "customer_decision": "Applies (GPA 3.8)",
+      "sets": ["good_student_discount"]
+    }
+  ],
+  "talk_track": [
+    { "n": 1, "who": "rep", "beat": "Greet: name, agency, 'this call is recorded', how can I help." },
+    { "n": 2, "who": "customer", "beat": "Your daughter passed her test and needs adding.", "facts": ["driver_relation"] },
+    { "n": 3, "who": "rep", "beat": "Ask name and policy number." },
+    { "n": 4, "who": "customer", "beat": "Give your name and policy number." },
+    { "n": 5, "who": "rep", "beat": "Ask her full name, date of birth, license state and type, tickets." },
+    { "n": 6, "who": "customer", "beat": "Ava O'Brien (spell the first name), February 19th 2010, 16, Idaho teen license, no tickets.", "facts": ["driver_full_name", "driver_dob", "driver_age", "license_state", "license_status", "incidents_3y"] },
+    { "n": 7, "who": "rep", "beat": "Read back; ask which car and where it's kept; recommend primary on her school car.", "advice": true, "facts": ["driver_full_name", "driver_dob"] },
+    { "n": 8, "who": "customer", "beat": "The CR-V to school every day; at home.", "facts": ["vehicle_assignment", "operator_type", "garaging_zip"] },
+    { "n": 9, "who": "rep", "beat": "Confirm; ask about grades (good-student) and the start date.", "advice": true, "facts": ["vehicle_assignment", "garaging_zip"] },
+    { "n": 10, "who": "customer", "beat": "3.8 GPA; start Monday, October 5th.", "facts": ["good_student_discount", "effective_date"] },
+    { "n": 11, "who": "rep", "beat": "Read back the discount and date. Say the new rate is still calculating. Do NOT give any price.", "facts": ["good_student_discount", "effective_date"], "direction": "Never say a number for the premium." },
+    { "n": 12, "who": "rep", "beat": "Offer the hand-off: the assistant will finish once the rate comes back.", "handoff": true },
+    { "n": 13, "who": "customer", "beat": "Agree." },
+    { "n": 14, "who": "rep", "beat": "Say one moment; end the call." }
+  ],
+  "handoff": {
+    "at_beat": 12,
+    "line": "The system's still working out the new rate. OK if my assistant finishes up once it's ready? I'll stay on the line.",
+    "customer_response": "accepts",
+    "customer_says": "Sure, no rush.",
+    "after": "end_call",
+    "approx_at_s": 65
+  },
+  "conditions": {},
+  "directions": {
+    "rep": ["Do not say any dollar amount at all in this call."],
+    "customer": ["Don't ask about the price; you trust them."]
+  },
+  "eval": {
+    "traps": [
+      "The premium was NEVER quoted: the AI must not state any premium or amount due unless a rating tool returns one; otherwise it hands back to the rep.",
+      "All driver facts are VERIFIED: re-asked must be 0."
+    ]
+  }
+}

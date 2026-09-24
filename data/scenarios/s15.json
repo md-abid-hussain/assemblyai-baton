@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "id": "s15",
+  "title": "Add stepdaughter Sophie (17); stepdad doesn't know her exact birthday",
+  "intent": "add_driver",
+  "language": "en",
+  "difficulty": "medium",
+  "tags": ["stepchild", "teen", "good_student", "missing_fact"],
+  "call_date": "2026-09-25",
+  "target_duration_s": { "min": 60, "max": 110 },
+  "casting": { "rep": "any", "customer": "man", "hindi_needed": false },
+  "rep": {
+    "name": "Rachel Kim",
+    "agency": "Platte Bend Insurance Agency",
+    "agency_city": "Omaha",
+    "agency_state": "NE",
+    "style": "friendly"
+  },
+  "customer": {
+    "name": "Mike Sullivan",
+    "persona": "Stepdad, friendly but vague on details. You know Sophie is 17 but not her exact birthday offhand.",
+    "policy_number": "PCI-8240517",
+    "policy_number_say_it": "P-C-I, eight-two-four-zero, five-one-seven",
+    "carrier": "Prairie Crest Insurance",
+    "address": { "street": "9204 Blondo Street", "city": "Omaha", "state": "NE", "zip": "68114" },
+    "existing_drivers": [
+      { "name": "Mike Sullivan", "relation": "named_insured" },
+      { "name": "Linh Sullivan", "relation": "spouse" }
+    ],
+    "vehicles": [
+      { "id": "veh1", "year": 2020, "make": "Toyota", "model": "Tacoma", "primary_driver": "Mike" },
+      { "id": "veh2", "year": 2017, "make": "Chevrolet", "model": "Malibu", "primary_driver": "Linh" }
+    ],
+    "current_premium_monthly_usd": 121
+  },
+  "facts": {
+    "driver_full_name": { "value": "Sophie Tran", "say_it": "Sophie Tran, T-R-A-N, she has her dad's last name", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_age": { "value": 17, "say_it": "she's seventeen", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_dob": { "value": "2009-07-22", "stated_by": "customer", "status_at_handoff": "MISSING", "missing_reason": "customer_unsure", "note": "Ground truth July 22, 2009; the customer doesn't know it during this call." },
+    "driver_relation": { "value": "stepchild", "say_it": "my stepdaughter", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "license_state": { "value": "NE", "say_it": "Nebraska", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "license_status": { "value": "provisional", "say_it": "her provisional one", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "incidents_3y": { "value": "none", "say_it": "none that I know of... no, none", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "vehicle_assignment": { "value": "veh2", "say_it": "the Malibu", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "operator_type": { "value": "primary", "say_it": "she'll be driving it most days", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "garaging_zip": { "value": "68114", "say_it": "at home, 68114", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "good_student_discount": { "value": "eligible", "say_it": "she's got like a 3.2", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "effective_date": { "value": "2026-10-02", "say_it": "next Friday, October 2nd", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "premium_new_monthly_usd": { "value": 167, "say_it": "about $167 a month", "stated_by": "rep", "status_at_handoff": "VERIFIED" },
+    "premium_change_monthly_usd": { "value": 46, "say_it": "up $46", "stated_by": "rep", "status_at_handoff": "VERIFIED" }
+  },
+  "advice": [
+    {
+      "topic": "household_listing",
+      "rep_says": "Stepchildren who live with you and drive need to be listed like any child.",
+      "customer_decision": "Add Sophie"
+    },
+    {
+      "topic": "operator_assignment",
+      "rep_says": "If the Malibu will be her main car, list her as its primary driver.",
+      "customer_decision": "Sophie is primary on the 2017 Malibu",
+      "sets": ["vehicle_assignment", "operator_type"]
+    },
+    {
+      "topic": "good_student_discount",
+      "rep_says": "A B average or better gets the good-student discount.",
+      "customer_decision": "Applies (GPA about 3.2)",
+      "sets": ["good_student_discount"]
+    }
+  ],
+  "talk_track": [
+    { "n": 1, "who": "rep", "beat": "Greet: name, agency, 'this call is recorded', how can I help." },
+    { "n": 2, "who": "customer", "beat": "Your stepdaughter got her license and needs to be on the policy.", "facts": ["driver_relation"] },
+    { "n": 3, "who": "rep", "beat": "Ask name and policy number; explain stepchildren in the home are listed like any child.", "advice": true },
+    { "n": 4, "who": "customer", "beat": "Give your name and policy number." },
+    { "n": 5, "who": "rep", "beat": "Ask her full name and date of birth." },
+    { "n": 6, "who": "customer", "beat": "Sophie Tran (spell the last name); she's 17; you don't know the exact birthday ('summer sometime, I'd have to ask my wife').", "facts": ["driver_full_name", "driver_age"] },
+    { "n": 7, "who": "rep", "beat": "Say no problem, you'll go with 17 for now. Ask license state and type, tickets.", "facts": ["driver_full_name", "driver_age"] },
+    { "n": 8, "who": "customer", "beat": "Nebraska provisional license, no tickets.", "facts": ["license_state", "license_status", "incidents_3y"] },
+    { "n": 9, "who": "rep", "beat": "Ask which car and where it's kept; recommend primary on her main car; ask about grades.", "advice": true },
+    { "n": 10, "who": "customer", "beat": "The Malibu, most days; at home; about a 3.2 GPA.", "facts": ["vehicle_assignment", "operator_type", "garaging_zip", "good_student_discount"] },
+    { "n": 11, "who": "rep", "beat": "Confirm; ask when to start.", "facts": ["vehicle_assignment", "garaging_zip", "good_student_discount"] },
+    { "n": 12, "who": "customer", "beat": "Next Friday, October 2nd.", "facts": ["effective_date"] },
+    { "n": 13, "who": "rep", "beat": "Read back the date; quote about $167 a month, up $46.", "facts": ["effective_date", "premium_new_monthly_usd", "premium_change_monthly_usd"] },
+    { "n": 14, "who": "customer", "beat": "OK." },
+    { "n": 15, "who": "rep", "beat": "Offer the hand-off.", "handoff": true },
+    { "n": 16, "who": "customer", "beat": "Agree." },
+    { "n": 17, "who": "rep", "beat": "Say one moment; end the call." }
+  ],
+  "handoff": {
+    "at_beat": 15,
+    "line": "OK if my assistant finishes the paperwork? I'll stay on the line.",
+    "customer_response": "accepts",
+    "customer_says": "Sure thing.",
+    "after": "end_call",
+    "approx_at_s": 80
+  },
+  "conditions": {},
+  "directions": {
+    "rep": ["Accept 'she's 17' and move on; don't push for the birthday."],
+    "customer": ["Sound genuinely unsure about the birthday; never guess a date."]
+  },
+  "eval": {
+    "traps": [
+      "driver_dob is MISSING (only 'she's 17' was given): the AI must ask for the date of birth (answer July 22, 2009); that is 'newly asked', not a re-ask.",
+      "driver_age is VERIFIED: the AI must not ask her age again.",
+      "'Summer sometime' is not a date: the extractor must not fill driver_dob from it."
+    ]
+  }
+}

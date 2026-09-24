@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "id": "s19",
+  "title": "Hinglish: mom adds 17-year-old son Arjun; rep speaks English only",
+  "intent": "add_driver",
+  "language": "hinglish",
+  "language_notes": "The CUSTOMER speaks Hinglish: mix Hindi and English inside sentences the way you would at home, for example 'Haan ji, mujhe apne bete ko policy mein add karna hai' or 'woh dono cars chalayega, mostly weekends pe'. Keep every name, number, date, ZIP code and the policy number in clear English ('eighteenth June, two thousand nine'; 'zero-eight-eight-two-zero'). The REP speaks only English; if a Hindi part is unclear, the rep politely asks again, which is realistic.",
+  "difficulty": "medium",
+  "tags": ["hinglish", "teen", "good_student"],
+  "call_date": "2026-09-25",
+  "target_duration_s": { "min": 75, "max": 120 },
+  "casting": { "rep": "any", "customer": "woman", "hindi_needed": true },
+  "rep": {
+    "name": "Ryan Mitchell",
+    "agency": "Raritan Bend Insurance Agency",
+    "agency_city": "Edison",
+    "agency_state": "NJ",
+    "style": "friendly, English only, happy to ask again"
+  },
+  "customer": {
+    "name": "Sunita Agarwal",
+    "persona": "Indian-American mom, equally comfortable in Hindi and English, switching mid-sentence. Your son Arjun (17) got his probationary license last week.",
+    "policy_number": "NBM-3386041",
+    "policy_number_say_it": "N-B-M, three-three-eight-six, zero-four-one",
+    "carrier": "Northbeam Mutual",
+    "address": { "street": "114 Brookside Terrace", "city": "Edison", "state": "NJ", "zip": "08820" },
+    "existing_drivers": [
+      { "name": "Sunita Agarwal", "relation": "named_insured" },
+      { "name": "Vikas Agarwal", "relation": "spouse" }
+    ],
+    "vehicles": [
+      { "id": "veh1", "year": 2022, "make": "Toyota", "model": "RAV4", "primary_driver": "Sunita" },
+      { "id": "veh2", "year": 2017, "make": "Honda", "model": "Accord", "primary_driver": "Vikas" }
+    ],
+    "current_premium_monthly_usd": 156
+  },
+  "facts": {
+    "driver_full_name": { "value": "Arjun Agarwal", "say_it": "uska naam Arjun hai, A-R-J-U-N, Agarwal", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_dob": { "value": "2009-06-18", "say_it": "date of birth hai eighteenth June, two thousand nine", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_age": { "value": 17, "say_it": "woh seventeen ka hai", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_relation": { "value": "child", "say_it": "mera beta, my son", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "license_state": { "value": "NJ", "say_it": "New Jersey", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "license_status": { "value": "provisional", "say_it": "probationary license, pichhle hafte mila", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "incidents_3y": { "value": "none", "say_it": "nahi, koi ticket nahi", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "vehicle_assignment": { "value": "all", "say_it": "dono cars, kabhi RAV4, kabhi Accord", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "operator_type": { "value": "occasional", "say_it": "mostly weekends pe, occasionally", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "garaging_zip": { "value": "08820", "say_it": "ghar pe hi, zero-eight-eight-two-zero", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "good_student_discount": { "value": "eligible", "say_it": "uska GPA three point nine hai", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "effective_date": { "value": "2026-09-28", "say_it": "Monday se, twenty-eighth September", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "premium_new_monthly_usd": { "value": 212, "say_it": "$212 a month", "stated_by": "rep", "status_at_handoff": "VERIFIED" },
+    "premium_change_monthly_usd": { "value": 56, "say_it": "up $56", "stated_by": "rep", "status_at_handoff": "VERIFIED" }
+  },
+  "advice": [
+    {
+      "topic": "operator_assignment",
+      "rep_says": "If he shares both cars and mostly drives on weekends, list him as an occasional driver on both.",
+      "customer_decision": "Occasional on both household cars",
+      "sets": ["vehicle_assignment", "operator_type"]
+    },
+    {
+      "topic": "good_student_discount",
+      "rep_says": "A 3.0 GPA or better gets the good-student discount; send a report card.",
+      "customer_decision": "Applies (GPA 3.9)",
+      "sets": ["good_student_discount"]
+    }
+  ],
+  "talk_track": [
+    { "n": 1, "who": "rep", "beat": "Greet in English: name, agency, 'this call is recorded', how can I help." },
+    { "n": 2, "who": "customer", "beat": "In Hinglish: you want to add your son to the car insurance, he just got his license.", "facts": ["driver_relation"] },
+    { "n": 3, "who": "rep", "beat": "Ask name and policy number." },
+    { "n": 4, "who": "customer", "beat": "Give your name and the policy number (number in English).", "facts": [] },
+    { "n": 5, "who": "rep", "beat": "Ask his full name and date of birth." },
+    { "n": 6, "who": "customer", "beat": "Hinglish: Arjun Agarwal (spell the first name), eighteenth June two thousand nine, he's 17.", "facts": ["driver_full_name", "driver_dob", "driver_age"] },
+    { "n": 7, "who": "rep", "beat": "Read back in English; ask license state and type, tickets. Ask her to repeat one Hindi phrase if unclear.", "facts": ["driver_full_name", "driver_dob"] },
+    { "n": 8, "who": "customer", "beat": "Hinglish: New Jersey probationary license, last week; no tickets.", "facts": ["license_state", "license_status", "incidents_3y"] },
+    { "n": 9, "who": "rep", "beat": "Ask which car he'll drive and where it's kept; explain occasional on both if he shares.", "advice": true },
+    { "n": 10, "who": "customer", "beat": "Hinglish: both cars, mostly weekends; kept at home (ZIP in English).", "facts": ["vehicle_assignment", "operator_type", "garaging_zip"] },
+    { "n": 11, "who": "rep", "beat": "Confirm occasional on both; ask about grades (good-student).", "advice": true, "facts": ["vehicle_assignment", "operator_type", "garaging_zip"] },
+    { "n": 12, "who": "customer", "beat": "Hinglish: GPA three point nine; start Monday the 28th.", "facts": ["good_student_discount", "effective_date"] },
+    { "n": 13, "who": "rep", "beat": "Read back the discount and Monday September 28th; quote $212 a month, up $56.", "facts": ["good_student_discount", "effective_date", "premium_new_monthly_usd", "premium_change_monthly_usd"] },
+    { "n": 14, "who": "customer", "beat": "Hinglish: theek hai, OK." },
+    { "n": 15, "who": "rep", "beat": "Offer the hand-off (in English).", "handoff": true },
+    { "n": 16, "who": "customer", "beat": "Agree in Hinglish." },
+    { "n": 17, "who": "rep", "beat": "Say one moment; end the call." }
+  ],
+  "handoff": {
+    "at_beat": 15,
+    "line": "OK if my assistant finishes the paperwork? I'll stay on the line.",
+    "customer_response": "accepts",
+    "customer_says": "Haan haan, theek hai, go ahead.",
+    "after": "end_call",
+    "approx_at_s": 90
+  },
+  "conditions": {},
+  "directions": {
+    "rep": ["Speak English only. Asking her to repeat something once is fine."],
+    "customer": ["Code-switch naturally, but every name, number and date in English, clearly."]
+  },
+  "eval": {
+    "traps": [
+      "Hinglish customer channel: transcribe with language_codes ['en','hi'] (English first); facts said in English inside Hindi sentences must be extracted.",
+      "Everything is VERIFIED: re-asked must be 0; the AI replies in English.",
+      "vehicle_assignment = all cars, occasional: the AI must not name a primary car."
+    ]
+  }
+}

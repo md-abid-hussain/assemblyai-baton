@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "id": "s21",
+  "title": "Add nephew Marcus (20) from a noisy street; talks over the rep; changes the car",
+  "intent": "add_driver",
+  "language": "en",
+  "difficulty": "hard",
+  "tags": ["other_relative", "college", "correction", "crosstalk", "background_noise", "pending_fact", "relative_date"],
+  "call_date": "2026-09-25",
+  "target_duration_s": { "min": 75, "max": 120 },
+  "casting": { "rep": "any", "customer": "man", "hindi_needed": false },
+  "rep": {
+    "name": "Diane Scott",
+    "agency": "Stony Point Mill Insurance",
+    "agency_city": "Richmond",
+    "agency_state": "VA",
+    "style": "patient, a little formal"
+  },
+  "customer": {
+    "name": "Darnell Robinson",
+    "persona": "Calling while walking outside near traffic; loud, fast talker who talks over the rep. Your nephew Marcus (20) is living with you this semester while at community college.",
+    "policy_number": "NBM-9901473",
+    "policy_number_say_it": "N-B-M, nine-nine-zero-one, four-seven-three",
+    "carrier": "Northbeam Mutual",
+    "address": { "street": "1408 Westover Hills Boulevard", "city": "Richmond", "state": "VA", "zip": "23225" },
+    "existing_drivers": [
+      { "name": "Darnell Robinson", "relation": "named_insured" },
+      { "name": "Keisha Robinson", "relation": "spouse" }
+    ],
+    "vehicles": [
+      { "id": "veh1", "year": 2021, "make": "Toyota", "model": "Tacoma", "primary_driver": "Darnell" },
+      { "id": "veh2", "year": 2014, "make": "Ford", "model": "Fusion", "primary_driver": "Keisha" }
+    ],
+    "current_premium_monthly_usd": 142
+  },
+  "facts": {
+    "driver_full_name": { "value": "Marcus Hill", "say_it": "Marcus Hill, H-I-L-L", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_dob": { "value": "2006-03-15", "say_it": "March 15th, 2006", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_age": { "value": 20, "say_it": "he's twenty", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_relation": { "value": "other_relative", "say_it": "my nephew, my sister's son", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "license_state": { "value": "VA", "say_it": "Virginia", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "license_status": { "value": "full", "say_it": "full license", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "incidents_3y": { "value": "none", "say_it": "clean", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "vehicle_assignment": {
+      "value": "veh2",
+      "say_it": "the Fusion",
+      "stated_by": "customer",
+      "status_at_handoff": "VERIFIED",
+      "correction": { "initial_value": "veh1", "said_wrong_by": "customer", "how": "'He'll take the truck... no, no, the Fusion. He's not touching my truck.'" }
+    },
+    "operator_type": { "value": "primary", "say_it": "every day to school", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "garaging_zip": { "value": "23225", "say_it": "at the house, 23225", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "premium_new_monthly_usd": { "value": 193, "say_it": "$193 a month", "stated_by": "rep", "status_at_handoff": "VERIFIED" },
+    "premium_change_monthly_usd": { "value": 51, "say_it": "up $51", "stated_by": "rep", "status_at_handoff": "VERIFIED" },
+    "effective_date": { "value": "2026-09-26", "say_it": "oh, starting tomorrow", "stated_by": "customer", "status_at_handoff": "PENDING", "note": "'Tomorrow' = Saturday, September 26, 2026; said as the rep begins the hand-off." }
+  },
+  "advice": [
+    {
+      "topic": "household_listing",
+      "rep_says": "Relatives living with you who drive your cars need to be on the policy, even for a semester.",
+      "customer_decision": "Add Marcus"
+    },
+    {
+      "topic": "operator_assignment",
+      "rep_says": "Whichever car he drives to school every day, he should be its primary driver.",
+      "customer_decision": "Marcus is primary on the 2014 Fusion",
+      "sets": ["vehicle_assignment", "operator_type"]
+    }
+  ],
+  "talk_track": [
+    { "n": 1, "who": "rep", "beat": "Greet: name, agency, 'this call is recorded', how can I help." },
+    { "n": 2, "who": "customer", "beat": "Loud: your nephew is staying with you and needs to be on the insurance.", "facts": ["driver_relation"], "direction": "Start before the rep finishes the greeting." },
+    { "n": 3, "who": "rep", "beat": "Ask name and policy number; explain relatives living with you must be listed.", "advice": true },
+    { "n": 4, "who": "customer", "beat": "Give name and policy number over the traffic; repeat part of it when asked." },
+    { "n": 5, "who": "rep", "beat": "Read back the policy number; ask his full name and date of birth." },
+    { "n": 6, "who": "customer", "beat": "Marcus Hill (spell the last name), March 15th 2006, 20.", "facts": ["driver_full_name", "driver_dob", "driver_age"] },
+    { "n": 7, "who": "rep", "beat": "Read back; ask license state and type, tickets.", "facts": ["driver_full_name", "driver_dob"] },
+    { "n": 8, "who": "customer", "beat": "Virginia, full, clean; talk over the end of the rep's question.", "facts": ["license_state", "license_status", "incidents_3y"] },
+    { "n": 9, "who": "rep", "beat": "Ask which car he'll drive and where it's kept; primary on the car he drives to school.", "advice": true },
+    { "n": 10, "who": "customer", "beat": "The truck... no, the Fusion; every day to school; at the house.", "facts": ["vehicle_assignment", "operator_type", "garaging_zip"], "direction": "Say 'the truck' first, then change to the Fusion." },
+    { "n": 11, "who": "rep", "beat": "Confirm the Fusion, primary, at the house. Quote $193 a month, up $51.", "facts": ["vehicle_assignment", "operator_type", "garaging_zip", "premium_new_monthly_usd", "premium_change_monthly_usd"] },
+    { "n": 12, "who": "customer", "beat": "Fine; then, overlapping the rep, add 'oh, starting tomorrow'.", "facts": ["effective_date"], "direction": "Say it as the rep starts talking again." },
+    { "n": 13, "who": "rep", "beat": "Go into the hand-off line without confirming the date.", "handoff": true, "direction": "Don't repeat 'tomorrow'." },
+    { "n": 14, "who": "customer", "beat": "Agree." },
+    { "n": 15, "who": "rep", "beat": "Say one moment; end the call." }
+  ],
+  "handoff": {
+    "at_beat": 13,
+    "line": "OK if my assistant finishes the paperwork? I'll stay on the line.",
+    "customer_response": "accepts",
+    "customer_says": "Yeah, yeah, go ahead.",
+    "after": "end_call",
+    "approx_at_s": 80
+  },
+  "conditions": {
+    "crosstalk": "The customer talks over the rep at least twice and answers before questions finish.",
+    "background_noise": "Customer is outdoors: traffic, horns, a bus or bike passing, some wind on the mic."
+  },
+  "directions": {
+    "rep": ["Ask him to repeat once because of the noise; stay calm when he overlaps you."],
+    "customer": ["Actually walk outside near a road (safely, not while driving). Speak a bit loudly, like people do outdoors."]
+  },
+  "eval": {
+    "traps": [
+      "vehicle_assignment was corrected from the Tacoma to the Fusion: the AI must use the 2014 Ford Fusion.",
+      "effective_date is PENDING ('tomorrow' = Saturday, September 26, 2026): confirm it, don't ask from scratch.",
+      "Street noise plus crosstalk on the customer channel: the hardest robustness case in the set."
+    ]
+  }
+}

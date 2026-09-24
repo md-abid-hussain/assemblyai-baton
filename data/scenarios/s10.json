@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "id": "s10",
+  "title": "Add partner Alex; 'occasional' becomes primary after advice; asks about the AI first",
+  "intent": "add_driver",
+  "language": "en",
+  "difficulty": "medium",
+  "tags": ["partner", "violation", "correction", "accepts_after_question"],
+  "call_date": "2026-09-25",
+  "target_duration_s": { "min": 75, "max": 120 },
+  "casting": { "rep": "any", "customer": "any", "hindi_needed": false },
+  "rep": {
+    "name": "Grace Lindqvist",
+    "agency": "Cedar Loon Insurance Agency",
+    "agency_city": "Minneapolis",
+    "agency_state": "MN",
+    "style": "direct, dry humor"
+  },
+  "customer": {
+    "name": "Chris Morgan",
+    "persona": "Relaxed and a little casual about details at first. Your partner Alex moved in in August and sold their car; Alex will use your Jeep to get to work.",
+    "policy_number": "SRI-9054117",
+    "policy_number_say_it": "S-R-I, nine-zero-five-four, one-one-seven",
+    "carrier": "Summit Rock Insurance",
+    "address": { "street": "4821 Upton Avenue South", "city": "Minneapolis", "state": "MN", "zip": "55410" },
+    "existing_drivers": [
+      { "name": "Chris Morgan", "relation": "named_insured" }
+    ],
+    "vehicles": [
+      { "id": "veh1", "year": 2019, "make": "Jeep", "model": "Cherokee", "primary_driver": "Chris" },
+      { "id": "veh2", "year": 2020, "make": "Tesla", "model": "Model 3", "primary_driver": "Chris" }
+    ],
+    "current_premium_monthly_usd": 146
+  },
+  "facts": {
+    "driver_full_name": { "value": "Alex Rivera", "say_it": "Alex Rivera, R-I-V-E-R-A", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_dob": { "value": "1997-11-04", "say_it": "November 4th, 1997", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_age": { "value": 28, "say_it": "twenty-eight", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_relation": { "value": "domestic_partner", "say_it": "my partner, we live together", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "license_state": { "value": "MN", "say_it": "Minnesota", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "license_status": { "value": "full", "say_it": "regular license", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "incidents_3y": { "value": "one speeding ticket, March 2025", "say_it": "one speeding ticket, March of last year", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "vehicle_assignment": { "value": "veh1", "say_it": "the Jeep", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "operator_type": {
+      "value": "primary",
+      "say_it": "every weekday to work, yeah",
+      "stated_by": "customer",
+      "status_at_handoff": "VERIFIED",
+      "correction": { "initial_value": "occasional", "said_wrong_by": "customer", "how": "when the rep asks how often, admit it's every weekday; agree to list Alex as primary on the Jeep." }
+    },
+    "garaging_zip": { "value": "55410", "say_it": "at home, 55410", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "effective_date": { "value": "2026-10-01", "say_it": "October 1st", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "premium_new_monthly_usd": { "value": 187, "say_it": "$187 a month", "stated_by": "rep", "status_at_handoff": "VERIFIED" },
+    "premium_change_monthly_usd": { "value": 41, "say_it": "up $41", "stated_by": "rep", "status_at_handoff": "VERIFIED" }
+  },
+  "advice": [
+    {
+      "topic": "household_listing",
+      "rep_says": "A partner who lives with you and drives your car needs to be listed.",
+      "customer_decision": "Add Alex"
+    },
+    {
+      "topic": "operator_assignment",
+      "rep_says": "If Alex drives the Jeep to work every weekday, Alex is its primary driver, not occasional; listing it wrong can cause problems with a claim.",
+      "customer_decision": "Alex is primary on the 2019 Jeep Cherokee",
+      "sets": ["operator_type", "vehicle_assignment"]
+    }
+  ],
+  "talk_track": [
+    { "n": 1, "who": "rep", "beat": "Greet: name, agency, 'this call is recorded', how can I help." },
+    { "n": 2, "who": "customer", "beat": "Your partner moved in and should probably be on the insurance.", "facts": ["driver_relation"] },
+    { "n": 3, "who": "rep", "beat": "Ask name and policy number; explain partners living with you must be listed.", "advice": true },
+    { "n": 4, "who": "customer", "beat": "Give your name and policy number." },
+    { "n": 5, "who": "rep", "beat": "Ask Alex's full name and date of birth." },
+    { "n": 6, "who": "customer", "beat": "Alex Rivera (spell it), November 4th 1997, 28.", "facts": ["driver_full_name", "driver_dob", "driver_age"] },
+    { "n": 7, "who": "rep", "beat": "Read back; ask license state and type, and any tickets or accidents.", "facts": ["driver_full_name", "driver_dob"] },
+    { "n": 8, "who": "customer", "beat": "Minnesota, regular license, one speeding ticket last March.", "facts": ["license_state", "license_status", "incidents_3y"] },
+    { "n": 9, "who": "rep", "beat": "Ask which car Alex will drive and how often." },
+    { "n": 10, "who": "customer", "beat": "The Jeep, 'just occasionally'.", "facts": ["vehicle_assignment", "operator_type"], "direction": "Say 'occasionally' casually." },
+    { "n": 11, "who": "rep", "beat": "Probe: how often, commuting? Explain that daily commuting makes Alex the primary driver.", "advice": true },
+    { "n": 12, "who": "customer", "beat": "Admit it's every weekday to work; OK, list Alex as primary. Car is kept at home.", "facts": ["operator_type", "garaging_zip"] },
+    { "n": 13, "who": "rep", "beat": "Confirm primary on the Jeep, parked at home; ask start date.", "facts": ["operator_type", "vehicle_assignment", "garaging_zip"] },
+    { "n": 14, "who": "customer", "beat": "October 1st.", "facts": ["effective_date"] },
+    { "n": 15, "who": "rep", "beat": "Read back the date; quote $187 a month, up $41.", "facts": ["effective_date", "premium_new_monthly_usd", "premium_change_monthly_usd"] },
+    { "n": 16, "who": "customer", "beat": "Fine." },
+    { "n": 17, "who": "rep", "beat": "Offer the hand-off.", "handoff": true },
+    { "n": 18, "who": "customer", "beat": "Ask whether the assistant will make you repeat everything; after the answer, agree." },
+    { "n": 19, "who": "rep", "beat": "Reassure: it already has everything and you're right here. End the call." }
+  ],
+  "handoff": {
+    "at_beat": 17,
+    "line": "OK if my assistant finishes the paperwork? I'll stay on the line.",
+    "customer_response": "accepts_after_question",
+    "customer_says": "Is it going to make me repeat all of this? ...OK, sure.",
+    "after": "end_call",
+    "approx_at_s": 95
+  },
+  "conditions": {},
+  "directions": {
+    "rep": ["Answer the repeat question in one line: 'No, it already has everything, and I'm right here.'"],
+    "customer": ["Be casual at first, then a bit sheepish when you admit it's daily."]
+  },
+  "eval": {
+    "traps": [
+      "operator_type was corrected occasional -> primary after advice: the AI must say primary on the Jeep.",
+      "The customer explicitly worried about repeating themselves: any re-ask is especially visible here (re-asked must be 0).",
+      "The speeding ticket is a VERIFIED fact: the AI must not explain its effect on price (that is advice)."
+    ]
+  }
+}

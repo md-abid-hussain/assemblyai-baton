@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "id": "s18",
+  "title": "Add daughter Leah (18) who takes the Jetta to college; campus ZIP unknown",
+  "intent": "add_driver",
+  "language": "en",
+  "difficulty": "hard",
+  "tags": ["college", "good_student", "garaging_differs", "missing_fact"],
+  "call_date": "2026-09-25",
+  "target_duration_s": { "min": 75, "max": 120 },
+  "casting": { "rep": "any", "customer": "man", "hindi_needed": false },
+  "rep": {
+    "name": "Julia Novak",
+    "agency": "Isthmus Bay Insurance Agency",
+    "agency_city": "Madison",
+    "agency_state": "WI",
+    "style": "thorough"
+  },
+  "customer": {
+    "name": "David Kim",
+    "persona": "Engineer, precise, but you don't know the campus ZIP. Your daughter Leah (18) moves into her dorm in Milwaukee this Sunday and is taking the Jetta.",
+    "policy_number": "PCI-3395281",
+    "policy_number_say_it": "P-C-I, three-three-nine-five, two-eight-one",
+    "carrier": "Prairie Crest Insurance",
+    "address": { "street": "418 Toepfer Avenue", "city": "Madison", "state": "WI", "zip": "53711" },
+    "existing_drivers": [
+      { "name": "David Kim", "relation": "named_insured" },
+      { "name": "Grace Kim", "relation": "spouse" }
+    ],
+    "vehicles": [
+      { "id": "veh1", "year": 2022, "make": "Mazda", "model": "CX-5", "primary_driver": "David" },
+      { "id": "veh2", "year": 2015, "make": "Volkswagen", "model": "Jetta", "primary_driver": "Grace" }
+    ],
+    "current_premium_monthly_usd": 118
+  },
+  "facts": {
+    "driver_full_name": { "value": "Leah Kim", "say_it": "Leah, L-E-A-H, Kim", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_dob": { "value": "2008-05-12", "say_it": "May 12th, 2008", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_age": { "value": 18, "say_it": "eighteen", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_relation": { "value": "child", "say_it": "my daughter", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "license_state": { "value": "WI", "say_it": "Wisconsin", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "license_status": { "value": "full", "say_it": "full license", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "incidents_3y": { "value": "none", "say_it": "none", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "vehicle_assignment": { "value": "veh2", "say_it": "the Jetta", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "operator_type": { "value": "primary", "say_it": "it'll be her car at school", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "garaging_zip": { "value": "53211", "stated_by": "customer", "status_at_handoff": "MISSING", "missing_reason": "customer_unsure", "note": "The car moves to campus in Milwaukee (53211). The home ZIP 53711 is NOT the answer." },
+    "good_student_discount": { "value": "eligible", "say_it": "3.5 in high school", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "effective_date": { "value": "2026-09-27", "say_it": "this Sunday, the 27th, move-in day", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "premium_new_monthly_usd": { "value": 149, "say_it": "$149 a month, based on your home ZIP for now", "stated_by": "rep", "status_at_handoff": "VERIFIED" },
+    "premium_change_monthly_usd": { "value": 31, "say_it": "up $31", "stated_by": "rep", "status_at_handoff": "VERIFIED" }
+  },
+  "advice": [
+    {
+      "topic": "garaging",
+      "rep_says": "The car has to be rated where it's kept most of the time; if it lives at school, that's the campus ZIP, and the price can change once we have it.",
+      "customer_decision": "Will provide the campus ZIP"
+    },
+    {
+      "topic": "operator_assignment",
+      "rep_says": "Since the Jetta goes with her, she's its primary driver.",
+      "customer_decision": "Leah is primary on the 2015 Jetta",
+      "sets": ["vehicle_assignment", "operator_type"]
+    },
+    {
+      "topic": "good_student_discount",
+      "rep_says": "Her 3.5 GPA qualifies for the good-student discount; college grades count once she has them.",
+      "customer_decision": "Applies",
+      "sets": ["good_student_discount"]
+    }
+  ],
+  "talk_track": [
+    { "n": 1, "who": "rep", "beat": "Greet: name, agency, 'this call is recorded', how can I help." },
+    { "n": 2, "who": "customer", "beat": "Your daughter is taking a car to college this weekend; she needs to be on the policy.", "facts": ["driver_relation"] },
+    { "n": 3, "who": "rep", "beat": "Ask name and policy number." },
+    { "n": 4, "who": "customer", "beat": "Give your name and policy number." },
+    { "n": 5, "who": "rep", "beat": "Ask her full name, date of birth, license state and type, tickets." },
+    { "n": 6, "who": "customer", "beat": "Leah Kim (spell it), May 12th 2008, 18, Wisconsin full license, no tickets.", "facts": ["driver_full_name", "driver_dob", "driver_age", "license_state", "license_status", "incidents_3y"] },
+    { "n": 7, "who": "rep", "beat": "Read back; ask which car and where it will be kept.", "facts": ["driver_full_name", "driver_dob"] },
+    { "n": 8, "who": "customer", "beat": "The Jetta; it'll be at her dorm in Milwaukee.", "facts": ["vehicle_assignment", "operator_type"] },
+    { "n": 9, "who": "rep", "beat": "Explain the car is rated where it's kept, so you need the campus ZIP; ask for it once.", "advice": true },
+    { "n": 10, "who": "customer", "beat": "You don't know it offhand; you'd have to look it up.", "direction": "Never guess a number." },
+    { "n": 11, "who": "rep", "beat": "OK, move on. Recommend primary on the Jetta; ask about grades and start date.", "advice": true, "facts": ["vehicle_assignment", "operator_type"] },
+    { "n": 12, "who": "customer", "beat": "3.5 GPA; start this Sunday the 27th, move-in day.", "facts": ["good_student_discount", "effective_date"] },
+    { "n": 13, "who": "rep", "beat": "Read back; quote $149 a month (up $31) based on the home ZIP for now, may change with the campus ZIP.", "facts": ["good_student_discount", "effective_date", "premium_new_monthly_usd", "premium_change_monthly_usd"] },
+    { "n": 14, "who": "customer", "beat": "Makes sense." },
+    { "n": 15, "who": "rep", "beat": "Offer the hand-off.", "handoff": true },
+    { "n": 16, "who": "customer", "beat": "Agree." },
+    { "n": 17, "who": "rep", "beat": "Say one moment; end the call." }
+  ],
+  "handoff": {
+    "at_beat": 15,
+    "line": "OK if my assistant finishes the paperwork? I'll stay on the line.",
+    "customer_response": "accepts",
+    "customer_says": "Sure.",
+    "after": "end_call",
+    "approx_at_s": 85
+  },
+  "conditions": {},
+  "directions": {
+    "rep": ["Say clearly that the price is based on the home ZIP for now."],
+    "customer": ["Don't say any ZIP for the campus; you genuinely don't know it."]
+  },
+  "eval": {
+    "traps": [
+      "garaging_zip is MISSING (the car moves to campus): the AI must ask for it; answer 53211. The home ZIP 53711 must NOT be used.",
+      "The $149 quote used the home ZIP: once the campus ZIP is known the AI must not present $149 as final; it re-rates via a tool or hands back.",
+      "Effective 'this Sunday, the 27th' = 2026-09-27."
+    ]
+  }
+}

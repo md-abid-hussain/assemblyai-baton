@@ -1,0 +1,9 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "lib": ["es2023", "dom"],
+    "types": ["node"]
+  },
+  "include": ["./**/*.ts", "../lib/**/*.ts"],
+  "exclude": ["../node_modules", "../out", "../fixtures"]
+}

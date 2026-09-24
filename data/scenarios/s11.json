@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "id": "s11",
+  "title": "Add brother Omar (Michigan license); kids interrupt; car choice comes up at the last second",
+  "intent": "add_driver",
+  "language": "en",
+  "difficulty": "hard",
+  "tags": ["sibling", "out_of_state_license", "interruptions", "pending_fact", "relative_date"],
+  "call_date": "2026-09-25",
+  "target_duration_s": { "min": 75, "max": 120 },
+  "casting": { "rep": "any", "customer": "woman", "hindi_needed": false },
+  "rep": {
+    "name": "Brian Foster",
+    "agency": "Sycamore Row Insurance Agency",
+    "agency_city": "Nashville",
+    "agency_state": "TN",
+    "style": "easygoing"
+  },
+  "customer": {
+    "name": "Fatima Hassan",
+    "persona": "Busy mom working from home; your kids interrupt you during the call. Your younger brother Omar (24) moved in while he finishes grad school.",
+    "policy_number": "BSC-3108852",
+    "policy_number_say_it": "B-S-C, three-one-zero-eight, eight-five-two",
+    "carrier": "Bluestem Casualty",
+    "address": { "street": "2216 Warfield Drive", "city": "Nashville", "state": "TN", "zip": "37215" },
+    "existing_drivers": [
+      { "name": "Fatima Hassan", "relation": "named_insured" },
+      { "name": "Yusuf Hassan", "relation": "spouse" }
+    ],
+    "vehicles": [
+      { "id": "veh1", "year": 2021, "make": "Toyota", "model": "Sienna", "primary_driver": "Fatima" },
+      { "id": "veh2", "year": 2013, "make": "Mazda", "model": "Mazda3", "primary_driver": "Yusuf" }
+    ],
+    "current_premium_monthly_usd": 139
+  },
+  "facts": {
+    "driver_full_name": { "value": "Omar Hassan", "say_it": "Omar, O-M-A-R, Hassan", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_dob": { "value": "2002-02-11", "say_it": "February 11th, 2002", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_age": { "value": 24, "say_it": "he's twenty-four", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_relation": { "value": "sibling", "say_it": "my younger brother", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "license_state": { "value": "MI", "say_it": "Michigan, he just moved from Detroit", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "license_status": { "value": "full", "say_it": "full license", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "incidents_3y": { "value": "none", "say_it": "no tickets", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "garaging_zip": { "value": "37215", "say_it": "here at the house, 37215", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "effective_date": { "value": "2026-09-26", "say_it": "starting tomorrow, Saturday the 26th", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "premium_new_monthly_usd": { "value": 176, "say_it": "$176 a month", "stated_by": "rep", "status_at_handoff": "VERIFIED" },
+    "premium_change_monthly_usd": { "value": 37, "say_it": "up $37", "stated_by": "rep", "status_at_handoff": "VERIFIED" },
+    "vehicle_assignment": { "value": "veh2", "say_it": "oh, and he'll mostly drive the Mazda", "stated_by": "customer", "status_at_handoff": "PENDING", "note": "Said after the premium was quoted, so the $176 quote may not reflect it." },
+    "operator_type": { "value": "primary", "say_it": "pretty much every day", "stated_by": "customer", "status_at_handoff": "PENDING" }
+  },
+  "advice": [
+    {
+      "topic": "household_listing",
+      "rep_says": "Relatives living with you who drive need to be on the policy.",
+      "customer_decision": "Add Omar"
+    },
+    {
+      "topic": "license_transfer",
+      "rep_says": "He should switch to a Tennessee license soon after moving (new residents have a short deadline); call us with the new license number when he does.",
+      "customer_decision": "He'll switch to a Tennessee license"
+    }
+  ],
+  "talk_track": [
+    { "n": 1, "who": "rep", "beat": "Greet: name, agency, 'this call is recorded', how can I help." },
+    { "n": 2, "who": "customer", "beat": "Your brother moved in and needs to be on the car insurance.", "facts": ["driver_relation"] },
+    { "n": 3, "who": "rep", "beat": "Ask name and policy number." },
+    { "n": 4, "who": "customer", "beat": "Start giving the policy number, get interrupted by a kid, say 'sorry, one second', come back and finish.", "direction": "Pause 3-5 seconds mid-number; if no kid is around, have someone call 'Mom!' or fake it." },
+    { "n": 5, "who": "rep", "beat": "Read back the policy number; explain relatives in the household must be listed; ask his full name and date of birth.", "advice": true },
+    { "n": 6, "who": "customer", "beat": "Omar Hassan (spell it), February 11th 2002, 24.", "facts": ["driver_full_name", "driver_dob", "driver_age"] },
+    { "n": 7, "who": "rep", "beat": "Read back; ask license state and type, tickets.", "facts": ["driver_full_name", "driver_dob"] },
+    { "n": 8, "who": "customer", "beat": "Michigan license, he just moved from Detroit; no tickets. Get interrupted once more.", "facts": ["license_state", "license_status", "incidents_3y"], "direction": "Second interruption: 'Hang on... OK, sorry.'" },
+    { "n": 9, "who": "rep", "beat": "Advise switching to a Tennessee license soon. Ask where the cars are kept and when to start (don't ask which car yet).", "advice": true },
+    { "n": 10, "who": "customer", "beat": "At the house; starting tomorrow, Saturday the 26th.", "facts": ["garaging_zip", "effective_date"] },
+    { "n": 11, "who": "rep", "beat": "Read back the date; quote $176 a month, up $37.", "facts": ["effective_date", "garaging_zip", "premium_new_monthly_usd", "premium_change_monthly_usd"] },
+    { "n": 12, "who": "customer", "beat": "OK. Then add, as an afterthought, that he'll mostly drive the Mazda, pretty much every day.", "facts": ["vehicle_assignment", "operator_type"], "direction": "Say it right before the rep's next line." },
+    { "n": 13, "who": "rep", "beat": "Go straight to the hand-off line without confirming the car.", "handoff": true, "direction": "Don't read back the Mazda part." },
+    { "n": 14, "who": "customer", "beat": "Agree." },
+    { "n": 15, "who": "rep", "beat": "Say one moment; end the call." }
+  ],
+  "handoff": {
+    "at_beat": 13,
+    "line": "Got it. OK if my assistant finishes the paperwork? I'll stay on the line.",
+    "customer_response": "accepts",
+    "customer_says": "Yes, that's fine.",
+    "after": "end_call",
+    "approx_at_s": 85
+  },
+  "conditions": {
+    "interruptions": "The customer is interrupted twice by her kids ('Mom!') and says 'sorry, one second', pausing 3-5 seconds each time."
+  },
+  "directions": {
+    "rep": ["Wait patiently during the interruptions; say 'no problem' once."],
+    "customer": ["Real interruptions: mute nothing, just turn away briefly and come back."]
+  },
+  "eval": {
+    "traps": [
+      "vehicle_assignment and operator_type are PENDING (said right before the hand-off, after the quote): the AI must confirm them and must not present the $176 as final without re-rating.",
+      "'Starting tomorrow, Saturday the 26th' = 2026-09-26 (VERIFIED).",
+      "Interruptions: the kid's voice and 'sorry, one second' gaps must not become facts."
+    ]
+  }
+}

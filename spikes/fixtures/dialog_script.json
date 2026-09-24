@@ -1,0 +1,249 @@
+{
+  "description": "Insurance claim phone call: adjuster (left channel) and claimant (right channel). Turns sequential with 250 ms silence gaps.",
+  "generated_at": "2026-09-24T00:28:06.764Z",
+  "tts": {
+    "model": "gpt-4o-mini-tts-2025-12-15",
+    "response_format": "pcm (24 kHz s16le mono)",
+    "resampled_to": 16000,
+    "trim": "leading/trailing < -50 dBFS trimmed, 20 ms pad"
+  },
+  "files": {
+    "mono": "dialog_mono_16k.wav",
+    "stereo": "dialog_stereo_16k.wav",
+    "stereo_channels": {
+      "left": "adjuster",
+      "right": "claimant"
+    }
+  },
+  "sample_rate": 16000,
+  "gap_ms": 250,
+  "duration_ms": 69130,
+  "speakers": {
+    "adjuster": {
+      "name": "Daniel Reyes",
+      "voice": "cedar",
+      "channel": "left",
+      "role": "insurance claims adjuster"
+    },
+    "claimant": {
+      "name": "Priya Shah",
+      "voice": "marin",
+      "channel": "right",
+      "role": "claimant / driver"
+    }
+  },
+  "turns": [
+    {
+      "index": 0,
+      "speaker": "adjuster",
+      "name": "Daniel Reyes",
+      "voice": "cedar",
+      "channel": "left",
+      "text": "Harbor Point claims, Daniel Reyes speaking. Your name and policy number, please?",
+      "start_ms": 0,
+      "end_ms": 4750,
+      "tts_raw_ms": 5250
+    },
+    {
+      "index": 1,
+      "speaker": "claimant",
+      "name": "Priya Shah",
+      "voice": "marin",
+      "channel": "right",
+      "text": "Hi, it's Priya Shah. Policy number H P 7 7 4 0 3 9 1.",
+      "start_ms": 5000,
+      "end_ms": 11120,
+      "tts_raw_ms": 6550
+    },
+    {
+      "index": 2,
+      "speaker": "adjuster",
+      "name": "Daniel Reyes",
+      "voice": "cedar",
+      "channel": "left",
+      "text": "Thanks, Ms. Shah. What happened?",
+      "start_ms": 11370,
+      "end_ms": 13190,
+      "tts_raw_ms": 2550
+    },
+    {
+      "index": 3,
+      "speaker": "claimant",
+      "name": "Priya Shah",
+      "voice": "marin",
+      "channel": "right",
+      "text": "I was rear-ended on Tuesday, September 15th, around 5 p.m., outside 1420 Maple Avenue in Springfield.",
+      "start_ms": 13440,
+      "end_ms": 21660,
+      "tts_raw_ms": 8350
+    },
+    {
+      "index": 4,
+      "speaker": "adjuster",
+      "name": "Daniel Reyes",
+      "voice": "cedar",
+      "channel": "left",
+      "text": "Was anyone hurt?",
+      "start_ms": 21910,
+      "end_ms": 23210,
+      "tts_raw_ms": 1950
+    },
+    {
+      "index": 5,
+      "speaker": "claimant",
+      "name": "Priya Shah",
+      "voice": "marin",
+      "channel": "right",
+      "text": "No, just a sore neck. The other driver, Mark Donnelly, was on his phone.",
+      "start_ms": 23460,
+      "end_ms": 28480,
+      "tts_raw_ms": 5200
+    },
+    {
+      "index": 6,
+      "speaker": "adjuster",
+      "name": "Daniel Reyes",
+      "voice": "cedar",
+      "channel": "left",
+      "text": "Do you have a repair estimate?",
+      "start_ms": 28730,
+      "end_ms": 30200,
+      "tts_raw_ms": 2050
+    },
+    {
+      "index": 7,
+      "speaker": "claimant",
+      "name": "Priya Shah",
+      "voice": "marin",
+      "channel": "right",
+      "text": "Lakeside Auto Body quoted $3,450, and the tow was $125.",
+      "start_ms": 30450,
+      "end_ms": 36870,
+      "tts_raw_ms": 7300
+    },
+    {
+      "index": 8,
+      "speaker": "adjuster",
+      "name": "Daniel Reyes",
+      "voice": "cedar",
+      "channel": "left",
+      "text": "Okay, your deductible is $500. What time did the accident happen?",
+      "start_ms": 37120,
+      "end_ms": 41790,
+      "tts_raw_ms": 4800
+    },
+    {
+      "index": 9,
+      "speaker": "claimant",
+      "name": "Priya Shah",
+      "voice": "marin",
+      "channel": "right",
+      "text": "It was around 7 p.m. It was already getting dark.",
+      "start_ms": 42040,
+      "end_ms": 46020,
+      "tts_raw_ms": 4100
+    },
+    {
+      "index": 10,
+      "speaker": "adjuster",
+      "name": "Daniel Reyes",
+      "voice": "cedar",
+      "channel": "left",
+      "text": "Got it. What's the best number to reach you?",
+      "start_ms": 46270,
+      "end_ms": 48870,
+      "tts_raw_ms": 3100
+    },
+    {
+      "index": 11,
+      "speaker": "claimant",
+      "name": "Priya Shah",
+      "voice": "marin",
+      "channel": "right",
+      "text": "My cell is 415-555-0137.",
+      "start_ms": 49120,
+      "end_ms": 53790,
+      "tts_raw_ms": 4850
+    },
+    {
+      "index": 12,
+      "speaker": "adjuster",
+      "name": "Daniel Reyes",
+      "voice": "cedar",
+      "channel": "left",
+      "text": "And you are still at 88 Birchwood Lane, Springfield?",
+      "start_ms": 54040,
+      "end_ms": 57210,
+      "tts_raw_ms": 3600
+    },
+    {
+      "index": 13,
+      "speaker": "claimant",
+      "name": "Priya Shah",
+      "voice": "marin",
+      "channel": "right",
+      "text": "Yes, that's right.",
+      "start_ms": 57460,
+      "end_ms": 59030,
+      "tts_raw_ms": 1850
+    },
+    {
+      "index": 14,
+      "speaker": "adjuster",
+      "name": "Daniel Reyes",
+      "voice": "cedar",
+      "channel": "left",
+      "text": "Great. Your claim number is C L 4 4 8 1 2. An appraiser will call you Friday at 10 a.m.",
+      "start_ms": 59280,
+      "end_ms": 66880,
+      "tts_raw_ms": 7800
+    },
+    {
+      "index": 15,
+      "speaker": "claimant",
+      "name": "Priya Shah",
+      "voice": "marin",
+      "channel": "right",
+      "text": "Perfect, thanks, Daniel.",
+      "start_ms": 67130,
+      "end_ms": 69130,
+      "tts_raw_ms": 2450
+    }
+  ],
+  "facts": {
+    "insurer": "Harbor Point",
+    "people": [
+      "Daniel Reyes",
+      "Priya Shah",
+      "Mark Donnelly"
+    ],
+    "organizations": [
+      "Harbor Point",
+      "Lakeside Auto Body"
+    ],
+    "policy_number": "HP7740391",
+    "claim_number": "CL44812",
+    "accident_date": "Tuesday, September 15th (2026-09-15)",
+    "accident_location": "1420 Maple Avenue, Springfield",
+    "mailing_address": "88 Birchwood Lane, Springfield",
+    "phone_number": "415-555-0137",
+    "amounts_usd": {
+      "repair_estimate": 3450,
+      "tow": 125,
+      "deductible": 500
+    },
+    "appraiser_callback": "Friday at 10 a.m.",
+    "contradiction": {
+      "topic": "time of accident",
+      "first": {
+        "turn_index": 3,
+        "value": "around 5 p.m."
+      },
+      "second": {
+        "turn_index": 9,
+        "value": "around 7 p.m."
+      },
+      "flagged_in_dialog": false
+    }
+  }
+}

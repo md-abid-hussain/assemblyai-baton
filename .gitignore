@@ -1,0 +1,28 @@
+node_modules/
+.next/
+dist/
+build/
+out/
+coverage/
+.env
+.env.local
+.env.*.local
+*.log
+.DS_Store
+.vercel/
+.turbo/
+spikes/.cache/
+spikes/out/
+
+# Recording kit: private call audio + sidecars (voices stay private until consent is confirmed)
+data/calls/*
+!data/calls/README.md
+tools/recording-kit/participants.json
+
+# Public repo hygiene (DESIGN 3.1): research notes profile judges and hold win estimates.
+# Only the live-verified API results (research/10*.md) are published.
+research/*
+!research/10*.md
+
+# Build bundle (scripts/assemble-bundle.mjs)
+bundle/

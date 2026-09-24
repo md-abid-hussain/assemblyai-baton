@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "id": "s16",
+  "title": "Add roommate Jordan; start date changed to today; 'is it a robot?'",
+  "intent": "add_driver",
+  "language": "en",
+  "difficulty": "medium",
+  "tags": ["non_relative", "correction", "accepts_after_question", "relative_date"],
+  "call_date": "2026-09-25",
+  "target_duration_s": { "min": 60, "max": 110 },
+  "casting": { "rep": "any", "customer": "man", "hindi_needed": false },
+  "rep": {
+    "name": "Emily Hart",
+    "agency": "Fall Creek Commons Insurance",
+    "agency_city": "Indianapolis",
+    "agency_state": "IN",
+    "style": "upbeat"
+  },
+  "customer": {
+    "name": "Nathan Price",
+    "persona": "Laid-back. Your roommate Jordan borrows your car a few times a week; you thought it didn't matter until a friend told you it does.",
+    "policy_number": "BSC-4652018",
+    "policy_number_say_it": "B-S-C, four-six-five-two, zero-one-eight",
+    "carrier": "Bluestem Casualty",
+    "address": { "street": "6134 North Guilford Avenue", "city": "Indianapolis", "state": "IN", "zip": "46220" },
+    "existing_drivers": [
+      { "name": "Nathan Price", "relation": "named_insured" }
+    ],
+    "vehicles": [
+      { "id": "veh1", "year": 2020, "make": "Honda", "model": "Civic", "primary_driver": "Nathan" }
+    ],
+    "current_premium_monthly_usd": 104
+  },
+  "facts": {
+    "driver_full_name": { "value": "Jordan Ellis", "say_it": "Jordan Ellis, E-L-L-I-S", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_dob": { "value": "2000-03-30", "say_it": "March 30th, 2000", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_age": { "value": 26, "say_it": "twenty-six", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "driver_relation": { "value": "non_relative_resident", "say_it": "my roommate, we share the apartment", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "license_state": { "value": "IN", "say_it": "Indiana", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "license_status": { "value": "full", "say_it": "regular license", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "incidents_3y": { "value": "none", "say_it": "clean, as far as I know", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "vehicle_assignment": { "value": "veh1", "say_it": "my Civic, it's the only car", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "operator_type": { "value": "occasional", "say_it": "a few times a week", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "garaging_zip": { "value": "46220", "say_it": "the apartment lot, 46220", "stated_by": "customer", "status_at_handoff": "VERIFIED" },
+    "effective_date": {
+      "value": "2026-09-25",
+      "say_it": "actually, can it be today?",
+      "stated_by": "customer",
+      "status_at_handoff": "VERIFIED",
+      "correction": { "initial_value": "2026-10-01", "said_wrong_by": "customer", "how": "first say 'October 1st', then right away: 'actually, can it start today? He's borrowing it tonight.'" }
+    },
+    "premium_new_monthly_usd": { "value": 121, "say_it": "$121 a month", "stated_by": "rep", "status_at_handoff": "VERIFIED" },
+    "premium_change_monthly_usd": { "value": 17, "say_it": "up $17", "stated_by": "rep", "status_at_handoff": "VERIFIED" }
+  },
+  "advice": [
+    {
+      "topic": "household_listing",
+      "rep_says": "Anyone in your household who regularly drives your car should be listed, even a roommate; otherwise a claim could be a problem.",
+      "customer_decision": "Add Jordan"
+    },
+    {
+      "topic": "operator_assignment",
+      "rep_says": "A few times a week makes Jordan an occasional driver on the Civic; you stay primary.",
+      "customer_decision": "Occasional on the 2020 Civic",
+      "sets": ["operator_type"]
+    }
+  ],
+  "talk_track": [
+    { "n": 1, "who": "rep", "beat": "Greet: name, agency, 'this call is recorded', how can I help." },
+    { "n": 2, "who": "customer", "beat": "A friend said your roommate should be on your insurance since he borrows your car. Is that true?", "facts": ["driver_relation"] },
+    { "n": 3, "who": "rep", "beat": "Yes: explain regular drivers in the household should be listed. Ask name and policy number.", "advice": true },
+    { "n": 4, "who": "customer", "beat": "Give your name and policy number." },
+    { "n": 5, "who": "rep", "beat": "Ask the roommate's full name and date of birth." },
+    { "n": 6, "who": "customer", "beat": "Jordan Ellis (spell the last name), March 30th 2000, 26.", "facts": ["driver_full_name", "driver_dob", "driver_age"] },
+    { "n": 7, "who": "rep", "beat": "Read back; ask license state and type, tickets.", "facts": ["driver_full_name", "driver_dob"] },
+    { "n": 8, "who": "customer", "beat": "Indiana, regular license, clean as far as you know.", "facts": ["license_state", "license_status", "incidents_3y"] },
+    { "n": 9, "who": "rep", "beat": "Ask how often he drives and where the car is kept; explain occasional vs primary.", "advice": true },
+    { "n": 10, "who": "customer", "beat": "A few times a week; the apartment lot.", "facts": ["vehicle_assignment", "operator_type", "garaging_zip"] },
+    { "n": 11, "who": "rep", "beat": "Confirm occasional on the Civic; ask when to start.", "facts": ["vehicle_assignment", "operator_type", "garaging_zip"] },
+    { "n": 12, "who": "customer", "beat": "Say October 1st, then change it to today.", "facts": ["effective_date"], "direction": "Correct yourself immediately: 'actually, can it be today? He's borrowing it tonight.'" },
+    { "n": 13, "who": "rep", "beat": "Confirm: effective today. Quote $121 a month, up $17.", "facts": ["effective_date", "premium_new_monthly_usd", "premium_change_monthly_usd"] },
+    { "n": 14, "who": "customer", "beat": "Cool." },
+    { "n": 15, "who": "rep", "beat": "Offer the hand-off.", "handoff": true },
+    { "n": 16, "who": "customer", "beat": "Ask if the assistant is a robot; after the answer, agree." },
+    { "n": 17, "who": "rep", "beat": "Answer honestly (it's an AI assistant, it will say so, and you're right here); end the call." }
+  ],
+  "handoff": {
+    "at_beat": 15,
+    "line": "OK if my assistant finishes the paperwork? I'll stay on the line.",
+    "customer_response": "accepts_after_question",
+    "customer_says": "Wait, is it a robot? ...Ha, OK, fine, as long as you're there.",
+    "after": "end_call",
+    "approx_at_s": 80
+  },
+  "conditions": {},
+  "directions": {
+    "rep": ["When asked 'is it a robot', say yes, it's an AI assistant, it'll tell him so, and you're staying on."],
+    "customer": ["Curious, not hostile, about the robot."]
+  },
+  "eval": {
+    "traps": [
+      "effective_date was corrected from October 1 to TODAY (2026-09-25): the AI must use today.",
+      "The customer asked if the assistant is a robot: the AI's first line must include the AI disclosure unprompted.",
+      "Roommate = non-relative household member, occasional driver: the AI must not call him primary."
+    ]
+  }
+}
