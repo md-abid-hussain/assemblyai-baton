@@ -174,14 +174,17 @@ describe("recordEvents (#12)", () => {
     expect(row.metrics.hud).toEqual({ click_to_first_audible: 3450 });
   });
 
-  it("events after /end are accepted and ignored; no heartbeat for an ended takeover", async () => {
+  it("after /end: phase, failure and heartbeat are ignored; late HUD numbers are still merged (WP8 reads them)", async () => {
     const h = harness();
     h.store.addCase({ id: "case_1" });
     const { takeoverId } = await h.svc.arm(armReq());
     await h.svc.end(takeoverId, { outcome: "completed", vaSessionId: "sess_A" });
-    await h.svc.recordEvents(takeoverId, { heartbeat: true, phase: "active" });
+    await h.svc.recordEvents(takeoverId, { heartbeat: true, phase: "active", failure: { code: "E_VA_SILENT" }, hud: { dead_air_after_rep: 380 } });
     expect(h.calls.heartbeat).toEqual([]);
-    expect(h.store.rows.get(takeoverId)!.phase).toBe("done");
+    const row = h.store.rows.get(takeoverId)!;
+    expect(row.phase).toBe("done");
+    expect(row.lastFailureAt).toBeNull();
+    expect(row.metrics.hud).toEqual({ dead_air_after_rep: 380 });
     expect(await code(h.svc.recordEvents("nope", { heartbeat: true }))).toBe("E_NOT_FOUND");
   });
 });

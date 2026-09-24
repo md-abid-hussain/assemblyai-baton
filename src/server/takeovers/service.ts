@@ -201,7 +201,18 @@ export class TakeoverServiceImpl implements TakeoverService {
       const attempt: 0 | 1 = t.retries > 0 ? 1 : 0;
       if (!t.endedAt) await this.d.limits.heartbeat(this.d.liveSessionIdFor(takeoverId, attempt));
     }
-    if (t.endedAt) return; // late events after /end are accepted and ignored (the heartbeat above never runs then)
+    if (t.endedAt) {
+      // After /end only measurements are still merged (a HUD value or the provisional QA can race the end; WP8 reads
+      // metrics.hud when it verifies). Phase, failure and heartbeat are ignored.
+      const late = {
+        ...(e.timings ? { timings: e.timings } : {}),
+        ...(e.vaSessionId && !t.vaSessionId ? { vaSessionId: e.vaSessionId } : {}),
+        ...(e.hud ? { hud: e.hud as Record<string, number> } : {}),
+        ...(e.provisionalQa ? { provisionalQa: e.provisionalQa } : {}),
+      };
+      if (Object.keys(late).length) await this.d.store.recordEvents(takeoverId, late);
+      return;
+    }
     const failureAt = e.failure ? new Date(this.now()) : undefined;
     await this.d.store.recordEvents(takeoverId, {
       ...(e.phase ? { phase: e.phase } : {}),
