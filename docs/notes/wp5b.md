@@ -105,7 +105,7 @@ POST /v1/agents", param `tools[3].http`. Non-fatal (the session stayed open).
 ### Day-1 spend
 
 $0.635 on the guard ledger (10 sessions, wall-clock billing, rounded up); $0.600 by `session_duration_seconds`.
-OpenAI TTS for 7 short clips: < $0.01.
+OpenAI TTS for 7 short clips: < $0.01. With the live integration test (§4): **$0.683 total for round 1** (guard ledger; budget $2.00).
 
 ## 2. What push mode needs from WP1 / WP6 (requests filed)
 
@@ -117,3 +117,144 @@ OpenAI TTS for 7 short clips: < $0.01.
   updates." (`docs/notes/requests/wp5b-to-wp1.md`).
 - **WP6** (route #14): in push mode the immediate `result` is `{status:"link_sent"}` (+ `ui.sms/link/paymentId`),
   which the contract already allows. Nothing else changes: the controller polls #15 and uses `PaymentView.toolResult`.
+
+## 3. What was built (product code)
+
+All browser code imports `client-only`; nothing in `src/client/**` imports `src/server/**` (boundaries test green).
+
+| File | What |
+|---|---|
+| `src/client/va/controller.ts` | `VoiceAgentControllerImpl` (`createVoiceAgentController(deps)`): implements `VoiceAgentController` + `VoiceAgentControllerExt`. `connect(token)` (browser `new WebSocket(tokenUrl(token))`, 3 s open timeout) or `attach(session)` (Node/tests); `start(compiled, {holdAudioUntilCtxMs})`; `applyStage`; `say`; `setPayingState`; `playCustomerClip`; `setMicSource`; `end`; `endNow` (pagehide) |
+| `src/client/va/first-update.ts` | `buildFirstUpdate(compiled, {keytermsEnabled})` = exactly the T-D1-0 shape (a unit test checks it is byte-equal to the fixtures that passed live); `basicFirstUpdateGuard` = a conservative local whitelist, used only until WP1's `validateFirstUpdate` is injected |
+| `src/client/va/payment-watch.ts` | §5.8 steps 3–8 for both pay modes: 1.5 s polling of #15, 60 s deadline from the SMS, 30 s extensions up to 180 s while the phone is active, reassurance every 45 s (not in `checkout-open`/`processing`), the client timeout result, late success |
+| `src/client/va/cap.ts` | §5.9.5 dynamic cap: wrap-up at cap − 20 s, the clock paused while paying, never in paying/closing; `cap` ends the session; the 600 s ceiling ends any stage |
+| `src/client/va/captions.ts` | §5.10 caption rules 1–4 → `va.caption` / `va.user` BatonEvents |
+| `src/client/va/retry.ts` | `startVoiceAgentWithRetry`: the GREETING-phase RETRYING rule (once, attempt 1, same compiled config, failure reported, old socket ended first; `VaStartFailed` → recorded-AI fallback) |
+| `src/client/hud/latency.ts` | `LatencyHudImpl` (`LatencyHud` + ext): marks on the AudioContext clock → `click_to_first_audible`, `dead_air_after_rep`, `turn_audible_latency`, `tool_turn_latency` (last/p50/p90/n); session ids; underruns; slow network. `hudMetricReporter` → `hud` BatonEvents + POST #12 |
+| `src/client/hud/view-model.ts`, `use-hud.ts` | Display data (dead air first, the "includes {rep}'s ≈3.5 s handoff line" note, the §5.10 tooltip verbatim, session ids, badges) and a `useHud(hud, repFirst)` hook for WP7's component |
+| `src/core/contracts/ext/wp5b-va.ts` | Additive types: `VoiceAgentControllerExt`, `VaControllerEvent`, `VaControllerPhase`, `PayToolMode`, `VaToolCaller`, `VaPaymentPoller`, `VaStageSource`, `VaEventsPoster`, `LatencyHudExt`, `HudSnapshot` |
+
+### Controller behaviour (decisions)
+
+- **First update**: built from `CompiledTakeover` and validated (WP1's validator if injected, else the local guard)
+  before a byte is sent. A failure → `error{code:"E_VA_CONFIG", retryable:false}` and a thrown `BatonError`.
+- **Audio in**: the feeder starts on `session.ready`, never before. Customer clips (`playCustomerClip`) mark the HUD
+  `eos` at the clip's end; with no clip and no mic, the receipt of `input.speech.stopped` is the `eos` fallback.
+- **Audio out**: leading silence (≤ −50 dBFS; digital silence is −Infinity, compared but never serialized) is
+  dropped until the reply's first audible chunk; `player.holdUntil(repLineEnd)`; the player's first-audible-PLAYED
+  callback drives the HUD, the captions, the `first_audible` event and the ACTIVE phase.
+- **Barge-in** on the first of `input.speech.started` / `reply.done{interrupted}` / `transcript.agent{interrupted}`,
+  only if agent audio is playing or buffered: `player.flush()` runs synchronously in the event handler, the captions
+  are cut at the flush time with "—", later chunks of that reply are dropped, and one `va.reply{interrupted:true}` is
+  emitted. A speech start in the last 400 ms of a reply that finished streaming lets the tail play. Mic mode: a local
+  VAD onset ducks to 30 % and restores after 2.5 s without a server barge-in.
+- **Tools**: all six are registered; `ToolDispatcher.policy="immediate"`. For a response with `stage` /
+  `systemPrompt` / `tools` / `transcriptionMode`, `session.update{system_prompt, tools[, input:{transcription_mode}]}`
+  is sent inside the handler, so the dispatcher's `tool.result` always follows it (T-D1-2). An invented tool name →
+  an `error` event with `E_VA_CONFIG` (G0 rule 17) plus the dispatcher's is_error answer.
+- **Pay** (`send_esign_and_pay_link`): route #14 → a `phone.sms` event; `not_sent` is a plain answer.
+  - Push (default): answer `{status:"link_sent"}` at once → PAYING (cap paused) → PaymentWatch → on success
+    `stageSource("close")` + `session.update` → `reply.create "Payment is confirmed. Call send_confirmation now."`.
+  - Failed/expired → the server's instruction. Timeout → the timeout line and a `payment{status:"timeout"}` event (the
+    phone closes the overlay). A late success → close + "The payment just came through. Call send_confirmation now."
+  - Hold (flag only): the result is withheld and resolved with the server-built `PaymentView.toolResult` after the
+    close update; silent replies during a hold are not counted as `E_VA_SILENT`.
+- **hand_back_to_rep**: the result is sent; the `hand_back` event fires after the agent's next spoken reply has
+  played (≤4 s after it finished streaming; 10 s safety).
+- **close_ready**: after a successful `send_confirmation`, a spoken reply that does not end in "?" plus 2.5 s of quiet
+  (a question waits 12 s for an answer); any speech or new reply cancels the timer.
+- **Errors** (§5.9.6): first-update failures are classified in `start()` (`E_VA_CONFIG`: no retry; `E_VA_AUTH`,
+  capacity, transient and `E_VA_TIMEOUT`: retryable). Mid-session `immutable_field`/`invalid_*` are only logged.
+  `silent_no_output` → "Please continue." once; twice → `E_VA_SILENT` (retryable). An unexpected close after ready →
+  a retryable error, then `ended`. Errors that race in between `session.ready` and `start()` resuming are deferred.
+- **Heartbeat**: `POST #12 {heartbeat:true, vaSessionId}` every 10 s while open; `{vaSessionId}` once at ready.
+- **iOS**: `PageLifecycle.onPause("ios_background")` → `session.end` after 10 s unless the page resumes.
+- **Ending**: `end()` = `session.end` → `session.ended` (≤2 s) → close → `ended{sessionSeconds}`; idempotent.
+
+## 4. Tests and measured numbers
+
+- `npm run typecheck` clean; `npm test` green (16 files, 319 tests; WP5b's 48 are in `tests/unit/client/{va,hud}/**`).
+- `tests/integration/va-retry.test.ts` ($0, fake server): 5/5.
+  - A retry after `server_error` post-compile, in this order: end the old socket → report the failure → mint
+    attempt 1 → send the same first update, byte for byte.
+  - A pre-ready `internal_error` retries; no audible greeting within 5 s → `E_VA_TIMEOUT` → retry.
+  - `E_VA_CONFIG` never retries; two failures → `VaStartFailed` after exactly one retry.
+- `tests/integration/va-core.test.ts` (LIVE, `RUN_LIVE=1`): **PASS**, session `sess_ce94…`, 36.0 s, $0.045. The real
+  controller on a Node socket:
+  - the s02 greeting was spoken verbatim;
+  - the TTS "Yes, that's right. Tomorrow, Saturday." → `confirm_effective_date {date:"2026-09-26"}`;
+  - on the wire, `session.update{disclose prompt + tools}` immediately before its `tool.result` → `session.updated`,
+    no `session.error`;
+  - the auto-fired reply called `get_disclosure`; the disclosure was read; one `session.end` → `session.ended`.
+
+| Measurement (India → US) | Value |
+|---|---|
+| First update → `session.ready` | 611–672 ms (5 sessions) |
+| `session.ready` → first audible greeting chunk received | 292–341 ms (leading silence 180–240 ms) |
+| Greeting length (65–69 words) | 22.0–23.7 s of audio |
+| Stage-change `tool.result` → the new tool's `tool.call` | 650–880 ms |
+| Voiced end → `input.speech.stopped` | min_latency 1.3 s, balanced 1.9 s |
+| Voiced end → `update_case_field` `tool.call` (DOB / ZIP) | min_latency 2.9 / 2.2 s, balanced 3.5 / 2.7 s |
+| The hold tool's carrying pre-amble | silent; `reply.done` 0.2 s after `tool.call` |
+| 12 s idle socket before the first update | not closed, not billed, ready in 672 ms |
+
+## 5. What the integrator must wire (G1 / G2)
+
+1. **WP5 (TakeoverController, D2 10:00):**
+   - At ARMED: `POST /api/va/token {attempt:0}` → `controller.connect(token)` (the pre-open; token TTL per the WP2
+     request). At tSend: `controller.start(compiled, {holdAudioUntilCtxMs: repLineEnd})`, or use
+     `startVoiceAgentWithRetry({ preopened, mintToken, makeController, reportFailure, … })` for the GREETING retry.
+   - Listen to `onEvent`:
+     - `first_audible{greeting:true}` → GREETING → ACTIVE; `paying` → PAYING;
+     - `hand_back` → play the rep's "I'm back" line, then `end("hand_back")`;
+     - `close_ready` → CLOSING → `end("completed")`;
+     - `ended` → `POST /end` with `vaSessionId`;
+     - `error{retryable}` after the greeting → the owner's call (FAILED or fallback).
+   - `pagehide` → `controller.endNow("pagehide")` (plus the keepalive `/end`, G0 rule 10).
+   - Pass `hud`: one `LatencyHudImpl` per page with `onMetric: hudMetricReporter({sink, postEvents, eventTime})`. Mark
+     `arm`, `repLineStart` and `repLineEnd` on it; call `setSessionIds({rep, customer})` from WP4.
+2. **WP4 (AudioEngine):** `createVaOutput()`, `createFeeder()` and `nowMs()` as in services.ts. What the controller
+   relies on:
+   - it pushes only chunks from the first audible one on (leading silence is already trimmed), with
+     `audible = level > −50 dBFS`;
+   - the player fires `onFirstAudiblePlayed(replyId, ctxMs)` for the first `audible` chunk of each reply when it is
+     actually PLAYED (never before `holdUntil`);
+   - `flush()` is synchronous and idempotent; `enqueueClip` resolves with the clip end on the AudioContext clock.
+3. **WP6 (D3 11:00):** `callTool` = the route #14 body (`VaToolCaller`); `pollPayment` = #15; **`stageSource`** for
+   the paid → close transition (request `wp5b-to-wp6.md`); push-mode `{status:"link_sent"}`; and
+   `MockPhoneProps.onState → controller.setPayingState`.
+4. **WP1 (G1):** inject `validateFirstUpdate`; the push-mode pay tool and pay-stage text (request `wp5b-to-wp1.md`);
+   re-run T-D1-0 on the compiler output (`va-t0-first-update.ts --fixture-dir`).
+5. **WP7 (G2):** render `useHud(hud, repFirst)` in `src/components/hud/**`; consume the `va.caption` (replace by
+   `replyId`), `va.user`, `va.reply`, `va.tool`, `stage`, `payment`, `phone.sms`, `hud` and `error` BatonEvents.
+6. **WP11:** chips/typed/autopilot audio → `controller.playCustomerClip(pcm24k)`; autopilot waits for
+   `va.reply{phase:"done"}` (it never barges in).
+7. **Env → config:** `PAY_TOOL_MODE` (default `push`), `VA_KEYTERMS` (default `1`), `VA_SESSION_CAP_MAX_MS`
+   (default 420000) → `createVoiceAgentController({ config: { payToolMode, vaKeyterms, vaSessionCapMaxMs } })`.
+8. **Integrator:** the token-auth option in `aai-open.ts`, then T-D1-3 part B (`wp5b-to-integrator.md`).
+
+## 6. Acceptance status (TASKS WP5b)
+
+| # | Item | Status |
+|---|---|---|
+| 1 | T-D1-0 … T-D1-5 executed and recorded | **Done**, except T-D1-3 part B (needs the integrator's token-auth open) |
+| 2 | Live Node integration (s02 greeting verbatim, the PENDING date via `confirm_effective_date`, the stage change to disclose with §5.9.4 ordering, `session.end`) and the VA-retry test | **PASS** (`va-core` live; `va-retry` on a fake server) |
+| 3 | K2: 10 manual takeovers of s01 from India, plus one early pass with a real Polar payment | **Pending**: needs WP4 (browser engine), WP5 (takeover), WP6 (tools, Polar) and WP7 (`/call`) on D3, and the user's browser |
+| 4 | Barge-in flushes within one frame; interrupted captions truncated; the wrap-up never fires in paying/closing | **PASS in unit tests** (the flush is synchronous in the event handler; caption truncation; cap and controller tests for paying and closing). Browser-side timing needs WP4's player (K2) |
+
+## 7. Known gaps
+
+- **T-D1-3 part B** (a token expiring during the idle) has not run. Until it does, WP2 is asked to mint VA tokens with
+  a 20–30 s window.
+- **The browser path is untested end to end** (a real `WebSocket`, WP4's worklet player and feeder, the iOS
+  lifecycle). The Node test covers the protocol; K2 covers the browser.
+- **`stageSource` is required for the paid → close step.** Without it the controller logs `E_CASE_STATE`, and the
+  agent cannot call `send_confirmation` (it is not in the pay stage's tool list).
+- **`hold` mode is kept behind the flag**, but its status line and reassurances are silent (T-D1-1). Do not ship it.
+- **The `close_ready` heuristic** is "a spoken reply not ending in '?' plus 2.5 s of quiet". If the agent's goodbye
+  ends with a question, the 12 s fallback applies.
+- **The HUD `eos` in mic mode** uses a simple RMS VAD (P2 is cut; untested live).
+- **Prompt compliance** (WP1): a VERIFIED `effective_date` was re-asked once in T-D1-4, when the stub result left the
+  stage at `confirm`.
+- `basicFirstUpdateGuard` duplicates part of WP1's validator on purpose, as a stop-gap. WP1's validator is
+  authoritative once injected.

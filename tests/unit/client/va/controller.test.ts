@@ -386,6 +386,20 @@ describe("VoiceAgentController: cap, heartbeats, lifecycle, ending (§5.9.5)", (
     expect(s.events.some((e) => e.type === "wrap_up")).toBe(false); // paying
   });
 
+  it("wrap-up never fires once closing (after close_ready)", async () => {
+    const s = setup({ tools: { send_confirmation: () => ({ result: { ok: true, confirmation_number: "END-1", spoken: "E N D 1", sms_sent: true } }) } });
+    await ready(s, { vaSessionCapMs: 60_000 });
+    s.engine.clock.t = 10_000;
+    s.ws.server({ type: "tool.call", call_id: "sc", name: "send_confirmation", arguments: {} });
+    await flush();
+    speak(s.ws, "bye", { chunks: 1, text: "Goodbye!" });
+    await vi.advanceTimersByTimeAsync(2600);
+    expect(s.events.some((e) => e.type === "close_ready")).toBe(true);
+    s.engine.clock.t = 45_000; // past cap − 20 s
+    await vi.advanceTimersByTimeAsync(2000);
+    expect(s.events.some((e) => e.type === "wrap_up")).toBe(false);
+  });
+
   it("wrap-up then end at the cap", async () => {
     const s = setup();
     await ready(s, { vaSessionCapMs: 30_000 });
