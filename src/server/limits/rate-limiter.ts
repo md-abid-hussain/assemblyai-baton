@@ -2,6 +2,7 @@ import "server-only";
 
 import { and, eq, gt, sql } from "drizzle-orm";
 
+import { BatonError, type FallbackKind } from "../../core/contracts/errors";
 import type { RateLimiter } from "../../core/contracts/services";
 import type { Db } from "../db/client";
 import { rateEvents } from "../db/schema";
@@ -73,3 +74,28 @@ export const RATE = {
   vaDayVisitor: { bucket: "va-d", limit: 8, windowSec: 86_400 },
   vaHourIp: { bucket: "va-ip", limit: 12, windowSec: 3600 },
 } as const;
+
+export type RateSpec = { bucket: string; limit: number; windowSec: number };
+
+/**
+ * Check several limits first (no writes), then record a hit on each, so a refused request never burns another
+ * bucket. Throws 429 `E_RATE_LIMITED` (with `Retry-After`) naming the reason in plain words.
+ */
+export async function enforceRates(
+  r: RateLimiter & { check?: DbRateLimiter["check"] },
+  specs: { spec: RateSpec; key: string; message: string }[],
+  opts: { fallback?: FallbackKind } = {},
+): Promise<void> {
+  for (const s of specs) {
+    const c = r.check ? await r.check(s.spec.bucket, s.key, s.spec.limit, s.spec.windowSec) : { ok: true, retryAfterSec: 0 };
+    if (!c.ok) {
+      throw new BatonError("E_RATE_LIMITED", s.message, { retryAfterMs: c.retryAfterSec * 1000, ...(opts.fallback ? { fallback: opts.fallback } : {}) });
+    }
+  }
+  for (const s of specs) {
+    const h = await r.hit(s.spec.bucket, s.key, s.spec.limit, s.spec.windowSec);
+    if (!h.ok) {
+      throw new BatonError("E_RATE_LIMITED", s.message, { retryAfterMs: h.retryAfterSec * 1000, ...(opts.fallback ? { fallback: opts.fallback } : {}) });
+    }
+  }
+}

@@ -2,6 +2,7 @@ import "server-only";
 
 import { LocalOpenGuard, getLocalOpenGuard } from "../../../scripts/lib/local-open-guard";
 import type { GetLimitsAuthority, LimitsAuthority, RateLimiter } from "../../core/contracts/services";
+import { setBalanceErrorHandler } from "../aai/tokens";
 import { getDb } from "../db/client";
 import { env } from "../env";
 import { DbFlagStore } from "../flags";
@@ -43,7 +44,12 @@ export const getLimitsAuthority: GetLimitsAuthority = () => {
   if (holder.authority) return holder.authority;
   const e = env();
   if (e.LIMITS_ROLE === "authority") {
-    holder.authority = new DbLimitsAuthority({ db: getDb() });
+    const auth = new DbLimitsAuthority({ db: getDb() });
+    // F8: a balance/credit mint error flips replay_only (aai_balance) on the authority.
+    setBalanceErrorHandler(async () => {
+      await auth.flagStore.tripReplayOnly("aai_balance");
+    });
+    holder.authority = auth;
   } else if (e.LIMITS_AUTHORITY_URL) {
     if (!e.LIMITS_AUTHORITY_KEY) throw new Error("[limits] LIMITS_AUTHORITY_URL is set but LIMITS_AUTHORITY_KEY is missing (value never printed)");
     holder.authority = new RemoteLimitsAuthority(e.LIMITS_AUTHORITY_URL, e.LIMITS_AUTHORITY_KEY, {
