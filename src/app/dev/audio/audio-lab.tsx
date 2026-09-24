@@ -244,9 +244,12 @@ export function AudioLab() {
       d.current.loaded = true;
       d.current.callId = call.current.callId;
       d.current.format = `${call.current.format.encoding}/${call.current.format.sampleRate}`;
+      // `?hold=1`: keep the sessions open after the recording ends (they are fed silence on the same clock), for the
+      // 3-minute drift / feed-offset check with the 69 s fixture. Default: finish after 1.5 s of silence (§5.1.8).
+      const hold = new URLSearchParams(window.location.search).get("hold") === "1";
       player.current.onEnded(() => {
         d.current.ended = true;
-        if (mgr.current) void mgr.current.finishAfterSilence(1500);
+        if (mgr.current && !hold) void mgr.current.finishAfterSilence(1500);
       });
       player.current.onTick((t) => {
         const w = now();

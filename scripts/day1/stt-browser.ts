@@ -36,7 +36,9 @@ interface Diag {
 async function launch(name: string): Promise<Browser> {
   const t = TYPES[name]!;
   if (name === "chromium") {
-    return t.launch({ headless: !has("headed"), args: ["--autoplay-policy=no-user-gesture-required", "--use-fake-ui-for-media-stream", "--use-fake-device-for-media-stream"] });
+    // --channel chromium = the full browser in new-headless mode (tabs get real visibility changes); default = headless shell.
+    const channel = arg("channel");
+    return t.launch({ headless: !has("headed"), ...(channel ? { channel } : {}), args: ["--autoplay-policy=no-user-gesture-required", "--use-fake-ui-for-media-stream", "--use-fake-device-for-media-stream"] });
   }
   if (name === "firefox") {
     return t.launch({ headless: !has("headed"), firefoxUserPrefs: { "media.navigator.streams.fake": true, "media.navigator.permission.disabled": true, "media.autoplay.default": 0 } });
@@ -54,7 +56,7 @@ async function boot(page: Page, fixture: "8k" | "16k", mode = "loopback"): Promi
     if (m.type() === "error") errors.push(m.text());
   });
   page.on("pageerror", (e) => errors.push(e.message));
-  await page.goto(`${BASE}/dev/audio`, { waitUntil: "networkidle" });
+  await page.goto(`${BASE}/dev/audio${has("hold") ? "?hold=1" : ""}`, { waitUntil: "networkidle" });
   await page.selectOption('[data-testid="mode"]', mode);
   await page.selectOption('[data-testid="fixture"]', fixture);
   await page.click('[data-testid="unlock"]');
@@ -136,11 +138,24 @@ async function backgroundRun(seconds: number, fixture: "8k" | "16k") {
     await boot(page, fixture);
     await sleep(5000);
     const before = summarize(await diag(page));
+    // Headless never hides a page, so a real background needs `--headed`: a second tab in front and, with
+    // `--minimize`, the window minimized through CDP (both make document.visibilityState "hidden").
     const other = await context.newPage();
     await other.goto("about:blank");
     await other.bringToFront();
+    let restore: (() => Promise<void>) | null = null;
+    if (has("minimize")) {
+      const cdp = await context.newCDPSession(other);
+      const { windowId } = (await cdp.send("Browser.getWindowForTarget")) as { windowId: number };
+      await cdp.send("Browser.setWindowBounds", { windowId, bounds: { windowState: "minimized" } });
+      restore = async () => {
+        await cdp.send("Browser.setWindowBounds", { windowId, bounds: { windowState: "normal" } });
+      };
+    }
+    await sleep(500);
     const visAfterSwitch = await page.evaluate(() => document.visibilityState);
     await sleep(seconds * 1000);
+    if (restore) await restore();
     await page.bringToFront();
     await sleep(1000);
     const after = summarize(await diag(page));
