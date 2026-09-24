@@ -157,7 +157,9 @@ describe.skipIf(!HAS_WP1)("acceptance 2: /compile passes validateFirstUpdate for
         it(`${id} @ ${point} (keyterms ${keytermsEnabled ? "on" : "off"})`, async () => {
           const tArmMs = points[point];
           const snap = snapshotAt(tArmMs);
+          const t0 = performance.now();
           const compiled = await compileViaRoute({ policy, snapshotAt, tArmMs, keytermsEnabled, payToolMode: "push" });
+          const routeMs = performance.now() - t0;
           // what the client sends: the first update built from the route's JSON
           const msg = wp1!.compiler.buildFirstUpdate(compiled);
           expect(() => wp1!.compiler.validateFirstUpdate(msg, { keytermsEnabled })).not.toThrow();
@@ -171,7 +173,7 @@ describe.skipIf(!HAS_WP1)("acceptance 2: /compile passes validateFirstUpdate for
           expect(compiled.vaSessionCapMs).toBeLessThanOrEqual(420_000);
           if (process.env.WP5_REPORT) {
             const verified = Object.values(snap.fields).filter((f) => f.status === "VERIFIED").length;
-            console.info(`[wp5] ${id} @${point} kt=${keytermsEnabled ? 1 : 0} tArm=${tArmMs} verified=${verified} stage=${compiled.stage} mode=${compiled.transcriptionMode} cap=${compiled.vaSessionCapMs} greetingWords=${compiled.greeting.split(/\s+/).length} keyterms=${compiled.keyterms.length} prompt=${compiled.systemPrompt.length}`);
+            console.info(`[wp5] ${id} @${point} kt=${keytermsEnabled ? 1 : 0} tArm=${tArmMs} verified=${verified} stage=${compiled.stage} mode=${compiled.transcriptionMode} cap=${compiled.vaSessionCapMs} greetingWords=${compiled.greeting.split(/\s+/).length} keyterms=${compiled.keyterms.length} prompt=${compiled.systemPrompt.length} routeMs=${routeMs.toFixed(1)}`);
           }
         });
       }
