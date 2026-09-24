@@ -24,9 +24,9 @@ import { isFrozenStatus, type ExtractStatus, type PgCaseRepository, type TurnUpd
  * 4. One short transaction under the case advisory lock: insert events with the next seq, re-derive, version+1.
  * 5. Return. 6. `defer(maybeRunVerifier)`.
  *
- * Per case, one extraction runs at a time in this process (a per-case queue), and when more than one turn is waiting
- * they go to luna together, at most `maxNewTurns` (3) per call, ordered by `endMs`; each request still returns
- * the events of its own turn. Across processes the step-4 lock keeps the result correct.
+ * Per case, one extraction runs at a time in this process (a per-case queue, ordered by `endMs`). When more than 2
+ * turns are waiting they go to luna together, at most `maxNewTurns` (3) per call (`batchSizeFor`); each request still
+ * returns the events of its own turn. Across processes the step-4 lock keeps the result correct.
  *
  * After the takeover snapshot is frozen (case status ai_active or later) a turn returns `skipped:"after_takeover"`
  * (stored for the transcript, never extracted), unless it is in the drain's `pendingTurnIds` and arrives within
@@ -71,6 +71,14 @@ interface CaseQueue {
 }
 
 const exLog = log.child({ component: "extract" });
+
+/**
+ * §5.3 batching: only when MORE THAN 2 turns are queued for the case, send up to `max` (3) together; otherwise one
+ * turn per luna call. Measured on the s01 fixture (docs/notes/wp3.md): single-turn calls found 29/30 labelled events
+ * over 3 passes, 3-turn batches 24/30 (7, 8, 9 of 10), so batching is a backlog-only measure. With WP4's CaseSync
+ * (one request in flight per case) the backlog never exceeds 1 and every call is single-turn.
+ */
+export const batchSizeFor = (queued: number, max: number): number => (queued > 2 ? Math.min(Math.max(1, max), queued) : 1);
 
 export interface ExtractOutcome extends ExtractResponse {
   status: ExtractStatus | "duplicate" | "after_takeover";
@@ -173,7 +181,7 @@ export class ExtractService {
     try {
       while (q.pending.length) {
         q.pending.sort((a, b) => a.turn.endMs - b.turn.endMs || a.turn.recvMs - b.turn.recvMs);
-        const batch = q.pending.splice(0, Math.max(1, this.d.engine.extractor.maxNewTurns));
+        const batch = q.pending.splice(0, batchSizeFor(q.pending.length, this.d.engine.extractor.maxNewTurns));
         try {
           await this.runBatch(caseId, batch);
         } catch (err) {

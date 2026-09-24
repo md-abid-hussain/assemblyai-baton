@@ -7,6 +7,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import type { CaseState } from "@/core/contracts/case";
 import type { DrainReport } from "@/core/contracts/takeover";
 import { takeovers } from "@/server/db/schema";
+import { batchSizeFor } from "@/server/cases/extract-service";
 import { dialog, harness, newCase, shuffled, sleep, turnOf } from "./helpers/fixtures";
 import { createTestDb, HAS_DB, type TestDb } from "./helpers/test-db";
 
@@ -62,6 +63,17 @@ describe.skipIf(!HAS_DB)("ExtractService (F1) on Postgres", () => {
     expect(later.skipped).toBe("duplicate");
     expect(later.events).toHaveLength(3);
     expect(later.state.version).toBe(1);
+  });
+
+  it("batches only a backlog: >2 queued → up to 3 per luna call, else one turn per call", async () => {
+    expect([0, 1, 2, 3, 4, 7].map((n) => batchSizeFor(n, 3))).toEqual([1, 1, 1, 3, 3, 3]);
+    const h = harness(t, { latencyMs: () => 120 });
+    const caseId = await newCase(h, { callId: null });
+    await Promise.all(dialog.turns.slice(0, 7).map((f) => h.service.handle(turnOf(caseId, f))));
+    // 1 starts alone; 6 queue up → 3, then 3 → 3
+    expect(h.extractor.batchSizes).toEqual([1, 3, 3]);
+    expect(h.extractor.inputs[1]!.newTurns.map((x) => x.turnId)).toEqual(["customer-0", "rep-1", "customer-1"]);
+    expect(h.extractor.inputs[1]!.recent.map((x) => x.turnId)).toEqual(["rep-0"]);
   });
 
   it("an upstream failure is a 200-style result: turn failed, state unchanged except the version", async () => {
