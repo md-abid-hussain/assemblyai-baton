@@ -229,6 +229,21 @@ export class PgCaseRepository implements CaseRepository {
     await this.d.db.update(cases).set({ runPlan: plan as unknown as Record<string, unknown>, updatedAt: new Date() }).where(eq(cases.id, caseId));
   }
 
+  /**
+   * The non-derivable parts of `CaseState` (stage, disclosures, payment, confirmation number; WP6 tools), written
+   * under the same case lock and re-derived, so a concurrent extraction can never overwrite them (or be overwritten).
+   * Never write `cases.state` directly.
+   */
+  async setCaseExtras(
+    caseId: string,
+    patch: Partial<Pick<CaseState, "stage" | "disclosuresGiven" | "payment" | "confirmationNumber">>,
+  ): Promise<CaseState> {
+    return this.d.db.transaction(async (tx) => {
+      const row = await this.lockCase(tx, caseId);
+      return this.deriveAndSave(tx, { ...row, state: { ...row.state, ...patch } }, {});
+    });
+  }
+
   // ------------------------------------------------------------------------------------------ WP3 extensions
 
   async loadRow(caseId: string, exec: Exec = this.d.db): Promise<CaseRow | null> {
