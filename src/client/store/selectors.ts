@@ -271,7 +271,8 @@ export function humanLines(s: UiState): TranscriptLine[] {
 /** "Baton passed at 01:42.3 · protocol 2.9 s" */
 export function separatorText(s: UiState): string | null {
   if (s.takeover.tArmMs === null) return null;
-  const proto = s.takeover.connectedT !== null && s.takeover.armedT !== null ? s.takeover.connectedT - s.takeover.armedT : null;
+  const g = s.takeover.steps.find((x) => x.phase === "greeting" || x.phase === "active");
+  const proto = g && s.takeover.armedT !== null && !g.detail?.recorded ? g.t - s.takeover.armedT : null;
   const who = s.takeover.source === "auto_handoff" ? " (auto, at the handoff line)" : "";
   return `Baton passed at ${formatCallClock(s.takeover.tArmMs)}${who}${proto !== null ? ` · protocol ${formatDuration(proto)}` : ""}`;
 }
@@ -297,16 +298,13 @@ const STEP_LABEL: Record<(typeof PROTOCOL_STEPS)[number], string> = {
 export function protocolSteps(s: UiState, now: number = s.t): StepView[] {
   const steps: ProtocolStepView[] = s.takeover.steps;
   const idxOf = (p: string) => steps.findIndex((x) => x.phase === p);
-  const after = PROTOCOL_STEPS.length;
   const endOfProtocol = steps.find((x) => !PROTOCOL_STEPS.includes(x.phase as (typeof PROTOCOL_STEPS)[number]) && x.phase !== "retrying");
-  const connectedT = s.takeover.connectedT;
   return PROTOCOL_STEPS.map((step, i) => {
     const at = idxOf(step);
     const cur = at >= 0 ? steps[at] : undefined;
     const nextStep = PROTOCOL_STEPS.slice(i + 1).map((p) => steps[idxOf(p)]).find(Boolean);
     let endT: number | null = nextStep?.t ?? null;
-    if (endT === null && step === "connecting") endT = connectedT ?? endOfProtocol?.t ?? null;
-    if (endT === null && i === after - 1 && endOfProtocol) endT = endOfProtocol.t;
+    if (endT === null && cur) endT = endOfProtocol?.t ?? null;
     const status: StepView["status"] = !cur ? (nextStep ? "done" : "pending") : endT !== null ? "done" : "active";
     const ms = cur ? (endT ?? now) - cur.t : null;
     return { step, label: STEP_LABEL[step], status, ms, startT: cur?.t ?? null };
