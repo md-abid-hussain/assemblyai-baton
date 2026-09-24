@@ -18,8 +18,8 @@ zerops:
     deploy:
       readinessCheck:
         httpGet: { port: 3000, path: /api/health }
-        failureTimeout: 120
-        retryPeriod: 5
+        failureTimeout: 120s     # Go durations: a bare int is rejected; retryPeriod must be within [10s, 1h]
+        retryPeriod: 10s
     run:
       base: nodejs@22
       ports:
@@ -28,7 +28,6 @@ zerops:
       envVariables:
         NODE_ENV: production
         PORT: "3000"
-        HOSTNAME: 0.0.0.0
         DATABASE_URL: ${db_connectionString}
         ENABLE_INPROC_WORKER: "1"
         LIMITS_ROLE: authority
@@ -40,7 +39,9 @@ zerops:
         # at import time / in the GUI, never here. Note: envVariables here win over secret variables of the same name.
       initCommands:
         - node bundle/migrate.mjs  # idempotent drizzle migrator (advisory-locked); runs on every container start
-      start: node bundle/server.js # standalone server.js chdir()s to its own dir
+      # HOSTNAME is a reserved Zerops system variable (the container hostname), so it cannot be set in envVariables.
+      # Next's standalone server binds to $HOSTNAME, so override it for the node process only (env execs node).
+      start: env HOSTNAME=0.0.0.0 node bundle/server.js # standalone server.js chdir()s to its own dir
       healthCheck:
         httpGet: { port: 3000, path: /api/health }
       crontab:
