@@ -1,37 +1,10 @@
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
-import { fileURLToPath } from "node:url";
-
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { PaymentView } from "../../../../src/core/contracts/api";
-import type { CompiledTakeover } from "../../../../src/core/contracts/takeover";
 import { SessionCap, wrapUpInstructions } from "../../../../src/client/va/cap";
 import { basicFirstUpdateGuard, buildFirstUpdate } from "../../../../src/client/va/first-update";
 import { PAY_TIMEOUT_RESULT, PaymentWatch, type PaymentOutcome } from "../../../../src/client/va/payment-watch";
-
-const ROOT = resolve(fileURLToPath(new URL("../../../..", import.meta.url)));
-const fixture = (name: string) =>
-  JSON.parse(readFileSync(resolve(ROOT, "scripts/day1/fixtures", name), "utf8")) as { type: "session.update"; session: Record<string, unknown> };
-
-export function compiledFromFixture(name = "first-update-confirm.json", over: Partial<CompiledTakeover> = {}): CompiledTakeover {
-  const fx = fixture(name).session as { system_prompt: string; greeting: string; tools: CompiledTakeover["tools"]; input: { transcription_mode: CompiledTakeover["transcriptionMode"] } };
-  return {
-    greeting: fx.greeting,
-    systemPrompt: fx.system_prompt,
-    keyterms: ["Lucas Delgado", "Corolla"],
-    tools: fx.tools,
-    stage: name.includes("confirm") ? "confirm" : "disclose",
-    snapshot: {} as CompiledTakeover["snapshot"],
-    voice: "alba",
-    transcriptionMode: fx.input.transcription_mode,
-    vaSessionCapMs: 165_000,
-    promptVersion: "test0001",
-    deployMarker: "baton-deploy=dev-wp5b",
-    compiledBy: "server",
-    ...over,
-  };
-}
+import { compiledFromFixture, fixture } from "./fakes";
 
 describe("buildFirstUpdate (§5.9.1)", () => {
   it("emits exactly the live-verified keys, keyterms only when enabled and non-empty", () => {

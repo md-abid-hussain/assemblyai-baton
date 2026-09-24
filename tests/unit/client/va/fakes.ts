@@ -3,10 +3,15 @@
  * a WHATWG-style fake socket, a fake audio engine (clock, output player, paced feeder) and a recording sink.
  * No network, no credentials.
  */
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+
 import { bytesToBase64 } from "../../../../src/core/audio/base64";
 import type { WebSocketLike } from "../../../../src/core/aai/voice-agent";
 import type { BatonEvent } from "../../../../src/core/contracts/events";
 import type { MicSource, PacedFeeder, VaOutputPlayer } from "../../../../src/core/contracts/services";
+import type { CompiledTakeover } from "../../../../src/core/contracts/takeover";
 
 type Listener = (ev: never) => void;
 
@@ -193,3 +198,29 @@ export function pcmChunkB64(amplitude: number, ms = 10): string {
   for (let i = 0; i < n; i++) v.setInt16(i * 2, i % 2 === 0 ? amplitude : -amplitude, true);
   return bytesToBase64(bytes);
 }
+
+// ------------------------------------------------------------------------------ compiled takeovers from the T-D1-0 fixtures
+
+const ROOT = resolve(fileURLToPath(new URL("../../../..", import.meta.url)));
+export const fixture = (name: string) =>
+  JSON.parse(readFileSync(resolve(ROOT, "scripts/day1/fixtures", name), "utf8")) as { type: "session.update"; session: Record<string, unknown> };
+
+export function compiledFromFixture(name = "first-update-confirm.json", over: Partial<CompiledTakeover> = {}): CompiledTakeover {
+  const fx = fixture(name).session as { system_prompt: string; greeting: string; tools: CompiledTakeover["tools"]; input: { transcription_mode: CompiledTakeover["transcriptionMode"] } };
+  return {
+    greeting: fx.greeting,
+    systemPrompt: fx.system_prompt,
+    keyterms: ["Lucas Delgado", "Corolla"],
+    tools: fx.tools,
+    stage: name.includes("confirm") ? "confirm" : "disclose",
+    snapshot: {} as CompiledTakeover["snapshot"],
+    voice: "alba",
+    transcriptionMode: fx.input.transcription_mode,
+    vaSessionCapMs: 165_000,
+    promptVersion: "test0001",
+    deployMarker: "baton-deploy=dev-wp5b",
+    compiledBy: "server",
+    ...over,
+  };
+}
+
