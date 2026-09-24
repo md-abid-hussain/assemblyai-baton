@@ -122,7 +122,7 @@ export function snapshot(over: Partial<Record<FieldId, FieldState>> = {}): CaseS
 
 export async function seedTakeover(
   db: Db,
-  o: { caseId?: string; takeoverId?: string; vaSessionId?: string | null; mode?: "watch" | "live" | "spot" | "synthetic"; armedAt?: Date; endedAt?: Date | null; metrics?: Record<string, unknown>; outcome?: "completed" | "handed_back" | null; snap?: CaseState } = {},
+  o: { caseId?: string; takeoverId?: string; vaSessionId?: string | null; mode?: "watch" | "live" | "spot" | "synthetic"; armedAt?: Date; endedAt?: Date | null; metrics?: Record<string, unknown>; outcome?: "completed" | "handed_back" | null; snap?: CaseState; greeting?: string } = {},
 ): Promise<{ caseId: string; takeoverId: string }> {
   const caseId = o.caseId ?? `case_${randomBytes(4).toString("hex")}`;
   const takeoverId = o.takeoverId ?? `tko_${randomBytes(4).toString("hex")}`;
@@ -133,7 +133,7 @@ export async function seedTakeover(
     caseId,
     tArmMs: 61000.5,
     snapshot: snap as never,
-    greeting: "Hi Mark, this is the AI assistant.",
+    greeting: o.greeting ?? "Hi Mark, this is the AI assistant.",
     vaSessionId: o.vaSessionId === undefined ? "sess_test_1" : o.vaSessionId,
     outcome: o.outcome === undefined ? "completed" : o.outcome,
     metrics: (o.metrics ?? {}) as never,
