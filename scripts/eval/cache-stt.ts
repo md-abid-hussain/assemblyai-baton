@@ -25,8 +25,8 @@ import { STT_VARIANTS, type SttVariant } from "../../src/core/contracts/eval";
 import type { Scenario } from "../../src/core/contracts/scenario";
 import { takeAudioOf } from "../../src/core/scenario/assets";
 import { planCalls, type PlannedCall } from "../../src/core/scenario/build";
-import { isCompleteCache, serializeSttCacheRecord } from "../../src/core/scenario/stt-cache";
-import { downmixUlaw, estimateSttUsd, runSttCache, type OpenedChannel, type OpenedSessions, type RunnerSession } from "../../src/core/scenario/stt-run";
+import { cacheMeta, isCompleteCache, serializeSttCacheRecord } from "../../src/core/scenario/stt-cache";
+import { downmixUlaw, estimateSttUsd, paramsHashOf, runSttCache, type OpenedChannel, type OpenedSessions, type RunnerSession } from "../../src/core/scenario/stt-run";
 import { loadKit, parseFlags, PILOT_SCENARIOS, readSplit, readSttCache, resolvePaths, str, sttCachePath, type PipelinePaths } from "../calls/lib/kit-io";
 
 
@@ -149,7 +149,7 @@ async function runOne(paths: PipelinePaths, t: CacheTarget, o: { speed: number }
 
 async function main(): Promise<void> {
   const f = parseFlags(process.argv.slice(2), {
-    calls: "string", variants: "string", "max-usd": "string", speed: "string", force: "boolean", "dry-run": "boolean",
+    calls: "string", variants: "string", "max-usd": "string", speed: "string", force: "boolean", "dry-run": "boolean", "refresh-stale": "boolean",
     "calls-dir": "string", "scenarios-dir": "string", "data-root": "string",
   });
   const paths = resolvePaths({ callsDir: str(f["calls-dir"]), scenariosDir: str(f["scenarios-dir"]), dataRoot: str(f["data-root"]) });
@@ -177,7 +177,15 @@ async function main(): Promise<void> {
     try {
       const recs = readSttCache(paths.dataRoot, t.call.entry.callId, t.variant);
       if (recs && isCompleteCache(recs, t.variant)) {
-        console.log(`cached: ${t.call.entry.callId} ${t.variant}`);
+        // The trailer's params hash pins the exact params (e.g. WP4's TUNING_8K after T-D1-6 on real takes).
+        const want = paramsFor(t.call.scenario, t.call.entry, t.variant);
+        const meta = cacheMeta(recs);
+        const stale = Object.entries(want).some(([ch, p]) => meta[ch as keyof typeof meta]?.paramsHash !== paramsHashOf(p as unknown as Record<string, unknown>));
+        if (stale && f["refresh-stale"]) {
+          console.log(`stale: ${t.call.entry.callId} ${t.variant} (params changed since it was cached) → re-run`);
+          return true;
+        }
+        console.log(`cached: ${t.call.entry.callId} ${t.variant}${stale ? " (STALE: params changed since; --refresh-stale to re-run)" : ""}`);
         return false;
       }
     } catch {
