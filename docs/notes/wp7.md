@@ -115,6 +115,36 @@ and was committed first (`459254b`), then `git merge main` (C2 contracts v2, cle
 A second resume found a clean tree at `34ebec8` with `main` already merged; typecheck and `npm test` (88 files,
 1120/1120) were re-run green and the saved browser pass (`report.json`, 44 states) was spot-checked. No code changed.
 
+A third resume found the tree clean at `c913c63`, which **is** `main`: WP7·2 merged at `8584be5` and `wp/wp7`
+fast-forwarded over the later G2 merges, so `git log main..HEAD` is empty and there was nothing to merge or commit.
+`main` has since taken WP9, WP18 and WP13 (`git diff 8584be5..c913c63 -- src/` is **purely additive**: `src/content/**`,
+`src/core/scenario/**`, three `contracts/ext` files, `src/generated/*.json`, `server/jobs/va-audit.ts`, `server/qa/deps.ts`)
+— nothing under `src/components/call/**`, `src/app/call/**` or the global CSS, so the console surface is untouched.
+Everything below was **re-verified against that tree**, not merely re-read. No code changed.
+
+- `npm run typecheck` clean; `npm test` **102 files, 1293 passed + 1 skipped**.
+- **Browser pass re-run** (not the saved report): `next dev --webpack -p 3108`, 44 states, **min a11y 98** (40 at 100),
+  phone clipped in 0, horizontal scroll in 0, and the MockPhone flow SMS → e-sign → Sign → Simulate → **Paid** at both
+  1366×768 and 390. The dev log had **zero** errors, warnings or hydration notices across the whole pass. The only
+  remaining deduction is still `landmark-one-main` (weight 3) on `completed-qa`: Radix's modal QA dialog `aria-hidden`s
+  the console, so the page has no visible `<main>` while it is open. Real Lighthouse reports the same thing, so this is
+  left alone rather than nesting a `<main>` inside a `role="dialog"` to chase 100.
+- **Unknown-call state checked live** at `/call/s01` (`src/generated/calls.json` is still `[]`, so this is what a judge
+  hits if WP9's manifest is not deployed — integrator item 3). It is correct at 1366×768 and 390 and throws no page
+  errors: title "Call unavailable", narrator and strip "This call isn't available. It may have been renamed or removed.
+  Pick another call from the home page.", an **All calls** button, and "The call did not load, so there is nothing to
+  start yet." in the control column — no stale "choose Express" hint.
+- Deleted a stale `test-results/wp7-shots/1366x768-live-no-manifest.png` left over from an earlier session: it predated
+  `e533e66` and still showed the old generic "Something went wrong · Unknown call" card with the stale start hint, which
+  reads like a live regression. `test-results/` is git-ignored, so re-run the harness rather than trusting old PNGs.
+
+**Suite flake worth knowing (not WP7, affects everyone):** the *first* `npm test` on a cold machine failed 13 tests
+across 8 `tests/unit/server/**` files (`payments/routes`, `limits/stt-routes`, `jobs/runner`, `cases/routes`,
+`runs/runs-va`) — all "real Postgres" files, each sitting at ~17 s against the 20 s `testTimeout`. Every one passes
+alone, the immediate re-run was **102/102 files green in 9.3 s**, and `--maxWorkers=1` is green too. So it is
+first-connection contention on the one shared local Postgres under `fileParallelism`, not a code regression. If CI
+starts flaking here, give those files their own database or run them serially rather than raising the timeout.
+
 ### Done
 
 - **MockPhone mounted** (`8dcd72f` merges `wp/wp6`; no WP6 file edited). `ConsoleEnv.renderPhone` mounts WP6's
