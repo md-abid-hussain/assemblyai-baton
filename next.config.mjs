@@ -61,9 +61,14 @@ const nextConfig = {
   },
   // G1 (wp3-to-integrator §3): the Express prefill and cached-replay events read WP9's extraction cache with fs at
   // run time; `data/` is not traced otherwise. Matches nothing until WP9 writes data/cache/extract/**.
+  // G2-finish (wp14b-to-wp12 §2): the gallery seed reads data/relays/*.json with fs at run time (FsGallerySource),
+  // and /api/cases resolves relay versions. Without these the deployed gallery is silently empty.
   outputFileTracingIncludes: {
-    "/api/cases": ["./data/cache/extract/**"],
+    "/api/cases": ["./data/cache/extract/**", "./data/relays/*.json"],
     "/api/extract": ["./data/cache/extract/**"],
+    "/api/relays": ["./data/relays/*.json"],
+    "/api/relays/[id]": ["./data/relays/*.json"],
+    "/api/relays/[id]/compiled": ["./data/relays/*.json"],
   },
   // No server-side image optimisation: keeps the native, LGPL-licensed libvips (sharp) out of the deploy bundle.
   // `next/image` still works and serves the original files (pre-size images in public/).

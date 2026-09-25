@@ -12,6 +12,7 @@ import { GET as compiledRoute } from "@/app/api/relays/[id]/compiled/route";
 import { DELETE as deleteRoute, GET as getRoute, PUT as putRoute } from "@/app/api/relays/[id]/route";
 import { GET as listRoute, POST as createRoute } from "@/app/api/relays/route";
 import { signVisitorId } from "@/server/auth/visitor";
+import { setKernelBinding } from "@/server/engine/kernel-binding";
 import { rateEvents } from "@/server/db/schema";
 import { DbRateLimiter } from "@/server/limits/rate-limiter";
 import { MemoryGallerySource, setRelaysDeps } from "@/server/relays";
@@ -201,13 +202,21 @@ describe.skipIf(!HAS_DB)("/api/relays routes", () => {
     }
   });
 
-  it("GET /compiled: 404 across workspaces, 503 E_MAINTENANCE until the kernel compiler is wired, then the injected view", async () => {
+  it("GET /compiled: 404 across workspaces, 503 E_MAINTENANCE with no kernel bound, 200 with the real one, then the injected view", async () => {
     const v = visitor();
     const c = await cloneDental(v.h);
     expect((await compiledRoute(req("GET", `/api/relays/${c.id}/compiled`, undefined, visitor().h), ctxOf(c.id))).status).toBe(404);
-    const r = await compiledRoute(req("GET", `/api/relays/${c.id}/compiled`, undefined, v.h), ctxOf(c.id));
-    expect(r.status).toBe(503);
-    expect(await errCode(r)).toBe("E_MAINTENANCE");
+    // The kernel is bound by default since G2-finish, so the E_MAINTENANCE path is exercised by unbinding it.
+    setKernelBinding(null);
+    try {
+      const r = await compiledRoute(req("GET", `/api/relays/${c.id}/compiled`, undefined, v.h), ctxOf(c.id));
+      expect(r.status).toBe(503);
+      expect(await errCode(r)).toBe("E_MAINTENANCE");
+    } finally {
+      setKernelBinding(undefined);
+    }
+    // With the real kernel bound (the default), the route compiles for real - no injected view.
+    expect((await compiledRoute(req("GET", `/api/relays/${c.id}/compiled`, undefined, v.h), ctxOf(c.id))).status).toBe(200);
     const seen: { versionId: string | null; title: string }[] = [];
     setRelaysDeps({
       db: t.db, gallery: new MemoryGallerySource(galleryEntries()), rateLimiter: () => limiter,

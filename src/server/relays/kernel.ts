@@ -1,16 +1,20 @@
 import "server-only";
 
-import { BlueprintSchema, KERNEL_VERSION, type Blueprint, type LintIssue } from "../../core/contracts/v2";
-import { blueprintHash } from "./canonical";
+import { KERNEL_VERSION, type Blueprint, type LintIssue } from "../../core/contracts/v2";
+import { lintBlueprintJson } from "../../core/relay/lint";
+import { BlueprintMigrationError, blueprintHash, migrateBlueprint } from "../../core/relay/migrate";
 
 /**
  * The slice of WP14a's kernel the registry needs, as a port (TASKS-v2 §2: never import another WP's unmerged code).
  *
- * `parse` = WP14a's `lintBlueprintJson(json)` (`migrateBlueprint` + `BlueprintSchema` + `lintBlueprint`), `hash` =
- * `blueprintHash`. Until WP14a·2 lands on main, `defaultRelayKernel` parses with `BlueprintSchema` and maps zod issues
- * to `SCHEMA` lint issues only (no rule lint). The swap is this file only:
- *   parse: (json) => lintBlueprintJson(json), hash: (bp) => blueprintHash(bp)   // from src/core/relay/{lint,migrate}
- * (docs/notes/wp14b.md "What the integrator must do").
+ * `parse` = WP14a's `migrateBlueprint` + `lintBlueprintJson(json)` (`BlueprintSchema` + the full rule lint), `hash` =
+ * WP14a's isomorphic `blueprintHash`. **Swapped in at G2-finish** (WP14a·2/·3 are on `main`; before that this file
+ * parsed with `BlueprintSchema` and reported `SCHEMA` issues only). The core and server hashes are identical —
+ * `./canonical.ts` stays as the server-side definition and the pinned vector in `tests/unit/server/relays/pure.test.ts`
+ * covers both (docs/notes/requests/wp14b-to-wp14a.md §1).
+ *
+ * `parse` must never throw: `migrateBlueprint` rejects a non-object or an unknown `meta.schema`, so that becomes a
+ * `SCHEMA` issue with a null blueprint, exactly as a zod failure does.
  */
 export interface RelayKernel {
   readonly kernelVersion: string;
@@ -25,17 +29,14 @@ export const hasLintErrors = (issues: readonly LintIssue[]): boolean => issues.s
 export const defaultRelayKernel: RelayKernel = {
   kernelVersion: KERNEL_VERSION,
   parse(json) {
-    const r = BlueprintSchema.safeParse(json);
-    if (r.success) return { blueprint: r.data, issues: [] };
-    return {
-      blueprint: null,
-      issues: r.error.issues.slice(0, 50).map((iss) => ({
-        code: "SCHEMA",
-        severity: "error" as const,
-        path: iss.path.filter((k): k is string | number => typeof k !== "symbol"),
-        message: iss.message,
-      })),
-    };
+    let migrated: unknown;
+    try {
+      migrated = migrateBlueprint(json);
+    } catch (e) {
+      if (!(e instanceof BlueprintMigrationError)) throw e;
+      return { blueprint: null, issues: [{ code: "SCHEMA", severity: "error", path: [], message: e.message }] };
+    }
+    return lintBlueprintJson(migrated);
   },
   hash: (bp) => blueprintHash(bp),
 };

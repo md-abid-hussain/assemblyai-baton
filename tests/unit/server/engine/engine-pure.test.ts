@@ -1,12 +1,13 @@
 /**
  * WP14b·2 engine pieces without a database: the `RelayEngineFactory` LRU, the `CallCatalog` order and gallery-sim
- * mapping, the compiled view, the run helpers and the kernel binding slot. Fake kernel (WP14a·2 is not on main); $0.
+ * mapping, the compiled view, the run helpers and the kernel binding slot. Mostly a fake kernel, so the pieces are
+ * tested in isolation; the binding-slot test checks the real WP14a kernel bound at G2-finish. $0.
  */
 import { afterEach, describe, expect, it } from "vitest";
 
 import type { CallManifestEntry } from "@/core/contracts/scenario";
 import type { SimCallResolutionLite } from "@/core/contracts/ext/wp14b-engine";
-import { CompiledRelayViewSchema, CreateCaseResponseV2Schema, ProvenanceStripSchema, UiSpecSchema, type Blueprint } from "@/core/contracts/v2";
+import { CompiledRelayViewSchema, CreateCaseResponseV2Schema, KERNEL_VERSION, ProvenanceStripSchema, UiSpecSchema, type Blueprint } from "@/core/contracts/v2";
 import { RelayCallCatalog } from "@/server/engine/catalog";
 import { compiledRelayView, strictSchemaErrors } from "@/server/engine/compile-view";
 import { CachedRelayEngineFactory } from "@/server/engine/factory";
@@ -197,14 +198,23 @@ describe("run helpers", () => {
     expect(CreateCaseResponseV2Schema.shape.provenance.parse(fields.provenance)).toEqual(runProvenance(true));
   });
 
-  it("the kernel binding slot: null by default (WP14a·2 not on main), settable for tests, restorable", () => {
-    expect(getKernelBinding()).toBeNull();
+  it("the kernel binding slot: WP14a's kernel by default (bound at G2-finish), settable for tests, restorable", () => {
+    // Was "null by default" while WP14a·2 was on its branch. Now the default is the real kernel, so this also
+    // guards the wiring itself: it must be WP14a's compiler, not a stub.
+    const def = getKernelBinding();
+    expect(def).not.toBeNull();
+    expect(def!.kernelVersion).toBe(KERNEL_VERSION);
+    const bp = dentalBlueprint();
+    const compiled = def!.compile(bp, { versionId: "rv_a", relayId: "rly_a", hash: "h", flagship: false });
+    expect(compiled.blueprint).not.toBeNull(); // the legacy engine returns blueprint: null
+    expect(def!.cannedSnapshot(compiled, bp.context.samples[0]!, "all_verified").fields).not.toEqual({});
+
     const k = fakeKernel();
     setKernelBinding(k);
     expect(getKernelBinding()).toBe(k);
     setKernelBinding(null);
-    expect(getKernelBinding()).toBeNull();
+    expect(getKernelBinding()).toBeNull(); // an explicit null still disables it (the 503 E_MAINTENANCE path)
     setKernelBinding(undefined);
-    expect(getKernelBinding()).toBeNull();
+    expect(getKernelBinding()).toBe(def); // undefined restores the default binding, not null
   });
 });

@@ -69,7 +69,10 @@ export function blankBlueprint(industry: Industry, callDate: string): Blueprint 
       persona: { tone: "warm and brief", extraRules: [] },
       subject: "{?f.customer_name.verified}{f.customer_name|first_name}{:}you{/?}",
       greeting: {
-        opening: "Hi {customer.firstName}, I'm {org.name}'s AI assistant, not a person, and this call is recorded.",
+        // 13 words, so lint G2 (opening ≤ 14 words) passes for every industry — an org name is 1-4 words and would
+        // push it over (docs/notes/requests/wp14a-to-wp14b.md §1). Same line as the flagship; C1 still matches
+        // "AI assistant" / "not a person" / "recorded".
+        opening: "Hi {customer.firstName}, I'm {rep.firstName}'s AI assistant, not a person. This call is recorded.",
         summary: "I'll finish up from here.",
         clauses: [],
         optOut: "Ask for a person anytime to go back.",
