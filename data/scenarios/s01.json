@@ -93,7 +93,7 @@
   ],
   "handoff": {
     "at_beat": 17,
-    "line": "OK if my assistant finishes the paperwork? I'll stay on the line.",
+    "line": "OK if my assistant finishes the paperwork? I'll be one tap away if you need me.",
     "customer_response": "accepts",
     "customer_says": "Sure, go ahead.",
     "after": "end_call",

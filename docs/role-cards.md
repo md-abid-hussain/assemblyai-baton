@@ -90,7 +90,7 @@ Give the REP card to whoever plays the agency rep and the CUSTOMER card to whoev
 
 **Hand-off**
 
-- At beat 17 (around 95 s) say something like: "OK if my assistant finishes the paperwork? I'll stay on the line."
+- At beat 17 (around 95 s) say something like: "OK if my assistant finishes the paperwork? I'll be one tap away if you need me."
 - They will agree ("Sure, go ahead."). Say "Great - you'll hear them in a second, I'm right here" and END THE CALL.
 
 ### s01 · CUSTOMER card · Add 17-year-old daughter Maya to the Civic (golden demo path)
@@ -152,7 +152,7 @@ Give the REP card to whoever plays the agency rep and the CUSTOMER card to whoev
 
 **Hand-off**
 
-- Around 95 s the rep will ask something like: "OK if my assistant finishes the paperwork? I'll stay on the line."
+- Around 95 s the rep will ask something like: "OK if my assistant finishes the paperwork? I'll be one tap away if you need me."
 - You answer: "Sure, go ahead."
 - Then the rep ends the call - that's the end of the recording.
 
@@ -340,7 +340,7 @@ Give the REP card to whoever plays the agency rep and the CUSTOMER card to whoev
 
 **Hand-off**
 
-- At beat 15 (around 85 s) say something like: "OK if my assistant finishes the paperwork? I'll stay on the line."
+- At beat 15 (around 85 s) say something like: "OK if my assistant finishes the paperwork? I'll be one tap away if you need me."
 - They will decline ("Oh, I'd rather just finish with you, if that's all right."). Say "No problem, I'll finish it with you" and do the TAIL beats yourself, then end the call.
 
 ### s03 · CUSTOMER card · Add 19-year-old daughter Hannah; customer declines the AI and the rep finishes
@@ -403,7 +403,7 @@ Give the REP card to whoever plays the agency rep and the CUSTOMER card to whoev
 
 **Hand-off**
 
-- Around 85 s the rep will ask something like: "OK if my assistant finishes the paperwork? I'll stay on the line."
+- Around 85 s the rep will ask something like: "OK if my assistant finishes the paperwork? I'll be one tap away if you need me."
 - You answer: "Oh, I'd rather just finish with you, if that's all right."
 - Then the rep finishes the call with you (follow your TAIL beats).
 
@@ -466,7 +466,7 @@ Give the REP card to whoever plays the agency rep and the CUSTOMER card to whoev
 
 **Hand-off**
 
-- At beat 15 (around 80 s) say something like: "OK if my assistant finishes the paperwork? I'll stay on the line."
+- At beat 15 (around 80 s) say something like: "OK if my assistant finishes the paperwork? I'll be one tap away if you need me."
 - They will agree ("Sure, sounds good."). Say "Great - you'll hear them in a second, I'm right here" and END THE CALL.
 
 ### s04 · CUSTOMER card · Add new wife Jasmine; husband corrects her birthday; premium goes down
@@ -524,7 +524,7 @@ Give the REP card to whoever plays the agency rep and the CUSTOMER card to whoev
 
 **Hand-off**
 
-- Around 80 s the rep will ask something like: "OK if my assistant finishes the paperwork? I'll stay on the line."
+- Around 80 s the rep will ask something like: "OK if my assistant finishes the paperwork? I'll be one tap away if you need me."
 - You answer: "Sure, sounds good."
 - Then the rep ends the call - that's the end of the recording.
 
@@ -589,7 +589,7 @@ Give the REP card to whoever plays the agency rep and the CUSTOMER card to whoev
 
 **Hand-off**
 
-- At beat 15 (around 75 s) say something like: "OK if my assistant finishes the paperwork? I'll stay on the line."
+- At beat 15 (around 75 s) say something like: "OK if my assistant finishes the paperwork? I'll be one tap away if you need me."
 - They will agree ("Yep, fine."). Say "Great - you'll hear them in a second, I'm right here" and END THE CALL.
 
 ### s05 · CUSTOMER card · Add 18-year-old son Owen; rep never asks the license state (it's Wisconsin)
@@ -647,7 +647,7 @@ Give the REP card to whoever plays the agency rep and the CUSTOMER card to whoev
 
 **Hand-off**
 
-- Around 75 s the rep will ask something like: "OK if my assistant finishes the paperwork? I'll stay on the line."
+- Around 75 s the rep will ask something like: "OK if my assistant finishes the paperwork? I'll be one tap away if you need me."
 - You answer: "Yep, fine."
 - Then the rep ends the call - that's the end of the recording.
 
@@ -837,7 +837,7 @@ Give the REP card to whoever plays the agency rep and the CUSTOMER card to whoev
 
 **Hand-off**
 
-- At beat 15 (around 90 s) say something like: "OK if my assistant finishes the paperwork? I'll stay on the line."
+- At beat 15 (around 90 s) say something like: "OK if my assistant finishes the paperwork? I'll be one tap away if you need me."
 - They will agree ("Of course."). Say "Great - you'll hear them in a second, I'm right here" and END THE CALL.
 
 ### s07 · CUSTOMER card · Add college student Claire (20) for winter break; mom corrects the ZIP
@@ -896,7 +896,7 @@ Give the REP card to whoever plays the agency rep and the CUSTOMER card to whoev
 
 **Hand-off**
 
-- Around 90 s the rep will ask something like: "OK if my assistant finishes the paperwork? I'll stay on the line."
+- Around 90 s the rep will ask something like: "OK if my assistant finishes the paperwork? I'll be one tap away if you need me."
 - You answer: "Of course."
 - Then the rep ends the call - that's the end of the recording.
 
@@ -961,7 +961,7 @@ Give the REP card to whoever plays the agency rep and the CUSTOMER card to whoev
 
 **Hand-off**
 
-- At beat 15 (around 80 s) say something like: "OK if my assistant finishes the paperwork? I'll stay on the line."
+- At beat 15 (around 80 s) say something like: "OK if my assistant finishes the paperwork? I'll be one tap away if you need me."
 - They will agree ("That's fine, thank you."). Say "Great - you'll hear them in a second, I'm right here" and END THE CALL.
 
 ### s08 · CUSTOMER card · Add 78-year-old father Walter; rep forgets to ask the start date
@@ -1020,7 +1020,7 @@ Give the REP card to whoever plays the agency rep and the CUSTOMER card to whoev
 
 **Hand-off**
 
-- Around 80 s the rep will ask something like: "OK if my assistant finishes the paperwork? I'll stay on the line."
+- Around 80 s the rep will ask something like: "OK if my assistant finishes the paperwork? I'll be one tap away if you need me."
 - You answer: "That's fine, thank you."
 - Then the rep ends the call - that's the end of the recording.
 
@@ -1083,7 +1083,7 @@ Give the REP card to whoever plays the agency rep and the CUSTOMER card to whoev
 
 **Hand-off**
 
-- At beat 15 (around 80 s) say something like: "OK if my assistant finishes the paperwork? I'll stay on the line."
+- At beat 15 (around 80 s) say something like: "OK if my assistant finishes the paperwork? I'll be one tap away if you need me."
 - They will agree ("Yes, please."). Say "Great - you'll hear them in a second, I'm right here" and END THE CALL.
 
 ### s09 · CUSTOMER card · Add 15-year-old Ethan on a learner's permit; noisy living room; price unchanged
@@ -1141,7 +1141,7 @@ Give the REP card to whoever plays the agency rep and the CUSTOMER card to whoev
 
 **Hand-off**
 
-- Around 80 s the rep will ask something like: "OK if my assistant finishes the paperwork? I'll stay on the line."
+- Around 80 s the rep will ask something like: "OK if my assistant finishes the paperwork? I'll be one tap away if you need me."
 - You answer: "Yes, please."
 - Then the rep ends the call - that's the end of the recording.
 
@@ -1206,7 +1206,7 @@ Give the REP card to whoever plays the agency rep and the CUSTOMER card to whoev
 
 **Hand-off**
 
-- At beat 17 (around 95 s) say something like: "OK if my assistant finishes the paperwork? I'll stay on the line."
+- At beat 17 (around 95 s) say something like: "OK if my assistant finishes the paperwork? I'll be one tap away if you need me."
 - They will ask something first ("Is it going to make me repeat all of this? ...OK, sure."). Reassure them in one line, then say "you'll hear them in a second" and END THE CALL.
 
 ### s10 · CUSTOMER card · Add partner Alex; 'occasional' becomes primary after advice; asks about the AI first
@@ -1266,7 +1266,7 @@ Give the REP card to whoever plays the agency rep and the CUSTOMER card to whoev
 
 **Hand-off**
 
-- Around 95 s the rep will ask something like: "OK if my assistant finishes the paperwork? I'll stay on the line."
+- Around 95 s the rep will ask something like: "OK if my assistant finishes the paperwork? I'll be one tap away if you need me."
 - You answer: "Is it going to make me repeat all of this? ...OK, sure."
 - Then the rep ends the call - that's the end of the recording.
 
@@ -1329,7 +1329,7 @@ Give the REP card to whoever plays the agency rep and the CUSTOMER card to whoev
 
 **Hand-off**
 
-- At beat 13 (around 85 s) say something like: "Got it. OK if my assistant finishes the paperwork? I'll stay on the line."
+- At beat 13 (around 85 s) say something like: "Got it. OK if my assistant finishes the paperwork? I'll be one tap away if you need me."
 - They will agree ("Yes, that's fine."). Say "Great - you'll hear them in a second, I'm right here" and END THE CALL.
 
 ### s11 · CUSTOMER card · Add brother Omar (Michigan license); kids interrupt; car choice comes up at the last second
@@ -1385,7 +1385,7 @@ Give the REP card to whoever plays the agency rep and the CUSTOMER card to whoev
 
 **Hand-off**
 
-- Around 85 s the rep will ask something like: "Got it. OK if my assistant finishes the paperwork? I'll stay on the line."
+- Around 85 s the rep will ask something like: "Got it. OK if my assistant finishes the paperwork? I'll be one tap away if you need me."
 - You answer: "Yes, that's fine."
 - Then the rep ends the call - that's the end of the recording.
 
@@ -1446,7 +1446,7 @@ Give the REP card to whoever plays the agency rep and the CUSTOMER card to whoev
 
 **Hand-off**
 
-- At beat 12 (around 65 s) say something like: "The system's still working out the new rate. OK if my assistant finishes up once it's ready? I'll stay on the line."
+- At beat 12 (around 65 s) say something like: "The system's still working out the new rate. OK if my assistant finishes up once it's ready? I'll be one tap away if you need me."
 - They will agree ("Sure, no rush."). Say "Great - you'll hear them in a second, I'm right here" and END THE CALL.
 
 ### s12 · CUSTOMER card · Add 16-year-old Ava; rep hands off before the new price is known
@@ -1502,7 +1502,7 @@ Give the REP card to whoever plays the agency rep and the CUSTOMER card to whoev
 
 **Hand-off**
 
-- Around 65 s the rep will ask something like: "The system's still working out the new rate. OK if my assistant finishes up once it's ready? I'll stay on the line."
+- Around 65 s the rep will ask something like: "The system's still working out the new rate. OK if my assistant finishes up once it's ready? I'll be one tap away if you need me."
 - You answer: "Sure, no rush."
 - Then the rep ends the call - that's the end of the recording.
 
@@ -1567,7 +1567,7 @@ Give the REP card to whoever plays the agency rep and the CUSTOMER card to whoev
 
 **Hand-off**
 
-- At beat 15 (around 90 s) say something like: "OK if my assistant finishes the paperwork? I'll stay on the line."
+- At beat 15 (around 90 s) say something like: "OK if my assistant finishes the paperwork? I'll be one tap away if you need me."
 - They will agree ("Fine, go ahead."). Say "Great - you'll hear them in a second, I'm right here" and END THE CALL.
 
 ### s13 · CUSTOMER card · Add son Dominick (22) with an at-fault accident; rep misspells his name
@@ -1625,7 +1625,7 @@ Give the REP card to whoever plays the agency rep and the CUSTOMER card to whoev
 
 **Hand-off**
 
-- Around 90 s the rep will ask something like: "OK if my assistant finishes the paperwork? I'll stay on the line."
+- Around 90 s the rep will ask something like: "OK if my assistant finishes the paperwork? I'll be one tap away if you need me."
 - You answer: "Fine, go ahead."
 - Then the rep ends the call - that's the end of the recording.
 
@@ -1693,7 +1693,7 @@ Give the REP card to whoever plays the agency rep and the CUSTOMER card to whoev
 
 **Hand-off**
 
-- At beat 15 (around 85 s) say something like: "OK if my assistant finishes the paperwork? I'll stay on the line."
+- At beat 15 (around 85 s) say something like: "OK if my assistant finishes the paperwork? I'll be one tap away if you need me."
 - They will decline ("Honestly, I'd rather you just finish it. I don't like those automated things."). Say "No problem, I'll finish it with you" and do the TAIL beats yourself, then end the call.
 
 ### s14 · CUSTOMER card · Add mother Carmen (Florida license); she chimes in; customer refuses the AI
@@ -1755,7 +1755,7 @@ Give the REP card to whoever plays the agency rep and the CUSTOMER card to whoev
 
 **Hand-off**
 
-- Around 85 s the rep will ask something like: "OK if my assistant finishes the paperwork? I'll stay on the line."
+- Around 85 s the rep will ask something like: "OK if my assistant finishes the paperwork? I'll be one tap away if you need me."
 - You answer: "Honestly, I'd rather you just finish it. I don't like those automated things."
 - Then the rep finishes the call with you (follow your TAIL beats).
 
@@ -1820,7 +1820,7 @@ Give the REP card to whoever plays the agency rep and the CUSTOMER card to whoev
 
 **Hand-off**
 
-- At beat 15 (around 80 s) say something like: "OK if my assistant finishes the paperwork? I'll stay on the line."
+- At beat 15 (around 80 s) say something like: "OK if my assistant finishes the paperwork? I'll be one tap away if you need me."
 - They will agree ("Sure thing."). Say "Great - you'll hear them in a second, I'm right here" and END THE CALL.
 
 ### s15 · CUSTOMER card · Add stepdaughter Sophie (17); stepdad doesn't know her exact birthday
@@ -1879,7 +1879,7 @@ Give the REP card to whoever plays the agency rep and the CUSTOMER card to whoev
 
 **Hand-off**
 
-- Around 80 s the rep will ask something like: "OK if my assistant finishes the paperwork? I'll stay on the line."
+- Around 80 s the rep will ask something like: "OK if my assistant finishes the paperwork? I'll be one tap away if you need me."
 - You answer: "Sure thing."
 - Then the rep ends the call - that's the end of the recording.
 
@@ -1942,7 +1942,7 @@ Give the REP card to whoever plays the agency rep and the CUSTOMER card to whoev
 
 **Hand-off**
 
-- At beat 15 (around 80 s) say something like: "OK if my assistant finishes the paperwork? I'll stay on the line."
+- At beat 15 (around 80 s) say something like: "OK if my assistant finishes the paperwork? I'll be one tap away if you need me."
 - They will ask something first ("Wait, is it a robot? ...Ha, OK, fine, as long as you're there."). Reassure them in one line, then say "you'll hear them in a second" and END THE CALL.
 
 ### s16 · CUSTOMER card · Add roommate Jordan; start date changed to today; 'is it a robot?'
@@ -2000,7 +2000,7 @@ Give the REP card to whoever plays the agency rep and the CUSTOMER card to whoev
 
 **Hand-off**
 
-- Around 80 s the rep will ask something like: "OK if my assistant finishes the paperwork? I'll stay on the line."
+- Around 80 s the rep will ask something like: "OK if my assistant finishes the paperwork? I'll be one tap away if you need me."
 - You answer: "Wait, is it a robot? ...Ha, OK, fine, as long as you're there."
 - Then the rep ends the call - that's the end of the recording.
 
@@ -2069,7 +2069,7 @@ Give the REP card to whoever plays the agency rep and the CUSTOMER card to whoev
 
 **Hand-off**
 
-- At beat 15 (around 90 s) say something like: "OK if my assistant finishes the paperwork? I'll stay on the line."
+- At beat 15 (around 90 s) say something like: "OK if my assistant finishes the paperwork? I'll be one tap away if you need me."
 - They will decline ("No no, you just finish it. I'm cooking, I don't want to explain everything again to a machine."). Say "No problem, I'll finish it with you" and do the TAIL beats yourself, then end the call.
 
 ### s17 · CUSTOMER card · Add 17-year-old Rohan with a speeding ticket; kitchen noise; mom declines the AI
@@ -2132,7 +2132,7 @@ Give the REP card to whoever plays the agency rep and the CUSTOMER card to whoev
 
 **Hand-off**
 
-- Around 90 s the rep will ask something like: "OK if my assistant finishes the paperwork? I'll stay on the line."
+- Around 90 s the rep will ask something like: "OK if my assistant finishes the paperwork? I'll be one tap away if you need me."
 - You answer: "No no, you just finish it. I'm cooking, I don't want to explain everything again to a machine."
 - Then the rep finishes the call with you (follow your TAIL beats).
 
@@ -2197,7 +2197,7 @@ Give the REP card to whoever plays the agency rep and the CUSTOMER card to whoev
 
 **Hand-off**
 
-- At beat 15 (around 85 s) say something like: "OK if my assistant finishes the paperwork? I'll stay on the line."
+- At beat 15 (around 85 s) say something like: "OK if my assistant finishes the paperwork? I'll be one tap away if you need me."
 - They will agree ("Sure."). Say "Great - you'll hear them in a second, I'm right here" and END THE CALL.
 
 ### s18 · CUSTOMER card · Add daughter Leah (18) who takes the Jetta to college; campus ZIP unknown
@@ -2256,7 +2256,7 @@ Give the REP card to whoever plays the agency rep and the CUSTOMER card to whoev
 
 **Hand-off**
 
-- Around 85 s the rep will ask something like: "OK if my assistant finishes the paperwork? I'll stay on the line."
+- Around 85 s the rep will ask something like: "OK if my assistant finishes the paperwork? I'll be one tap away if you need me."
 - You answer: "Sure."
 - Then the rep ends the call - that's the end of the recording.
 
@@ -2323,7 +2323,7 @@ Give the REP card to whoever plays the agency rep and the CUSTOMER card to whoev
 
 **Hand-off**
 
-- At beat 15 (around 90 s) say something like: "OK if my assistant finishes the paperwork? I'll stay on the line."
+- At beat 15 (around 90 s) say something like: "OK if my assistant finishes the paperwork? I'll be one tap away if you need me."
 - They will agree ("Haan haan, theek hai, go ahead."). Say "Great - you'll hear them in a second, I'm right here" and END THE CALL.
 
 ### s19 · CUSTOMER card · Hinglish: mom adds 17-year-old son Arjun; rep speaks English only
@@ -2386,7 +2386,7 @@ Give the REP card to whoever plays the agency rep and the CUSTOMER card to whoev
 
 **Hand-off**
 
-- Around 90 s the rep will ask something like: "OK if my assistant finishes the paperwork? I'll stay on the line."
+- Around 90 s the rep will ask something like: "OK if my assistant finishes the paperwork? I'll be one tap away if you need me."
 - You answer: "Haan haan, theek hai, go ahead."
 - Then the rep ends the call - that's the end of the recording.
 
@@ -2579,7 +2579,7 @@ Give the REP card to whoever plays the agency rep and the CUSTOMER card to whoev
 
 **Hand-off**
 
-- At beat 13 (around 80 s) say something like: "OK if my assistant finishes the paperwork? I'll stay on the line."
+- At beat 13 (around 80 s) say something like: "OK if my assistant finishes the paperwork? I'll be one tap away if you need me."
 - They will agree ("Yeah, yeah, go ahead."). Say "Great - you'll hear them in a second, I'm right here" and END THE CALL.
 
 ### s21 · CUSTOMER card · Add nephew Marcus (20) from a noisy street; talks over the rep; changes the car
@@ -2635,7 +2635,7 @@ Give the REP card to whoever plays the agency rep and the CUSTOMER card to whoev
 
 **Hand-off**
 
-- Around 80 s the rep will ask something like: "OK if my assistant finishes the paperwork? I'll stay on the line."
+- Around 80 s the rep will ask something like: "OK if my assistant finishes the paperwork? I'll be one tap away if you need me."
 - You answer: "Yeah, yeah, go ahead."
 - Then the rep ends the call - that's the end of the recording.
 
@@ -2699,7 +2699,7 @@ Give the REP card to whoever plays the agency rep and the CUSTOMER card to whoev
 
 **Hand-off**
 
-- At beat 13 (around 70 s) say something like: "OK if my assistant finishes the paperwork? I'll stay on the line."
+- At beat 13 (around 70 s) say something like: "OK if my assistant finishes the paperwork? I'll be one tap away if you need me."
 - They will agree ("Great, thanks."). Say "Great - you'll hear them in a second, I'm right here" and END THE CALL.
 
 ### s22 · CUSTOMER card · Add the family's nanny Gabriela (doesn't live there); two facts never asked
@@ -2755,7 +2755,7 @@ Give the REP card to whoever plays the agency rep and the CUSTOMER card to whoev
 
 **Hand-off**
 
-- Around 70 s the rep will ask something like: "OK if my assistant finishes the paperwork? I'll stay on the line."
+- Around 70 s the rep will ask something like: "OK if my assistant finishes the paperwork? I'll be one tap away if you need me."
 - You answer: "Great, thanks."
 - Then the rep ends the call - that's the end of the recording.
 

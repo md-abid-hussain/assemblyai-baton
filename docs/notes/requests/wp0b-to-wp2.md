@@ -68,3 +68,10 @@ The contracts are frozen with the amendments in `docs/notes/g0.md` ("Contract de
   scaffold test pins it).
 - **pagehide requests are keepalive `fetch` calls with the Authorization header, never `sendBeacon`** (route #5b
   release, #7 closed report, #13 end), so your auth middleware needs no body-token fallback.
+
+---
+
+## Integrator status (G1, 2026-09-25)
+
+- Items 1 and 2 are wired at G1 (`src/instrumentation.ts`, `scripts/lib/remote.ts`).
+Details: `docs/notes/g1.md` ("Integrator requests: disposition").

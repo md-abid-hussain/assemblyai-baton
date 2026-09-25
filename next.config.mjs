@@ -59,6 +59,12 @@ const nextConfig = {
   outputFileTracingExcludes: {
     "*": ["./spikes/**", "./tools/**", "./research/**", "./data/calls/**", "./node_modules/sharp/**", "./node_modules/@img/**"],
   },
+  // G1 (wp3-to-integrator §3): the Express prefill and cached-replay events read WP9's extraction cache with fs at
+  // run time; `data/` is not traced otherwise. Matches nothing until WP9 writes data/cache/extract/**.
+  outputFileTracingIncludes: {
+    "/api/cases": ["./data/cache/extract/**"],
+    "/api/extract": ["./data/cache/extract/**"],
+  },
   // No server-side image optimisation: keeps the native, LGPL-licensed libvips (sharp) out of the deploy bundle.
   // `next/image` still works and serves the original files (pre-size images in public/).
   images: { unoptimized: true },
