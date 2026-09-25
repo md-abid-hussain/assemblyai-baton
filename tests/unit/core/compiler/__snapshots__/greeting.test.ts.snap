@@ -15,8 +15,8 @@ exports[`compileGreeting: six canonical states (snapshots) > long agency and pen
     "field": "incidents_3y",
     "kind": "confirm",
   },
-  "text": "Hi Priya, this is Harborview Insurance Agency of Greater Cleveland and the Western Reserve's AI assistant. I'm an automated assistant, not a person, and this call is still being recorded. Daniel passed me your request to add Maya. You can ask for Daniel at any time. Just to confirm, Maya has had the following in the last three years: one speeding ticket in 2024. Is that right?",
-  "wordCount": 67,
+  "text": "Hi Priya, I'm Daniel's AI assistant, not a person. This call is recorded. I'll finish adding Maya. Ask for Daniel anytime. Just to confirm, Maya had one speeding ticket in 2024 in the last three years?",
+  "wordCount": 36,
 }
 `;
 
@@ -30,8 +30,8 @@ exports[`compileGreeting: six canonical states (snapshots) > nothing known 1`] =
     "field": "driver_full_name",
     "kind": "ask",
   },
-  "text": "Hi Priya, this is Harborview Insurance Agency's AI assistant. I'm an automated assistant, not a person, and this call is still being recorded. Daniel passed me your request to add a new driver. You can ask for Daniel at any time. To finish up, I just need the new driver's full name.",
-  "wordCount": 52,
+  "text": "Hi Priya, I'm Daniel's AI assistant, not a person. This call is recorded. I'll finish adding a new driver. Ask for Daniel anytime. I just need the new driver's full name.",
+  "wordCount": 31,
 }
 `;
 
@@ -47,8 +47,8 @@ exports[`compileGreeting: six canonical states (snapshots) > pending name, verif
     "field": "driver_full_name",
     "kind": "confirm",
   },
-  "text": "Hi Priya, this is Harborview Insurance Agency's AI assistant. I'm an automated assistant, not a person, and this call is still being recorded. Daniel passed me your request to add a new driver on the 2018 Toyota Highlander. You can ask for Daniel at any time. Just to confirm, the new driver's name is Maya. Is that right?",
-  "wordCount": 58,
+  "text": "Hi Priya, I'm Daniel's AI assistant, not a person. This call is recorded. I'll finish adding a new driver to the 2018 Toyota Highlander. Ask for Daniel anytime. Just to confirm, the new driver's name is Maya?",
+  "wordCount": 37,
 }
 `;
 
@@ -67,8 +67,8 @@ exports[`compileGreeting: six canonical states (snapshots) > s01 all verified 1`
     "field": null,
     "kind": "none",
   },
-  "text": "Hi Priya, this is Harborview Insurance Agency's AI assistant. I'm an automated assistant, not a person, and this call is still being recorded. Daniel passed me your request to add Maya as a driver on the 2021 Honda Civic, starting Friday, October 2nd, at $142 a month. You can ask for Daniel at any time. I have everything I need, so next I'll read you the updated premium. Ready?",
-  "wordCount": 69,
+  "text": "Hi Priya, I'm Daniel's AI assistant, not a person. This call is recorded. I'll finish adding Maya to the 2021 Honda Civic, starting Friday, October 2nd, at $142 a month. Ask for Daniel anytime. Ready for the updated premium?",
+  "wordCount": 39,
 }
 `;
 
@@ -86,8 +86,8 @@ exports[`compileGreeting: six canonical states (snapshots) > s02 pending date 1`
     "field": "effective_date",
     "kind": "confirm",
   },
-  "text": "Hi Mark, this is Mesa Ridge Insurance Group's AI assistant. I'm an automated assistant, not a person, and this call is still being recorded. Carmen passed me your request to add Lucas as a driver on the 2014 Toyota Corolla, at $171 a month. You can ask for Carmen at any time. Just to confirm, the change should start Saturday, September 26th. Is that right?",
-  "wordCount": 65,
+  "text": "Hi Mark, I'm Carmen's AI assistant, not a person. This call is recorded. I'll finish adding Lucas to the 2014 Toyota Corolla, at $171 a month. Ask for Carmen anytime. Just to confirm, the change should start Saturday, September 26th?",
+  "wordCount": 40,
 }
 `;
 
@@ -97,16 +97,17 @@ exports[`compileGreeting: six canonical states (snapshots) > s05 missing license
   "asserted": [
     "driver_full_name",
     "vehicle_assignment",
-    "effective_date",
     "premium_new_monthly_usd",
   ],
   "confirms": null,
-  "dropped": [],
+  "dropped": [
+    "date",
+  ],
   "nextStep": {
     "field": "license_state",
     "kind": "ask",
   },
-  "text": "Hi Greg, this is Prairie Lantern Insurance Agency's AI assistant. I'm an automated assistant, not a person, and this call is still being recorded. Kevin passed me your request to add Owen as a driver on the 2012 Toyota Camry, starting Thursday, October 1st, at $204 a month. You can ask for Kevin at any time. To finish up, I just need which state issued Owen's license.",
-  "wordCount": 67,
+  "text": "Hi Greg, I'm Kevin's AI assistant, not a person. This call is recorded. I'll finish adding Owen to the 2012 Toyota Camry, at $204 a month. Ask for Kevin anytime. I just need which state issued Owen's license.",
+  "wordCount": 38,
 }
 `;

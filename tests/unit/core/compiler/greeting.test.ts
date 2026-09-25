@@ -2,7 +2,8 @@ import { describe, expect, it } from "vitest";
 import type { CaseState, FieldId, FieldStatus, Party, PolicyRecord } from "../../../../src/core/contracts";
 import { addDays } from "../../../../src/core/case/dates";
 import {
-  GREETING_DISCLOSURE_RES, GREETING_MAX_WORDS, assertGreetingInvariant, compileGreeting, compileGreetingV1,
+  GREETING_DISCLOSURE_RES, GREETING_MAX_WORDS, GREETING_OPENING_MAX_WORDS, assertGreetingInvariant, compileGreeting,
+  compileGreetingV1, greetingOpening, wordsIn,
 } from "../../../../src/core/compiler/greeting";
 import { spokenDate, spokenDob, spokenMoney, spokenZip, stateName } from "../../../../src/core/compiler/spoken";
 import { GREETING_PRIORITY, firstNameOf, licenseWords, vehicleLabelOf } from "../../../../src/core/intents/add-driver";
@@ -11,30 +12,41 @@ import { handoffStateOf, policyOf, stateOf, type FieldSpec } from "../case/_fixt
 
 const s01 = policyOf("s01");
 
-describe("compileGreeting: scenario examples (DESIGN §5.6)", () => {
-  it("s01 at the planned hand-off: every clause, premium quoted by the rep, 'ready?' close", () => {
+describe("compileGreeting: scenario examples (DESIGN §5.6, v2.1 ≤ 40 words)", () => {
+  it("s01 at the planned hand-off: every clause, premium quoted by the rep, 'ready?' close, ≤ 40 words", () => {
     const g = compileGreeting(handoffStateOf("s01"), s01);
     expect(g.text).toBe(
-      "Hi Priya, this is Harborview Insurance Agency's AI assistant. I'm an automated assistant, not a person, and this call is still being recorded. " +
-        "Daniel passed me your request to add Maya as a driver on the 2021 Honda Civic, starting Friday, October 2nd, at $142 a month. " +
-        "You can ask for Daniel at any time. I have everything I need, so next I'll read you the updated premium. Ready?",
+      "Hi Priya, I'm Daniel's AI assistant, not a person. This call is recorded. " +
+        "I'll finish adding Maya to the 2021 Honda Civic, starting Friday, October 2nd, at $142 a month. " +
+        "Ask for Daniel anytime. Ready for the updated premium?",
     );
     expect(g.asserted).toEqual(["driver_full_name", "vehicle_assignment", "effective_date", "premium_new_monthly_usd"]);
     expect(g.nextStep).toEqual({ kind: "none", field: null });
+    expect(g.dropped).toEqual([]);
+    expect(g.wordCount).toBe(39);
     expect(g.wordCount).toBeLessThanOrEqual(GREETING_MAX_WORDS);
+  });
+
+  it("the opening carries the AI disclosure and the recording notice in ≤ 14 words; the first fact comes by word 24", () => {
+    const opening = greetingOpening(s01);
+    expect(wordsIn(opening)).toBeLessThanOrEqual(GREETING_OPENING_MAX_WORDS);
+    for (const re of GREETING_DISCLOSURE_RES) expect(opening).toMatch(re);
+    const g = compileGreeting(handoffStateOf("s01"), s01);
+    expect(g.text.split(/\s+/).indexOf("Maya")).toBeLessThan(24);
   });
 
   it("s02: effective_date PENDING ('tomorrow' = Saturday, September 26th) → no date clause, confirm it", () => {
     const g = compileGreeting(handoffStateOf("s02"), policyOf("s02"));
-    expect(g.text).toContain("Carmen passed me your request to add Lucas as a driver on the 2014 Toyota Corolla, at $171 a month.");
-    expect(g.text).toMatch(/Just to confirm, the change should start Saturday, September 26th\. Is that right\?$/);
+    expect(g.text).toContain("I'll finish adding Lucas to the 2014 Toyota Corolla, at $171 a month.");
+    expect(g.text).toMatch(/Just to confirm, the change should start Saturday, September 26th\?$/);
+    expect(g.wordCount).toBeLessThanOrEqual(GREETING_MAX_WORDS);
     expect(g.confirms).toBe("effective_date");
     expect(g.asserted).not.toContain("effective_date");
   });
 
   it("s05: license_state MISSING → ask which state issued Owen's license", () => {
     const g = compileGreeting(handoffStateOf("s05"), policyOf("s05"));
-    expect(g.text).toMatch(/To finish up, I just need which state issued Owen's license\.$/);
+    expect(g.text).toMatch(/I just need which state issued Owen's license\.$/);
     expect(g.asks).toBe("license_state");
     expect(g.text).not.toMatch(/Illinois|Wisconsin/);
   });
@@ -59,7 +71,7 @@ describe("compileGreeting: rules", () => {
     });
     const g = compileGreeting(st, s01);
     expect(g.confirms).toBe("driver_dob");
-    expect(g.text).toContain("Just to confirm, Maya's date of birth is March 14th, 2009. Is that right?");
+    expect(g.text).toContain("Just to confirm, Maya's date of birth is March 14th, 2009?");
     expect(g.text).not.toContain("4 4 1 0 7");
   });
 
@@ -70,31 +82,38 @@ describe("compileGreeting: rules", () => {
       operator_type: { status: "PENDING", value: "primary" },
     });
     const g = compileGreeting(st, s01);
-    expect(g.text).toContain("to add a new driver.");
-    expect(g.text).toContain("Just to confirm, the new driver's name is Maya Raman. Is that right?");
+    expect(g.text).toContain("I'll finish adding a new driver.");
+    expect(g.text).toContain("Just to confirm, the new driver's name is Maya Raman?");
     const g2 = compileGreeting(stateOf(s01, { operator_type: { status: "PENDING", value: "occasional" } }), s01);
     expect(g2.text).toContain("the new driver will be the occasional driver of the car");
   });
 
-  it("the length cap drops the date clause, then the vehicle clause", () => {
-    const longPolicy: PolicyRecord = { ...s01, agencyName: "Harborview Insurance Agency of Greater Cleveland, Lakewood and the Western Reserve" };
-    const st = stateOf(longPolicy, {
+  it("the length cap drops the date clause, then the vehicle clause, then the premium clause", () => {
+    const facts = {
       driver_full_name: { status: "VERIFIED", value: "maya raman" },
       vehicle_assignment: { status: "VERIFIED", value: "veh1" },
       effective_date: { status: "VERIFIED", value: "2026-10-02" },
       premium_new_monthly_usd: { status: "VERIFIED", value: "142.00", source: "rep" },
-      incidents_3y: { status: "PENDING", value: "one speeding ticket last spring and a minor parking lot fender bender" },
-    });
-    const g = compileGreeting(st, longPolicy);
-    expect(g.dropped).toEqual(["date", "vehicle"]);
-    expect(g.asserted).toEqual(["driver_full_name", "premium_new_monthly_usd"]);
-    expect(g.text).not.toContain("October 2nd");
-    expect(g.text).not.toContain("Civic");
-    const st2 = stateOf(s01, { ...Object.fromEntries((["driver_full_name", "vehicle_assignment", "effective_date", "premium_new_monthly_usd"] as const)
-      .map((f) => [f, { status: st.fields[f].status, value: st.fields[f].value, source: st.fields[f].source }])), incidents_3y: { status: "PENDING", value: "a ticket" } });
-    const g2 = compileGreeting(st2, s01);
-    expect(g2.dropped).toEqual(["date"]);
-    expect(g2.text).toContain("2021 Honda Civic");
+    } as const satisfies Partial<Record<FieldId, FieldSpec>>;
+    // A long free-text PENDING value: every droppable clause goes (free text can still overflow; lint G2 checks samples).
+    const st = stateOf(s01, { ...facts, incidents_3y: { status: "PENDING", value: "one speeding ticket last spring and a minor parking lot fender bender" } });
+    const g = compileGreeting(st, s01);
+    expect(g.dropped).toEqual(["date", "vehicle", "premium"]);
+    expect(g.asserted).toEqual(["driver_full_name"]);
+    expect(g.text).not.toMatch(/October 2nd|\$142/);
+    expect(g.text).toContain("I'll finish adding Maya.");
+    // Date and vehicle go; the premium stays.
+    const g2 = compileGreeting(stateOf(s01, { ...facts, incidents_3y: { status: "PENDING", value: "a ticket" } }), s01);
+    expect(g2.dropped).toEqual(["date", "vehicle"]);
+    expect(g2.asserted).toEqual(["driver_full_name", "premium_new_monthly_usd"]);
+    expect(g2.wordCount).toBeLessThanOrEqual(GREETING_MAX_WORDS);
+    // Only the date goes.
+    const { premium_new_monthly_usd: _p, ...noPremium } = facts;
+    const g3 = compileGreeting(stateOf(s01, { ...noPremium, driver_dob: { status: "PENDING", value: "2009-03-14" } }), s01);
+    expect(g3.dropped).toEqual(["date"]);
+    expect(g3.text).toContain("2021 Honda Civic");
+    expect(g3.asserted).toEqual(["driver_full_name", "vehicle_assignment"]);
+    expect(g3.wordCount).toBeLessThanOrEqual(GREETING_MAX_WORDS);
   });
 
   it("'all' vehicles, relation words from the display, no MISSING premium asks", () => {
@@ -104,8 +123,8 @@ describe("compileGreeting: rules", () => {
       driver_relation: { status: "PENDING", value: "child", display: "child (daughter)" },
     });
     const g = compileGreeting(st, s01);
-    expect(g.text).toContain("add Maya as a driver on all your vehicles.");
-    expect(g.text).toContain("Just to confirm, Maya is your daughter. Is that right?");
+    expect(g.text).toContain("I'll finish adding Maya to all your vehicles.");
+    expect(g.text).toContain("Just to confirm, Maya is your daughter?");
     const onlyPremiumMissing = compileGreeting(handoffStateOf("s01"), s01);
     expect(onlyPremiumMissing.asks).toBeNull();
   });
@@ -222,7 +241,7 @@ describe("compileGreeting: property test (500 random states)", () => {
       const firstPending = GREETING_PRIORITY.find((f) => st.fields[f].status === "PENDING") ?? null;
       expect(g.confirms, ctx).toBe(firstPending);
       if (g.confirms) expect(st.fields[g.confirms].status, ctx).toBe("PENDING");
-      const nextSentences = (g.text.match(/Just to confirm|To finish up|I have everything I need/g) ?? []).length;
+      const nextSentences = (g.text.match(/Just to confirm|I just need|Ready for the updated premium/g) ?? []).length;
       expect(nextSentences, ctx).toBe(1);
       // No non-VERIFIED value may appear, except the one confirm clause.
       for (const f of Object.keys(st.fields) as FieldId[]) {
@@ -244,6 +263,7 @@ describe("compileGreetingV1 (naive)", () => {
     expect(g.text).toContain("starting Saturday, September 26th");
     expect(g.asserted).toContain("effective_date");
     expect(g.text).toContain("I also have that");
+    expect(g.wordCount).toBeGreaterThan(GREETING_MAX_WORDS); // v1 has no cap (why v3's rules matter)
     expect(g.nextStep.kind).toBe("none");
     const g5 = compileGreetingV1(handoffStateOf("s05"), policyOf("s05"));
     expect(g5.asks).toBe("license_state");

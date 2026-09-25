@@ -109,15 +109,16 @@ export const TOOL_SCHEMAS: Readonly<Record<ToolName, VaFunctionTool>> = {
 };
 
 /**
- * `send_esign_and_pay_link` in `PAY_TOOL_MODE=push` (§5.8 fallback): interactive, returns `{status:"link_sent"}`
- * immediately; the system later tells the agent that payment is confirmed.
+ * `send_esign_and_pay_link` in `PAY_TOOL_MODE=push` (§5.8; the production mode since T-D1-1): interactive, returns
+ * `{status:"link_sent"}` immediately; the system later tells the agent that payment finished. Texts and timeout as
+ * WP5b validated live (wp5b-to-wp1 item 1).
  */
 export const PAY_LINK_PUSH_TOOL: VaFunctionTool = {
   ...TOOL_SCHEMAS.send_esign_and_pay_link,
   execution_mode: "interactive",
-  timeout_seconds: 30,
+  timeout_seconds: 10,
   description:
-    "Text the customer a secure link to e-sign the change and pay the amount due today. Only after the customer agreed to the premium and to receiving the text. Returns as soon as the link is sent; then wait quietly until the system says payment is confirmed.",
+    "Text the customer a secure link to e-sign the change and pay the amount due today. Only after the customer agreed to the premium and to receiving the text. Returns right after the text is sent; the system tells you when the payment finishes.",
 };
 
 /** §5.8 stage lists (always the full list; `update_case_field` and `hand_back_to_rep` are in every stage). */

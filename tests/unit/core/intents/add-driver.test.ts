@@ -262,7 +262,7 @@ describe("phrase table (§5.6)", () => {
     expect(confirmPhrase("license_state", "OH", pc)).toBe("Maya's license is from Ohio");
     expect(confirmPhrase("license_status", "provisional", pc)).toBe("Maya has a probationary license");
     expect(confirmPhrase("incidents_3y", "none", pc)).toBe("Maya has had no tickets or accidents in the last three years");
-    expect(confirmPhrase("incidents_3y", "one ticket", pc)).toBe("Maya has had the following in the last three years: one ticket");
+    expect(confirmPhrase("incidents_3y", "one ticket", pc)).toBe("Maya had one ticket in the last three years");
     expect(confirmPhrase("vehicle_assignment", "veh1", pc)).toBe("Maya will mainly drive the 2021 Honda Civic");
     expect(confirmPhrase("vehicle_assignment", "all", pc)).toBe("Maya will drive all your vehicles");
     expect(confirmPhrase("operator_type", "primary", pc)).toBe("Maya will be the primary driver of the 2021 Honda Civic");
@@ -278,11 +278,11 @@ describe("phrase table (§5.6)", () => {
     expect(askPhrase("driver_relation", d)).toBe("how the new driver is related to you");
     expect(askPhrase("driver_dob", d)).toBe("the new driver's date of birth");
     expect(askPhrase("license_state", pc)).toBe("which state issued Maya's license");
-    expect(askPhrase("license_status", pc)).toBe("whether Maya has a learner's permit, a probationary license or a full license");
+    expect(askPhrase("license_status", pc)).toBe("whether Maya has a permit, a probationary license or a full license");
     expect(askPhrase("incidents_3y", pc)).toBe("whether Maya has had any tickets or accidents in the last three years");
     expect(askPhrase("vehicle_assignment", pc)).toBe("which car Maya will mainly drive");
-    expect(askPhrase("operator_type", pc)).toBe("whether Maya will drive the 2021 Honda Civic every day or just occasionally");
-    expect(askPhrase("operator_type", d)).toBe("whether the new driver will drive the car every day or just occasionally");
+    expect(askPhrase("operator_type", pc)).toBe("whether Maya will drive the 2021 Honda Civic daily or just occasionally");
+    expect(askPhrase("operator_type", d)).toBe("whether the new driver will drive the car daily or just occasionally");
     expect(askPhrase("garaging_zip", pc)).toBe("the ZIP code where the car is kept overnight");
     expect(askPhrase("effective_date", pc)).toBe("the date you'd like this change to start");
     expect(askPhrase("license_number", pc)).toBe("Maya's license number");

@@ -52,9 +52,12 @@ export const STAGE_INSTRUCTIONS: Readonly<Record<Stage, string>> = {
     "Payment is confirmed. Call send_confirmation, read the confirmation number digit by digit, ask if there is anything else about this change, then say goodbye.",
 };
 
-/** `pay` instructions under the PAY_TOOL_MODE=push fallback (§5.8): the tool returns at once; the agent waits. */
+/**
+ * `pay` instructions under PAY_TOOL_MODE=push (§5.8; the production mode since T-D1-1): the tool returns at once; the
+ * agent says one sentence and waits. Wording as WP5b validated live (wp5b-to-wp1 item 1).
+ */
 export const PAY_PUSH_INSTRUCTIONS =
-  "The customer agreed to the e-signature and text. Call send_esign_and_pay_link now with their words. It returns as soon as the link is sent; then tell the customer you will wait while they sign and pay, and stay quiet unless asked until the system says payment is confirmed.";
+  "The customer agreed to the e-signature and text. Call send_esign_and_pay_link now with their words. When it returns, tell the customer in one short sentence that you texted the secure link and will wait while they sign and pay. Then stay quiet unless asked; the system gives status updates.";
 
 /** Version of the prompt template (marker excluded), stored on the takeover. */
 export const PROMPT_VERSION: string = sha256Hex(`${PROMPT_V3}\n${JSON.stringify(STAGE_INSTRUCTIONS)}\n${PAY_PUSH_INSTRUCTIONS}`).slice(0, 8);

@@ -413,7 +413,7 @@ export function confirmPhrase(field: FieldId, value: string, pc: PhraseCtx): str
     case "incidents_3y":
       return value === "none"
         ? `${d} has had no tickets or accidents in the last three years`
-        : `${d} has had the following in the last three years: ${value}`;
+        : `${d} had ${value} in the last three years`; // v2.1: short enough for the 40-word greeting
     case "vehicle_assignment":
       return value === "all" ? `${d} will drive all your vehicles` : `${d} will mainly drive the ${vehicleLabelOf(pc.policy, value)}`;
     case "operator_type": return `${d} will be the ${value} driver of the ${pc.vehicleLabel ?? "car"}`;
@@ -425,7 +425,7 @@ export function confirmPhrase(field: FieldId, value: string, pc: PhraseCtx): str
   }
 }
 
-/** `askPhrase(field)` (§5.6 phrase table), completing "To finish up, I just need …". */
+/** `askPhrase(field)` (§5.6 phrase table), completing "I just need …" (v2.1; was "To finish up, I just need …"). */
 export function askPhrase(field: FieldId, pc: PhraseCtx): string {
   const { d } = pc;
   switch (field) {
@@ -433,10 +433,10 @@ export function askPhrase(field: FieldId, pc: PhraseCtx): string {
     case "driver_relation": return `how ${d} is related to you`;
     case "driver_dob": return `${d}'s date of birth`;
     case "license_state": return `which state issued ${d}'s license`;
-    case "license_status": return `whether ${d} has a learner's permit, a probationary license or a full license`;
+    case "license_status": return `whether ${d} has a permit, a probationary license or a full license`; // v2.1 (40-word greeting)
     case "incidents_3y": return `whether ${d} has had any tickets or accidents in the last three years`;
     case "vehicle_assignment": return `which car ${d} will mainly drive`;
-    case "operator_type": return `whether ${d} will drive the ${pc.vehicleLabel ?? "car"} every day or just occasionally`;
+    case "operator_type": return `whether ${d} will drive the ${pc.vehicleLabel ?? "car"} daily or just occasionally`; // v2.1
     case "garaging_zip": return "the ZIP code where the car is kept overnight";
     case "effective_date": return "the date you'd like this change to start";
     case "license_number": return `${d}'s license number`;
