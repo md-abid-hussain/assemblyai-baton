@@ -106,3 +106,67 @@ uncommitted by the interruption; WP7·1 committed them first (`69a47fa`).
 - Provisional QA (`computeQa` over the AI transcript/tool rail) before the verified card; WP5 `info` notices;
   AI-half evidence clips via #21 (check the 302 → signed OGG in a browser); the rep's "I'm back" line.
 - A browser smoke of `/call` with `next dev --webpack -p 3108` once WP9's s01 manifest is in the tree.
+
+## WP7·2 (D1 PM): the G2 slice UI
+
+Resumed after a usage-limit interruption: the uncommitted provisional-QA work was sound (typecheck and tests green)
+and was committed first (`459254b`), then `git merge main` (C2 contracts v2, clean). Commits: `e09690e`, `30df252`,
+`933a25c` (before the interruption), `459254b`, `86af305`, `e533e66`, `a908065`.
+
+### Done
+
+- **MockPhone mounted** (`8dcd72f` merges `wp/wp6`; no WP6 file edited). `ConsoleEnv.renderPhone` mounts WP6's
+  `MockPhone` with `store.phoneEvents()` (a never-trimmed phone-only event list), `paymentId` + takeover token from the
+  session (`phoneAuth()`), `visitorToken`, and `onState` → store + the VA's `setPayingState`. It floats bottom-right
+  from `phone.sms` on screens < 1600 px (zoomed to fit 768/700 px heights; "Your turn: tap the text" pill; minimise to a
+  pill; steps aside 5 s after paid and at once when the QA card opens), docks in the right column at ≥ 1600 px, and is
+  the "Phone" tab on mobile (opens on the SMS; back to "Call" 3 s after paid and at the end of the pass, where the QA
+  card lives). Fixture logs and recorded runs use a read-only preview of the same events. `/dev/ui?phone=wp6` drives
+  the real component with a fixture payments client (no network).
+- **WP6 tool clients** are the default ports (`createCallTool` / `createPaymentsClient`), with a tap that captures
+  route #14's `ui.paymentId` for the phone.
+- **Express default; `?express=1`**: a 3 s countdown card over the blurred console ("Start now", "Full call instead",
+  "Wait, let me choose"). `primeCallAudio()` / `callHref()` (`src/client/session/prime.ts`) are for WP7b's landing CTA
+  (request `docs/notes/requests/wp7-to-wp7b.md`). A full page load falls back to "Tap to enable sound".
+- **Provenance banner** under the narrator strip (human half / transcription / AI half / customer in the AI half, each
+  with a tooltip); WP7·3's provenance strip replaces it.
+- **Narrator strip** basics per phase; "Your turn" is in the AI accent (it was the error red).
+- **QA card**: **provisional numbers the moment the pass ends** (`src/client/session/provisional-qa.ts`: WP1's
+  `computeQa` over the agent's own captions, tool rail and the case snapshot taken at compile; disclosure windows
+  anchored on each `get_disclosure` result; critical tokens read back from WP1's templates), then WP8's
+  `/api/verifications` result replaces them ("Verified from recording"); 404/failed keep the provisional numbers with a
+  plain reason.
+- **WP5 info notices** (`view().notice` at level `info`) become the top bar's soft line (new `ui.notice` UiAction and
+  `notice` in `Wp7UiState`, additive); error notices already arrive as `error` events.
+- **AI-half evidence clips** (`src/client/session/ai-clip.ts`): route #21 needs the Bearer header, so the page fetches
+  the recording once per VA session (the browser drops the header on the cross-origin 302), keeps a blob URL and plays
+  each clip window; 404 + Retry-After is retried 4×; failures leave the chip silent with a warning.
+- **Load errors**: "The call could not load" (5xx) or "This call isn't available" + an "All calls" link (unknown call,
+  no context), one-line narrator, no stale "choose Express" hint.
+- **AI-half customer without WP11**: the judge answers with the mic (`LIVE_INPUTS`); the phone's own autopilot still
+  simulates an untouched payment.
+
+### Browser pass (acceptance 1 and 4)
+
+`tests/unit/ui/browser/console-shots.ts` against `next dev --webpack -p 3108` (fixture pages, $0): 7 states
+(countdown, preflight, shadowing, protocol, AI speaking, paying, completed + QA) at **1440×900, 1366×768, 1024×768 and
+390×844** in light, plus 1366×768 and 390 in dark: **44 states, a11y min 98** (38 at 100; the 98s are the open QA
+dialog, where the inert console hides `<main>`), no horizontal scroll, the phone fully in the viewport at 1366×768 and
+390, and the MockPhone flow SMS → e-sign → Sign → Simulate → **Paid** at both sizes. `a11y-audit.ts` is a
+Lighthouse-weighted axe-rule proxy (the `lighthouse` package is not a dependency); confirm with the DevTools Lighthouse
+panel on the deploy. PNGs + `report.json` land in `test-results/wp7-shots` (git-ignored).
+
+### Tests
+
+- `npm run typecheck` clean; `npm test` **88 files, 1120/1120** (worktree, local Postgres); `next build --webpack` OK.
+- New: `provisional-qa.test.ts` (s01 scoring, window anchoring, hand-back, template read-back), `ai-clip.test.ts`,
+  orchestrator tests for provisional QA at pass end (+ 404 keeps it) and info notices, and the real-controller
+  wiring test now asserts the provisional QA computed from real WP5b captions.
+
+### Open / for the integrator
+
+- The live G2 browser check (Express → Pass → greeting → pay → close → verified) needs secrets, WP9's s01 take and a
+  deploy: `docs/notes/requests/wp7-to-integrator.md` item 5. Nothing live ran here (**$0 spend**).
+- AI-half evidence clips depend on the signed OGG being fetchable cross-origin (bucket CORS). If it is not, WP8 could
+  add a JSON variant of #21 that returns the signed URL, and the page would set `<audio src>` directly.
+- The rep's "I'm back" line (`playRepBack`) and the autopilot/typed customer inputs wait for WP11.
