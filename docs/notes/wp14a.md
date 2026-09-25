@@ -247,3 +247,68 @@ $0: no AssemblyAI, OpenAI or Zerops calls.
 - The browser compile-time benchmark (acceptance 7).
 - The P§4.4 Dental tool-result fixture, written against WP16·2's `RelayToolService`.
 - The `TUNING_8K` request from WP9, if one arrives.
+
+## WP14a·2 (resumed run): post-G2 re-verification on merged `main` (D1 Fri Sep 25, 15:39–15:50 IST)
+
+A third usage-limit interruption hit the WP14a·2 slot. **No work was lost and no new kernel code was needed:** the
+worktree was clean on arrival, `main` (`c913c63`) was already an ancestor of `HEAD` through the merge commit
+`9d7d293`, and every WP14a·2 and WP14a·3 deliverable was already committed. What the interrupted run had *not* done
+is verify the branch on top of that merge. This section records that verification.
+
+### The merge that was already in place
+
+`9d7d293` merges `main` = **`c913c63`** into `313d323`. That `main` carries the **G2 slice**: `G2: merge wp/wp13`,
+`wp/wp18`, `wp/wp9`, `wp/wp7`, `wp/wp6`. It brings in notes, pitch docs, `scripts/{calls,day1,eval}/**` and one
+`package.json` change — an `overrides` block pinning `@esbuild-kit/core-utils` to `$esbuild`, which is what shrinks
+`package-lock.json` by 412 lines. No WP14a path was touched and there was nothing to re-resolve. Lock checked against
+`package.json`: no dependency missing. **No `npm install` was run.**
+
+### Verified at `HEAD`
+
+| Check | Result |
+|---|---|
+| `npx tsc --noEmit` | clean |
+| `npm test` | **114 files, 1570 passed, 1 skipped, 0 failed** |
+| `npx vitest run tests/unit/core/relay` | 14 files, **340 passed** |
+| `npx tsx scripts/relay/snapshot-legacy.ts --check` | `oracle up to date` |
+| `data/relays/baton-add-driver.json` `handoff.repLine` | the s01 line, byte for byte |
+| `GREETING_MAX_WORDS` (`src/core/compiler/greeting.ts:24`) | `40` |
+| `requests/wp5b-to-wp1.md` | still closed (resolution section intact) |
+
+**This is the result that mattered.** The three spec-injection commits (`63b3636`, `90c0bcc`, `b46ebcb`) widen WP1
+core signatures with an optional trailing `spec?: IntentSpec` (§2 rule 9), and G2 merged WP5, WP6, WP7 and WP9 — all
+WP1-core consumers — onto `main` independently. A clean typecheck plus 1570 green tests on the merged tree is the
+evidence that the widening is genuinely additive against the real G2 code, not just against the pre-G2 tree the
+parameters were written on. **The §2 rule 9 "merges only after G2" condition is now satisfied.**
+
+### One caveat for the integrator: re-run a red full suite before bisecting
+
+The **first** full `npm test` after the merge came back `4 failed | 110 passed`. It is a shared-Postgres flake, not a
+regression:
+
+- the 4 files (`cases/prefill`, `cases/repository`, `limits/ledger`, `tools/g1-stack`) each sat at the 20 s
+  `testTimeout`, and their errors are `pg-protocol` parse failures and `undefined` rows — starvation, not assertions;
+- each passes alone; `npx vitest run tests/unit/server` (34 files, 320 tests) passes; the 2nd and 3rd full runs passed.
+
+Cause: 17 test files each build their own `pg.Pool` with `max` 5–20 in its own vitest worker, against `baton-pg`'s
+stock `max_connections = 100`. Pools fill only on a cold DB. Not WP14a's paths — filed as
+`docs/notes/requests/wp14a-to-wp12.md` with three suggested fixes (raising `max_connections` is the one-line one).
+WP14a's own suites are DB-free and never flake.
+
+### Live spend
+
+$0. No AssemblyAI, OpenAI or Zerops calls in this run.
+
+### What the integrator must do (updated now that G2 has landed)
+
+Supersedes item 1 of the WP14a·3 list above: the post-G2 condition is met and verified, so **`wp/wp14a` can now be
+merged at `HEAD` (`9d7d293`) with `--no-ff`** — no need to stop at `27ec817` or `b7395fb`. The merge is then a
+fast-forward of content already proven against this `main`. Afterwards, still re-run
+`npx tsx scripts/relay/snapshot-legacy.ts --check` on merged `main`, and the WP16 / WP14b follow-ups listed in the
+WP14a·3 section are unchanged.
+
+### Still open for WP14a·4 (T4, D2 AM) — unchanged
+
+The P§4.7 widening commit (incl. `ToolOutcome.nextStep` and `CaseStateSchema.intent`), the Chromium compile
+benchmark (acceptance 7), the P§4.4 Dental tool-result fixture against WP16·2's `RelayToolService`, and the
+`TUNING_8K` request from WP9 if one arrives.
