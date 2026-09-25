@@ -312,3 +312,64 @@ WP14a·3 section are unchanged.
 The P§4.7 widening commit (incl. `ToolOutcome.nextStep` and `CaseStateSchema.intent`), the Chromium compile
 benchmark (acceptance 7), the P§4.4 Dental tool-result fixture against WP16·2's `RelayToolService`, and the
 `TUNING_8K` request from WP9 if one arrives.
+
+## WP14a·3 (resumed run): completion audit on the G2-merged tree (D1 Fri Sep 25, 15:44–15:58 IST)
+
+A second usage-limit interruption hit the WP14a·3 slot. **Nothing was lost and no new kernel code was needed.** On
+arrival the worktree was clean, `main` (`c913c63`, the G2 slice) was already an ancestor of `HEAD` through `9d7d293`,
+so `git merge main` was a no-op, and every WP14a·3 deliverable was already committed (`f18822e`, `8358762`,
+`d4d70e3`, `b7395fb` on top of `63b3636`, `90c0bcc`, `b46ebcb`), as was the post-G2 re-verification `051c355`. There
+was no uncommitted work to keep. This run is therefore an **audit of the unit against the TASKS-v2 §6 T3 list**
+rather than new code, and it closes WP14a·3.
+
+### T3 deliverable → evidence
+
+| TASKS-v2 §6 WP14a T3 item | Evidence |
+|---|---|
+| Optional trailing `spec?: IntentSpec` on the 12 named WP1 core entry points | All present: `deriveCaseState` (`case/derive.ts:101`), status rules (`case/status-rules.ts:69,92,124`), `applyExtraction` (`case/apply.ts:115`), `nextStepOf`/`inputModeFor`/`vaSessionCapMs` (`compiler/stages.ts:46,70,115`), `caseStateJson` (`compiler/prompt.ts:84`), `disclosureText` (`compiler/disclosures.ts:45`), `computeQa` (`qa/index.ts:80`), `classifySentence`/`valueBearing` (`qa/reask.ts:56,30`), `suggestReplies` (`compiler/suggest.ts:143`), `buildSttParams` (`aai/stt-params.ts:135`) |
+| …and **only** that (never an existing parameter or return) | Diff audit of `63b3636`: every deleted `export function`/`export const` line reappears identical with one trailing `spec?: IntentSpec`. Two notes below |
+| `LEGACY_BATON_SPEC` | `src/core/intents/baton-legacy-spec.ts`; `parity-spec.test.ts` proves none = legacy = compiled |
+| `safety.ts` + `brand-denylist.ts` | Both present; `safety.test.ts`, `brand-denylist.test.ts` |
+| The full P§4.6 corpus | All six corpus bullets covered: s01/s02/s05 × 3 pass points and the 200 random snapshots (`parity-baton.test.ts`), WP1's compiler fixtures (`parity-wp1-fixtures.test.ts`), **the WP3 12-turn fixture** (`snapshot-legacy.ts:163` `extractorInputs()` reads `tests/fixtures/extract/s01-dialog.json`), WP8's QA fixtures (`parity-qa-fixtures.test.ts`), the 22 scenarios' `normalizeField` truth values (`normalize.json`, 609 inputs) |
+| The remaining lint rules (G2, W3, B1, K1, K2 and the rest) | `LINT_RULES_PENDING = []` (`lint.ts:39`); 80 lint fixtures |
+
+Two harmless shape changes the §2 rule 9 audit turned up, recorded so the integrator does not have to rediscover them:
+
+1. `inputModeFor` and `vaSessionCapMs` lost their `: InputModeFor` / `: VaSessionCapMs` const annotations (the spec
+   parameter is spelled inline instead, with `Parameters<…>` for the first argument). A function with one extra
+   **optional** trailing parameter is still assignable to the original type, so every consumer is unaffected.
+2. `nextStepFor`, `openRequiredFor` and `readinessFor` moved out of `relay/spec.ts` into `relay/spec-link.ts`, but
+   `spec.ts:204` re-exports all three, so the old import path still resolves. No other worktree imports them yet.
+
+### Checks re-run at `HEAD` (`051c355`)
+
+| Check | Result |
+|---|---|
+| `npx tsc --noEmit` | clean (exit 0) |
+| `npm test` | **114 files, 1570 passed, 1 skipped, 0 failed** (Postgres up; no flake this time — see the caveat in the section above) |
+| `npx vitest run tests/unit/core/relay` | 14 files, **340 passed** |
+| `npx tsx scripts/relay/snapshot-legacy.ts --check` | `oracle up to date` |
+
+### Inbound requests re-checked
+
+A sweep of every worktree for `*-to-wp14a.md` found only the two already handled (`.wt/wp14b/…/wp14b-to-wp14a.md`,
+`.wt/wp16/…/wp16-to-wp14a.md`); no new request has arrived. Both are answered, including the two items easiest to
+miss:
+
+- WP14b §5 asks `CompileRelayOptions` to keep accepting `{versionId, relayId, hash, flagship}` — all four keys are
+  there (`compile.ts:34`), so `KernelBinding.compile` will typecheck.
+- WP14b §5's canned-snapshot request is `cannedCaseState(compiled, account, state)` in `relay/canned.ts`, which
+  returns a full `CaseState`, matching `KernelBinding.cannedSnapshot`.
+
+Their remaining item (WP16 §4, the P§4.4 tool-result fixture) still needs `RelayToolService` from WP16·2 and stays in
+WP14a·4, as `requests/wp14a-to-wp16.md` says.
+
+### Live spend
+
+$0. No AssemblyAI, OpenAI or Zerops calls in this run.
+
+### Status
+
+**WP14a·3 is complete.** The integrator guidance is unchanged from the section above: merge `wp/wp14a` at `HEAD` with
+`--no-ff` (the post-G2 condition of §2 rule 9 is met and verified), then re-run the oracle check on merged `main`. The
+"Still open for WP14a·4" list is unchanged.
