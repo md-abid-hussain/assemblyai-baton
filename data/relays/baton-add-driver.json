@@ -1,0 +1,1582 @@
+{
+  "meta": {
+    "schema": "changeover.blueprint/2.0",
+    "slug": "baton-add-driver",
+    "title": "Baton · add a driver",
+    "tagline": "A licensed rep hands a live call to an AI that finishes the add-a-driver paperwork.",
+    "industry": "insurance",
+    "locale": "en-US",
+    "intent": {
+      "id": "add_driver",
+      "summary": "add a driver to a personal auto policy",
+      "caseNoun": "insurance policy-change case"
+    },
+    "roles": {
+      "rep": "licensed representative",
+      "customer": "policyholder",
+      "org": "agency"
+    },
+    "origin": "seed",
+    "sampleOnly": true
+  },
+  "context": {
+    "facts": [
+      {
+        "key": "policy_number",
+        "label": "Policy number"
+      },
+      {
+        "key": "carrier",
+        "label": "Carrier"
+      },
+      {
+        "key": "address_street",
+        "label": "Street"
+      },
+      {
+        "key": "address_city",
+        "label": "City"
+      },
+      {
+        "key": "address_zip",
+        "label": "ZIP"
+      },
+      {
+        "key": "address_state",
+        "label": "State"
+      },
+      {
+        "key": "current_monthly_premium_usd",
+        "label": "Current monthly premium"
+      },
+      {
+        "key": "rating_new_monthly_usd",
+        "label": "Rating tool: new monthly premium"
+      },
+      {
+        "key": "scenario_due_today_usd",
+        "label": "Rating tool: due today"
+      }
+    ],
+    "tables": [
+      {
+        "id": "vehicles",
+        "label": "Vehicles",
+        "columns": [
+          "id",
+          "year",
+          "make",
+          "model",
+          "label",
+          "make_model"
+        ],
+        "idColumn": "id",
+        "labelColumn": "label"
+      },
+      {
+        "id": "existing_drivers",
+        "label": "Existing drivers",
+        "columns": [
+          "name",
+          "relation"
+        ],
+        "idColumn": "name",
+        "labelColumn": "name"
+      }
+    ],
+    "samples": [
+      {
+        "customer": {
+          "firstName": "Priya",
+          "lastName": "Raman",
+          "phoneLast4": "8207",
+          "address": {
+            "line1": "1427 Belle Avenue",
+            "city": "Lakewood",
+            "state": "OH",
+            "zip": "44107"
+          }
+        },
+        "org": {
+          "name": "Harborview Insurance Agency",
+          "repFirstName": "Daniel"
+        },
+        "callDate": "2026-09-25",
+        "facts": {
+          "policy_number": "NBM-4418207",
+          "carrier": "Northbeam Mutual",
+          "address_street": "1427 Belle Avenue",
+          "address_city": "Lakewood",
+          "address_zip": "44107",
+          "address_state": "OH",
+          "current_monthly_premium_usd": "96",
+          "rating_new_monthly_usd": "142"
+        },
+        "tables": {
+          "vehicles": [
+            {
+              "id": "veh1",
+              "year": "2021",
+              "make": "Honda",
+              "model": "Civic",
+              "label": "2021 Honda Civic",
+              "make_model": "Honda Civic"
+            },
+            {
+              "id": "veh2",
+              "year": "2018",
+              "make": "Toyota",
+              "model": "Highlander",
+              "label": "2018 Toyota Highlander",
+              "make_model": "Toyota Highlander"
+            }
+          ],
+          "existing_drivers": [
+            {
+              "name": "Priya Raman",
+              "relation": "named_insured"
+            },
+            {
+              "name": "Arun Raman",
+              "relation": "spouse"
+            }
+          ]
+        }
+      },
+      {
+        "customer": {
+          "firstName": "Mark",
+          "lastName": "Delgado",
+          "phoneLast4": "0316",
+          "address": {
+            "line1": "2240 East Quartz Street",
+            "city": "Mesa",
+            "state": "AZ",
+            "zip": "85213"
+          }
+        },
+        "org": {
+          "name": "Mesa Ridge Insurance Group",
+          "repFirstName": "Carmen"
+        },
+        "callDate": "2026-09-25",
+        "facts": {
+          "policy_number": "BSC-2290316",
+          "carrier": "Bluestem Casualty",
+          "address_street": "2240 East Quartz Street",
+          "address_city": "Mesa",
+          "address_zip": "85213",
+          "address_state": "AZ",
+          "current_monthly_premium_usd": "118",
+          "rating_new_monthly_usd": "171"
+        },
+        "tables": {
+          "vehicles": [
+            {
+              "id": "veh1",
+              "year": "2019",
+              "make": "Ford",
+              "model": "F-150",
+              "label": "2019 Ford F-150",
+              "make_model": "Ford F-150"
+            },
+            {
+              "id": "veh2",
+              "year": "2014",
+              "make": "Toyota",
+              "model": "Corolla",
+              "label": "2014 Toyota Corolla",
+              "make_model": "Toyota Corolla"
+            }
+          ],
+          "existing_drivers": [
+            {
+              "name": "Mark Delgado",
+              "relation": "named_insured"
+            },
+            {
+              "name": "Elena Delgado",
+              "relation": "spouse"
+            }
+          ]
+        }
+      },
+      {
+        "customer": {
+          "firstName": "Greg",
+          "lastName": "Palmer",
+          "phoneLast4": "1733",
+          "address": {
+            "line1": "2715 Brookdale Court",
+            "city": "Naperville",
+            "state": "IL",
+            "zip": "60540"
+          }
+        },
+        "org": {
+          "name": "Prairie Lantern Insurance Agency",
+          "repFirstName": "Kevin"
+        },
+        "callDate": "2026-09-25",
+        "facts": {
+          "policy_number": "PCI-6081733",
+          "carrier": "Prairie Crest Insurance",
+          "address_street": "2715 Brookdale Court",
+          "address_city": "Naperville",
+          "address_zip": "60540",
+          "address_state": "IL",
+          "current_monthly_premium_usd": "133",
+          "rating_new_monthly_usd": "204",
+          "scenario_due_today_usd": "34.1"
+        },
+        "tables": {
+          "vehicles": [
+            {
+              "id": "veh1",
+              "year": "2019",
+              "make": "Chevrolet",
+              "model": "Silverado",
+              "label": "2019 Chevrolet Silverado",
+              "make_model": "Chevrolet Silverado"
+            },
+            {
+              "id": "veh2",
+              "year": "2012",
+              "make": "Toyota",
+              "model": "Camry",
+              "label": "2012 Toyota Camry",
+              "make_model": "Toyota Camry"
+            }
+          ],
+          "existing_drivers": [
+            {
+              "name": "Greg Palmer",
+              "relation": "named_insured"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "fields": [
+    {
+      "id": "driver_full_name",
+      "label": "New driver's full name",
+      "description": "The new driver's name as spoken.",
+      "type": "person_name",
+      "normalizer": "person_name",
+      "required": true,
+      "setBy": "ai_allowed",
+      "adviceDomain": false,
+      "promptVisibility": "always",
+      "validation": {},
+      "examples": [
+        "Maya Raman"
+      ],
+      "compare": "token_subset",
+      "display": "title",
+      "capture": {
+        "priority": 1,
+        "mode": "balanced",
+        "entity": true
+      },
+      "phrases": {
+        "ask": "the new driver's full name",
+        "confirm": "the new driver's name is {f.driver_full_name|title}"
+      },
+      "qa": {
+        "ask": [
+          "\\b(full name|last name|first name|(her|his|their|the driver'?s|the new driver'?s) name|spell)\\b"
+        ],
+        "weak": [
+          "\\bname\\b"
+        ]
+      },
+      "ui": {
+        "group": "Driver",
+        "hidden": false
+      }
+    },
+    {
+      "id": "driver_dob",
+      "label": "Date of birth",
+      "description": "The new driver's date of birth.",
+      "type": "date",
+      "normalizer": "date_of_birth",
+      "required": true,
+      "setBy": "ai_allowed",
+      "adviceDomain": false,
+      "promptVisibility": "always",
+      "validation": {},
+      "examples": [
+        "2009-03-14"
+      ],
+      "compare": "exact",
+      "display": "spoken_dob",
+      "capture": {
+        "priority": 3,
+        "mode": "balanced",
+        "entity": true
+      },
+      "phrases": {
+        "ask": "{subject}'s date of birth",
+        "confirm": "{subject}'s date of birth is {f.driver_dob|spoken_dob}"
+      },
+      "qa": {
+        "ask": [
+          "\\b(date of birth|birth ?date|birthday|born|how old|age|dob)\\b"
+        ],
+        "weak": []
+      },
+      "ui": {
+        "group": "Driver",
+        "hidden": false
+      }
+    },
+    {
+      "id": "driver_age",
+      "label": "Age",
+      "description": "The new driver's age in years.",
+      "type": "integer",
+      "normalizer": "insurance.age",
+      "required": false,
+      "setBy": "rep_or_customer",
+      "adviceDomain": false,
+      "promptVisibility": "when_known",
+      "validation": {},
+      "examples": [
+        "17"
+      ],
+      "compare": "exact",
+      "display": "raw",
+      "capture": {
+        "priority": 0,
+        "mode": "balanced",
+        "entity": false
+      },
+      "phrases": {
+        "ask": "the age",
+        "confirm": "{subject} is {f.driver_age}"
+      },
+      "qa": {
+        "ask": [],
+        "weak": []
+      },
+      "ui": {
+        "group": "Driver",
+        "hidden": false
+      }
+    },
+    {
+      "id": "driver_relation",
+      "label": "Relationship to policyholder",
+      "description": "How the new driver is related to the policyholder.",
+      "type": "enum",
+      "normalizer": "insurance.relation",
+      "enumValues": [
+        {
+          "value": "spouse",
+          "label": "Spouse",
+          "synonyms": [],
+          "spokenForms": [
+            "wife",
+            "husband",
+            "spouse"
+          ]
+        },
+        {
+          "value": "domestic_partner",
+          "label": "Domestic partner",
+          "synonyms": [],
+          "spokenForms": [
+            "partner"
+          ]
+        },
+        {
+          "value": "child",
+          "label": "Child",
+          "synonyms": [],
+          "spokenForms": [
+            "daughter",
+            "son",
+            "child",
+            "kid"
+          ]
+        },
+        {
+          "value": "stepchild",
+          "label": "Stepchild",
+          "synonyms": [],
+          "spokenForms": [
+            "stepdaughter",
+            "stepson",
+            "stepchild"
+          ]
+        },
+        {
+          "value": "parent",
+          "label": "Parent",
+          "synonyms": [],
+          "spokenForms": [
+            "mother",
+            "father",
+            "mom",
+            "dad",
+            "parent"
+          ]
+        },
+        {
+          "value": "sibling",
+          "label": "Sibling",
+          "synonyms": [],
+          "spokenForms": [
+            "brother",
+            "sister",
+            "sibling"
+          ]
+        },
+        {
+          "value": "other_relative",
+          "label": "Other relative",
+          "synonyms": [],
+          "spokenForms": [
+            "niece",
+            "nephew",
+            "cousin",
+            "grandchild",
+            "granddaughter",
+            "grandson",
+            "relative"
+          ]
+        },
+        {
+          "value": "non_relative_resident",
+          "label": "Not related, lives with you",
+          "synonyms": [],
+          "spokenForms": [
+            "roommate",
+            "housemate",
+            "lives with you"
+          ],
+          "confirm": "{subject} is not related to you but lives with you",
+          "confirmIfRaw": [
+            {
+              "pattern": "\\b(roommate|boyfriend|girlfriend|room mate)\\b",
+              "text": "{subject} is your {f.driver_relation|insurance.relation_word}"
+            }
+          ]
+        },
+        {
+          "value": "non_relative_nonresident",
+          "label": "Not related, lives elsewhere",
+          "synonyms": [],
+          "spokenForms": [
+            "doesn't live with you",
+            "not related"
+          ],
+          "confirm": "{subject} is not related to you and doesn't live with you"
+        }
+      ],
+      "required": true,
+      "setBy": "ai_allowed",
+      "adviceDomain": false,
+      "promptVisibility": "always",
+      "validation": {},
+      "examples": [
+        "my daughter"
+      ],
+      "compare": "exact",
+      "display": "insurance.relation_display",
+      "capture": {
+        "priority": 2,
+        "mode": "balanced",
+        "entity": true
+      },
+      "phrases": {
+        "ask": "how {subject} is related to you",
+        "confirm": "{subject} is your {f.driver_relation|insurance.relation_word}"
+      },
+      "qa": {
+        "ask": [
+          "\\b(relat\\w*|your (daughter|son|wife|husband|partner|child|kid)|how do you know)\\b"
+        ],
+        "weak": []
+      },
+      "ui": {
+        "group": "Driver",
+        "hidden": false
+      }
+    },
+    {
+      "id": "license_state",
+      "label": "License state",
+      "description": "The state that issued the new driver's license.",
+      "type": "state",
+      "normalizer": "us_state",
+      "required": true,
+      "setBy": "ai_allowed",
+      "adviceDomain": false,
+      "promptVisibility": "always",
+      "validation": {},
+      "examples": [
+        "OH"
+      ],
+      "compare": "exact",
+      "display": "state_with_code",
+      "capture": {
+        "priority": 4,
+        "mode": "balanced",
+        "entity": true
+      },
+      "phrases": {
+        "ask": "which state issued {subject}'s license",
+        "confirm": "{subject}'s license is from {f.license_state|state_name}"
+      },
+      "qa": {
+        "ask": [
+          "\\b(which state|what state|state (issued|is (it|the license|her license|his license) from)|issued (it|her|his|the)|licensed in)\\b"
+        ],
+        "weak": []
+      },
+      "ui": {
+        "group": "License",
+        "hidden": false
+      }
+    },
+    {
+      "id": "license_status",
+      "label": "License type",
+      "description": "Learner's permit, probationary (provisional) or full license.",
+      "type": "enum",
+      "normalizer": "insurance.license_status",
+      "enumValues": [
+        {
+          "value": "learner_permit",
+          "label": "Learner's permit",
+          "synonyms": [],
+          "word": "learner's permit",
+          "spokenForms": [
+            "learner",
+            "permit"
+          ]
+        },
+        {
+          "value": "provisional",
+          "label": "Probationary license",
+          "synonyms": [],
+          "word": "probationary license",
+          "spokenForms": [
+            "probationary",
+            "provisional",
+            "junior",
+            "intermediate",
+            "graduated"
+          ]
+        },
+        {
+          "value": "full",
+          "label": "Full license",
+          "synonyms": [],
+          "word": "full license",
+          "spokenForms": [
+            "full license",
+            "fully licensed"
+          ]
+        }
+      ],
+      "required": true,
+      "setBy": "ai_allowed",
+      "adviceDomain": false,
+      "promptVisibility": "always",
+      "validation": {},
+      "examples": [
+        "probationary license"
+      ],
+      "compare": "exact",
+      "display": "insurance.license_words",
+      "capture": {
+        "priority": 5,
+        "mode": "balanced",
+        "entity": true
+      },
+      "phrases": {
+        "ask": "whether {subject} has a permit, a probationary license or a full license",
+        "confirm": "{subject} has a {f.license_status|insurance.license_words}"
+      },
+      "qa": {
+        "ask": [
+          "\\b(permit|probationary|provisional|learner'?s|(kind|type|sort) of licen[cs]e|full licen[cs]e|licen[cs]e (type|status|class))\\b"
+        ],
+        "weak": [
+          "\\blicen[cs]e[ds]?\\b"
+        ]
+      },
+      "ui": {
+        "group": "License",
+        "hidden": false
+      }
+    },
+    {
+      "id": "license_number",
+      "label": "License number",
+      "description": "The driver's license number, digits and letters only.",
+      "type": "id_code",
+      "normalizer": "id_code",
+      "required": false,
+      "setBy": "ai_allowed",
+      "adviceDomain": false,
+      "promptVisibility": "when_known",
+      "validation": {},
+      "examples": [
+        "RM123456"
+      ],
+      "compare": "exact",
+      "display": "spoken_chars",
+      "capture": {
+        "priority": 0,
+        "mode": "max_accuracy",
+        "entity": false
+      },
+      "phrases": {
+        "ask": "{subject}'s license number",
+        "confirm": "{subject}'s license number is {f.license_number|spoken_chars}"
+      },
+      "qa": {
+        "ask": [
+          "\\blicen[cs]e (number|no\\.?|#)\\b",
+          "\\bdriver'?s licen[cs]e number\\b"
+        ],
+        "weak": []
+      },
+      "ui": {
+        "group": "License",
+        "hidden": false
+      }
+    },
+    {
+      "id": "incidents_3y",
+      "label": "Tickets / accidents (3 yrs)",
+      "description": "\"none\", or a short description of tickets, accidents or claims in the last 3 years.",
+      "type": "text",
+      "normalizer": "insurance.incidents",
+      "required": false,
+      "setBy": "ai_allowed",
+      "adviceDomain": false,
+      "promptVisibility": "when_known",
+      "validation": {},
+      "examples": [
+        "none"
+      ],
+      "compare": "exact",
+      "display": "insurance.incidents_display",
+      "capture": {
+        "priority": 6,
+        "mode": "balanced",
+        "entity": true
+      },
+      "phrases": {
+        "ask": "whether {subject} has had any tickets or accidents in the last three years",
+        "confirm": "{?f.incidents_3y=none}{subject} has had no tickets or accidents in the last three years{:}{subject} had {f.incidents_3y} in the last three years{/?}"
+      },
+      "qa": {
+        "ask": [
+          "\\b(tickets?|accidents?|violations?|claims?|driving record|citations?|moving violations?)\\b"
+        ],
+        "weak": []
+      },
+      "ui": {
+        "group": "Driver",
+        "hidden": false
+      }
+    },
+    {
+      "id": "vehicle_assignment",
+      "label": "Vehicle they'll drive",
+      "description": "The policy vehicle the new driver will mainly drive.",
+      "type": "lookup",
+      "normalizer": "insurance.vehicle",
+      "lookup": {
+        "table": "vehicles",
+        "matchColumns": [
+          "model",
+          "label",
+          "make_model"
+        ],
+        "allowAll": true
+      },
+      "required": true,
+      "setBy": "ai_allowed",
+      "adviceDomain": false,
+      "promptVisibility": "always",
+      "validation": {},
+      "examples": [
+        "the Civic"
+      ],
+      "compare": "exact",
+      "display": "lookup_label",
+      "capture": {
+        "priority": 7,
+        "mode": "balanced",
+        "entity": true
+      },
+      "phrases": {
+        "ask": "which car {subject} will mainly drive",
+        "confirm": "{?f.vehicle_assignment=all}{subject} will drive all your vehicles{:}{subject} will mainly drive the {f.vehicle_assignment|lookup_label}{/?}"
+      },
+      "qa": {
+        "ask": [
+          "\\b(which (car|vehicle|one)|what (car|vehicle)|drive (mainly|mostly|primarily)|(mainly|mostly|primarily) drive|be driving)\\b"
+        ],
+        "weak": [
+          "\\b(vehicle|car)\\b"
+        ]
+      },
+      "ui": {
+        "group": "Vehicle",
+        "hidden": false
+      }
+    },
+    {
+      "id": "operator_type",
+      "label": "Primary or occasional driver",
+      "description": "Primary or occasional driver of that vehicle.",
+      "type": "enum",
+      "normalizer": "enum",
+      "enumValues": [
+        {
+          "value": "occasional",
+          "label": "Occasional",
+          "synonyms": [
+            "\\b(occasional|occasionally|sometimes|weekends?|once in a while|now and then|rarely|here and there|every now|not often|part[- ]time)\\b"
+          ],
+          "spokenForms": [
+            "occasional",
+            "occasionally",
+            "sometimes"
+          ]
+        },
+        {
+          "value": "primary",
+          "label": "Primary",
+          "synonyms": [
+            "\\b(primary|primarily|every ?day|daily|mainly|mostly|main driver|principal|all the time|basically (his|hers|theirs)|(his|her|their) car|full[- ]time)\\b"
+          ],
+          "spokenForms": [
+            "primary",
+            "every day",
+            "main driver",
+            "mainly"
+          ]
+        }
+      ],
+      "required": true,
+      "setBy": "ai_allowed",
+      "adviceDomain": false,
+      "promptVisibility": "always",
+      "validation": {},
+      "examples": [
+        "primary"
+      ],
+      "compare": "exact",
+      "display": "raw",
+      "capture": {
+        "priority": 8,
+        "mode": "balanced",
+        "entity": true
+      },
+      "phrases": {
+        "ask": "whether {subject} will drive the {?f.vehicle_assignment.verified}{f.vehicle_assignment|lookup_label}{:}car{/?} daily or just occasionally",
+        "confirm": "{subject} will be the {f.operator_type} driver of the {?f.vehicle_assignment.verified}{f.vehicle_assignment|lookup_label}{:}car{/?}"
+      },
+      "qa": {
+        "ask": [
+          "\\b(every ?day|primary|main driver|occasional\\w*|how often)\\b"
+        ],
+        "weak": []
+      },
+      "ui": {
+        "group": "Vehicle",
+        "hidden": false
+      }
+    },
+    {
+      "id": "garaging_zip",
+      "label": "Garaging ZIP (where the car is kept)",
+      "description": "5-digit ZIP where that vehicle is kept overnight.",
+      "type": "zip",
+      "normalizer": "us_zip5",
+      "required": true,
+      "setBy": "ai_allowed",
+      "adviceDomain": false,
+      "promptVisibility": "always",
+      "validation": {},
+      "examples": [
+        "44107"
+      ],
+      "compare": "exact",
+      "display": "raw",
+      "capture": {
+        "priority": 9,
+        "mode": "balanced",
+        "entity": true
+      },
+      "phrases": {
+        "ask": "the ZIP code where the car is kept overnight",
+        "confirm": "the car is kept at ZIP code {f.garaging_zip|spoken_zip}"
+      },
+      "qa": {
+        "ask": [
+          "\\b(zip|postal|kept overnight|parked|garag\\w*)\\b"
+        ],
+        "weak": []
+      },
+      "ui": {
+        "group": "Vehicle",
+        "hidden": false
+      }
+    },
+    {
+      "id": "effective_date",
+      "label": "Effective date",
+      "description": "The date the change takes effect.",
+      "type": "date",
+      "normalizer": "date_future",
+      "required": true,
+      "setBy": "rep_or_customer",
+      "adviceDomain": false,
+      "promptVisibility": "always",
+      "validation": {
+        "minDaysFromCall": 0,
+        "maxDaysFromCall": 90
+      },
+      "examples": [
+        "2026-10-02"
+      ],
+      "compare": "exact",
+      "display": "spoken_date",
+      "capture": {
+        "priority": 10,
+        "mode": "balanced",
+        "entity": true
+      },
+      "phrases": {
+        "ask": "the date you'd like this change to start",
+        "confirm": "the change should start {f.effective_date|spoken_date}"
+      },
+      "qa": {
+        "ask": [
+          "\\b(effective|start|begin|what date|which day|when would|when should|when do you want)\\b"
+        ],
+        "weak": []
+      },
+      "confirmTool": {
+        "name": "confirm_effective_date",
+        "description": "Record the date the customer confirmed or chose for this change to take effect. Call only after the customer says the date or clearly confirms it.",
+        "windowDays": 30
+      },
+      "ui": {
+        "group": "Change",
+        "hidden": false
+      }
+    },
+    {
+      "id": "good_student_discount",
+      "label": "Good-student discount",
+      "description": "Good-student discount: eligible, not eligible or pending proof (the rep decides).",
+      "type": "enum",
+      "normalizer": "insurance.discount",
+      "enumValues": [
+        {
+          "value": "eligible",
+          "label": "Eligible",
+          "synonyms": [],
+          "spokenForms": []
+        },
+        {
+          "value": "not_eligible",
+          "label": "Not eligible",
+          "synonyms": [],
+          "spokenForms": []
+        },
+        {
+          "value": "pending_proof",
+          "label": "Pending proof",
+          "synonyms": [],
+          "spokenForms": []
+        }
+      ],
+      "required": false,
+      "setBy": "rep_or_customer",
+      "adviceDomain": true,
+      "promptVisibility": "when_known",
+      "validation": {},
+      "examples": [
+        "eligible"
+      ],
+      "compare": "exact",
+      "display": "underscore_to_space",
+      "capture": {
+        "priority": 0,
+        "mode": "balanced",
+        "entity": false
+      },
+      "phrases": {
+        "ask": "the good-student discount",
+        "confirm": "the good-student discount is {f.good_student_discount.display}"
+      },
+      "qa": {
+        "ask": [],
+        "weak": []
+      },
+      "ui": {
+        "group": "Rep decisions",
+        "hidden": false
+      }
+    },
+    {
+      "id": "driver_training_discount",
+      "label": "Driver-training discount",
+      "description": "Driver-training discount: eligible, not eligible or pending proof (the rep decides).",
+      "type": "enum",
+      "normalizer": "insurance.discount",
+      "enumValues": [
+        {
+          "value": "eligible",
+          "label": "Eligible",
+          "synonyms": [],
+          "spokenForms": []
+        },
+        {
+          "value": "not_eligible",
+          "label": "Not eligible",
+          "synonyms": [],
+          "spokenForms": []
+        },
+        {
+          "value": "pending_proof",
+          "label": "Pending proof",
+          "synonyms": [],
+          "spokenForms": []
+        }
+      ],
+      "required": false,
+      "setBy": "rep_or_customer",
+      "adviceDomain": true,
+      "promptVisibility": "when_known",
+      "validation": {},
+      "examples": [
+        "eligible"
+      ],
+      "compare": "exact",
+      "display": "underscore_to_space",
+      "capture": {
+        "priority": 0,
+        "mode": "balanced",
+        "entity": false
+      },
+      "phrases": {
+        "ask": "the driver-training discount",
+        "confirm": "the driver-training discount is {f.driver_training_discount.display}"
+      },
+      "qa": {
+        "ask": [],
+        "weak": []
+      },
+      "ui": {
+        "group": "Rep decisions",
+        "hidden": false
+      }
+    },
+    {
+      "id": "distant_student_discount",
+      "label": "Distant-student discount",
+      "description": "Distant-student discount: eligible, not eligible or pending proof (the rep decides).",
+      "type": "enum",
+      "normalizer": "insurance.discount",
+      "enumValues": [
+        {
+          "value": "eligible",
+          "label": "Eligible",
+          "synonyms": [],
+          "spokenForms": []
+        },
+        {
+          "value": "not_eligible",
+          "label": "Not eligible",
+          "synonyms": [],
+          "spokenForms": []
+        },
+        {
+          "value": "pending_proof",
+          "label": "Pending proof",
+          "synonyms": [],
+          "spokenForms": []
+        }
+      ],
+      "required": false,
+      "setBy": "rep_or_customer",
+      "adviceDomain": true,
+      "promptVisibility": "when_known",
+      "validation": {},
+      "examples": [
+        "eligible"
+      ],
+      "compare": "exact",
+      "display": "underscore_to_space",
+      "capture": {
+        "priority": 0,
+        "mode": "balanced",
+        "entity": false
+      },
+      "phrases": {
+        "ask": "the distant-student discount",
+        "confirm": "the distant-student discount is {f.distant_student_discount.display}"
+      },
+      "qa": {
+        "ask": [],
+        "weak": []
+      },
+      "ui": {
+        "group": "Rep decisions",
+        "hidden": false
+      }
+    },
+    {
+      "id": "mature_driver_discount",
+      "label": "Mature-driver discount",
+      "description": "Mature-driver discount: eligible, not eligible or pending proof (the rep decides).",
+      "type": "enum",
+      "normalizer": "insurance.discount",
+      "enumValues": [
+        {
+          "value": "eligible",
+          "label": "Eligible",
+          "synonyms": [],
+          "spokenForms": []
+        },
+        {
+          "value": "not_eligible",
+          "label": "Not eligible",
+          "synonyms": [],
+          "spokenForms": []
+        },
+        {
+          "value": "pending_proof",
+          "label": "Pending proof",
+          "synonyms": [],
+          "spokenForms": []
+        }
+      ],
+      "required": false,
+      "setBy": "rep_or_customer",
+      "adviceDomain": true,
+      "promptVisibility": "when_known",
+      "validation": {},
+      "examples": [
+        "eligible"
+      ],
+      "compare": "exact",
+      "display": "underscore_to_space",
+      "capture": {
+        "priority": 0,
+        "mode": "balanced",
+        "entity": false
+      },
+      "phrases": {
+        "ask": "the mature-driver discount",
+        "confirm": "the mature-driver discount is {f.mature_driver_discount.display}"
+      },
+      "qa": {
+        "ask": [],
+        "weak": []
+      },
+      "ui": {
+        "group": "Rep decisions",
+        "hidden": false
+      }
+    },
+    {
+      "id": "coverage_change",
+      "label": "Coverage change",
+      "description": "What the customer decided about coverage.",
+      "type": "text",
+      "normalizer": "free_text_lower",
+      "required": false,
+      "setBy": "rep_or_customer",
+      "adviceDomain": true,
+      "promptVisibility": "when_known",
+      "validation": {},
+      "examples": [
+        "keep current limits"
+      ],
+      "compare": "exact",
+      "display": "as_spoken",
+      "capture": {
+        "priority": 0,
+        "mode": "balanced",
+        "entity": false
+      },
+      "phrases": {
+        "ask": "the coverage change",
+        "confirm": "the coverage change is {f.coverage_change.display}"
+      },
+      "qa": {
+        "ask": [],
+        "weak": []
+      },
+      "ui": {
+        "group": "Rep decisions",
+        "hidden": false
+      }
+    },
+    {
+      "id": "underwriting_review",
+      "label": "Underwriting review needed",
+      "description": "Whether underwriting must review the change.",
+      "type": "boolean",
+      "normalizer": "boolean",
+      "required": false,
+      "setBy": "rep_only",
+      "adviceDomain": true,
+      "promptVisibility": "when_known",
+      "validation": {},
+      "examples": [
+        "false"
+      ],
+      "compare": "exact",
+      "display": "raw",
+      "capture": {
+        "priority": 0,
+        "mode": "balanced",
+        "entity": false
+      },
+      "phrases": {
+        "ask": "the underwriting review needed",
+        "confirm": "the underwriting review needed is {f.underwriting_review.display}"
+      },
+      "qa": {
+        "ask": [],
+        "weak": []
+      },
+      "ui": {
+        "group": "Rep decisions",
+        "hidden": false
+      }
+    },
+    {
+      "id": "premium_new_monthly_usd",
+      "label": "New monthly premium",
+      "description": "The new monthly premium in dollars.",
+      "type": "money",
+      "normalizer": "money",
+      "required": true,
+      "setBy": "rep_only",
+      "adviceDomain": false,
+      "serverResolvable": {
+        "value": "monthly_premium"
+      },
+      "promptVisibility": "rep_verified_only",
+      "validation": {},
+      "examples": [
+        "142.00"
+      ],
+      "compare": "exact",
+      "display": "spoken_monthly",
+      "capture": {
+        "priority": 0,
+        "mode": "balanced",
+        "entity": false
+      },
+      "phrases": {
+        "ask": "the new monthly premium",
+        "confirm": "the new monthly premium is {f.premium_new_monthly_usd.display}"
+      },
+      "qa": {
+        "ask": [],
+        "weak": []
+      },
+      "ui": {
+        "group": "Price",
+        "hidden": false
+      }
+    },
+    {
+      "id": "premium_change_monthly_usd",
+      "label": "Monthly premium change",
+      "description": "The monthly premium change in dollars (negative for a decrease).",
+      "type": "signed_money",
+      "normalizer": "signed_money",
+      "required": false,
+      "setBy": "rep_only",
+      "adviceDomain": false,
+      "promptVisibility": "rep_verified_only",
+      "validation": {},
+      "examples": [
+        "46.00"
+      ],
+      "compare": "exact",
+      "display": "spoken_monthly",
+      "capture": {
+        "priority": 0,
+        "mode": "balanced",
+        "entity": false
+      },
+      "phrases": {
+        "ask": "the monthly premium change",
+        "confirm": "the monthly premium change is {f.premium_change_monthly_usd.display}"
+      },
+      "qa": {
+        "ask": [],
+        "weak": []
+      },
+      "ui": {
+        "group": "Price",
+        "hidden": false
+      }
+    },
+    {
+      "id": "amount_due_today_usd",
+      "label": "Amount due today",
+      "description": "The amount due today in dollars.",
+      "type": "money",
+      "normalizer": "money",
+      "required": false,
+      "setBy": "rep_only",
+      "adviceDomain": false,
+      "promptVisibility": "rep_verified_only",
+      "validation": {},
+      "examples": [
+        "23.40"
+      ],
+      "compare": "exact",
+      "display": "spoken_money",
+      "capture": {
+        "priority": 0,
+        "mode": "balanced",
+        "entity": false
+      },
+      "phrases": {
+        "ask": "the amount due today",
+        "confirm": "the amount due today is {f.amount_due_today_usd.display}"
+      },
+      "qa": {
+        "ask": [],
+        "weak": []
+      },
+      "ui": {
+        "group": "Price",
+        "hidden": false
+      }
+    }
+  ],
+  "values": [
+    {
+      "id": "monthly_premium",
+      "label": "New monthly premium",
+      "type": "money",
+      "ref": {
+        "kind": "first_of",
+        "refs": [
+          {
+            "kind": "field",
+            "field": "premium_new_monthly_usd",
+            "requireRep": true
+          },
+          {
+            "kind": "builtin",
+            "id": "insurance.monthly_premium"
+          }
+        ]
+      }
+    },
+    {
+      "id": "due_today",
+      "label": "Due today",
+      "type": "money",
+      "ref": {
+        "kind": "builtin",
+        "id": "insurance.due_today_prorated"
+      }
+    }
+  ],
+  "listening": {
+    "keyterms": [
+      "learner's permit",
+      "probationary license",
+      "endorsement",
+      "garaging",
+      "premium",
+      "liability limits",
+      "good student discount",
+      "driver's ed"
+    ],
+    "contextKeyterms": [
+      "customer.firstName",
+      "customer.lastName",
+      "customer.fullName",
+      "table.existing_drivers.name",
+      "org.name",
+      "fact.carrier",
+      "org.repFirstName",
+      "table.vehicles.make",
+      "table.vehicles.model",
+      "table.vehicles.make_model",
+      "fact.address_street",
+      "fact.address_city"
+    ],
+    "languageCodes": [
+      "en"
+    ],
+    "scenarioPrompt": "Recorded phone call at a US insurance agency. A customer service representative and a policyholder discuss adding a driver to a personal auto policy: people's names, relationship, age or date of birth, learner's permit or driver's license, vehicle year make and model, ZIP codes, effective dates, and monthly premiums in dollars.",
+    "tuning": "telephony_8k"
+  },
+  "handoff": {
+    "allowedWhen": {
+      "minCallSeconds": 20,
+      "requireVerified": []
+    },
+    "repLine": "OK if my assistant finishes the paperwork? I'll be one tap away if you need me.",
+    "repLinePatterns": [
+      "\\b(finish|finishes|wrap|wraps) (up )?the paperwork\\b",
+      "\\b(one tap away|stay on the line)\\b"
+    ],
+    "acceptance": {
+      "phrase": "Sure, go ahead.",
+      "patterns": [
+        "\\b(sure|ok|okay|yes|yeah|go ahead|that's fine|fine)\\b"
+      ]
+    },
+    "autoBaton": true,
+    "repReturnLine": "I'm bringing your agent back on the line now."
+  },
+  "playbook": {
+    "voice": "alba",
+    "persona": {
+      "tone": "Warm, brief and plain-spoken US English.",
+      "extraRules": []
+    },
+    "subject": "{?f.driver_full_name.verified}{f.driver_full_name|first_name}{:}the new driver{/?}",
+    "greeting": {
+      "opening": "Hi {customer.firstName}, I'm {rep.firstName}'s AI assistant, not a person. This call is recorded.",
+      "summary": "I'll finish adding {?f.driver_full_name.verified}{f.driver_full_name|first_name}{:}a new driver{/?}{clause.vehicle}{clause.date}{clause.premium}.",
+      "clauses": [
+        {
+          "id": "date",
+          "text": "{?f.effective_date.verified}, starting {f.effective_date|spoken_date}{/?}",
+          "dropOrder": 0
+        },
+        {
+          "id": "vehicle",
+          "text": "{?f.vehicle_assignment.verified}{?f.vehicle_assignment=all} to all your vehicles{:} to the {f.vehicle_assignment|lookup_label}{/?}{/?}",
+          "dropOrder": 1
+        },
+        {
+          "id": "premium",
+          "text": "{?f.premium_new_monthly_usd.rep}, at {f.premium_new_monthly_usd|spoken_monthly}{/?}",
+          "dropOrder": 2
+        }
+      ],
+      "optOut": "Ask for {rep.firstName} anytime.",
+      "next": {
+        "confirm": "Just to confirm, {phrase.confirm}?",
+        "ask": "I just need {phrase.ask}.",
+        "ready": "Ready for the updated premium?"
+      },
+      "maxWords": 40
+    },
+    "promptTemplate": "IDENTITY\nYou are {org.name}'s automated AI assistant finishing a policy change that a licensed representative, {rep.firstName},\nstarted with the customer, {customer.firstName} {customer.lastName}. You already said the greeting. You are not a person; if asked, say so.\nTODAY is {call.date|spoken_date_long} (the date of this call). Resolve relative dates against TODAY.\nYou handle ADMINISTRATIVE steps only. You never give insurance advice, never recommend coverages, limits or deductibles,\nand never explain what is or isn't covered. If the customer asks for advice or anything outside this change, call\nhand_back_to_rep with reason \"advice_requested\" (or \"out_of_scope\").\n\nCASE STATE (authoritative; VERIFIED = already confirmed with the customer)\n{case.json}\n\nRULES\n1. Never ask for a VERIFIED field, and never ask the customer to repeat it.\n2. Confirm PENDING fields one at a time by reading the value back. If the customer confirms or corrects it, call update_case_field.\n3. Ask for MISSING fields one at a time; when answered, call update_case_field.\n4. If the customer disputes a VERIFIED value, call update_case_field with their value and reason \"customer_corrected\";\n   if the result is \"conflict\", read back the recorded value, ask which is right, and call update_case_field again with\n   reason \"customer_corrected\" only if they insist. Never silently change a VERIFIED value.\n5. State a premium, amount or date ONLY if it comes from CASE STATE or a tool result. Never estimate or compute money.\n6. When a tool returns disclosure text, read it EXACTLY as written, word for word, then stop and wait for the answer.\n7. Never ask for, repeat, or accept card numbers, bank details or passwords. Payment happens only through the secure link.\n   If the customer starts reading a card number, stop them politely and explain the link.\n8. One question per turn. Short sentences. Natural US English. Say ZIP codes digit by digit.\n9. If the customer asks for {rep.firstName}, or is upset or confused twice, call hand_back_to_rep.\n10. Discounts, coverage limits, deductibles and underwriting are {rep.firstName}'s decisions. Never offer, re-offer or\n    change them; if the customer brings them up, say {rep.firstName} will follow up, or call hand_back_to_rep.\n\nCURRENT STAGE: {stage}\n{stage.goal}",
+    "caseJson": {
+      "header": [
+        {
+          "key": "policy",
+          "from": "fact.policy_number"
+        }
+      ],
+      "tables": [
+        {
+          "key": "vehicles",
+          "table": "vehicles"
+        }
+      ],
+      "maxChars": 1800
+    },
+    "vaKeyterms": [
+      "f.driver_full_name",
+      "f.driver_relation",
+      "table.vehicles.make_model",
+      "table.vehicles.model",
+      "customer.fullName",
+      "org.name",
+      "org.repFirstName"
+    ],
+    "stages": [
+      {
+        "id": "confirm",
+        "kind": "confirm",
+        "label": "Confirm",
+        "goal": "Resolve every PENDING and MISSING required field, using confirm_effective_date for the date and update_case_field for everything else. When all required fields are VERIFIED, the system gives you the next step.",
+        "tools": [
+          "confirm_effective_date",
+          "update_case_field",
+          "hand_back_to_rep"
+        ],
+        "exit": {
+          "kind": "all_required_verified"
+        }
+      },
+      {
+        "id": "disclose",
+        "kind": "disclose",
+        "label": "Disclose",
+        "goal": "Call get_disclosure with kind \"premium_change\" and read it exactly. If the customer agrees, call get_disclosure with kind \"esign_consent\" and read it exactly. If they decline the premium, call hand_back_to_rep with reason \"customer_declined\".",
+        "tools": [
+          "get_disclosure",
+          "confirm_effective_date",
+          "update_case_field",
+          "hand_back_to_rep"
+        ],
+        "exit": {
+          "kind": "disclosure_accepted",
+          "disclosure": "esign_consent"
+        }
+      },
+      {
+        "id": "pay",
+        "kind": "act",
+        "label": "Pay",
+        "goal": "The customer agreed to the e-signature and text. Call send_esign_and_pay_link now with their words. When it returns, tell the customer in one short sentence that you texted the secure link and will wait while they sign and pay. Then stay quiet unless asked; the system gives status updates.",
+        "tools": [
+          "send_esign_and_pay_link",
+          "get_disclosure",
+          "update_case_field",
+          "hand_back_to_rep"
+        ],
+        "exit": {
+          "kind": "connector_succeeded",
+          "connector": "esign_pay"
+        }
+      },
+      {
+        "id": "close",
+        "kind": "close",
+        "label": "Close",
+        "goal": "Payment is confirmed. Call send_confirmation, read the confirmation number digit by digit, ask if there is anything else about this change, then say goodbye.",
+        "tools": [
+          "send_confirmation",
+          "update_case_field",
+          "hand_back_to_rep"
+        ],
+        "exit": {
+          "kind": "end"
+        }
+      }
+    ],
+    "disclosures": [
+      {
+        "id": "premium_change",
+        "title": "Premium change",
+        "text": "Here's the change. We're adding {?f.driver_full_name.known}{f.driver_full_name|first_name}{:}the new driver{/?} as a {?f.license_status.known}{f.license_status|insurance.license_adjective} {/?}driver{?f.vehicle_assignment.known}{?f.vehicle_assignment=all} on all your vehicles{:} on the {f.vehicle_assignment|lookup_label}{/?}{/?}{?f.effective_date.known}, starting {f.effective_date|spoken_date}{/?}. Your new premium is {v.monthly_premium|spoken_money} a month, and {v.due_today|spoken_money}{?opt.tax_suffix} plus any applicable tax{/?} is due today, prorated for the rest of this billing period. The change is subject to the terms of your policy. Would you like me to go ahead?",
+        "criticalTokens": [
+          "{v.monthly_premium|spoken_money}",
+          "{v.due_today|spoken_money}",
+          "{?f.effective_date.known}{f.effective_date|spoken_date}{/?}",
+          "{?f.driver_full_name.known}{f.driver_full_name|first_name}{:}the new driver{/?}",
+          "{?opt.tax_suffix}plus any applicable tax{/?}"
+        ],
+        "requiresReady": true,
+        "requiresAccepted": null,
+        "consent": false
+      },
+      {
+        "id": "esign_consent",
+        "title": "E-sign consent",
+        "text": "I'll text a secure link to the number on file ending in {customer.phoneLast4|spoken_chars}, so you can review and sign this change electronically and pay the {v.due_today|spoken_money}. You can ask for a paper copy instead, and you can withdraw consent to electronic documents at any time. Is it OK if I text you that link now?",
+        "criticalTokens": [
+          "{customer.phoneLast4|spoken_chars}",
+          "electronically",
+          "paper copy"
+        ],
+        "requiresReady": true,
+        "requiresAccepted": "premium_change",
+        "consent": true
+      }
+    ],
+    "builtinToolText": {
+      "updateCaseFieldValueHint": "As spoken; date of birth as YYYY-MM-DD; state as 2 letters; ZIP as 5 digits; vehicle as year make model"
+    },
+    "sessionCap": {
+      "baseSec": 150,
+      "perFieldSec": 15,
+      "maxSec": 420
+    }
+  },
+  "connectors": [
+    {
+      "type": "payment_link",
+      "id": "esign_pay",
+      "label": "E-sign and pay link",
+      "toolName": "send_esign_and_pay_link",
+      "description": "Text the customer a secure link to e-sign the change and pay the amount due today. Only after the customer agreed to the premium and to receiving the text. Returns right after the text is sent; the system tells you when the payment finishes.",
+      "provider": "polar_sandbox",
+      "amount": "due_today",
+      "esign": true,
+      "smsTemplate": "{org.name}: review and e-sign your policy change, then pay {v.due_today|spoken_money} here.",
+      "requiresDisclosure": "esign_consent"
+    },
+    {
+      "type": "confirmation",
+      "id": "confirmation",
+      "label": "Confirmation",
+      "toolName": "send_confirmation",
+      "description": "Finalize the change and text a confirmation. Only after payment is confirmed.",
+      "requires": [
+        "esign_pay"
+      ],
+      "smsTemplate": "{org.name}: your policy change is confirmed. Thank you, {customer.firstName}."
+    }
+  ],
+  "qa": {
+    "reaskTargets": [],
+    "verbatimThreshold": 0.9,
+    "adviceLexicon": [
+      "\\b(recommend\\w*|suggest\\w*|you (should|might want to)|limits?|deductibles?|coverages?|discounts?)\\b"
+    ]
+  },
+  "extraction": {
+    "domainLine": "an insurance policy-change case",
+    "intentLine": "add a driver to a personal auto policy",
+    "fieldGuide": "- driver_full_name: the new driver's name as spoken (\"Maya\", \"Maya Raman\").\n- driver_dob: YYYY-MM-DD.            - driver_age: integer years (\"17\").\n- driver_relation: one of spouse, domestic_partner, child, stepchild, parent, sibling, other_relative,\n  non_relative_resident, non_relative_nonresident.\n- license_state: 2-letter US state code (\"OH\").   - license_number: as spoken, digits/letters only.\n- license_status: one of learner_permit, provisional (probationary), full.\n- incidents_3y: \"none\", or a short description of tickets/accidents/claims in the last 3 years.\n- vehicle_assignment: the policy vehicle the new driver will mainly drive, as its id from POLICY VEHICLES (\"veh1\").\n- operator_type: primary or occasional (for that vehicle).\n- garaging_zip: 5-digit ZIP where that vehicle is kept overnight.\n- effective_date: YYYY-MM-DD. Resolve relative dates (\"tomorrow\", \"next Friday\") against CALL DATE.\n- good_student_discount, driver_training_discount, distant_student_discount, mature_driver_discount:\n  eligible, not_eligible or pending_proof.\n- coverage_change: short text of what the customer decided about coverage (\"keep current limits\").\n- underwriting_review: \"true\" or \"false\".\n- premium_new_monthly_usd, premium_change_monthly_usd, amount_due_today_usd: dollars with cents (\"142.00\", \"-12.50\").\n  Only the REP can state these.",
+    "contextKey": "policy",
+    "context": [
+      {
+        "key": "policyholder",
+        "from": "customer.fullName"
+      },
+      {
+        "key": "vehicles",
+        "from": "table.vehicles"
+      },
+      {
+        "key": "address_zip",
+        "from": "fact.address_zip"
+      },
+      {
+        "key": "existing_drivers",
+        "from": "table.existing_drivers.name"
+      }
+    ]
+  },
+  "compliance": {
+    "aiDisclosurePatterns": [
+      "AI assistant",
+      "not a person"
+    ],
+    "recordingNoticePattern": "recorded",
+    "neverCollect": [
+      "card_number",
+      "bank_account",
+      "password",
+      "ssn"
+    ]
+  }
+}

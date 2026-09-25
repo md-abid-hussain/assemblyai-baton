@@ -5,8 +5,11 @@
  * (= sha256(template + stage instructions).slice(0, 8)).
  */
 import type { CaseState, FieldId, PolicyRecord, Stage } from "../contracts/case";
+import type { IntentSpec } from "../contracts/v2/relay";
 import { sha256Hex } from "../case/sha256";
 import { ADVICE_DOMAIN_SET, FIELD_IDS, REQUIRED_SET } from "../intents/add-driver.fields";
+import { accountFor } from "../relay/account";
+import { kernelOrLegacy } from "../relay/spec-link";
 import { spokenDateLong } from "./spoken";
 import type { PayToolMode } from "./tool-schemas";
 
@@ -52,9 +55,12 @@ export const STAGE_INSTRUCTIONS: Readonly<Record<Stage, string>> = {
     "Payment is confirmed. Call send_confirmation, read the confirmation number digit by digit, ask if there is anything else about this change, then say goodbye.",
 };
 
-/** `pay` instructions under the PAY_TOOL_MODE=push fallback (§5.8): the tool returns at once; the agent waits. */
+/**
+ * `pay` instructions under PAY_TOOL_MODE=push (§5.8; the production mode since T-D1-1): the tool returns at once; the
+ * agent says one sentence and waits. Wording as WP5b validated live (wp5b-to-wp1 item 1).
+ */
 export const PAY_PUSH_INSTRUCTIONS =
-  "The customer agreed to the e-signature and text. Call send_esign_and_pay_link now with their words. It returns as soon as the link is sent; then tell the customer you will wait while they sign and pay, and stay quiet unless asked until the system says payment is confirmed.";
+  "The customer agreed to the e-signature and text. Call send_esign_and_pay_link now with their words. When it returns, tell the customer in one short sentence that you texted the secure link and will wait while they sign and pay. Then stay quiet unless asked; the system gives status updates.";
 
 /** Version of the prompt template (marker excluded), stored on the takeover. */
 export const PROMPT_VERSION: string = sha256Hex(`${PROMPT_V3}\n${JSON.stringify(STAGE_INSTRUCTIONS)}\n${PAY_PUSH_INSTRUCTIONS}`).slice(0, 8);
@@ -71,8 +77,13 @@ const MONEY_FIELDS_IN_PROMPT: ReadonlySet<FieldId> = new Set<FieldId>(["premium_
  * `caseStateJson` (§5.7): compact JSON, ≤ 1800 chars. The 10 required fields plus any non-MISSING optional
  * field; advice-domain fields go under `decided_by_rep` (read-only context). Money fields appear only when the REP
  * quoted them (VERIFIED from the rep), never otherwise, and never as MISSING.
+ *
+ * WP14a·3: with `spec` = a compiled relay's spec (`compileRelay(bp).spec`), the kernel's case JSON of that relay
+ * (`promptVisibility`, `caseJson.{header,tables,maxChars}`); `LEGACY_BATON_SPEC` keeps this code. Parity: equal for Baton.
  */
-export function caseStateJson(state: Pick<CaseState, "fields">, policy: PolicyRecord): string {
+export function caseStateJson(state: Pick<CaseState, "fields">, policy: PolicyRecord, spec?: IntentSpec): string {
+  const k = kernelOrLegacy(spec, "caseStateJson");
+  if (k) return k.caseJson(state, accountFor(policy));
   const vehicles = Object.fromEntries(policy.vehicles.map((v) => [v.id, v.label]));
   const fields: Record<string, { status: string; value?: string }> = {};
   const optional: string[] = [];

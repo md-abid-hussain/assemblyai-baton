@@ -1,0 +1,12 @@
+{
+ "oracle": "scripts/relay/snapshot-legacy.ts (legacy Baton code)",
+ "deployId": "parity",
+ "payToolMode": "push",
+ "promptVersion": "05b9c597",
+ "extractorVersion": "f03ba7a71306",
+ "greetingMaxWords": 40,
+ "counts": {
+  "named": 17,
+  "random": 200
+ }
+}

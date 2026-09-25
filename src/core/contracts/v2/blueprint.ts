@@ -44,7 +44,9 @@ export const NORMALIZERS = ["text", "free_text_lower", "person_name", "date", "d
 export const FORMATTERS = ["raw", "title", "first_name", "lower", "spoken_date", "spoken_date_long", "spoken_dob",
   "spoken_zip", "spoken_chars", "spoken_money", "spoken_monthly", "state_name", "state_with_code", "enum_label",
   "enum_word", "lookup_label", "underscore_to_space", "insurance.relation_word", "insurance.relation_display",
-  "insurance.license_words", "insurance.license_adjective", "insurance.incidents_display"] as const;
+  "insurance.license_words", "insurance.license_adjective", "insurance.incidents_display",
+  "as_spoken",   // WP14a·2, additive: the words as spoken when known, else the value (legacy "as spoken" displays)
+] as const;
 export const BUILTIN_VALUES = ["insurance.monthly_premium", "insurance.due_today_prorated"] as const;
 export const HAND_BACK_REASONS_V2 = ["advice_requested", "customer_request", "conflict", "customer_declined",
   "out_of_scope", "payment_problem", "other"] as const;   // = contracts/tools.ts HAND_BACK_REASONS
@@ -129,7 +131,10 @@ export const FieldSchema = z.object({
   enumValues: z.array(EnumValueSchema).max(20).optional(),                   // required iff type = "enum"
   lookup: z.object({ table: IdSchema, matchColumns: z.array(z.string()).min(1).max(4), allowAll: z.boolean() }).optional(),
   required: z.boolean(),
-  setBy: z.enum(["rep_only", "ai_allowed"]),              // rep_only: only a REP statement or a server value makes it VERIFIED
+  setBy: z.enum(["rep_only", "ai_allowed", "rep_or_customer"]),   // rep_only: only a REP statement or a server value makes it VERIFIED
+  // ai_allowed: either party, and the AI may set it with update_case_field (the tool enum, in field order).
+  // rep_or_customer (WP14a·2, additive): either party's statements count, but the AI cannot write it with
+  // update_case_field (Baton: age, the start date with its own confirm tool, the discounts and coverage).
   adviceDomain: z.boolean(),                              // a rep decision: the AI never raises or changes it (prompt → decided_by_rep)
   serverResolvable: z.object({ value: IdSchema }).optional(),   // never asked; a named value supplies it (Baton: the premium)
   promptVisibility: z.enum(["always", "when_known", "rep_verified_only"]),

@@ -85,7 +85,7 @@ const MINI: Blueprint = {
     persona: { tone: "warm and brief", extraRules: [] },
     subject: "{?f.patient_name.verified}{f.patient_name|first_name}{:}the patient{/?}",
     greeting: {
-      opening: "Hi {customer.firstName}, I'm {org.name}'s AI assistant, not a person, and this call is recorded.",
+      opening: "Hi {customer.firstName}, I'm {org.name}'s AI assistant, not a person. This call is recorded.",
       summary: "{?f.treatment.verified}I have the {f.treatment.display} booking for {subject}{/?}{clause.date}.",
       clauses: [{ id: "date", text: "{?f.appointment_date.verified} on {f.appointment_date|spoken_date}{/?}", dropOrder: 0 }],
       optOut: "Say Sam anytime to go back.",

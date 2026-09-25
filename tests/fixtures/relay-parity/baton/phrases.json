@@ -1,0 +1,2337 @@
+{
+ "snapshots": {
+  "verified_name": {
+   "driver_full_name": [
+    "VERIFIED",
+    "maya raman",
+    "customer",
+    "Maya Raman"
+   ],
+   "vehicle_assignment": [
+    "VERIFIED",
+    "veh1",
+    "customer",
+    "2021 Honda Civic"
+   ]
+  },
+  "no_name": {}
+ },
+ "phrases": [
+  {
+   "snapshot": "verified_name",
+   "field": "driver_full_name",
+   "kind": "ask",
+   "text": "the new driver's full name"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "driver_full_name",
+   "value": "maya raman",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the new driver's name is Maya Raman"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "driver_full_name",
+   "value": "maya raman",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the new driver's name is Maya Raman"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "driver_full_name",
+   "value": "maya raman",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the new driver's name is Maya Raman"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "driver_dob",
+   "kind": "ask",
+   "text": "Maya's date of birth"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "driver_dob",
+   "value": "2009-03-14",
+   "raw": null,
+   "kind": "confirm",
+   "text": "Maya's date of birth is March 14th, 2009"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "driver_dob",
+   "value": "2009-03-14",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "Maya's date of birth is March 14th, 2009"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "driver_dob",
+   "value": "2009-03-14",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "Maya's date of birth is March 14th, 2009"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "driver_age",
+   "kind": "ask",
+   "text": "the age"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "driver_age",
+   "value": "17",
+   "raw": null,
+   "kind": "confirm",
+   "text": "Maya is 17"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "driver_age",
+   "value": "17",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "Maya is 17"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "driver_age",
+   "value": "17",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "Maya is 17"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "driver_relation",
+   "kind": "ask",
+   "text": "how Maya is related to you"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "driver_relation",
+   "value": "spouse",
+   "raw": null,
+   "kind": "confirm",
+   "text": "Maya is your spouse"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "driver_relation",
+   "value": "spouse",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "Maya is your spouse"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "driver_relation",
+   "value": "spouse",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "Maya is your spouse"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "driver_relation",
+   "value": "domestic_partner",
+   "raw": null,
+   "kind": "confirm",
+   "text": "Maya is your partner"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "driver_relation",
+   "value": "domestic_partner",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "Maya is your partner"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "driver_relation",
+   "value": "domestic_partner",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "Maya is your partner"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "driver_relation",
+   "value": "child",
+   "raw": null,
+   "kind": "confirm",
+   "text": "Maya is your child"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "driver_relation",
+   "value": "child",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "Maya is your child"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "driver_relation",
+   "value": "child",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "Maya is your daughter"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "driver_relation",
+   "value": "stepchild",
+   "raw": null,
+   "kind": "confirm",
+   "text": "Maya is your stepchild"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "driver_relation",
+   "value": "stepchild",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "Maya is your stepchild"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "driver_relation",
+   "value": "stepchild",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "Maya is your stepchild"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "driver_relation",
+   "value": "parent",
+   "raw": null,
+   "kind": "confirm",
+   "text": "Maya is your parent"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "driver_relation",
+   "value": "parent",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "Maya is your parent"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "driver_relation",
+   "value": "parent",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "Maya is your parent"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "driver_relation",
+   "value": "sibling",
+   "raw": null,
+   "kind": "confirm",
+   "text": "Maya is your sibling"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "driver_relation",
+   "value": "sibling",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "Maya is your sibling"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "driver_relation",
+   "value": "sibling",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "Maya is your sibling"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "driver_relation",
+   "value": "other_relative",
+   "raw": null,
+   "kind": "confirm",
+   "text": "Maya is your relative"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "driver_relation",
+   "value": "other_relative",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "Maya is your relative"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "driver_relation",
+   "value": "other_relative",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "Maya is your relative"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "driver_relation",
+   "value": "non_relative_resident",
+   "raw": null,
+   "kind": "confirm",
+   "text": "Maya is not related to you but lives with you"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "driver_relation",
+   "value": "non_relative_resident",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "Maya is your roommate"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "driver_relation",
+   "value": "non_relative_resident",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "Maya is not related to you but lives with you"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "driver_relation",
+   "value": "non_relative_nonresident",
+   "raw": null,
+   "kind": "confirm",
+   "text": "Maya is not related to you and doesn't live with you"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "driver_relation",
+   "value": "non_relative_nonresident",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "Maya is not related to you and doesn't live with you"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "driver_relation",
+   "value": "non_relative_nonresident",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "Maya is not related to you and doesn't live with you"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "license_state",
+   "kind": "ask",
+   "text": "which state issued Maya's license"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "license_state",
+   "value": "OH",
+   "raw": null,
+   "kind": "confirm",
+   "text": "Maya's license is from Ohio"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "license_state",
+   "value": "OH",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "Maya's license is from Ohio"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "license_state",
+   "value": "OH",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "Maya's license is from Ohio"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "license_status",
+   "kind": "ask",
+   "text": "whether Maya has a permit, a probationary license or a full license"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "license_status",
+   "value": "learner_permit",
+   "raw": null,
+   "kind": "confirm",
+   "text": "Maya has a learner's permit"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "license_status",
+   "value": "learner_permit",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "Maya has a learner's permit"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "license_status",
+   "value": "learner_permit",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "Maya has a learner's permit"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "license_status",
+   "value": "provisional",
+   "raw": null,
+   "kind": "confirm",
+   "text": "Maya has a probationary license"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "license_status",
+   "value": "provisional",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "Maya has a probationary license"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "license_status",
+   "value": "provisional",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "Maya has a probationary license"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "license_status",
+   "value": "full",
+   "raw": null,
+   "kind": "confirm",
+   "text": "Maya has a full license"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "license_status",
+   "value": "full",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "Maya has a full license"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "license_status",
+   "value": "full",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "Maya has a full license"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "license_number",
+   "kind": "ask",
+   "text": "Maya's license number"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "license_number",
+   "value": "RM123456",
+   "raw": null,
+   "kind": "confirm",
+   "text": "Maya's license number is R M 1 2 3 4 5 6"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "license_number",
+   "value": "RM123456",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "Maya's license number is R M 1 2 3 4 5 6"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "license_number",
+   "value": "RM123456",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "Maya's license number is R M 1 2 3 4 5 6"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "incidents_3y",
+   "kind": "ask",
+   "text": "whether Maya has had any tickets or accidents in the last three years"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "incidents_3y",
+   "value": "none",
+   "raw": null,
+   "kind": "confirm",
+   "text": "Maya has had no tickets or accidents in the last three years"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "incidents_3y",
+   "value": "none",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "Maya has had no tickets or accidents in the last three years"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "incidents_3y",
+   "value": "none",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "Maya has had no tickets or accidents in the last three years"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "incidents_3y",
+   "value": "one speeding ticket, March 2025",
+   "raw": null,
+   "kind": "confirm",
+   "text": "Maya had one speeding ticket, March 2025 in the last three years"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "incidents_3y",
+   "value": "one speeding ticket, March 2025",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "Maya had one speeding ticket, March 2025 in the last three years"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "incidents_3y",
+   "value": "one speeding ticket, March 2025",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "Maya had one speeding ticket, March 2025 in the last three years"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "vehicle_assignment",
+   "kind": "ask",
+   "text": "which car Maya will mainly drive"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "vehicle_assignment",
+   "value": "veh1",
+   "raw": null,
+   "kind": "confirm",
+   "text": "Maya will mainly drive the 2021 Honda Civic"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "vehicle_assignment",
+   "value": "veh1",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "Maya will mainly drive the 2021 Honda Civic"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "vehicle_assignment",
+   "value": "veh1",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "Maya will mainly drive the 2021 Honda Civic"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "vehicle_assignment",
+   "value": "veh2",
+   "raw": null,
+   "kind": "confirm",
+   "text": "Maya will mainly drive the 2018 Toyota Highlander"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "vehicle_assignment",
+   "value": "veh2",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "Maya will mainly drive the 2018 Toyota Highlander"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "vehicle_assignment",
+   "value": "veh2",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "Maya will mainly drive the 2018 Toyota Highlander"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "vehicle_assignment",
+   "value": "all",
+   "raw": null,
+   "kind": "confirm",
+   "text": "Maya will drive all your vehicles"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "vehicle_assignment",
+   "value": "all",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "Maya will drive all your vehicles"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "vehicle_assignment",
+   "value": "all",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "Maya will drive all your vehicles"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "operator_type",
+   "kind": "ask",
+   "text": "whether Maya will drive the 2021 Honda Civic daily or just occasionally"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "operator_type",
+   "value": "primary",
+   "raw": null,
+   "kind": "confirm",
+   "text": "Maya will be the primary driver of the 2021 Honda Civic"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "operator_type",
+   "value": "primary",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "Maya will be the primary driver of the 2021 Honda Civic"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "operator_type",
+   "value": "primary",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "Maya will be the primary driver of the 2021 Honda Civic"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "operator_type",
+   "value": "occasional",
+   "raw": null,
+   "kind": "confirm",
+   "text": "Maya will be the occasional driver of the 2021 Honda Civic"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "operator_type",
+   "value": "occasional",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "Maya will be the occasional driver of the 2021 Honda Civic"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "operator_type",
+   "value": "occasional",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "Maya will be the occasional driver of the 2021 Honda Civic"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "garaging_zip",
+   "kind": "ask",
+   "text": "the ZIP code where the car is kept overnight"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "garaging_zip",
+   "value": "44107",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the car is kept at ZIP code 4 4 1 0 7"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "garaging_zip",
+   "value": "44107",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the car is kept at ZIP code 4 4 1 0 7"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "garaging_zip",
+   "value": "44107",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the car is kept at ZIP code 4 4 1 0 7"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "effective_date",
+   "kind": "ask",
+   "text": "the date you'd like this change to start"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "effective_date",
+   "value": "2026-10-02",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the change should start Friday, October 2nd"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "effective_date",
+   "value": "2026-10-02",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the change should start Friday, October 2nd"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "effective_date",
+   "value": "2026-10-02",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the change should start Friday, October 2nd"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "good_student_discount",
+   "kind": "ask",
+   "text": "the good-student discount"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "good_student_discount",
+   "value": "eligible",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the good-student discount is eligible"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "good_student_discount",
+   "value": "eligible",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the good-student discount is eligible"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "good_student_discount",
+   "value": "eligible",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the good-student discount is eligible"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "good_student_discount",
+   "value": "not_eligible",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the good-student discount is not eligible"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "good_student_discount",
+   "value": "not_eligible",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the good-student discount is not eligible"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "good_student_discount",
+   "value": "not_eligible",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the good-student discount is not eligible"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "good_student_discount",
+   "value": "pending_proof",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the good-student discount is pending proof"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "good_student_discount",
+   "value": "pending_proof",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the good-student discount is pending proof"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "good_student_discount",
+   "value": "pending_proof",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the good-student discount is pending proof"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "driver_training_discount",
+   "kind": "ask",
+   "text": "the driver-training discount"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "driver_training_discount",
+   "value": "eligible",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the driver-training discount is eligible"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "driver_training_discount",
+   "value": "eligible",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the driver-training discount is eligible"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "driver_training_discount",
+   "value": "eligible",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the driver-training discount is eligible"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "driver_training_discount",
+   "value": "not_eligible",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the driver-training discount is not eligible"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "driver_training_discount",
+   "value": "not_eligible",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the driver-training discount is not eligible"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "driver_training_discount",
+   "value": "not_eligible",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the driver-training discount is not eligible"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "driver_training_discount",
+   "value": "pending_proof",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the driver-training discount is pending proof"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "driver_training_discount",
+   "value": "pending_proof",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the driver-training discount is pending proof"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "driver_training_discount",
+   "value": "pending_proof",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the driver-training discount is pending proof"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "distant_student_discount",
+   "kind": "ask",
+   "text": "the distant-student discount"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "distant_student_discount",
+   "value": "eligible",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the distant-student discount is eligible"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "distant_student_discount",
+   "value": "eligible",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the distant-student discount is eligible"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "distant_student_discount",
+   "value": "eligible",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the distant-student discount is eligible"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "distant_student_discount",
+   "value": "not_eligible",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the distant-student discount is not eligible"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "distant_student_discount",
+   "value": "not_eligible",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the distant-student discount is not eligible"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "distant_student_discount",
+   "value": "not_eligible",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the distant-student discount is not eligible"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "distant_student_discount",
+   "value": "pending_proof",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the distant-student discount is pending proof"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "distant_student_discount",
+   "value": "pending_proof",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the distant-student discount is pending proof"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "distant_student_discount",
+   "value": "pending_proof",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the distant-student discount is pending proof"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "mature_driver_discount",
+   "kind": "ask",
+   "text": "the mature-driver discount"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "mature_driver_discount",
+   "value": "eligible",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the mature-driver discount is eligible"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "mature_driver_discount",
+   "value": "eligible",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the mature-driver discount is eligible"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "mature_driver_discount",
+   "value": "eligible",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the mature-driver discount is eligible"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "mature_driver_discount",
+   "value": "not_eligible",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the mature-driver discount is not eligible"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "mature_driver_discount",
+   "value": "not_eligible",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the mature-driver discount is not eligible"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "mature_driver_discount",
+   "value": "not_eligible",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the mature-driver discount is not eligible"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "mature_driver_discount",
+   "value": "pending_proof",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the mature-driver discount is pending proof"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "mature_driver_discount",
+   "value": "pending_proof",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the mature-driver discount is pending proof"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "mature_driver_discount",
+   "value": "pending_proof",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the mature-driver discount is pending proof"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "coverage_change",
+   "kind": "ask",
+   "text": "the coverage change"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "coverage_change",
+   "value": "keep current limits",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the coverage change is keep current limits"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "coverage_change",
+   "value": "keep current limits",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the coverage change is my roommate"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "coverage_change",
+   "value": "keep current limits",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the coverage change is child (daughter)"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "underwriting_review",
+   "kind": "ask",
+   "text": "the underwriting review needed"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "underwriting_review",
+   "value": "true",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the underwriting review needed is true"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "underwriting_review",
+   "value": "true",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the underwriting review needed is true"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "underwriting_review",
+   "value": "true",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the underwriting review needed is true"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "underwriting_review",
+   "value": "false",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the underwriting review needed is false"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "underwriting_review",
+   "value": "false",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the underwriting review needed is false"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "underwriting_review",
+   "value": "false",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the underwriting review needed is false"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "premium_new_monthly_usd",
+   "kind": "ask",
+   "text": "the new monthly premium"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "premium_new_monthly_usd",
+   "value": "142.00",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the new monthly premium is $142 a month"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "premium_new_monthly_usd",
+   "value": "142.00",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the new monthly premium is $142 a month"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "premium_new_monthly_usd",
+   "value": "142.00",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the new monthly premium is $142 a month"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "premium_change_monthly_usd",
+   "kind": "ask",
+   "text": "the monthly premium change"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "premium_change_monthly_usd",
+   "value": "46.00",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the monthly premium change is $46 a month"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "premium_change_monthly_usd",
+   "value": "46.00",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the monthly premium change is $46 a month"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "premium_change_monthly_usd",
+   "value": "46.00",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the monthly premium change is $46 a month"
+  },
+  {
+   "snapshot": "verified_name",
+   "field": "amount_due_today_usd",
+   "kind": "ask",
+   "text": "the amount due today"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "driver_full_name",
+   "kind": "ask",
+   "text": "the new driver's full name"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "driver_full_name",
+   "value": "maya raman",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the new driver's name is Maya Raman"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "driver_full_name",
+   "value": "maya raman",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the new driver's name is Maya Raman"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "driver_full_name",
+   "value": "maya raman",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the new driver's name is Maya Raman"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "driver_dob",
+   "kind": "ask",
+   "text": "the new driver's date of birth"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "driver_dob",
+   "value": "2009-03-14",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the new driver's date of birth is March 14th, 2009"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "driver_dob",
+   "value": "2009-03-14",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the new driver's date of birth is March 14th, 2009"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "driver_dob",
+   "value": "2009-03-14",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the new driver's date of birth is March 14th, 2009"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "driver_age",
+   "kind": "ask",
+   "text": "the age"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "driver_age",
+   "value": "17",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the new driver is 17"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "driver_age",
+   "value": "17",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the new driver is 17"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "driver_age",
+   "value": "17",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the new driver is 17"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "driver_relation",
+   "kind": "ask",
+   "text": "how the new driver is related to you"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "driver_relation",
+   "value": "spouse",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the new driver is your spouse"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "driver_relation",
+   "value": "spouse",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the new driver is your spouse"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "driver_relation",
+   "value": "spouse",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the new driver is your spouse"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "driver_relation",
+   "value": "domestic_partner",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the new driver is your partner"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "driver_relation",
+   "value": "domestic_partner",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the new driver is your partner"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "driver_relation",
+   "value": "domestic_partner",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the new driver is your partner"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "driver_relation",
+   "value": "child",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the new driver is your child"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "driver_relation",
+   "value": "child",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the new driver is your child"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "driver_relation",
+   "value": "child",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the new driver is your daughter"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "driver_relation",
+   "value": "stepchild",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the new driver is your stepchild"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "driver_relation",
+   "value": "stepchild",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the new driver is your stepchild"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "driver_relation",
+   "value": "stepchild",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the new driver is your stepchild"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "driver_relation",
+   "value": "parent",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the new driver is your parent"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "driver_relation",
+   "value": "parent",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the new driver is your parent"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "driver_relation",
+   "value": "parent",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the new driver is your parent"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "driver_relation",
+   "value": "sibling",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the new driver is your sibling"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "driver_relation",
+   "value": "sibling",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the new driver is your sibling"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "driver_relation",
+   "value": "sibling",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the new driver is your sibling"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "driver_relation",
+   "value": "other_relative",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the new driver is your relative"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "driver_relation",
+   "value": "other_relative",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the new driver is your relative"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "driver_relation",
+   "value": "other_relative",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the new driver is your relative"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "driver_relation",
+   "value": "non_relative_resident",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the new driver is not related to you but lives with you"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "driver_relation",
+   "value": "non_relative_resident",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the new driver is your roommate"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "driver_relation",
+   "value": "non_relative_resident",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the new driver is not related to you but lives with you"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "driver_relation",
+   "value": "non_relative_nonresident",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the new driver is not related to you and doesn't live with you"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "driver_relation",
+   "value": "non_relative_nonresident",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the new driver is not related to you and doesn't live with you"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "driver_relation",
+   "value": "non_relative_nonresident",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the new driver is not related to you and doesn't live with you"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "license_state",
+   "kind": "ask",
+   "text": "which state issued the new driver's license"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "license_state",
+   "value": "OH",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the new driver's license is from Ohio"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "license_state",
+   "value": "OH",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the new driver's license is from Ohio"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "license_state",
+   "value": "OH",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the new driver's license is from Ohio"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "license_status",
+   "kind": "ask",
+   "text": "whether the new driver has a permit, a probationary license or a full license"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "license_status",
+   "value": "learner_permit",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the new driver has a learner's permit"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "license_status",
+   "value": "learner_permit",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the new driver has a learner's permit"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "license_status",
+   "value": "learner_permit",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the new driver has a learner's permit"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "license_status",
+   "value": "provisional",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the new driver has a probationary license"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "license_status",
+   "value": "provisional",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the new driver has a probationary license"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "license_status",
+   "value": "provisional",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the new driver has a probationary license"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "license_status",
+   "value": "full",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the new driver has a full license"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "license_status",
+   "value": "full",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the new driver has a full license"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "license_status",
+   "value": "full",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the new driver has a full license"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "license_number",
+   "kind": "ask",
+   "text": "the new driver's license number"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "license_number",
+   "value": "RM123456",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the new driver's license number is R M 1 2 3 4 5 6"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "license_number",
+   "value": "RM123456",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the new driver's license number is R M 1 2 3 4 5 6"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "license_number",
+   "value": "RM123456",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the new driver's license number is R M 1 2 3 4 5 6"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "incidents_3y",
+   "kind": "ask",
+   "text": "whether the new driver has had any tickets or accidents in the last three years"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "incidents_3y",
+   "value": "none",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the new driver has had no tickets or accidents in the last three years"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "incidents_3y",
+   "value": "none",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the new driver has had no tickets or accidents in the last three years"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "incidents_3y",
+   "value": "none",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the new driver has had no tickets or accidents in the last three years"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "incidents_3y",
+   "value": "one speeding ticket, March 2025",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the new driver had one speeding ticket, March 2025 in the last three years"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "incidents_3y",
+   "value": "one speeding ticket, March 2025",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the new driver had one speeding ticket, March 2025 in the last three years"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "incidents_3y",
+   "value": "one speeding ticket, March 2025",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the new driver had one speeding ticket, March 2025 in the last three years"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "vehicle_assignment",
+   "kind": "ask",
+   "text": "which car the new driver will mainly drive"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "vehicle_assignment",
+   "value": "veh1",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the new driver will mainly drive the 2021 Honda Civic"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "vehicle_assignment",
+   "value": "veh1",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the new driver will mainly drive the 2021 Honda Civic"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "vehicle_assignment",
+   "value": "veh1",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the new driver will mainly drive the 2021 Honda Civic"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "vehicle_assignment",
+   "value": "veh2",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the new driver will mainly drive the 2018 Toyota Highlander"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "vehicle_assignment",
+   "value": "veh2",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the new driver will mainly drive the 2018 Toyota Highlander"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "vehicle_assignment",
+   "value": "veh2",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the new driver will mainly drive the 2018 Toyota Highlander"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "vehicle_assignment",
+   "value": "all",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the new driver will drive all your vehicles"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "vehicle_assignment",
+   "value": "all",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the new driver will drive all your vehicles"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "vehicle_assignment",
+   "value": "all",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the new driver will drive all your vehicles"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "operator_type",
+   "kind": "ask",
+   "text": "whether the new driver will drive the car daily or just occasionally"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "operator_type",
+   "value": "primary",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the new driver will be the primary driver of the car"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "operator_type",
+   "value": "primary",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the new driver will be the primary driver of the car"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "operator_type",
+   "value": "primary",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the new driver will be the primary driver of the car"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "operator_type",
+   "value": "occasional",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the new driver will be the occasional driver of the car"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "operator_type",
+   "value": "occasional",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the new driver will be the occasional driver of the car"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "operator_type",
+   "value": "occasional",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the new driver will be the occasional driver of the car"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "garaging_zip",
+   "kind": "ask",
+   "text": "the ZIP code where the car is kept overnight"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "garaging_zip",
+   "value": "44107",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the car is kept at ZIP code 4 4 1 0 7"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "garaging_zip",
+   "value": "44107",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the car is kept at ZIP code 4 4 1 0 7"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "garaging_zip",
+   "value": "44107",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the car is kept at ZIP code 4 4 1 0 7"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "effective_date",
+   "kind": "ask",
+   "text": "the date you'd like this change to start"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "effective_date",
+   "value": "2026-10-02",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the change should start Friday, October 2nd"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "effective_date",
+   "value": "2026-10-02",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the change should start Friday, October 2nd"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "effective_date",
+   "value": "2026-10-02",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the change should start Friday, October 2nd"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "good_student_discount",
+   "kind": "ask",
+   "text": "the good-student discount"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "good_student_discount",
+   "value": "eligible",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the good-student discount is eligible"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "good_student_discount",
+   "value": "eligible",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the good-student discount is eligible"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "good_student_discount",
+   "value": "eligible",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the good-student discount is eligible"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "good_student_discount",
+   "value": "not_eligible",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the good-student discount is not eligible"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "good_student_discount",
+   "value": "not_eligible",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the good-student discount is not eligible"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "good_student_discount",
+   "value": "not_eligible",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the good-student discount is not eligible"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "good_student_discount",
+   "value": "pending_proof",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the good-student discount is pending proof"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "good_student_discount",
+   "value": "pending_proof",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the good-student discount is pending proof"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "good_student_discount",
+   "value": "pending_proof",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the good-student discount is pending proof"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "driver_training_discount",
+   "kind": "ask",
+   "text": "the driver-training discount"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "driver_training_discount",
+   "value": "eligible",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the driver-training discount is eligible"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "driver_training_discount",
+   "value": "eligible",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the driver-training discount is eligible"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "driver_training_discount",
+   "value": "eligible",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the driver-training discount is eligible"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "driver_training_discount",
+   "value": "not_eligible",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the driver-training discount is not eligible"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "driver_training_discount",
+   "value": "not_eligible",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the driver-training discount is not eligible"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "driver_training_discount",
+   "value": "not_eligible",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the driver-training discount is not eligible"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "driver_training_discount",
+   "value": "pending_proof",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the driver-training discount is pending proof"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "driver_training_discount",
+   "value": "pending_proof",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the driver-training discount is pending proof"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "driver_training_discount",
+   "value": "pending_proof",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the driver-training discount is pending proof"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "distant_student_discount",
+   "kind": "ask",
+   "text": "the distant-student discount"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "distant_student_discount",
+   "value": "eligible",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the distant-student discount is eligible"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "distant_student_discount",
+   "value": "eligible",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the distant-student discount is eligible"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "distant_student_discount",
+   "value": "eligible",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the distant-student discount is eligible"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "distant_student_discount",
+   "value": "not_eligible",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the distant-student discount is not eligible"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "distant_student_discount",
+   "value": "not_eligible",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the distant-student discount is not eligible"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "distant_student_discount",
+   "value": "not_eligible",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the distant-student discount is not eligible"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "distant_student_discount",
+   "value": "pending_proof",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the distant-student discount is pending proof"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "distant_student_discount",
+   "value": "pending_proof",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the distant-student discount is pending proof"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "distant_student_discount",
+   "value": "pending_proof",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the distant-student discount is pending proof"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "mature_driver_discount",
+   "kind": "ask",
+   "text": "the mature-driver discount"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "mature_driver_discount",
+   "value": "eligible",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the mature-driver discount is eligible"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "mature_driver_discount",
+   "value": "eligible",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the mature-driver discount is eligible"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "mature_driver_discount",
+   "value": "eligible",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the mature-driver discount is eligible"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "mature_driver_discount",
+   "value": "not_eligible",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the mature-driver discount is not eligible"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "mature_driver_discount",
+   "value": "not_eligible",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the mature-driver discount is not eligible"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "mature_driver_discount",
+   "value": "not_eligible",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the mature-driver discount is not eligible"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "mature_driver_discount",
+   "value": "pending_proof",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the mature-driver discount is pending proof"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "mature_driver_discount",
+   "value": "pending_proof",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the mature-driver discount is pending proof"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "mature_driver_discount",
+   "value": "pending_proof",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the mature-driver discount is pending proof"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "coverage_change",
+   "kind": "ask",
+   "text": "the coverage change"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "coverage_change",
+   "value": "keep current limits",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the coverage change is keep current limits"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "coverage_change",
+   "value": "keep current limits",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the coverage change is my roommate"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "coverage_change",
+   "value": "keep current limits",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the coverage change is child (daughter)"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "underwriting_review",
+   "kind": "ask",
+   "text": "the underwriting review needed"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "underwriting_review",
+   "value": "true",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the underwriting review needed is true"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "underwriting_review",
+   "value": "true",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the underwriting review needed is true"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "underwriting_review",
+   "value": "true",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the underwriting review needed is true"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "underwriting_review",
+   "value": "false",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the underwriting review needed is false"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "underwriting_review",
+   "value": "false",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the underwriting review needed is false"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "underwriting_review",
+   "value": "false",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the underwriting review needed is false"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "premium_new_monthly_usd",
+   "kind": "ask",
+   "text": "the new monthly premium"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "premium_new_monthly_usd",
+   "value": "142.00",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the new monthly premium is $142 a month"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "premium_new_monthly_usd",
+   "value": "142.00",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the new monthly premium is $142 a month"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "premium_new_monthly_usd",
+   "value": "142.00",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the new monthly premium is $142 a month"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "premium_change_monthly_usd",
+   "kind": "ask",
+   "text": "the monthly premium change"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "premium_change_monthly_usd",
+   "value": "46.00",
+   "raw": null,
+   "kind": "confirm",
+   "text": "the monthly premium change is $46 a month"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "premium_change_monthly_usd",
+   "value": "46.00",
+   "raw": "my roommate",
+   "kind": "confirm",
+   "text": "the monthly premium change is $46 a month"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "premium_change_monthly_usd",
+   "value": "46.00",
+   "raw": "child (daughter)",
+   "kind": "confirm",
+   "text": "the monthly premium change is $46 a month"
+  },
+  {
+   "snapshot": "no_name",
+   "field": "amount_due_today_usd",
+   "kind": "ask",
+   "text": "the amount due today"
+  }
+ ]
+}

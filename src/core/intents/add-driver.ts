@@ -42,6 +42,8 @@ export const MIN_DRIVER_AGE = 14;
 export const MIN_DOB_YEAR = 1920;
 
 const lower = (s: string): string => collapseWs(s.toLowerCase().replace(/[’‘]/g, "'"));
+/** The normalizers' lower-case form (quotes straightened, whitespace collapsed); exported for the kernel. */
+export const speechLower = lower;
 
 // ------------------------------------------------------------------------------------------ vocabularies
 
@@ -90,11 +92,11 @@ const MAKE_SYNONYMS: Readonly<Record<string, string>> = {
 
 // ------------------------------------------------------------------------------------------ small helpers
 
-export const vehicleById = (policy: PolicyRecord, id: string): PolicyVehicle | undefined =>
+export const vehicleById = (policy: Pick<PolicyRecord, "vehicles">, id: string): PolicyVehicle | undefined =>
   policy.vehicles.find((v) => v.id === id);
 
 /** The label of a normalized vehicle value ("veh1" → "2021 Honda Civic"; "all" → "all your vehicles"). */
-export function vehicleLabelOf(policy: PolicyRecord, norm: string): string {
+export function vehicleLabelOf(policy: Pick<PolicyRecord, "vehicles">, norm: string): string {
   if (norm === "all") return "all your vehicles";
   return vehicleById(policy, norm)?.label ?? norm;
 }
@@ -122,8 +124,9 @@ export function effectiveDateInRange(norm: string, callDate: string, maxDays = E
 }
 
 // ------------------------------------------------------------------------------------------ per-kind normalizers
+// Exported (unchanged) for the kernel: relay/normalizers.ts calls these, never re-implements them (PLATFORM §4.3).
 
-function normName(raw: string): string | null {
+export function normName(raw: string): string | null {
   let s = raw.normalize("NFKC").toLowerCase().replace(/[’‘]/g, "'");
   s = s.replace(/\b(?:\p{L}-){1,}\p{L}\b/gu, " "); // spelled letters "m-a-y-a"
   s = s.replace(/[^\p{L}\s'-]/gu, " ");
@@ -132,7 +135,7 @@ function normName(raw: string): string | null {
   return s;
 }
 
-function normDob(raw: string, callDate: string): string | null {
+export function normDob(raw: string, callDate: string): string | null {
   const iso = parseExplicitDate(raw, callDate, "past");
   if (!iso) return null;
   const { y } = ymd(iso);
@@ -140,14 +143,14 @@ function normDob(raw: string, callDate: string): string | null {
   return iso;
 }
 
-function normAge(raw: string): string | null {
+export function normAge(raw: string): string | null {
   const m = /\b(\d{1,3})\b/.exec(wordsToNumbers(lower(raw)));
   if (!m) return null;
   const n = Number(m[1]);
   return n >= MIN_DRIVER_AGE && n <= 99 ? String(n) : null;
 }
 
-function normRelation(raw: string): string | null {
+export function normRelation(raw: string): string | null {
   const s = lower(raw).replace(/_/g, " ");
   for (const r of RELATIONS) if (s === r.replace(/_/g, " ")) return r;
   if (/\bnon[- ]relative[- ]resident\b/.test(s)) return "non_relative_resident";
@@ -166,7 +169,7 @@ const STATE_BY_NAME: ReadonlyArray<readonly [string, string]> = Object.entries(S
   .map(([code, name]) => [name.toLowerCase(), code] as const)
   .sort((a, b) => b[0].length - a[0].length);
 
-function normState(raw: string): string | null {
+export function normState(raw: string): string | null {
   const trimmed = raw.trim().replace(/\.$/, "");
   if (/^[A-Za-z]{2}$/.test(trimmed) && (US_STATES as readonly string[]).includes(trimmed.toUpperCase())) return trimmed.toUpperCase();
   const s = lower(raw);
@@ -180,7 +183,7 @@ function normState(raw: string): string | null {
   return valid.length === 1 ? valid[0]! : null;
 }
 
-function normLicenseStatus(raw: string): string | null {
+export function normLicenseStatus(raw: string): string | null {
   const s = lower(raw).replace(/_/g, " ");
   for (const v of LICENSE_STATUSES) if (s === v.replace(/_/g, " ")) return v;
   if (/\b(learner|learner's|learners|permit|temps|instruction permit)\b/.test(s)) return "learner_permit";
@@ -189,12 +192,12 @@ function normLicenseStatus(raw: string): string | null {
   return null;
 }
 
-function normLicenseNumber(raw: string): string | null {
+export function normLicenseNumber(raw: string): string | null {
   const s = raw.toUpperCase().replace(/[^A-Z0-9]/g, "");
   return s.length >= 1 && s.length <= 24 ? s : null;
 }
 
-function normIncidents(raw: string): string | null {
+export function normIncidents(raw: string): string | null {
   const s = lower(raw).replace(/[.!]+$/, "");
   if (!s) return null;
   if (/^(none|nothing|clean|no|nope|zero|n\/a|na)$/.test(s)) return "none";
@@ -204,7 +207,7 @@ function normIncidents(raw: string): string | null {
   return s;
 }
 
-function normVehicle(raw: string, policy: PolicyRecord): string | null {
+export function normVehicle(raw: string, policy: Pick<PolicyRecord, "vehicles">): string | null {
   const s = lower(raw);
   const direct = /\b(veh\d+)\b/.exec(s);
   if (direct && vehicleById(policy, direct[1]!)) return direct[1]!;
@@ -228,7 +231,7 @@ function normVehicle(raw: string, policy: PolicyRecord): string | null {
   return best && !tie ? best.id : null;
 }
 
-function normOperator(raw: string): string | null {
+export function normOperator(raw: string): string | null {
   const s = lower(raw);
   for (const v of OPERATOR_TYPES) if (s === v) return v;
   if (/\b(occasional|occasionally|sometimes|weekends?|once in a while|now and then|rarely|here and there|every now|not often|part[- ]time)\b/.test(s)) return "occasional";
@@ -236,7 +239,7 @@ function normOperator(raw: string): string | null {
   return null;
 }
 
-function normZip(raw: string): string | null {
+export function normZip(raw: string): string | null {
   const plus4 = /\b(\d{5})-\d{4}\b/.exec(raw);
   if (plus4) return plus4[1]!;
   const s = wordsToNumbers(lower(raw).replace(/\b(oh|o)\b/g, "zero"));
@@ -244,11 +247,11 @@ function normZip(raw: string): string | null {
   return /^\d{5}$/.test(digits) ? digits : null;
 }
 
-function normEffectiveDate(raw: string, callDate: string): string | null {
+export function normEffectiveDate(raw: string, callDate: string): string | null {
   return resolveRelativeDate(raw, callDate);
 }
 
-function normDiscount(raw: string): string | null {
+export function normDiscount(raw: string): string | null {
   const s = lower(raw).replace(/_/g, " ");
   for (const v of DISCOUNT_VALUES) if (s === v.replace(/_/g, " ")) return v;
   if (/\b(pending|proof|needs? to (send|provide|show|submit)|will send|report card|transcript|once (we|she|he|they) send|verify|verification|certificate)\b/.test(s)) return "pending_proof";
@@ -257,7 +260,7 @@ function normDiscount(raw: string): string | null {
   return null;
 }
 
-function normBool(raw: string): string | null {
+export function normBool(raw: string): string | null {
   const s = lower(raw);
   if (/^(true|yes|y|needed|required|needs review|review needed)$/.test(s) || /\b(needs?|requires?|will go to|subject to) (an? )?(underwriting|review)\b/.test(s)) return "true";
   if (/^(false|no|n|not needed|none|not required)$/.test(s) || /\b(no|not|doesn'?t need|does not need|won'?t need)\b/.test(s)) return "false";
@@ -323,7 +326,7 @@ export function normalizeField(field: FieldId, raw: string | number | boolean | 
 }
 
 /** Human display of a normalized value (DESIGN §5.4.1 "Display" column). `raw` refines "as spoken" displays. */
-export function displayValue(field: FieldId, norm: string, policy: PolicyRecord, raw?: string | null): string {
+export function displayValue(field: FieldId, norm: string, policy: Pick<PolicyRecord, "vehicles">, raw?: string | null): string {
   switch (field) {
     case "driver_full_name": return titleCase(norm);
     case "driver_dob": return spokenDob(norm);
@@ -413,7 +416,7 @@ export function confirmPhrase(field: FieldId, value: string, pc: PhraseCtx): str
     case "incidents_3y":
       return value === "none"
         ? `${d} has had no tickets or accidents in the last three years`
-        : `${d} has had the following in the last three years: ${value}`;
+        : `${d} had ${value} in the last three years`; // v2.1: short enough for the 40-word greeting
     case "vehicle_assignment":
       return value === "all" ? `${d} will drive all your vehicles` : `${d} will mainly drive the ${vehicleLabelOf(pc.policy, value)}`;
     case "operator_type": return `${d} will be the ${value} driver of the ${pc.vehicleLabel ?? "car"}`;
@@ -425,7 +428,7 @@ export function confirmPhrase(field: FieldId, value: string, pc: PhraseCtx): str
   }
 }
 
-/** `askPhrase(field)` (§5.6 phrase table), completing "To finish up, I just need …". */
+/** `askPhrase(field)` (§5.6 phrase table), completing "I just need …" (v2.1; was "To finish up, I just need …"). */
 export function askPhrase(field: FieldId, pc: PhraseCtx): string {
   const { d } = pc;
   switch (field) {
@@ -433,10 +436,10 @@ export function askPhrase(field: FieldId, pc: PhraseCtx): string {
     case "driver_relation": return `how ${d} is related to you`;
     case "driver_dob": return `${d}'s date of birth`;
     case "license_state": return `which state issued ${d}'s license`;
-    case "license_status": return `whether ${d} has a learner's permit, a probationary license or a full license`;
+    case "license_status": return `whether ${d} has a permit, a probationary license or a full license`; // v2.1 (40-word greeting)
     case "incidents_3y": return `whether ${d} has had any tickets or accidents in the last three years`;
     case "vehicle_assignment": return `which car ${d} will mainly drive`;
-    case "operator_type": return `whether ${d} will drive the ${pc.vehicleLabel ?? "car"} every day or just occasionally`;
+    case "operator_type": return `whether ${d} will drive the ${pc.vehicleLabel ?? "car"} daily or just occasionally`; // v2.1
     case "garaging_zip": return "the ZIP code where the car is kept overnight";
     case "effective_date": return "the date you'd like this change to start";
     case "license_number": return `${d}'s license number`;

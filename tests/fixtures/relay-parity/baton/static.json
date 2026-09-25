@@ -1,0 +1,2423 @@
+{
+ "policies": {
+  "s01": {
+   "policyNumber": "NBM-4418207",
+   "carrier": "Northbeam Mutual",
+   "agencyName": "Harborview Insurance Agency",
+   "repFirstName": "Daniel",
+   "policyholder": {
+    "firstName": "Priya",
+    "lastName": "Raman"
+   },
+   "phoneOnFileLast4": "8207",
+   "address": {
+    "street": "1427 Belle Avenue",
+    "city": "Lakewood",
+    "state": "OH",
+    "zip": "44107"
+   },
+   "existingDrivers": [
+    {
+     "name": "Priya Raman",
+     "relation": "named_insured"
+    },
+    {
+     "name": "Arun Raman",
+     "relation": "spouse"
+    }
+   ],
+   "vehicles": [
+    {
+     "id": "veh1",
+     "year": 2021,
+     "make": "Honda",
+     "model": "Civic",
+     "label": "2021 Honda Civic"
+    },
+    {
+     "id": "veh2",
+     "year": 2018,
+     "make": "Toyota",
+     "model": "Highlander",
+     "label": "2018 Toyota Highlander"
+    }
+   ],
+   "currentMonthlyPremiumUsd": 96,
+   "callDate": "2026-09-25"
+  },
+  "s02": {
+   "policyNumber": "BSC-2290316",
+   "carrier": "Bluestem Casualty",
+   "agencyName": "Mesa Ridge Insurance Group",
+   "repFirstName": "Carmen",
+   "policyholder": {
+    "firstName": "Mark",
+    "lastName": "Delgado"
+   },
+   "phoneOnFileLast4": "0316",
+   "address": {
+    "street": "2240 East Quartz Street",
+    "city": "Mesa",
+    "state": "AZ",
+    "zip": "85213"
+   },
+   "existingDrivers": [
+    {
+     "name": "Mark Delgado",
+     "relation": "named_insured"
+    },
+    {
+     "name": "Elena Delgado",
+     "relation": "spouse"
+    }
+   ],
+   "vehicles": [
+    {
+     "id": "veh1",
+     "year": 2019,
+     "make": "Ford",
+     "model": "F-150",
+     "label": "2019 Ford F-150"
+    },
+    {
+     "id": "veh2",
+     "year": 2014,
+     "make": "Toyota",
+     "model": "Corolla",
+     "label": "2014 Toyota Corolla"
+    }
+   ],
+   "currentMonthlyPremiumUsd": 118,
+   "callDate": "2026-09-25"
+  },
+  "s03": {
+   "policyNumber": "SRI-7730158",
+   "carrier": "Summit Rock Insurance",
+   "agencyName": "Ironbridge Insurance Agency",
+   "repFirstName": "Marcus",
+   "policyholder": {
+    "firstName": "Janet",
+    "lastName": "Kowalski"
+   },
+   "phoneOnFileLast4": "0158",
+   "address": {
+    "street": "5816 Northumberland Street",
+    "city": "Pittsburgh",
+    "state": "PA",
+    "zip": "15217"
+   },
+   "existingDrivers": [
+    {
+     "name": "Janet Kowalski",
+     "relation": "named_insured"
+    },
+    {
+     "name": "Stan Kowalski",
+     "relation": "spouse"
+    }
+   ],
+   "vehicles": [
+    {
+     "id": "veh1",
+     "year": 2020,
+     "make": "Subaru",
+     "model": "Forester",
+     "label": "2020 Subaru Forester"
+    },
+    {
+     "id": "veh2",
+     "year": 2016,
+     "make": "Honda",
+     "model": "Accord",
+     "label": "2016 Honda Accord"
+    }
+   ],
+   "currentMonthlyPremiumUsd": 131,
+   "callDate": "2026-09-25"
+  },
+  "s04": {
+   "policyNumber": "NBM-5102846",
+   "carrier": "Northbeam Mutual",
+   "agencyName": "Magnolia Bend Insurance Agency",
+   "repFirstName": "Nicole",
+   "policyholder": {
+    "firstName": "Tyler",
+    "lastName": "Brooks"
+   },
+   "phoneOnFileLast4": "2846",
+   "address": {
+    "street": "1193 Rosedale Road NE",
+    "city": "Atlanta",
+    "state": "GA",
+    "zip": "30306"
+   },
+   "existingDrivers": [
+    {
+     "name": "Tyler Brooks",
+     "relation": "named_insured"
+    }
+   ],
+   "vehicles": [
+    {
+     "id": "veh1",
+     "year": 2022,
+     "make": "Toyota",
+     "model": "RAV4",
+     "label": "2022 Toyota RAV4"
+    },
+    {
+     "id": "veh2",
+     "year": 2020,
+     "make": "Hyundai",
+     "model": "Elantra",
+     "label": "2020 Hyundai Elantra"
+    }
+   ],
+   "currentMonthlyPremiumUsd": 152,
+   "callDate": "2026-09-25"
+  },
+  "s05": {
+   "policyNumber": "PCI-6081733",
+   "carrier": "Prairie Crest Insurance",
+   "agencyName": "Prairie Lantern Insurance Agency",
+   "repFirstName": "Kevin",
+   "policyholder": {
+    "firstName": "Greg",
+    "lastName": "Palmer"
+   },
+   "phoneOnFileLast4": "1733",
+   "address": {
+    "street": "2715 Brookdale Court",
+    "city": "Naperville",
+    "state": "IL",
+    "zip": "60540"
+   },
+   "existingDrivers": [
+    {
+     "name": "Greg Palmer",
+     "relation": "named_insured"
+    }
+   ],
+   "vehicles": [
+    {
+     "id": "veh1",
+     "year": 2019,
+     "make": "Chevrolet",
+     "model": "Silverado",
+     "label": "2019 Chevrolet Silverado"
+    },
+    {
+     "id": "veh2",
+     "year": 2012,
+     "make": "Toyota",
+     "model": "Camry",
+     "label": "2012 Toyota Camry"
+    }
+   ],
+   "currentMonthlyPremiumUsd": 133,
+   "callDate": "2026-09-25"
+  },
+  "s06": {
+   "policyNumber": "SRI-3349021",
+   "carrier": "Summit Rock Insurance",
+   "agencyName": "Blue Spruce Insurance Agency",
+   "repFirstName": "Sam",
+   "policyholder": {
+    "firstName": "Angela",
+    "lastName": "Morris"
+   },
+   "phoneOnFileLast4": "9021",
+   "address": {
+    "street": "812 Dahlia Street",
+    "city": "Denver",
+    "state": "CO",
+    "zip": "80220"
+   },
+   "existingDrivers": [
+    {
+     "name": "Angela Morris",
+     "relation": "named_insured"
+    },
+    {
+     "name": "Chris Morris",
+     "relation": "spouse"
+    }
+   ],
+   "vehicles": [
+    {
+     "id": "veh1",
+     "year": 2023,
+     "make": "Kia",
+     "model": "Telluride",
+     "label": "2023 Kia Telluride"
+    },
+    {
+     "id": "veh2",
+     "year": 2017,
+     "make": "Chevrolet",
+     "model": "Equinox",
+     "label": "2017 Chevrolet Equinox"
+    }
+   ],
+   "currentMonthlyPremiumUsd": 164,
+   "callDate": "2026-09-25"
+  },
+  "s07": {
+   "policyNumber": "BSC-8816402",
+   "carrier": "Bluestem Casualty",
+   "agencyName": "Kestrel Point Insurance Agency",
+   "repFirstName": "Jordan",
+   "policyholder": {
+    "firstName": "Laura",
+    "lastName": "Bennett"
+   },
+   "phoneOnFileLast4": "6402",
+   "address": {
+    "street": "2340 Devonshire Road",
+    "city": "Ann Arbor",
+    "state": "MI",
+    "zip": "48104"
+   },
+   "existingDrivers": [
+    {
+     "name": "Laura Bennett",
+     "relation": "named_insured"
+    },
+    {
+     "name": "Mark Bennett",
+     "relation": "spouse"
+    }
+   ],
+   "vehicles": [
+    {
+     "id": "veh1",
+     "year": 2021,
+     "make": "Volvo",
+     "model": "XC60",
+     "label": "2021 Volvo XC60"
+    },
+    {
+     "id": "veh2",
+     "year": 2016,
+     "make": "Ford",
+     "model": "Escape",
+     "label": "2016 Ford Escape"
+    }
+   ],
+   "currentMonthlyPremiumUsd": 102,
+   "callDate": "2026-09-25"
+  },
+  "s08": {
+   "policyNumber": "NBM-2267519",
+   "carrier": "Northbeam Mutual",
+   "agencyName": "Palmetto Key Insurance Agency",
+   "repFirstName": "Luis",
+   "policyholder": {
+    "firstName": "Denise",
+    "lastName": "Carter"
+   },
+   "phoneOnFileLast4": "7519",
+   "address": {
+    "street": "15209 Amberly Drive",
+    "city": "Tampa",
+    "state": "FL",
+    "zip": "33647"
+   },
+   "existingDrivers": [
+    {
+     "name": "Denise Carter",
+     "relation": "named_insured"
+    }
+   ],
+   "vehicles": [
+    {
+     "id": "veh1",
+     "year": 2022,
+     "make": "Toyota",
+     "model": "RAV4",
+     "label": "2022 Toyota RAV4"
+    },
+    {
+     "id": "veh2",
+     "year": 2015,
+     "make": "Nissan",
+     "model": "Altima",
+     "label": "2015 Nissan Altima"
+    }
+   ],
+   "currentMonthlyPremiumUsd": 147,
+   "callDate": "2026-09-25"
+  },
+  "s09": {
+   "policyNumber": "PCI-4470385",
+   "carrier": "Prairie Crest Insurance",
+   "agencyName": "Narrows Point Insurance",
+   "repFirstName": "Hannah",
+   "policyholder": {
+    "firstName": "Rachel",
+    "lastName": "Nguyen"
+   },
+   "phoneOnFileLast4": "0385",
+   "address": {
+    "street": "2614 North Alder Street",
+    "city": "Tacoma",
+    "state": "WA",
+    "zip": "98406"
+   },
+   "existingDrivers": [
+    {
+     "name": "Rachel Nguyen",
+     "relation": "named_insured"
+    },
+    {
+     "name": "Tuan Nguyen",
+     "relation": "spouse"
+    }
+   ],
+   "vehicles": [
+    {
+     "id": "veh1",
+     "year": 2018,
+     "make": "Subaru",
+     "model": "Outback",
+     "label": "2018 Subaru Outback"
+    },
+    {
+     "id": "veh2",
+     "year": 2020,
+     "make": "Honda",
+     "model": "Pilot",
+     "label": "2020 Honda Pilot"
+    }
+   ],
+   "currentMonthlyPremiumUsd": 134,
+   "callDate": "2026-09-25"
+  },
+  "s10": {
+   "policyNumber": "SRI-9054117",
+   "carrier": "Summit Rock Insurance",
+   "agencyName": "Cedar Loon Insurance Agency",
+   "repFirstName": "Grace",
+   "policyholder": {
+    "firstName": "Chris",
+    "lastName": "Morgan"
+   },
+   "phoneOnFileLast4": "4117",
+   "address": {
+    "street": "4821 Upton Avenue South",
+    "city": "Minneapolis",
+    "state": "MN",
+    "zip": "55410"
+   },
+   "existingDrivers": [
+    {
+     "name": "Chris Morgan",
+     "relation": "named_insured"
+    }
+   ],
+   "vehicles": [
+    {
+     "id": "veh1",
+     "year": 2019,
+     "make": "Jeep",
+     "model": "Cherokee",
+     "label": "2019 Jeep Cherokee"
+    },
+    {
+     "id": "veh2",
+     "year": 2020,
+     "make": "Tesla",
+     "model": "Model 3",
+     "label": "2020 Tesla Model 3"
+    }
+   ],
+   "currentMonthlyPremiumUsd": 146,
+   "callDate": "2026-09-25"
+  },
+  "s11": {
+   "policyNumber": "BSC-3108852",
+   "carrier": "Bluestem Casualty",
+   "agencyName": "Sycamore Row Insurance Agency",
+   "repFirstName": "Brian",
+   "policyholder": {
+    "firstName": "Fatima",
+    "lastName": "Hassan"
+   },
+   "phoneOnFileLast4": "8852",
+   "address": {
+    "street": "2216 Warfield Drive",
+    "city": "Nashville",
+    "state": "TN",
+    "zip": "37215"
+   },
+   "existingDrivers": [
+    {
+     "name": "Fatima Hassan",
+     "relation": "named_insured"
+    },
+    {
+     "name": "Yusuf Hassan",
+     "relation": "spouse"
+    }
+   ],
+   "vehicles": [
+    {
+     "id": "veh1",
+     "year": 2021,
+     "make": "Toyota",
+     "model": "Sienna",
+     "label": "2021 Toyota Sienna"
+    },
+    {
+     "id": "veh2",
+     "year": 2013,
+     "make": "Mazda",
+     "model": "Mazda3",
+     "label": "2013 Mazda Mazda3"
+    }
+   ],
+   "currentMonthlyPremiumUsd": 139,
+   "callDate": "2026-09-25"
+  },
+  "s12": {
+   "policyNumber": "PCI-1932674",
+   "carrier": "Prairie Crest Insurance",
+   "agencyName": "Owyhee Bench Insurance",
+   "repFirstName": "Tessa",
+   "policyholder": {
+    "firstName": "Kevin",
+    "lastName": "O'Brien"
+   },
+   "phoneOnFileLast4": "2674",
+   "address": {
+    "street": "1648 South Division Avenue",
+    "city": "Boise",
+    "state": "ID",
+    "zip": "83706"
+   },
+   "existingDrivers": [
+    {
+     "name": "Kevin O'Brien",
+     "relation": "named_insured"
+    },
+    {
+     "name": "Megan O'Brien",
+     "relation": "spouse"
+    }
+   ],
+   "vehicles": [
+    {
+     "id": "veh1",
+     "year": 2018,
+     "make": "Honda",
+     "model": "CR-V",
+     "label": "2018 Honda CR-V"
+    },
+    {
+     "id": "veh2",
+     "year": 2019,
+     "make": "Subaru",
+     "model": "Crosstrek",
+     "label": "2019 Subaru Crosstrek"
+    }
+   ],
+   "currentMonthlyPremiumUsd": 128,
+   "callDate": "2026-09-25"
+  },
+  "s13": {
+   "policyNumber": "SRI-5561290",
+   "carrier": "Summit Rock Insurance",
+   "agencyName": "Riverbend Loft Insurance Agency",
+   "repFirstName": "Andre",
+   "policyholder": {
+    "firstName": "Patricia",
+    "lastName": "Wells"
+   },
+   "phoneOnFileLast4": "1290",
+   "address": {
+    "street": "6320 Nottingham Avenue",
+    "city": "St. Louis",
+    "state": "MO",
+    "zip": "63109"
+   },
+   "existingDrivers": [
+    {
+     "name": "Patricia Wells",
+     "relation": "named_insured"
+    }
+   ],
+   "vehicles": [
+    {
+     "id": "veh1",
+     "year": 2021,
+     "make": "Ram",
+     "model": "1500",
+     "label": "2021 Ram 1500"
+    },
+    {
+     "id": "veh2",
+     "year": 2019,
+     "make": "Nissan",
+     "model": "Rogue",
+     "label": "2019 Nissan Rogue"
+    }
+   ],
+   "currentMonthlyPremiumUsd": 158,
+   "callDate": "2026-09-25"
+  },
+  "s14": {
+   "policyNumber": "NBM-7719304",
+   "carrier": "Northbeam Mutual",
+   "agencyName": "Sugar Creek Crossing Insurance",
+   "repFirstName": "Tom",
+   "policyholder": {
+    "firstName": "Rosa",
+    "lastName": "Martinez"
+   },
+   "phoneOnFileLast4": "9304",
+   "address": {
+    "street": "3916 Park Road",
+    "city": "Charlotte",
+    "state": "NC",
+    "zip": "28209"
+   },
+   "existingDrivers": [
+    {
+     "name": "Rosa Martinez",
+     "relation": "named_insured"
+    }
+   ],
+   "vehicles": [
+    {
+     "id": "veh1",
+     "year": 2019,
+     "make": "Honda",
+     "model": "Pilot",
+     "label": "2019 Honda Pilot"
+    },
+    {
+     "id": "veh2",
+     "year": 2015,
+     "make": "Toyota",
+     "model": "Corolla",
+     "label": "2015 Toyota Corolla"
+    }
+   ],
+   "currentMonthlyPremiumUsd": 127,
+   "callDate": "2026-09-25"
+  },
+  "s15": {
+   "policyNumber": "PCI-8240517",
+   "carrier": "Prairie Crest Insurance",
+   "agencyName": "Platte Bend Insurance Agency",
+   "repFirstName": "Rachel",
+   "policyholder": {
+    "firstName": "Mike",
+    "lastName": "Sullivan"
+   },
+   "phoneOnFileLast4": "0517",
+   "address": {
+    "street": "9204 Blondo Street",
+    "city": "Omaha",
+    "state": "NE",
+    "zip": "68114"
+   },
+   "existingDrivers": [
+    {
+     "name": "Mike Sullivan",
+     "relation": "named_insured"
+    },
+    {
+     "name": "Linh Sullivan",
+     "relation": "spouse"
+    }
+   ],
+   "vehicles": [
+    {
+     "id": "veh1",
+     "year": 2020,
+     "make": "Toyota",
+     "model": "Tacoma",
+     "label": "2020 Toyota Tacoma"
+    },
+    {
+     "id": "veh2",
+     "year": 2017,
+     "make": "Chevrolet",
+     "model": "Malibu",
+     "label": "2017 Chevrolet Malibu"
+    }
+   ],
+   "currentMonthlyPremiumUsd": 121,
+   "callDate": "2026-09-25"
+  },
+  "s16": {
+   "policyNumber": "BSC-4652018",
+   "carrier": "Bluestem Casualty",
+   "agencyName": "Fall Creek Commons Insurance",
+   "repFirstName": "Emily",
+   "policyholder": {
+    "firstName": "Nathan",
+    "lastName": "Price"
+   },
+   "phoneOnFileLast4": "2018",
+   "address": {
+    "street": "6134 North Guilford Avenue",
+    "city": "Indianapolis",
+    "state": "IN",
+    "zip": "46220"
+   },
+   "existingDrivers": [
+    {
+     "name": "Nathan Price",
+     "relation": "named_insured"
+    }
+   ],
+   "vehicles": [
+    {
+     "id": "veh1",
+     "year": 2020,
+     "make": "Honda",
+     "model": "Civic",
+     "label": "2020 Honda Civic"
+    }
+   ],
+   "currentMonthlyPremiumUsd": 104,
+   "callDate": "2026-09-25"
+  },
+  "s17": {
+   "policyNumber": "SRI-6627340",
+   "carrier": "Summit Rock Insurance",
+   "agencyName": "Capitol Oak Insurance Agency",
+   "repFirstName": "Matt",
+   "policyholder": {
+    "firstName": "Kavitha",
+    "lastName": "Iyer"
+   },
+   "phoneOnFileLast4": "7340",
+   "address": {
+    "street": "2745 Freeport Boulevard",
+    "city": "Sacramento",
+    "state": "CA",
+    "zip": "95818"
+   },
+   "existingDrivers": [
+    {
+     "name": "Kavitha Iyer",
+     "relation": "named_insured"
+    },
+    {
+     "name": "Suresh Iyer",
+     "relation": "spouse"
+    }
+   ],
+   "vehicles": [
+    {
+     "id": "veh1",
+     "year": 2016,
+     "make": "Toyota",
+     "model": "Prius",
+     "label": "2016 Toyota Prius"
+    },
+    {
+     "id": "veh2",
+     "year": 2022,
+     "make": "Honda",
+     "model": "Accord",
+     "label": "2022 Honda Accord"
+    }
+   ],
+   "currentMonthlyPremiumUsd": 133,
+   "callDate": "2026-09-25"
+  },
+  "s18": {
+   "policyNumber": "PCI-3395281",
+   "carrier": "Prairie Crest Insurance",
+   "agencyName": "Isthmus Bay Insurance Agency",
+   "repFirstName": "Julia",
+   "policyholder": {
+    "firstName": "David",
+    "lastName": "Kim"
+   },
+   "phoneOnFileLast4": "5281",
+   "address": {
+    "street": "418 Toepfer Avenue",
+    "city": "Madison",
+    "state": "WI",
+    "zip": "53711"
+   },
+   "existingDrivers": [
+    {
+     "name": "David Kim",
+     "relation": "named_insured"
+    },
+    {
+     "name": "Grace Kim",
+     "relation": "spouse"
+    }
+   ],
+   "vehicles": [
+    {
+     "id": "veh1",
+     "year": 2022,
+     "make": "Mazda",
+     "model": "CX-5",
+     "label": "2022 Mazda CX-5"
+    },
+    {
+     "id": "veh2",
+     "year": 2015,
+     "make": "Volkswagen",
+     "model": "Jetta",
+     "label": "2015 Volkswagen Jetta"
+    }
+   ],
+   "currentMonthlyPremiumUsd": 118,
+   "callDate": "2026-09-25"
+  },
+  "s19": {
+   "policyNumber": "NBM-3386041",
+   "carrier": "Northbeam Mutual",
+   "agencyName": "Raritan Bend Insurance Agency",
+   "repFirstName": "Ryan",
+   "policyholder": {
+    "firstName": "Sunita",
+    "lastName": "Agarwal"
+   },
+   "phoneOnFileLast4": "6041",
+   "address": {
+    "street": "114 Brookside Terrace",
+    "city": "Edison",
+    "state": "NJ",
+    "zip": "08820"
+   },
+   "existingDrivers": [
+    {
+     "name": "Sunita Agarwal",
+     "relation": "named_insured"
+    },
+    {
+     "name": "Vikas Agarwal",
+     "relation": "spouse"
+    }
+   ],
+   "vehicles": [
+    {
+     "id": "veh1",
+     "year": 2022,
+     "make": "Toyota",
+     "model": "RAV4",
+     "label": "2022 Toyota RAV4"
+    },
+    {
+     "id": "veh2",
+     "year": 2017,
+     "make": "Honda",
+     "model": "Accord",
+     "label": "2017 Honda Accord"
+    }
+   ],
+   "currentMonthlyPremiumUsd": 156,
+   "callDate": "2026-09-25"
+  },
+  "s20": {
+   "policyNumber": "BSC-5518026",
+   "carrier": "Bluestem Casualty",
+   "agencyName": "Brazos Point Insurance Agency",
+   "repFirstName": "Aman",
+   "policyholder": {
+    "firstName": "Rohan",
+    "lastName": "Mehta"
+   },
+   "phoneOnFileLast4": "8026",
+   "address": {
+    "street": "6224 Crooked Creek Drive",
+    "city": "Plano",
+    "state": "TX",
+    "zip": "75024"
+   },
+   "existingDrivers": [
+    {
+     "name": "Rohan Mehta",
+     "relation": "named_insured"
+    }
+   ],
+   "vehicles": [
+    {
+     "id": "veh1",
+     "year": 2023,
+     "make": "Kia",
+     "model": "Telluride",
+     "label": "2023 Kia Telluride"
+    },
+    {
+     "id": "veh2",
+     "year": 2019,
+     "make": "Honda",
+     "model": "Civic",
+     "label": "2019 Honda Civic"
+    }
+   ],
+   "currentMonthlyPremiumUsd": 148,
+   "callDate": "2026-09-25"
+  },
+  "s21": {
+   "policyNumber": "NBM-9901473",
+   "carrier": "Northbeam Mutual",
+   "agencyName": "Stony Point Mill Insurance",
+   "repFirstName": "Diane",
+   "policyholder": {
+    "firstName": "Darnell",
+    "lastName": "Robinson"
+   },
+   "phoneOnFileLast4": "1473",
+   "address": {
+    "street": "1408 Westover Hills Boulevard",
+    "city": "Richmond",
+    "state": "VA",
+    "zip": "23225"
+   },
+   "existingDrivers": [
+    {
+     "name": "Darnell Robinson",
+     "relation": "named_insured"
+    },
+    {
+     "name": "Keisha Robinson",
+     "relation": "spouse"
+    }
+   ],
+   "vehicles": [
+    {
+     "id": "veh1",
+     "year": 2021,
+     "make": "Toyota",
+     "model": "Tacoma",
+     "label": "2021 Toyota Tacoma"
+    },
+    {
+     "id": "veh2",
+     "year": 2014,
+     "make": "Ford",
+     "model": "Fusion",
+     "label": "2014 Ford Fusion"
+    }
+   ],
+   "currentMonthlyPremiumUsd": 142,
+   "callDate": "2026-09-25"
+  },
+  "s22": {
+   "policyNumber": "NBM-6045128",
+   "carrier": "Northbeam Mutual",
+   "agencyName": "Pine Bush Crossing Insurance",
+   "repFirstName": "Chris",
+   "policyholder": {
+    "firstName": "Allison",
+    "lastName": "Wright"
+   },
+   "phoneOnFileLast4": "5128",
+   "address": {
+    "street": "212 Winthrop Avenue",
+    "city": "Albany",
+    "state": "NY",
+    "zip": "12203"
+   },
+   "existingDrivers": [
+    {
+     "name": "Allison Wright",
+     "relation": "named_insured"
+    },
+    {
+     "name": "Ben Wright",
+     "relation": "spouse"
+    }
+   ],
+   "vehicles": [
+    {
+     "id": "veh1",
+     "year": 2023,
+     "make": "Honda",
+     "model": "Odyssey",
+     "label": "2023 Honda Odyssey"
+    },
+    {
+     "id": "veh2",
+     "year": 2020,
+     "make": "Subaru",
+     "model": "Legacy",
+     "label": "2020 Subaru Legacy"
+    }
+   ],
+   "currentMonthlyPremiumUsd": 161,
+   "callDate": "2026-09-25"
+  }
+ },
+ "ratings": {
+  "s01": {
+   "newMonthlyUsd": 142,
+   "dueTodayUsd": null
+  },
+  "s02": {
+   "newMonthlyUsd": 171,
+   "dueTodayUsd": null
+  },
+  "s03": {
+   "newMonthlyUsd": 188,
+   "dueTodayUsd": 18.4
+  },
+  "s04": {
+   "newMonthlyUsd": 149,
+   "dueTodayUsd": null
+  },
+  "s05": {
+   "newMonthlyUsd": 204,
+   "dueTodayUsd": 34.1
+  },
+  "s06": {
+   "newMonthlyUsd": 219,
+   "dueTodayUsd": null
+  },
+  "s07": {
+   "newMonthlyUsd": 121,
+   "dueTodayUsd": null
+  },
+  "s08": {
+   "newMonthlyUsd": 171,
+   "dueTodayUsd": null
+  },
+  "s09": {
+   "newMonthlyUsd": 134,
+   "dueTodayUsd": null
+  },
+  "s10": {
+   "newMonthlyUsd": 187,
+   "dueTodayUsd": null
+  },
+  "s11": {
+   "newMonthlyUsd": 176,
+   "dueTodayUsd": null
+  },
+  "s12": {
+   "newMonthlyUsd": 183,
+   "dueTodayUsd": 21.7
+  },
+  "s13": {
+   "newMonthlyUsd": 246,
+   "dueTodayUsd": null
+  },
+  "s14": {
+   "newMonthlyUsd": 158,
+   "dueTodayUsd": 27.85
+  },
+  "s15": {
+   "newMonthlyUsd": 167,
+   "dueTodayUsd": null
+  },
+  "s16": {
+   "newMonthlyUsd": 121,
+   "dueTodayUsd": null
+  },
+  "s17": {
+   "newMonthlyUsd": 238,
+   "dueTodayUsd": 29.6
+  },
+  "s18": {
+   "newMonthlyUsd": 149,
+   "dueTodayUsd": null
+  },
+  "s19": {
+   "newMonthlyUsd": 212,
+   "dueTodayUsd": null
+  },
+  "s20": {
+   "newMonthlyUsd": 205,
+   "dueTodayUsd": null
+  },
+  "s21": {
+   "newMonthlyUsd": 193,
+   "dueTodayUsd": null
+  },
+  "s22": {
+   "newMonthlyUsd": 186,
+   "dueTodayUsd": null
+  }
+ },
+ "listeningKeyterms": {
+  "s01": [
+   "Priya",
+   "Raman",
+   "Priya Raman",
+   "Arun Raman",
+   "Harborview Insurance Agency",
+   "Northbeam Mutual",
+   "Daniel",
+   "Honda",
+   "Civic",
+   "Honda Civic",
+   "Toyota",
+   "Highlander",
+   "Toyota Highlander",
+   "1427 Belle Avenue",
+   "Lakewood",
+   "learner's permit",
+   "probationary license",
+   "endorsement",
+   "garaging",
+   "premium",
+   "liability limits",
+   "good student discount",
+   "driver's ed"
+  ],
+  "s02": [
+   "Mark",
+   "Delgado",
+   "Mark Delgado",
+   "Elena Delgado",
+   "Mesa Ridge Insurance Group",
+   "Bluestem Casualty",
+   "Carmen",
+   "Ford",
+   "F-150",
+   "Ford F-150",
+   "Toyota",
+   "Corolla",
+   "Toyota Corolla",
+   "2240 East Quartz Street",
+   "Mesa",
+   "learner's permit",
+   "probationary license",
+   "endorsement",
+   "garaging",
+   "premium",
+   "liability limits",
+   "good student discount",
+   "driver's ed"
+  ],
+  "s03": [
+   "Janet",
+   "Kowalski",
+   "Janet Kowalski",
+   "Stan Kowalski",
+   "Ironbridge Insurance Agency",
+   "Summit Rock Insurance",
+   "Marcus",
+   "Subaru",
+   "Forester",
+   "Subaru Forester",
+   "Honda",
+   "Accord",
+   "Honda Accord",
+   "5816 Northumberland Street",
+   "Pittsburgh",
+   "learner's permit",
+   "probationary license",
+   "endorsement",
+   "garaging",
+   "premium",
+   "liability limits",
+   "good student discount",
+   "driver's ed"
+  ],
+  "s04": [
+   "Tyler",
+   "Brooks",
+   "Tyler Brooks",
+   "Magnolia Bend Insurance Agency",
+   "Northbeam Mutual",
+   "Nicole",
+   "Toyota",
+   "RAV4",
+   "Toyota RAV4",
+   "Hyundai",
+   "Elantra",
+   "Hyundai Elantra",
+   "1193 Rosedale Road NE",
+   "Atlanta",
+   "learner's permit",
+   "probationary license",
+   "endorsement",
+   "garaging",
+   "premium",
+   "liability limits",
+   "good student discount",
+   "driver's ed"
+  ],
+  "s05": [
+   "Greg",
+   "Palmer",
+   "Greg Palmer",
+   "Prairie Lantern Insurance Agency",
+   "Prairie Crest Insurance",
+   "Kevin",
+   "Chevrolet",
+   "Silverado",
+   "Chevrolet Silverado",
+   "Toyota",
+   "Camry",
+   "Toyota Camry",
+   "2715 Brookdale Court",
+   "Naperville",
+   "learner's permit",
+   "probationary license",
+   "endorsement",
+   "garaging",
+   "premium",
+   "liability limits",
+   "good student discount",
+   "driver's ed"
+  ],
+  "s06": [
+   "Angela",
+   "Morris",
+   "Angela Morris",
+   "Chris Morris",
+   "Blue Spruce Insurance Agency",
+   "Summit Rock Insurance",
+   "Sam",
+   "Kia",
+   "Telluride",
+   "Kia Telluride",
+   "Chevrolet",
+   "Equinox",
+   "Chevrolet Equinox",
+   "812 Dahlia Street",
+   "Denver",
+   "learner's permit",
+   "probationary license",
+   "endorsement",
+   "garaging",
+   "premium",
+   "liability limits",
+   "good student discount",
+   "driver's ed"
+  ],
+  "s07": [
+   "Laura",
+   "Bennett",
+   "Laura Bennett",
+   "Mark Bennett",
+   "Kestrel Point Insurance Agency",
+   "Bluestem Casualty",
+   "Jordan",
+   "Volvo",
+   "XC60",
+   "Volvo XC60",
+   "Ford",
+   "Escape",
+   "Ford Escape",
+   "2340 Devonshire Road",
+   "Ann Arbor",
+   "learner's permit",
+   "probationary license",
+   "endorsement",
+   "garaging",
+   "premium",
+   "liability limits",
+   "good student discount",
+   "driver's ed"
+  ],
+  "s08": [
+   "Denise",
+   "Carter",
+   "Denise Carter",
+   "Palmetto Key Insurance Agency",
+   "Northbeam Mutual",
+   "Luis",
+   "Toyota",
+   "RAV4",
+   "Toyota RAV4",
+   "Nissan",
+   "Altima",
+   "Nissan Altima",
+   "15209 Amberly Drive",
+   "Tampa",
+   "learner's permit",
+   "probationary license",
+   "endorsement",
+   "garaging",
+   "premium",
+   "liability limits",
+   "good student discount",
+   "driver's ed"
+  ],
+  "s09": [
+   "Rachel",
+   "Nguyen",
+   "Rachel Nguyen",
+   "Tuan Nguyen",
+   "Narrows Point Insurance",
+   "Prairie Crest Insurance",
+   "Hannah",
+   "Subaru",
+   "Outback",
+   "Subaru Outback",
+   "Honda",
+   "Pilot",
+   "Honda Pilot",
+   "2614 North Alder Street",
+   "Tacoma",
+   "learner's permit",
+   "probationary license",
+   "endorsement",
+   "garaging",
+   "premium",
+   "liability limits",
+   "good student discount",
+   "driver's ed"
+  ],
+  "s10": [
+   "Chris",
+   "Morgan",
+   "Chris Morgan",
+   "Cedar Loon Insurance Agency",
+   "Summit Rock Insurance",
+   "Grace",
+   "Jeep",
+   "Cherokee",
+   "Jeep Cherokee",
+   "Tesla",
+   "Model 3",
+   "Tesla Model 3",
+   "4821 Upton Avenue South",
+   "Minneapolis",
+   "learner's permit",
+   "probationary license",
+   "endorsement",
+   "garaging",
+   "premium",
+   "liability limits",
+   "good student discount",
+   "driver's ed"
+  ],
+  "s11": [
+   "Fatima",
+   "Hassan",
+   "Fatima Hassan",
+   "Yusuf Hassan",
+   "Sycamore Row Insurance Agency",
+   "Bluestem Casualty",
+   "Brian",
+   "Toyota",
+   "Sienna",
+   "Toyota Sienna",
+   "Mazda",
+   "Mazda3",
+   "Mazda Mazda3",
+   "2216 Warfield Drive",
+   "Nashville",
+   "learner's permit",
+   "probationary license",
+   "endorsement",
+   "garaging",
+   "premium",
+   "liability limits",
+   "good student discount",
+   "driver's ed"
+  ],
+  "s12": [
+   "Kevin",
+   "O'Brien",
+   "Kevin O'Brien",
+   "Megan O'Brien",
+   "Owyhee Bench Insurance",
+   "Prairie Crest Insurance",
+   "Tessa",
+   "Honda",
+   "CR-V",
+   "Honda CR-V",
+   "Subaru",
+   "Crosstrek",
+   "Subaru Crosstrek",
+   "1648 South Division Avenue",
+   "Boise",
+   "learner's permit",
+   "probationary license",
+   "endorsement",
+   "garaging",
+   "premium",
+   "liability limits",
+   "good student discount",
+   "driver's ed"
+  ],
+  "s13": [
+   "Patricia",
+   "Wells",
+   "Patricia Wells",
+   "Riverbend Loft Insurance Agency",
+   "Summit Rock Insurance",
+   "Andre",
+   "Ram",
+   "1500",
+   "Ram 1500",
+   "Nissan",
+   "Rogue",
+   "Nissan Rogue",
+   "6320 Nottingham Avenue",
+   "St. Louis",
+   "learner's permit",
+   "probationary license",
+   "endorsement",
+   "garaging",
+   "premium",
+   "liability limits",
+   "good student discount",
+   "driver's ed"
+  ],
+  "s14": [
+   "Rosa",
+   "Martinez",
+   "Rosa Martinez",
+   "Sugar Creek Crossing Insurance",
+   "Northbeam Mutual",
+   "Tom",
+   "Honda",
+   "Pilot",
+   "Honda Pilot",
+   "Toyota",
+   "Corolla",
+   "Toyota Corolla",
+   "3916 Park Road",
+   "Charlotte",
+   "learner's permit",
+   "probationary license",
+   "endorsement",
+   "garaging",
+   "premium",
+   "liability limits",
+   "good student discount",
+   "driver's ed"
+  ],
+  "s15": [
+   "Mike",
+   "Sullivan",
+   "Mike Sullivan",
+   "Linh Sullivan",
+   "Platte Bend Insurance Agency",
+   "Prairie Crest Insurance",
+   "Rachel",
+   "Toyota",
+   "Tacoma",
+   "Toyota Tacoma",
+   "Chevrolet",
+   "Malibu",
+   "Chevrolet Malibu",
+   "9204 Blondo Street",
+   "Omaha",
+   "learner's permit",
+   "probationary license",
+   "endorsement",
+   "garaging",
+   "premium",
+   "liability limits",
+   "good student discount",
+   "driver's ed"
+  ],
+  "s16": [
+   "Nathan",
+   "Price",
+   "Nathan Price",
+   "Fall Creek Commons Insurance",
+   "Bluestem Casualty",
+   "Emily",
+   "Honda",
+   "Civic",
+   "Honda Civic",
+   "6134 North Guilford Avenue",
+   "Indianapolis",
+   "learner's permit",
+   "probationary license",
+   "endorsement",
+   "garaging",
+   "premium",
+   "liability limits",
+   "good student discount",
+   "driver's ed"
+  ],
+  "s17": [
+   "Kavitha",
+   "Iyer",
+   "Kavitha Iyer",
+   "Suresh Iyer",
+   "Capitol Oak Insurance Agency",
+   "Summit Rock Insurance",
+   "Matt",
+   "Toyota",
+   "Prius",
+   "Toyota Prius",
+   "Honda",
+   "Accord",
+   "Honda Accord",
+   "2745 Freeport Boulevard",
+   "Sacramento",
+   "learner's permit",
+   "probationary license",
+   "endorsement",
+   "garaging",
+   "premium",
+   "liability limits",
+   "good student discount",
+   "driver's ed"
+  ],
+  "s18": [
+   "David",
+   "Kim",
+   "David Kim",
+   "Grace Kim",
+   "Isthmus Bay Insurance Agency",
+   "Prairie Crest Insurance",
+   "Julia",
+   "Mazda",
+   "CX-5",
+   "Mazda CX-5",
+   "Volkswagen",
+   "Jetta",
+   "Volkswagen Jetta",
+   "418 Toepfer Avenue",
+   "Madison",
+   "learner's permit",
+   "probationary license",
+   "endorsement",
+   "garaging",
+   "premium",
+   "liability limits",
+   "good student discount",
+   "driver's ed"
+  ],
+  "s19": [
+   "Sunita",
+   "Agarwal",
+   "Sunita Agarwal",
+   "Vikas Agarwal",
+   "Raritan Bend Insurance Agency",
+   "Northbeam Mutual",
+   "Ryan",
+   "Toyota",
+   "RAV4",
+   "Toyota RAV4",
+   "Honda",
+   "Accord",
+   "Honda Accord",
+   "114 Brookside Terrace",
+   "Edison",
+   "learner's permit",
+   "probationary license",
+   "endorsement",
+   "garaging",
+   "premium",
+   "liability limits",
+   "good student discount",
+   "driver's ed"
+  ],
+  "s20": [
+   "Rohan",
+   "Mehta",
+   "Rohan Mehta",
+   "Brazos Point Insurance Agency",
+   "Bluestem Casualty",
+   "Aman",
+   "Kia",
+   "Telluride",
+   "Kia Telluride",
+   "Honda",
+   "Civic",
+   "Honda Civic",
+   "6224 Crooked Creek Drive",
+   "Plano",
+   "learner's permit",
+   "probationary license",
+   "endorsement",
+   "garaging",
+   "premium",
+   "liability limits",
+   "good student discount",
+   "driver's ed"
+  ],
+  "s21": [
+   "Darnell",
+   "Robinson",
+   "Darnell Robinson",
+   "Keisha Robinson",
+   "Stony Point Mill Insurance",
+   "Northbeam Mutual",
+   "Diane",
+   "Toyota",
+   "Tacoma",
+   "Toyota Tacoma",
+   "Ford",
+   "Fusion",
+   "Ford Fusion",
+   "1408 Westover Hills Boulevard",
+   "Richmond",
+   "learner's permit",
+   "probationary license",
+   "endorsement",
+   "garaging",
+   "premium",
+   "liability limits",
+   "good student discount",
+   "driver's ed"
+  ],
+  "s22": [
+   "Allison",
+   "Wright",
+   "Allison Wright",
+   "Ben Wright",
+   "Pine Bush Crossing Insurance",
+   "Northbeam Mutual",
+   "Chris",
+   "Honda",
+   "Odyssey",
+   "Honda Odyssey",
+   "Subaru",
+   "Legacy",
+   "Subaru Legacy",
+   "212 Winthrop Avenue",
+   "Albany",
+   "learner's permit",
+   "probationary license",
+   "endorsement",
+   "garaging",
+   "premium",
+   "liability limits",
+   "good student discount",
+   "driver's ed"
+  ]
+ },
+ "tools": {
+  "confirm": [
+   {
+    "type": "function",
+    "name": "confirm_effective_date",
+    "execution_mode": "interactive",
+    "timeout_seconds": 10,
+    "description": "Record the date the customer confirmed or chose for this change to take effect. Call only after the customer says the date or clearly confirms it.",
+    "parameters": {
+     "type": "object",
+     "required": [
+      "date",
+      "customer_words"
+     ],
+     "properties": {
+      "date": {
+       "type": "string",
+       "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+       "description": "YYYY-MM-DD",
+       "examples": [
+        "2026-10-02"
+       ]
+      },
+      "customer_words": {
+       "type": "string",
+       "description": "The customer's exact words"
+      }
+     }
+    }
+   },
+   {
+    "type": "function",
+    "name": "update_case_field",
+    "execution_mode": "interactive",
+    "timeout_seconds": 10,
+    "description": "Record a field value the customer just confirmed, corrected or newly provided.",
+    "parameters": {
+     "type": "object",
+     "required": [
+      "field",
+      "value",
+      "reason"
+     ],
+     "properties": {
+      "field": {
+       "type": "string",
+       "enum": [
+        "driver_full_name",
+        "driver_dob",
+        "driver_relation",
+        "license_state",
+        "license_status",
+        "license_number",
+        "incidents_3y",
+        "vehicle_assignment",
+        "operator_type",
+        "garaging_zip"
+       ]
+      },
+      "value": {
+       "type": "string",
+       "description": "As spoken; date of birth as YYYY-MM-DD; state as 2 letters; ZIP as 5 digits; vehicle as year make model"
+      },
+      "reason": {
+       "type": "string",
+       "enum": [
+        "customer_confirmed",
+        "customer_corrected",
+        "newly_provided"
+       ]
+      }
+     }
+    }
+   },
+   {
+    "type": "function",
+    "name": "hand_back_to_rep",
+    "execution_mode": "interactive",
+    "timeout_seconds": 10,
+    "description": "Return the call to the human representative. After calling it, say one short sentence that the rep is coming back.",
+    "parameters": {
+     "type": "object",
+     "required": [
+      "reason",
+      "summary"
+     ],
+     "properties": {
+      "reason": {
+       "type": "string",
+       "enum": [
+        "advice_requested",
+        "customer_request",
+        "conflict",
+        "customer_declined",
+        "out_of_scope",
+        "payment_problem",
+        "other"
+       ]
+      },
+      "summary": {
+       "type": "string",
+       "description": "One sentence for the rep"
+      }
+     }
+    }
+   }
+  ],
+  "disclose": [
+   {
+    "type": "function",
+    "name": "get_disclosure",
+    "execution_mode": "interactive",
+    "timeout_seconds": 10,
+    "description": "Get disclosure text that you must read to the customer word for word.",
+    "parameters": {
+     "type": "object",
+     "required": [
+      "kind"
+     ],
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "premium_change",
+        "esign_consent"
+       ]
+      }
+     }
+    }
+   },
+   {
+    "type": "function",
+    "name": "confirm_effective_date",
+    "execution_mode": "interactive",
+    "timeout_seconds": 10,
+    "description": "Record the date the customer confirmed or chose for this change to take effect. Call only after the customer says the date or clearly confirms it.",
+    "parameters": {
+     "type": "object",
+     "required": [
+      "date",
+      "customer_words"
+     ],
+     "properties": {
+      "date": {
+       "type": "string",
+       "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+       "description": "YYYY-MM-DD",
+       "examples": [
+        "2026-10-02"
+       ]
+      },
+      "customer_words": {
+       "type": "string",
+       "description": "The customer's exact words"
+      }
+     }
+    }
+   },
+   {
+    "type": "function",
+    "name": "update_case_field",
+    "execution_mode": "interactive",
+    "timeout_seconds": 10,
+    "description": "Record a field value the customer just confirmed, corrected or newly provided.",
+    "parameters": {
+     "type": "object",
+     "required": [
+      "field",
+      "value",
+      "reason"
+     ],
+     "properties": {
+      "field": {
+       "type": "string",
+       "enum": [
+        "driver_full_name",
+        "driver_dob",
+        "driver_relation",
+        "license_state",
+        "license_status",
+        "license_number",
+        "incidents_3y",
+        "vehicle_assignment",
+        "operator_type",
+        "garaging_zip"
+       ]
+      },
+      "value": {
+       "type": "string",
+       "description": "As spoken; date of birth as YYYY-MM-DD; state as 2 letters; ZIP as 5 digits; vehicle as year make model"
+      },
+      "reason": {
+       "type": "string",
+       "enum": [
+        "customer_confirmed",
+        "customer_corrected",
+        "newly_provided"
+       ]
+      }
+     }
+    }
+   },
+   {
+    "type": "function",
+    "name": "hand_back_to_rep",
+    "execution_mode": "interactive",
+    "timeout_seconds": 10,
+    "description": "Return the call to the human representative. After calling it, say one short sentence that the rep is coming back.",
+    "parameters": {
+     "type": "object",
+     "required": [
+      "reason",
+      "summary"
+     ],
+     "properties": {
+      "reason": {
+       "type": "string",
+       "enum": [
+        "advice_requested",
+        "customer_request",
+        "conflict",
+        "customer_declined",
+        "out_of_scope",
+        "payment_problem",
+        "other"
+       ]
+      },
+      "summary": {
+       "type": "string",
+       "description": "One sentence for the rep"
+      }
+     }
+    }
+   }
+  ],
+  "pay": [
+   {
+    "type": "function",
+    "name": "send_esign_and_pay_link",
+    "execution_mode": "interactive",
+    "timeout_seconds": 10,
+    "description": "Text the customer a secure link to e-sign the change and pay the amount due today. Only after the customer agreed to the premium and to receiving the text. Returns right after the text is sent; the system tells you when the payment finishes.",
+    "parameters": {
+     "type": "object",
+     "required": [
+      "customer_agreed_to_text",
+      "paper_copy_requested",
+      "customer_words"
+     ],
+     "properties": {
+      "customer_agreed_to_text": {
+       "type": "boolean"
+      },
+      "paper_copy_requested": {
+       "type": "boolean"
+      },
+      "customer_words": {
+       "type": "string",
+       "description": "The customer's exact words agreeing"
+      }
+     }
+    }
+   },
+   {
+    "type": "function",
+    "name": "get_disclosure",
+    "execution_mode": "interactive",
+    "timeout_seconds": 10,
+    "description": "Get disclosure text that you must read to the customer word for word.",
+    "parameters": {
+     "type": "object",
+     "required": [
+      "kind"
+     ],
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "premium_change",
+        "esign_consent"
+       ]
+      }
+     }
+    }
+   },
+   {
+    "type": "function",
+    "name": "update_case_field",
+    "execution_mode": "interactive",
+    "timeout_seconds": 10,
+    "description": "Record a field value the customer just confirmed, corrected or newly provided.",
+    "parameters": {
+     "type": "object",
+     "required": [
+      "field",
+      "value",
+      "reason"
+     ],
+     "properties": {
+      "field": {
+       "type": "string",
+       "enum": [
+        "driver_full_name",
+        "driver_dob",
+        "driver_relation",
+        "license_state",
+        "license_status",
+        "license_number",
+        "incidents_3y",
+        "vehicle_assignment",
+        "operator_type",
+        "garaging_zip"
+       ]
+      },
+      "value": {
+       "type": "string",
+       "description": "As spoken; date of birth as YYYY-MM-DD; state as 2 letters; ZIP as 5 digits; vehicle as year make model"
+      },
+      "reason": {
+       "type": "string",
+       "enum": [
+        "customer_confirmed",
+        "customer_corrected",
+        "newly_provided"
+       ]
+      }
+     }
+    }
+   },
+   {
+    "type": "function",
+    "name": "hand_back_to_rep",
+    "execution_mode": "interactive",
+    "timeout_seconds": 10,
+    "description": "Return the call to the human representative. After calling it, say one short sentence that the rep is coming back.",
+    "parameters": {
+     "type": "object",
+     "required": [
+      "reason",
+      "summary"
+     ],
+     "properties": {
+      "reason": {
+       "type": "string",
+       "enum": [
+        "advice_requested",
+        "customer_request",
+        "conflict",
+        "customer_declined",
+        "out_of_scope",
+        "payment_problem",
+        "other"
+       ]
+      },
+      "summary": {
+       "type": "string",
+       "description": "One sentence for the rep"
+      }
+     }
+    }
+   }
+  ],
+  "close": [
+   {
+    "type": "function",
+    "name": "send_confirmation",
+    "execution_mode": "interactive",
+    "timeout_seconds": 10,
+    "description": "Finalize the change and text a confirmation. Only after payment is confirmed.",
+    "parameters": {
+     "type": "object",
+     "required": [],
+     "properties": {}
+    }
+   },
+   {
+    "type": "function",
+    "name": "update_case_field",
+    "execution_mode": "interactive",
+    "timeout_seconds": 10,
+    "description": "Record a field value the customer just confirmed, corrected or newly provided.",
+    "parameters": {
+     "type": "object",
+     "required": [
+      "field",
+      "value",
+      "reason"
+     ],
+     "properties": {
+      "field": {
+       "type": "string",
+       "enum": [
+        "driver_full_name",
+        "driver_dob",
+        "driver_relation",
+        "license_state",
+        "license_status",
+        "license_number",
+        "incidents_3y",
+        "vehicle_assignment",
+        "operator_type",
+        "garaging_zip"
+       ]
+      },
+      "value": {
+       "type": "string",
+       "description": "As spoken; date of birth as YYYY-MM-DD; state as 2 letters; ZIP as 5 digits; vehicle as year make model"
+      },
+      "reason": {
+       "type": "string",
+       "enum": [
+        "customer_confirmed",
+        "customer_corrected",
+        "newly_provided"
+       ]
+      }
+     }
+    }
+   },
+   {
+    "type": "function",
+    "name": "hand_back_to_rep",
+    "execution_mode": "interactive",
+    "timeout_seconds": 10,
+    "description": "Return the call to the human representative. After calling it, say one short sentence that the rep is coming back.",
+    "parameters": {
+     "type": "object",
+     "required": [
+      "reason",
+      "summary"
+     ],
+     "properties": {
+      "reason": {
+       "type": "string",
+       "enum": [
+        "advice_requested",
+        "customer_request",
+        "conflict",
+        "customer_declined",
+        "out_of_scope",
+        "payment_problem",
+        "other"
+       ]
+      },
+      "summary": {
+       "type": "string",
+       "description": "One sentence for the rep"
+      }
+     }
+    }
+   }
+  ]
+ },
+ "extractor": {
+  "prompt": "You extract facts for an insurance policy-change case from a phone call between an agency REP and a policyholder CUSTOMER.\nIntent: add a driver to a personal auto policy. You see the current case, recent turns, and one or more NEW TURNS.\nEmit events ONLY for what the NEW TURNS say. Never repeat facts from earlier turns unless a NEW TURN restates, reads back,\nconfirms, corrects or denies them. Never invent values. If nothing relevant is said, return {\"events\": [], \"no_facts\": true}.\n\nFields (value formats):\n- driver_full_name: the new driver's name as spoken (\"Maya\", \"Maya Raman\").\n- driver_dob: YYYY-MM-DD.            - driver_age: integer years (\"17\").\n- driver_relation: one of spouse, domestic_partner, child, stepchild, parent, sibling, other_relative,\n  non_relative_resident, non_relative_nonresident.\n- license_state: 2-letter US state code (\"OH\").   - license_number: as spoken, digits/letters only.\n- license_status: one of learner_permit, provisional (probationary), full.\n- incidents_3y: \"none\", or a short description of tickets/accidents/claims in the last 3 years.\n- vehicle_assignment: the policy vehicle the new driver will mainly drive, as its id from POLICY VEHICLES (\"veh1\").\n- operator_type: primary or occasional (for that vehicle).\n- garaging_zip: 5-digit ZIP where that vehicle is kept overnight.\n- effective_date: YYYY-MM-DD. Resolve relative dates (\"tomorrow\", \"next Friday\") against CALL DATE.\n- good_student_discount, driver_training_discount, distant_student_discount, mature_driver_discount:\n  eligible, not_eligible or pending_proof.\n- coverage_change: short text of what the customer decided about coverage (\"keep current limits\").\n- underwriting_review: \"true\" or \"false\".\n- premium_new_monthly_usd, premium_change_monthly_usd, amount_due_today_usd: dollars with cents (\"142.00\", \"-12.50\").\n  Only the REP can state these.\nEvent kinds:\n- stated: the speaker gives a value, or proposes one in a question (\"Is that the Civic?\").\n- readback: the speaker repeats a value the OTHER party gave, to check it.\n- ack: the speaker affirms the other party's latest statement/readback (\"yes\", \"that's right\", \"correct\"). Set\n  acknowledges_turn_id to that turn; value = the value being affirmed (or null if unclear).\n- corrected: the speaker replaces an earlier value with a new one.\n- denied: the speaker says an earlier value is wrong without giving a new one (value null).\n- question: the speaker asks for a field without proposing a value (value null).\nquote: the shortest exact span of the NEW TURN (verbatim, same casing) that carries the event.\nturn_id: the id of the NEW TURN the event comes from.",
+  "format": {
+   "name": "add_driver_patch",
+   "strict": true,
+   "schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+     "events",
+     "no_facts"
+    ],
+    "properties": {
+     "no_facts": {
+      "type": "boolean"
+     },
+     "events": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "additionalProperties": false,
+       "required": [
+        "turn_id",
+        "field",
+        "kind",
+        "value",
+        "quote",
+        "acknowledges_turn_id",
+        "confidence"
+       ],
+       "properties": {
+        "turn_id": {
+         "type": "string"
+        },
+        "field": {
+         "type": "string",
+         "enum": [
+          "driver_full_name",
+          "driver_dob",
+          "driver_age",
+          "driver_relation",
+          "license_state",
+          "license_status",
+          "license_number",
+          "incidents_3y",
+          "vehicle_assignment",
+          "operator_type",
+          "garaging_zip",
+          "effective_date",
+          "good_student_discount",
+          "driver_training_discount",
+          "distant_student_discount",
+          "mature_driver_discount",
+          "coverage_change",
+          "underwriting_review",
+          "premium_new_monthly_usd",
+          "premium_change_monthly_usd",
+          "amount_due_today_usd"
+         ]
+        },
+        "kind": {
+         "type": "string",
+         "enum": [
+          "stated",
+          "readback",
+          "ack",
+          "corrected",
+          "denied",
+          "question"
+         ]
+        },
+        "value": {
+         "type": [
+          "string",
+          "null"
+         ]
+        },
+        "quote": {
+         "type": "string"
+        },
+        "acknowledges_turn_id": {
+         "type": [
+          "string",
+          "null"
+         ]
+        },
+        "confidence": {
+         "type": "string",
+         "enum": [
+          "high",
+          "medium",
+          "low"
+         ]
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "versionId": "f03ba7a71306"
+ },
+ "nextStageTable": [
+  {
+   "current": null,
+   "ready": false,
+   "esign": false,
+   "paid": false,
+   "next": "confirm"
+  },
+  {
+   "current": null,
+   "ready": false,
+   "esign": false,
+   "paid": true,
+   "next": "confirm"
+  },
+  {
+   "current": null,
+   "ready": false,
+   "esign": true,
+   "paid": false,
+   "next": "confirm"
+  },
+  {
+   "current": null,
+   "ready": false,
+   "esign": true,
+   "paid": true,
+   "next": "confirm"
+  },
+  {
+   "current": null,
+   "ready": true,
+   "esign": false,
+   "paid": false,
+   "next": "disclose"
+  },
+  {
+   "current": null,
+   "ready": true,
+   "esign": false,
+   "paid": true,
+   "next": "disclose"
+  },
+  {
+   "current": null,
+   "ready": true,
+   "esign": true,
+   "paid": false,
+   "next": "pay"
+  },
+  {
+   "current": null,
+   "ready": true,
+   "esign": true,
+   "paid": true,
+   "next": "close"
+  },
+  {
+   "current": "confirm",
+   "ready": false,
+   "esign": false,
+   "paid": false,
+   "next": "confirm"
+  },
+  {
+   "current": "confirm",
+   "ready": false,
+   "esign": false,
+   "paid": true,
+   "next": "confirm"
+  },
+  {
+   "current": "confirm",
+   "ready": false,
+   "esign": true,
+   "paid": false,
+   "next": "confirm"
+  },
+  {
+   "current": "confirm",
+   "ready": false,
+   "esign": true,
+   "paid": true,
+   "next": "confirm"
+  },
+  {
+   "current": "confirm",
+   "ready": true,
+   "esign": false,
+   "paid": false,
+   "next": "disclose"
+  },
+  {
+   "current": "confirm",
+   "ready": true,
+   "esign": false,
+   "paid": true,
+   "next": "disclose"
+  },
+  {
+   "current": "confirm",
+   "ready": true,
+   "esign": true,
+   "paid": false,
+   "next": "pay"
+  },
+  {
+   "current": "confirm",
+   "ready": true,
+   "esign": true,
+   "paid": true,
+   "next": "close"
+  },
+  {
+   "current": "disclose",
+   "ready": false,
+   "esign": false,
+   "paid": false,
+   "next": "disclose"
+  },
+  {
+   "current": "disclose",
+   "ready": false,
+   "esign": false,
+   "paid": true,
+   "next": "disclose"
+  },
+  {
+   "current": "disclose",
+   "ready": false,
+   "esign": true,
+   "paid": false,
+   "next": "pay"
+  },
+  {
+   "current": "disclose",
+   "ready": false,
+   "esign": true,
+   "paid": true,
+   "next": "close"
+  },
+  {
+   "current": "disclose",
+   "ready": true,
+   "esign": false,
+   "paid": false,
+   "next": "disclose"
+  },
+  {
+   "current": "disclose",
+   "ready": true,
+   "esign": false,
+   "paid": true,
+   "next": "disclose"
+  },
+  {
+   "current": "disclose",
+   "ready": true,
+   "esign": true,
+   "paid": false,
+   "next": "pay"
+  },
+  {
+   "current": "disclose",
+   "ready": true,
+   "esign": true,
+   "paid": true,
+   "next": "close"
+  },
+  {
+   "current": "pay",
+   "ready": false,
+   "esign": false,
+   "paid": false,
+   "next": "pay"
+  },
+  {
+   "current": "pay",
+   "ready": false,
+   "esign": false,
+   "paid": true,
+   "next": "close"
+  },
+  {
+   "current": "pay",
+   "ready": false,
+   "esign": true,
+   "paid": false,
+   "next": "pay"
+  },
+  {
+   "current": "pay",
+   "ready": false,
+   "esign": true,
+   "paid": true,
+   "next": "close"
+  },
+  {
+   "current": "pay",
+   "ready": true,
+   "esign": false,
+   "paid": false,
+   "next": "pay"
+  },
+  {
+   "current": "pay",
+   "ready": true,
+   "esign": false,
+   "paid": true,
+   "next": "close"
+  },
+  {
+   "current": "pay",
+   "ready": true,
+   "esign": true,
+   "paid": false,
+   "next": "pay"
+  },
+  {
+   "current": "pay",
+   "ready": true,
+   "esign": true,
+   "paid": true,
+   "next": "close"
+  },
+  {
+   "current": "close",
+   "ready": false,
+   "esign": false,
+   "paid": false,
+   "next": "close"
+  },
+  {
+   "current": "close",
+   "ready": false,
+   "esign": false,
+   "paid": true,
+   "next": "close"
+  },
+  {
+   "current": "close",
+   "ready": false,
+   "esign": true,
+   "paid": false,
+   "next": "close"
+  },
+  {
+   "current": "close",
+   "ready": false,
+   "esign": true,
+   "paid": true,
+   "next": "close"
+  },
+  {
+   "current": "close",
+   "ready": true,
+   "esign": false,
+   "paid": false,
+   "next": "close"
+  },
+  {
+   "current": "close",
+   "ready": true,
+   "esign": false,
+   "paid": true,
+   "next": "close"
+  },
+  {
+   "current": "close",
+   "ready": true,
+   "esign": true,
+   "paid": false,
+   "next": "close"
+  },
+  {
+   "current": "close",
+   "ready": true,
+   "esign": true,
+   "paid": true,
+   "next": "close"
+  }
+ ]
+}

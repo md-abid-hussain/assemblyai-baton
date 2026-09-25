@@ -4,8 +4,11 @@
  * `get_disclosure` handler (WP6).
  */
 import type { CaseState, DisclosureKind, PolicyRecord } from "../contracts/case";
+import type { IntentSpec } from "../contracts/v2/relay";
 import { daysInMonth, dayNumber, ymd } from "../case/dates";
 import { firstNameOf, licenseAdjective, vehicleLabelOf } from "../intents/add-driver";
+import { accountFor } from "../relay/account";
+import { kernelOrLegacy } from "../relay/spec-link";
 import { spokenChars, spokenDate, spokenMoney } from "./spoken";
 
 export interface DisclosureCtx {
@@ -33,8 +36,20 @@ const valueOf = (s: Pick<CaseState, "fields">, f: keyof CaseState["fields"]): st
  * `disclosureText(kind, ctx, {taxSuffix})` → `{text, criticalTokens}` (§5.8).
  * - premium_change: critical = monthly, dueToday, the date, the driver's first name (+ the tax phrase when on);
  * - esign_consent: critical = the last 4 digits (spaced), "electronically", "paper copy".
+ *
+ * WP14a·3: with `spec` = a compiled relay's spec, the relay's disclosure `kind` rendered by the kernel
+ * (`compiled.disclosure`), with `monthlyUsd`/`dueTodayUsd` supplied as the account's rating facts
+ * (`rating_new_monthly_usd`, `scenario_due_today_usd`) so Baton's `insurance.*` values resolve to them. Generic relays
+ * should call `compiled.disclosure` directly. `LEGACY_BATON_SPEC` keeps this code. Parity: equal for Baton.
  */
-export function disclosureText(kind: DisclosureKind, ctx: DisclosureCtx, opts: { taxSuffix?: boolean } = {}): DisclosureText {
+export function disclosureText(kind: DisclosureKind, ctx: DisclosureCtx, opts: { taxSuffix?: boolean } = {}, spec?: IntentSpec): DisclosureText {
+  const k = kernelOrLegacy(spec, "disclosureText");
+  if (k) {
+    const base = accountFor(ctx.policy);
+    const account = { ...base, facts: { ...base.facts, rating_new_monthly_usd: ctx.monthlyUsd, scenario_due_today_usd: ctx.dueTodayUsd } };
+    const d = k.disclosure(kind, { snapshot: ctx.snapshot, account, opts: { taxSuffix: opts.taxSuffix ?? false } });
+    return { kind: d.kind as DisclosureKind, text: d.text, criticalTokens: d.criticalTokens };
+  }
   const monthly = spokenMoney(ctx.monthlyUsd);
   const dueToday = spokenMoney(ctx.dueTodayUsd);
   if (kind === "esign_consent") {

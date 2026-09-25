@@ -1,0 +1,8493 @@
+[
+ {
+  "scenario": "s01",
+  "field": "driver_full_name",
+  "raw": "Maya Raman",
+  "result": {
+   "norm": "maya raman",
+   "display": "Maya Raman"
+  },
+  "spokenForms": [
+   "Maya Raman",
+   "Maya"
+  ],
+  "display": "Maya Raman"
+ },
+ {
+  "scenario": "s01",
+  "field": "driver_full_name",
+  "raw": "Maya Raman, M-A-Y-A",
+  "result": {
+   "norm": "maya raman",
+   "display": "Maya Raman"
+  },
+  "spokenForms": [
+   "Maya Raman",
+   "Maya"
+  ],
+  "display": "Maya Raman"
+ },
+ {
+  "scenario": "s01",
+  "field": "driver_dob",
+  "raw": "2009-03-14",
+  "result": {
+   "norm": "2009-03-14",
+   "display": "March 14th, 2009"
+  },
+  "spokenForms": [
+   "March 14th, 2009",
+   "March 14th",
+   "2009"
+  ],
+  "display": "March 14th, 2009"
+ },
+ {
+  "scenario": "s01",
+  "field": "driver_dob",
+  "raw": "March 14th, 2009",
+  "result": {
+   "norm": "2009-03-14",
+   "display": "March 14th, 2009"
+  },
+  "spokenForms": [
+   "March 14th, 2009",
+   "March 14th",
+   "2009"
+  ],
+  "display": "March 14th, 2009"
+ },
+ {
+  "scenario": "s01",
+  "field": "driver_age",
+  "raw": "17",
+  "result": {
+   "norm": "17",
+   "display": "17"
+  },
+  "spokenForms": [
+   "17"
+  ],
+  "display": "17"
+ },
+ {
+  "scenario": "s01",
+  "field": "driver_age",
+  "raw": "she's seventeen",
+  "result": {
+   "norm": "17",
+   "display": "17"
+  },
+  "spokenForms": [
+   "17"
+  ],
+  "display": "17"
+ },
+ {
+  "scenario": "s01",
+  "field": "driver_relation",
+  "raw": "child",
+  "result": {
+   "norm": "child",
+   "display": "child"
+  },
+  "spokenForms": [
+   "daughter",
+   "son",
+   "child",
+   "kid"
+  ],
+  "display": "child"
+ },
+ {
+  "scenario": "s01",
+  "field": "driver_relation",
+  "raw": "my daughter",
+  "result": {
+   "norm": "child",
+   "display": "child (daughter)"
+  },
+  "spokenForms": [
+   "daughter",
+   "son",
+   "child",
+   "kid"
+  ],
+  "display": "child (daughter)"
+ },
+ {
+  "scenario": "s01",
+  "field": "license_state",
+  "raw": "OH",
+  "result": {
+   "norm": "OH",
+   "display": "Ohio (OH)"
+  },
+  "spokenForms": [
+   "Ohio"
+  ],
+  "display": "Ohio (OH)"
+ },
+ {
+  "scenario": "s01",
+  "field": "license_state",
+  "raw": "Ohio",
+  "result": {
+   "norm": "OH",
+   "display": "Ohio (OH)"
+  },
+  "spokenForms": [
+   "Ohio"
+  ],
+  "display": "Ohio (OH)"
+ },
+ {
+  "scenario": "s01",
+  "field": "license_status",
+  "raw": "provisional",
+  "result": {
+   "norm": "provisional",
+   "display": "probationary license"
+  },
+  "spokenForms": [
+   "probationary",
+   "provisional",
+   "junior",
+   "intermediate",
+   "graduated"
+  ],
+  "display": "probationary license"
+ },
+ {
+  "scenario": "s01",
+  "field": "license_status",
+  "raw": "her probationary license, she passed last Tuesday",
+  "result": {
+   "norm": "provisional",
+   "display": "probationary license"
+  },
+  "spokenForms": [
+   "probationary",
+   "provisional",
+   "junior",
+   "intermediate",
+   "graduated"
+  ],
+  "display": "probationary license"
+ },
+ {
+  "scenario": "s01",
+  "field": "incidents_3y",
+  "raw": "none",
+  "result": {
+   "norm": "none",
+   "display": "none"
+  },
+  "spokenForms": [
+   "no tickets",
+   "no accidents",
+   "clean record"
+  ],
+  "display": "none"
+ },
+ {
+  "scenario": "s01",
+  "field": "incidents_3y",
+  "raw": "no tickets, nothing",
+  "result": {
+   "norm": "none",
+   "display": "none"
+  },
+  "spokenForms": [
+   "no tickets",
+   "no accidents",
+   "clean record"
+  ],
+  "display": "none"
+ },
+ {
+  "scenario": "s01",
+  "field": "vehicle_assignment",
+  "raw": "veh1",
+  "result": {
+   "norm": "veh1",
+   "display": "2021 Honda Civic"
+  },
+  "spokenForms": [
+   "Civic",
+   "2021 Honda Civic",
+   "Honda Civic"
+  ],
+  "display": "2021 Honda Civic"
+ },
+ {
+  "scenario": "s01",
+  "field": "vehicle_assignment",
+  "raw": "the Civic",
+  "result": {
+   "norm": "veh1",
+   "display": "2021 Honda Civic"
+  },
+  "spokenForms": [
+   "Civic",
+   "2021 Honda Civic",
+   "Honda Civic"
+  ],
+  "display": "2021 Honda Civic"
+ },
+ {
+  "scenario": "s01",
+  "field": "operator_type",
+  "raw": "primary",
+  "result": {
+   "norm": "primary",
+   "display": "primary"
+  },
+  "spokenForms": [
+   "primary",
+   "every day",
+   "main driver",
+   "mainly"
+  ],
+  "display": "primary"
+ },
+ {
+  "scenario": "s01",
+  "field": "operator_type",
+  "raw": "she'll drive it every day to school",
+  "result": {
+   "norm": "primary",
+   "display": "primary"
+  },
+  "spokenForms": [
+   "primary",
+   "every day",
+   "main driver",
+   "mainly"
+  ],
+  "display": "primary"
+ },
+ {
+  "scenario": "s01",
+  "field": "garaging_zip",
+  "raw": "44107",
+  "result": {
+   "norm": "44107",
+   "display": "44107"
+  },
+  "spokenForms": [
+   "44107",
+   "4 4 1 0 7"
+  ],
+  "display": "44107"
+ },
+ {
+  "scenario": "s01",
+  "field": "garaging_zip",
+  "raw": "it's parked at home, 44107",
+  "result": {
+   "norm": "44107",
+   "display": "44107"
+  },
+  "spokenForms": [
+   "44107",
+   "4 4 1 0 7"
+  ],
+  "display": "44107"
+ },
+ {
+  "scenario": "s01",
+  "field": "effective_date",
+  "raw": "2026-10-02",
+  "result": {
+   "norm": "2026-10-02",
+   "display": "Friday, October 2nd"
+  },
+  "spokenForms": [
+   "Friday, October 2nd",
+   "October 2nd",
+   "Friday"
+  ],
+  "display": "Friday, October 2nd"
+ },
+ {
+  "scenario": "s01",
+  "field": "effective_date",
+  "raw": "next Friday, October 2nd",
+  "result": {
+   "norm": "2026-10-02",
+   "display": "Friday, October 2nd"
+  },
+  "spokenForms": [
+   "Friday, October 2nd",
+   "October 2nd",
+   "Friday"
+  ],
+  "display": "Friday, October 2nd"
+ },
+ {
+  "scenario": "s01",
+  "field": "good_student_discount",
+  "raw": "eligible",
+  "result": {
+   "norm": "eligible",
+   "display": "eligible"
+  },
+  "spokenForms": [
+   "eligible"
+  ],
+  "display": "eligible"
+ },
+ {
+  "scenario": "s01",
+  "field": "good_student_discount",
+  "raw": "she has a 3.6 GPA",
+  "result": null,
+  "spokenForms": null,
+  "display": null
+ },
+ {
+  "scenario": "s01",
+  "field": "coverage_change",
+  "raw": "none - keeps current 50/100/50 liability limits",
+  "result": {
+   "norm": "none - keeps current 50/100/50 liability limits",
+   "display": "none - keeps current 50/100/50 liability limits"
+  },
+  "spokenForms": [
+   "none - keeps current 50/100/50 liability limits"
+  ],
+  "display": "none - keeps current 50/100/50 liability limits"
+ },
+ {
+  "scenario": "s01",
+  "field": "coverage_change",
+  "raw": "let's keep the limits as they are for now",
+  "result": {
+   "norm": "let's keep the limits as they are for now",
+   "display": "let's keep the limits as they are for now"
+  },
+  "spokenForms": [
+   "let's keep the limits as they are for now"
+  ],
+  "display": "let's keep the limits as they are for now"
+ },
+ {
+  "scenario": "s01",
+  "field": "premium_new_monthly_usd",
+  "raw": "142",
+  "result": {
+   "norm": "142.00",
+   "display": "$142 a month"
+  },
+  "spokenForms": [
+   "$142"
+  ],
+  "display": "$142 a month"
+ },
+ {
+  "scenario": "s01",
+  "field": "premium_new_monthly_usd",
+  "raw": "$142 a month",
+  "result": {
+   "norm": "142.00",
+   "display": "$142 a month"
+  },
+  "spokenForms": [
+   "$142"
+  ],
+  "display": "$142 a month"
+ },
+ {
+  "scenario": "s01",
+  "field": "premium_change_monthly_usd",
+  "raw": "46",
+  "result": {
+   "norm": "46.00",
+   "display": "$46 a month"
+  },
+  "spokenForms": [
+   "$46"
+  ],
+  "display": "$46 a month"
+ },
+ {
+  "scenario": "s01",
+  "field": "premium_change_monthly_usd",
+  "raw": "that's up $46 from your $96",
+  "result": {
+   "norm": "46.00",
+   "display": "$46 a month"
+  },
+  "spokenForms": [
+   "$46"
+  ],
+  "display": "$46 a month"
+ },
+ {
+  "scenario": "s02",
+  "field": "driver_full_name",
+  "raw": "Lucas Delgado",
+  "result": {
+   "norm": "lucas delgado",
+   "display": "Lucas Delgado"
+  },
+  "spokenForms": [
+   "Lucas Delgado",
+   "Lucas"
+  ],
+  "display": "Lucas Delgado"
+ },
+ {
+  "scenario": "s02",
+  "field": "driver_full_name",
+  "raw": "Lucas, L-U-C-A-S, Delgado",
+  "result": {
+   "norm": "lucas delgado",
+   "display": "Lucas Delgado"
+  },
+  "spokenForms": [
+   "Lucas Delgado",
+   "Lucas"
+  ],
+  "display": "Lucas Delgado"
+ },
+ {
+  "scenario": "s02",
+  "field": "driver_dob",
+  "raw": "2010-06-02",
+  "result": {
+   "norm": "2010-06-02",
+   "display": "June 2nd, 2010"
+  },
+  "spokenForms": [
+   "June 2nd, 2010",
+   "June 2nd",
+   "2010"
+  ],
+  "display": "June 2nd, 2010"
+ },
+ {
+  "scenario": "s02",
+  "field": "driver_dob",
+  "raw": "June 2nd, 2010",
+  "result": {
+   "norm": "2010-06-02",
+   "display": "June 2nd, 2010"
+  },
+  "spokenForms": [
+   "June 2nd, 2010",
+   "June 2nd",
+   "2010"
+  ],
+  "display": "June 2nd, 2010"
+ },
+ {
+  "scenario": "s02",
+  "field": "driver_age",
+  "raw": "16",
+  "result": {
+   "norm": "16",
+   "display": "16"
+  },
+  "spokenForms": [
+   "16"
+  ],
+  "display": "16"
+ },
+ {
+  "scenario": "s02",
+  "field": "driver_age",
+  "raw": "he's sixteen",
+  "result": {
+   "norm": "16",
+   "display": "16"
+  },
+  "spokenForms": [
+   "16"
+  ],
+  "display": "16"
+ },
+ {
+  "scenario": "s02",
+  "field": "driver_relation",
+  "raw": "child",
+  "result": {
+   "norm": "child",
+   "display": "child"
+  },
+  "spokenForms": [
+   "daughter",
+   "son",
+   "child",
+   "kid"
+  ],
+  "display": "child"
+ },
+ {
+  "scenario": "s02",
+  "field": "driver_relation",
+  "raw": "my son",
+  "result": {
+   "norm": "child",
+   "display": "child (son)"
+  },
+  "spokenForms": [
+   "daughter",
+   "son",
+   "child",
+   "kid"
+  ],
+  "display": "child (son)"
+ },
+ {
+  "scenario": "s02",
+  "field": "license_state",
+  "raw": "AZ",
+  "result": {
+   "norm": "AZ",
+   "display": "Arizona (AZ)"
+  },
+  "spokenForms": [
+   "Arizona"
+  ],
+  "display": "Arizona (AZ)"
+ },
+ {
+  "scenario": "s02",
+  "field": "license_state",
+  "raw": "Arizona",
+  "result": {
+   "norm": "AZ",
+   "display": "Arizona (AZ)"
+  },
+  "spokenForms": [
+   "Arizona"
+  ],
+  "display": "Arizona (AZ)"
+ },
+ {
+  "scenario": "s02",
+  "field": "license_status",
+  "raw": "provisional",
+  "result": {
+   "norm": "provisional",
+   "display": "probationary license"
+  },
+  "spokenForms": [
+   "probationary",
+   "provisional",
+   "junior",
+   "intermediate",
+   "graduated"
+  ],
+  "display": "probationary license"
+ },
+ {
+  "scenario": "s02",
+  "field": "license_status",
+  "raw": "the graduated license, he passed this morning",
+  "result": {
+   "norm": "provisional",
+   "display": "probationary license"
+  },
+  "spokenForms": [
+   "probationary",
+   "provisional",
+   "junior",
+   "intermediate",
+   "graduated"
+  ],
+  "display": "probationary license"
+ },
+ {
+  "scenario": "s02",
+  "field": "incidents_3y",
+  "raw": "none",
+  "result": {
+   "norm": "none",
+   "display": "none"
+  },
+  "spokenForms": [
+   "no tickets",
+   "no accidents",
+   "clean record"
+  ],
+  "display": "none"
+ },
+ {
+  "scenario": "s02",
+  "field": "incidents_3y",
+  "raw": "nothing, he's brand new",
+  "result": {
+   "norm": "none",
+   "display": "none"
+  },
+  "spokenForms": [
+   "no tickets",
+   "no accidents",
+   "clean record"
+  ],
+  "display": "none"
+ },
+ {
+  "scenario": "s02",
+  "field": "vehicle_assignment",
+  "raw": "veh2",
+  "result": {
+   "norm": "veh2",
+   "display": "2014 Toyota Corolla"
+  },
+  "spokenForms": [
+   "Corolla",
+   "2014 Toyota Corolla",
+   "Toyota Corolla"
+  ],
+  "display": "2014 Toyota Corolla"
+ },
+ {
+  "scenario": "s02",
+  "field": "vehicle_assignment",
+  "raw": "the Corolla",
+  "result": {
+   "norm": "veh2",
+   "display": "2014 Toyota Corolla"
+  },
+  "spokenForms": [
+   "Corolla",
+   "2014 Toyota Corolla",
+   "Toyota Corolla"
+  ],
+  "display": "2014 Toyota Corolla"
+ },
+ {
+  "scenario": "s02",
+  "field": "operator_type",
+  "raw": "primary",
+  "result": {
+   "norm": "primary",
+   "display": "primary"
+  },
+  "spokenForms": [
+   "primary",
+   "every day",
+   "main driver",
+   "mainly"
+  ],
+  "display": "primary"
+ },
+ {
+  "scenario": "s02",
+  "field": "operator_type",
+  "raw": "that'll be his car, every day",
+  "result": {
+   "norm": "primary",
+   "display": "primary"
+  },
+  "spokenForms": [
+   "primary",
+   "every day",
+   "main driver",
+   "mainly"
+  ],
+  "display": "primary"
+ },
+ {
+  "scenario": "s02",
+  "field": "garaging_zip",
+  "raw": "85213",
+  "result": {
+   "norm": "85213",
+   "display": "85213"
+  },
+  "spokenForms": [
+   "85213",
+   "8 5 2 1 3"
+  ],
+  "display": "85213"
+ },
+ {
+  "scenario": "s02",
+  "field": "garaging_zip",
+  "raw": "in our garage, 85213",
+  "result": {
+   "norm": "85213",
+   "display": "85213"
+  },
+  "spokenForms": [
+   "85213",
+   "8 5 2 1 3"
+  ],
+  "display": "85213"
+ },
+ {
+  "scenario": "s02",
+  "field": "effective_date",
+  "raw": "2026-09-26",
+  "result": {
+   "norm": "2026-09-26",
+   "display": "Saturday, September 26th"
+  },
+  "spokenForms": [
+   "Saturday, September 26th",
+   "September 26th",
+   "Saturday"
+  ],
+  "display": "Saturday, September 26th"
+ },
+ {
+  "scenario": "s02",
+  "field": "effective_date",
+  "raw": "starting tomorrow",
+  "result": {
+   "norm": "2026-09-26",
+   "display": "Saturday, September 26th"
+  },
+  "spokenForms": [
+   "Saturday, September 26th",
+   "September 26th",
+   "Saturday"
+  ],
+  "display": "Saturday, September 26th"
+ },
+ {
+  "scenario": "s02",
+  "field": "driver_training_discount",
+  "raw": "eligible",
+  "result": {
+   "norm": "eligible",
+   "display": "eligible"
+  },
+  "spokenForms": [
+   "eligible"
+  ],
+  "display": "eligible"
+ },
+ {
+  "scenario": "s02",
+  "field": "driver_training_discount",
+  "raw": "he did the driver's ed course at school in May",
+  "result": null,
+  "spokenForms": null,
+  "display": null
+ },
+ {
+  "scenario": "s02",
+  "field": "premium_new_monthly_usd",
+  "raw": "171",
+  "result": {
+   "norm": "171.00",
+   "display": "$171 a month"
+  },
+  "spokenForms": [
+   "$171"
+  ],
+  "display": "$171 a month"
+ },
+ {
+  "scenario": "s02",
+  "field": "premium_new_monthly_usd",
+  "raw": "$171 a month",
+  "result": {
+   "norm": "171.00",
+   "display": "$171 a month"
+  },
+  "spokenForms": [
+   "$171"
+  ],
+  "display": "$171 a month"
+ },
+ {
+  "scenario": "s02",
+  "field": "premium_change_monthly_usd",
+  "raw": "53",
+  "result": {
+   "norm": "53.00",
+   "display": "$53 a month"
+  },
+  "spokenForms": [
+   "$53"
+  ],
+  "display": "$53 a month"
+ },
+ {
+  "scenario": "s02",
+  "field": "premium_change_monthly_usd",
+  "raw": "up $53",
+  "result": {
+   "norm": "53.00",
+   "display": "$53 a month"
+  },
+  "spokenForms": [
+   "$53"
+  ],
+  "display": "$53 a month"
+ },
+ {
+  "scenario": "s03",
+  "field": "driver_full_name",
+  "raw": "Hannah Kowalski",
+  "result": {
+   "norm": "hannah kowalski",
+   "display": "Hannah Kowalski"
+  },
+  "spokenForms": [
+   "Hannah Kowalski",
+   "Hannah"
+  ],
+  "display": "Hannah Kowalski"
+ },
+ {
+  "scenario": "s03",
+  "field": "driver_full_name",
+  "raw": "Hannah, H-A-N-N-A-H, Kowalski",
+  "result": {
+   "norm": "hannah kowalski",
+   "display": "Hannah Kowalski"
+  },
+  "spokenForms": [
+   "Hannah Kowalski",
+   "Hannah"
+  ],
+  "display": "Hannah Kowalski"
+ },
+ {
+  "scenario": "s03",
+  "field": "driver_dob",
+  "raw": "2007-05-21",
+  "result": {
+   "norm": "2007-05-21",
+   "display": "May 21st, 2007"
+  },
+  "spokenForms": [
+   "May 21st, 2007",
+   "May 21st",
+   "2007"
+  ],
+  "display": "May 21st, 2007"
+ },
+ {
+  "scenario": "s03",
+  "field": "driver_dob",
+  "raw": "May 21st, 2007",
+  "result": {
+   "norm": "2007-05-21",
+   "display": "May 21st, 2007"
+  },
+  "spokenForms": [
+   "May 21st, 2007",
+   "May 21st",
+   "2007"
+  ],
+  "display": "May 21st, 2007"
+ },
+ {
+  "scenario": "s03",
+  "field": "driver_age",
+  "raw": "19",
+  "result": {
+   "norm": "19",
+   "display": "19"
+  },
+  "spokenForms": [
+   "19"
+  ],
+  "display": "19"
+ },
+ {
+  "scenario": "s03",
+  "field": "driver_age",
+  "raw": "she's nineteen",
+  "result": {
+   "norm": "19",
+   "display": "19"
+  },
+  "spokenForms": [
+   "19"
+  ],
+  "display": "19"
+ },
+ {
+  "scenario": "s03",
+  "field": "driver_relation",
+  "raw": "child",
+  "result": {
+   "norm": "child",
+   "display": "child"
+  },
+  "spokenForms": [
+   "daughter",
+   "son",
+   "child",
+   "kid"
+  ],
+  "display": "child"
+ },
+ {
+  "scenario": "s03",
+  "field": "driver_relation",
+  "raw": "my daughter",
+  "result": {
+   "norm": "child",
+   "display": "child (daughter)"
+  },
+  "spokenForms": [
+   "daughter",
+   "son",
+   "child",
+   "kid"
+  ],
+  "display": "child (daughter)"
+ },
+ {
+  "scenario": "s03",
+  "field": "license_state",
+  "raw": "PA",
+  "result": {
+   "norm": "PA",
+   "display": "Pennsylvania (PA)"
+  },
+  "spokenForms": [
+   "Pennsylvania"
+  ],
+  "display": "Pennsylvania (PA)"
+ },
+ {
+  "scenario": "s03",
+  "field": "license_state",
+  "raw": "Pennsylvania",
+  "result": {
+   "norm": "PA",
+   "display": "Pennsylvania (PA)"
+  },
+  "spokenForms": [
+   "Pennsylvania"
+  ],
+  "display": "Pennsylvania (PA)"
+ },
+ {
+  "scenario": "s03",
+  "field": "license_status",
+  "raw": "full",
+  "result": {
+   "norm": "full",
+   "display": "full license"
+  },
+  "spokenForms": [
+   "full license",
+   "fully licensed"
+  ],
+  "display": "full license"
+ },
+ {
+  "scenario": "s03",
+  "field": "license_status",
+  "raw": "a regular license, she's had it since seventeen",
+  "result": {
+   "norm": "full",
+   "display": "full license"
+  },
+  "spokenForms": [
+   "full license",
+   "fully licensed"
+  ],
+  "display": "full license"
+ },
+ {
+  "scenario": "s03",
+  "field": "incidents_3y",
+  "raw": "none",
+  "result": {
+   "norm": "none",
+   "display": "none"
+  },
+  "spokenForms": [
+   "no tickets",
+   "no accidents",
+   "clean record"
+  ],
+  "display": "none"
+ },
+ {
+  "scenario": "s03",
+  "field": "incidents_3y",
+  "raw": "no, never",
+  "result": {
+   "norm": "none",
+   "display": "none"
+  },
+  "spokenForms": [
+   "no tickets",
+   "no accidents",
+   "clean record"
+  ],
+  "display": "none"
+ },
+ {
+  "scenario": "s03",
+  "field": "vehicle_assignment",
+  "raw": "veh2",
+  "result": {
+   "norm": "veh2",
+   "display": "2016 Honda Accord"
+  },
+  "spokenForms": [
+   "Accord",
+   "2016 Honda Accord",
+   "Honda Accord"
+  ],
+  "display": "2016 Honda Accord"
+ },
+ {
+  "scenario": "s03",
+  "field": "vehicle_assignment",
+  "raw": "the Accord",
+  "result": {
+   "norm": "veh2",
+   "display": "2016 Honda Accord"
+  },
+  "spokenForms": [
+   "Accord",
+   "2016 Honda Accord",
+   "Honda Accord"
+  ],
+  "display": "2016 Honda Accord"
+ },
+ {
+  "scenario": "s03",
+  "field": "operator_type",
+  "raw": "primary",
+  "result": {
+   "norm": "primary",
+   "display": "primary"
+  },
+  "spokenForms": [
+   "primary",
+   "every day",
+   "main driver",
+   "mainly"
+  ],
+  "display": "primary"
+ },
+ {
+  "scenario": "s03",
+  "field": "operator_type",
+  "raw": "she'll be driving it most days",
+  "result": null,
+  "spokenForms": null,
+  "display": null
+ },
+ {
+  "scenario": "s03",
+  "field": "garaging_zip",
+  "raw": "15217",
+  "result": {
+   "norm": "15217",
+   "display": "15217"
+  },
+  "spokenForms": [
+   "15217",
+   "1 5 2 1 7"
+  ],
+  "display": "15217"
+ },
+ {
+  "scenario": "s03",
+  "field": "garaging_zip",
+  "raw": "here at the house, 15217",
+  "result": {
+   "norm": "15217",
+   "display": "15217"
+  },
+  "spokenForms": [
+   "15217",
+   "1 5 2 1 7"
+  ],
+  "display": "15217"
+ },
+ {
+  "scenario": "s03",
+  "field": "effective_date",
+  "raw": "2026-09-28",
+  "result": {
+   "norm": "2026-09-28",
+   "display": "Monday, September 28th"
+  },
+  "spokenForms": [
+   "Monday, September 28th",
+   "September 28th",
+   "Monday"
+  ],
+  "display": "Monday, September 28th"
+ },
+ {
+  "scenario": "s03",
+  "field": "effective_date",
+  "raw": "Monday, the 28th",
+  "result": {
+   "norm": "2026-09-28",
+   "display": "Monday, September 28th"
+  },
+  "spokenForms": [
+   "Monday, September 28th",
+   "September 28th",
+   "Monday"
+  ],
+  "display": "Monday, September 28th"
+ },
+ {
+  "scenario": "s03",
+  "field": "good_student_discount",
+  "raw": "not_eligible",
+  "result": {
+   "norm": "not_eligible",
+   "display": "not eligible"
+  },
+  "spokenForms": [
+   "not eligible"
+  ],
+  "display": "not eligible"
+ },
+ {
+  "scenario": "s03",
+  "field": "good_student_discount",
+  "raw": "she's part-time at community college",
+  "result": null,
+  "spokenForms": null,
+  "display": null
+ },
+ {
+  "scenario": "s03",
+  "field": "premium_new_monthly_usd",
+  "raw": "188",
+  "result": {
+   "norm": "188.00",
+   "display": "$188 a month"
+  },
+  "spokenForms": [
+   "$188"
+  ],
+  "display": "$188 a month"
+ },
+ {
+  "scenario": "s03",
+  "field": "premium_new_monthly_usd",
+  "raw": "$188 a month",
+  "result": {
+   "norm": "188.00",
+   "display": "$188 a month"
+  },
+  "spokenForms": [
+   "$188"
+  ],
+  "display": "$188 a month"
+ },
+ {
+  "scenario": "s03",
+  "field": "premium_change_monthly_usd",
+  "raw": "57",
+  "result": {
+   "norm": "57.00",
+   "display": "$57 a month"
+  },
+  "spokenForms": [
+   "$57"
+  ],
+  "display": "$57 a month"
+ },
+ {
+  "scenario": "s03",
+  "field": "premium_change_monthly_usd",
+  "raw": "up $57",
+  "result": {
+   "norm": "57.00",
+   "display": "$57 a month"
+  },
+  "spokenForms": [
+   "$57"
+  ],
+  "display": "$57 a month"
+ },
+ {
+  "scenario": "s03",
+  "field": "amount_due_today_usd",
+  "raw": "18.4",
+  "result": {
+   "norm": "18.40",
+   "display": "$18.40"
+  },
+  "spokenForms": [
+   "$18.40"
+  ],
+  "display": "$18.40"
+ },
+ {
+  "scenario": "s03",
+  "field": "amount_due_today_usd",
+  "raw": "$18.40 due today for the rest of this billing period",
+  "result": {
+   "norm": "18.40",
+   "display": "$18.40"
+  },
+  "spokenForms": [
+   "$18.40"
+  ],
+  "display": "$18.40"
+ },
+ {
+  "scenario": "s04",
+  "field": "driver_full_name",
+  "raw": "Jasmine Brooks",
+  "result": {
+   "norm": "jasmine brooks",
+   "display": "Jasmine Brooks"
+  },
+  "spokenForms": [
+   "Jasmine Brooks",
+   "Jasmine"
+  ],
+  "display": "Jasmine Brooks"
+ },
+ {
+  "scenario": "s04",
+  "field": "driver_full_name",
+  "raw": "Jasmine Brooks",
+  "result": {
+   "norm": "jasmine brooks",
+   "display": "Jasmine Brooks"
+  },
+  "spokenForms": [
+   "Jasmine Brooks",
+   "Jasmine"
+  ],
+  "display": "Jasmine Brooks"
+ },
+ {
+  "scenario": "s04",
+  "field": "driver_dob",
+  "raw": "1996-08-21",
+  "result": {
+   "norm": "1996-08-21",
+   "display": "August 21st, 1996"
+  },
+  "spokenForms": [
+   "August 21st, 1996",
+   "August 21st",
+   "1996"
+  ],
+  "display": "August 21st, 1996"
+ },
+ {
+  "scenario": "s04",
+  "field": "driver_dob",
+  "raw": "August 21st, 1996",
+  "result": {
+   "norm": "1996-08-21",
+   "display": "August 21st, 1996"
+  },
+  "spokenForms": [
+   "August 21st, 1996",
+   "August 21st",
+   "1996"
+  ],
+  "display": "August 21st, 1996"
+ },
+ {
+  "scenario": "s04",
+  "field": "driver_age",
+  "raw": "30",
+  "result": {
+   "norm": "30",
+   "display": "30"
+  },
+  "spokenForms": [
+   "30"
+  ],
+  "display": "30"
+ },
+ {
+  "scenario": "s04",
+  "field": "driver_age",
+  "raw": "she's thirty",
+  "result": {
+   "norm": "30",
+   "display": "30"
+  },
+  "spokenForms": [
+   "30"
+  ],
+  "display": "30"
+ },
+ {
+  "scenario": "s04",
+  "field": "driver_relation",
+  "raw": "spouse",
+  "result": {
+   "norm": "spouse",
+   "display": "spouse"
+  },
+  "spokenForms": [
+   "wife",
+   "husband",
+   "spouse"
+  ],
+  "display": "spouse"
+ },
+ {
+  "scenario": "s04",
+  "field": "driver_relation",
+  "raw": "my wife, we just got married",
+  "result": {
+   "norm": "spouse",
+   "display": "spouse (wife)"
+  },
+  "spokenForms": [
+   "wife",
+   "husband",
+   "spouse"
+  ],
+  "display": "spouse (wife)"
+ },
+ {
+  "scenario": "s04",
+  "field": "license_state",
+  "raw": "GA",
+  "result": {
+   "norm": "GA",
+   "display": "Georgia (GA)"
+  },
+  "spokenForms": [
+   "Georgia"
+  ],
+  "display": "Georgia (GA)"
+ },
+ {
+  "scenario": "s04",
+  "field": "license_state",
+  "raw": "Georgia",
+  "result": {
+   "norm": "GA",
+   "display": "Georgia (GA)"
+  },
+  "spokenForms": [
+   "Georgia"
+  ],
+  "display": "Georgia (GA)"
+ },
+ {
+  "scenario": "s04",
+  "field": "license_status",
+  "raw": "full",
+  "result": {
+   "norm": "full",
+   "display": "full license"
+  },
+  "spokenForms": [
+   "full license",
+   "fully licensed"
+  ],
+  "display": "full license"
+ },
+ {
+  "scenario": "s04",
+  "field": "license_status",
+  "raw": "regular license",
+  "result": {
+   "norm": "full",
+   "display": "full license"
+  },
+  "spokenForms": [
+   "full license",
+   "fully licensed"
+  ],
+  "display": "full license"
+ },
+ {
+  "scenario": "s04",
+  "field": "incidents_3y",
+  "raw": "none",
+  "result": {
+   "norm": "none",
+   "display": "none"
+  },
+  "spokenForms": [
+   "no tickets",
+   "no accidents",
+   "clean record"
+  ],
+  "display": "none"
+ },
+ {
+  "scenario": "s04",
+  "field": "incidents_3y",
+  "raw": "clean record",
+  "result": {
+   "norm": "none",
+   "display": "none"
+  },
+  "spokenForms": [
+   "no tickets",
+   "no accidents",
+   "clean record"
+  ],
+  "display": "none"
+ },
+ {
+  "scenario": "s04",
+  "field": "vehicle_assignment",
+  "raw": "veh2",
+  "result": {
+   "norm": "veh2",
+   "display": "2020 Hyundai Elantra"
+  },
+  "spokenForms": [
+   "Elantra",
+   "2020 Hyundai Elantra",
+   "Hyundai Elantra"
+  ],
+  "display": "2020 Hyundai Elantra"
+ },
+ {
+  "scenario": "s04",
+  "field": "vehicle_assignment",
+  "raw": "the Elantra, that's going to be her car",
+  "result": {
+   "norm": "veh2",
+   "display": "2020 Hyundai Elantra"
+  },
+  "spokenForms": [
+   "Elantra",
+   "2020 Hyundai Elantra",
+   "Hyundai Elantra"
+  ],
+  "display": "2020 Hyundai Elantra"
+ },
+ {
+  "scenario": "s04",
+  "field": "operator_type",
+  "raw": "primary",
+  "result": {
+   "norm": "primary",
+   "display": "primary"
+  },
+  "spokenForms": [
+   "primary",
+   "every day",
+   "main driver",
+   "mainly"
+  ],
+  "display": "primary"
+ },
+ {
+  "scenario": "s04",
+  "field": "operator_type",
+  "raw": "she'll drive it to work every day",
+  "result": {
+   "norm": "primary",
+   "display": "primary"
+  },
+  "spokenForms": [
+   "primary",
+   "every day",
+   "main driver",
+   "mainly"
+  ],
+  "display": "primary"
+ },
+ {
+  "scenario": "s04",
+  "field": "garaging_zip",
+  "raw": "30306",
+  "result": {
+   "norm": "30306",
+   "display": "30306"
+  },
+  "spokenForms": [
+   "30306",
+   "3 0 3 0 6"
+  ],
+  "display": "30306"
+ },
+ {
+  "scenario": "s04",
+  "field": "garaging_zip",
+  "raw": "same address, 30306",
+  "result": {
+   "norm": "30306",
+   "display": "30306"
+  },
+  "spokenForms": [
+   "30306",
+   "3 0 3 0 6"
+  ],
+  "display": "30306"
+ },
+ {
+  "scenario": "s04",
+  "field": "effective_date",
+  "raw": "2026-09-25",
+  "result": {
+   "norm": "2026-09-25",
+   "display": "Friday, September 25th"
+  },
+  "spokenForms": [
+   "Friday, September 25th",
+   "September 25th",
+   "Friday"
+  ],
+  "display": "Friday, September 25th"
+ },
+ {
+  "scenario": "s04",
+  "field": "effective_date",
+  "raw": "as of today",
+  "result": {
+   "norm": "2026-09-25",
+   "display": "Friday, September 25th"
+  },
+  "spokenForms": [
+   "Friday, September 25th",
+   "September 25th",
+   "Friday"
+  ],
+  "display": "Friday, September 25th"
+ },
+ {
+  "scenario": "s04",
+  "field": "premium_new_monthly_usd",
+  "raw": "149",
+  "result": {
+   "norm": "149.00",
+   "display": "$149 a month"
+  },
+  "spokenForms": [
+   "$149"
+  ],
+  "display": "$149 a month"
+ },
+ {
+  "scenario": "s04",
+  "field": "premium_new_monthly_usd",
+  "raw": "$149 a month",
+  "result": {
+   "norm": "149.00",
+   "display": "$149 a month"
+  },
+  "spokenForms": [
+   "$149"
+  ],
+  "display": "$149 a month"
+ },
+ {
+  "scenario": "s04",
+  "field": "premium_change_monthly_usd",
+  "raw": "-3",
+  "result": {
+   "norm": "-3.00",
+   "display": "-$3 a month"
+  },
+  "spokenForms": [
+   "-$3"
+  ],
+  "display": "-$3 a month"
+ },
+ {
+  "scenario": "s04",
+  "field": "premium_change_monthly_usd",
+  "raw": "actually $3 less than now",
+  "result": {
+   "norm": "-3.00",
+   "display": "-$3 a month"
+  },
+  "spokenForms": [
+   "-$3"
+  ],
+  "display": "-$3 a month"
+ },
+ {
+  "scenario": "s05",
+  "field": "driver_full_name",
+  "raw": "Owen Palmer",
+  "result": {
+   "norm": "owen palmer",
+   "display": "Owen Palmer"
+  },
+  "spokenForms": [
+   "Owen Palmer",
+   "Owen"
+  ],
+  "display": "Owen Palmer"
+ },
+ {
+  "scenario": "s05",
+  "field": "driver_full_name",
+  "raw": "Owen Palmer",
+  "result": {
+   "norm": "owen palmer",
+   "display": "Owen Palmer"
+  },
+  "spokenForms": [
+   "Owen Palmer",
+   "Owen"
+  ],
+  "display": "Owen Palmer"
+ },
+ {
+  "scenario": "s05",
+  "field": "driver_dob",
+  "raw": "2008-02-09",
+  "result": {
+   "norm": "2008-02-09",
+   "display": "February 9th, 2008"
+  },
+  "spokenForms": [
+   "February 9th, 2008",
+   "February 9th",
+   "2008"
+  ],
+  "display": "February 9th, 2008"
+ },
+ {
+  "scenario": "s05",
+  "field": "driver_dob",
+  "raw": "February 9th, 2008",
+  "result": {
+   "norm": "2008-02-09",
+   "display": "February 9th, 2008"
+  },
+  "spokenForms": [
+   "February 9th, 2008",
+   "February 9th",
+   "2008"
+  ],
+  "display": "February 9th, 2008"
+ },
+ {
+  "scenario": "s05",
+  "field": "driver_age",
+  "raw": "18",
+  "result": {
+   "norm": "18",
+   "display": "18"
+  },
+  "spokenForms": [
+   "18"
+  ],
+  "display": "18"
+ },
+ {
+  "scenario": "s05",
+  "field": "driver_age",
+  "raw": "he's eighteen",
+  "result": {
+   "norm": "18",
+   "display": "18"
+  },
+  "spokenForms": [
+   "18"
+  ],
+  "display": "18"
+ },
+ {
+  "scenario": "s05",
+  "field": "driver_relation",
+  "raw": "child",
+  "result": {
+   "norm": "child",
+   "display": "child"
+  },
+  "spokenForms": [
+   "daughter",
+   "son",
+   "child",
+   "kid"
+  ],
+  "display": "child"
+ },
+ {
+  "scenario": "s05",
+  "field": "driver_relation",
+  "raw": "my son",
+  "result": {
+   "norm": "child",
+   "display": "child (son)"
+  },
+  "spokenForms": [
+   "daughter",
+   "son",
+   "child",
+   "kid"
+  ],
+  "display": "child (son)"
+ },
+ {
+  "scenario": "s05",
+  "field": "license_state",
+  "raw": "WI",
+  "result": {
+   "norm": "WI",
+   "display": "Wisconsin (WI)"
+  },
+  "spokenForms": [
+   "Wisconsin"
+  ],
+  "display": "Wisconsin (WI)"
+ },
+ {
+  "scenario": "s05",
+  "field": "license_state",
+  "raw": "Wisconsin",
+  "result": {
+   "norm": "WI",
+   "display": "Wisconsin (WI)"
+  },
+  "spokenForms": [
+   "Wisconsin"
+  ],
+  "display": "Wisconsin (WI)"
+ },
+ {
+  "scenario": "s05",
+  "field": "license_status",
+  "raw": "full",
+  "result": {
+   "norm": "full",
+   "display": "full license"
+  },
+  "spokenForms": [
+   "full license",
+   "fully licensed"
+  ],
+  "display": "full license"
+ },
+ {
+  "scenario": "s05",
+  "field": "license_status",
+  "raw": "he's had his license about two years",
+  "result": null,
+  "spokenForms": null,
+  "display": null
+ },
+ {
+  "scenario": "s05",
+  "field": "incidents_3y",
+  "raw": "none",
+  "result": {
+   "norm": "none",
+   "display": "none"
+  },
+  "spokenForms": [
+   "no tickets",
+   "no accidents",
+   "clean record"
+  ],
+  "display": "none"
+ },
+ {
+  "scenario": "s05",
+  "field": "incidents_3y",
+  "raw": "no tickets",
+  "result": {
+   "norm": "none",
+   "display": "none"
+  },
+  "spokenForms": [
+   "no tickets",
+   "no accidents",
+   "clean record"
+  ],
+  "display": "none"
+ },
+ {
+  "scenario": "s05",
+  "field": "vehicle_assignment",
+  "raw": "veh2",
+  "result": {
+   "norm": "veh2",
+   "display": "2012 Toyota Camry"
+  },
+  "spokenForms": [
+   "Camry",
+   "2012 Toyota Camry",
+   "Toyota Camry"
+  ],
+  "display": "2012 Toyota Camry"
+ },
+ {
+  "scenario": "s05",
+  "field": "vehicle_assignment",
+  "raw": "the Camry",
+  "result": {
+   "norm": "veh2",
+   "display": "2012 Toyota Camry"
+  },
+  "spokenForms": [
+   "Camry",
+   "2012 Toyota Camry",
+   "Toyota Camry"
+  ],
+  "display": "2012 Toyota Camry"
+ },
+ {
+  "scenario": "s05",
+  "field": "operator_type",
+  "raw": "primary",
+  "result": {
+   "norm": "primary",
+   "display": "primary"
+  },
+  "spokenForms": [
+   "primary",
+   "every day",
+   "main driver",
+   "mainly"
+  ],
+  "display": "primary"
+ },
+ {
+  "scenario": "s05",
+  "field": "operator_type",
+  "raw": "it's basically his now",
+  "result": {
+   "norm": "primary",
+   "display": "primary"
+  },
+  "spokenForms": [
+   "primary",
+   "every day",
+   "main driver",
+   "mainly"
+  ],
+  "display": "primary"
+ },
+ {
+  "scenario": "s05",
+  "field": "garaging_zip",
+  "raw": "60540",
+  "result": {
+   "norm": "60540",
+   "display": "60540"
+  },
+  "spokenForms": [
+   "60540",
+   "6 0 5 4 0"
+  ],
+  "display": "60540"
+ },
+ {
+  "scenario": "s05",
+  "field": "garaging_zip",
+  "raw": "in my driveway, 60540",
+  "result": {
+   "norm": "60540",
+   "display": "60540"
+  },
+  "spokenForms": [
+   "60540",
+   "6 0 5 4 0"
+  ],
+  "display": "60540"
+ },
+ {
+  "scenario": "s05",
+  "field": "effective_date",
+  "raw": "2026-10-01",
+  "result": {
+   "norm": "2026-10-01",
+   "display": "Thursday, October 1st"
+  },
+  "spokenForms": [
+   "Thursday, October 1st",
+   "October 1st",
+   "Thursday"
+  ],
+  "display": "Thursday, October 1st"
+ },
+ {
+  "scenario": "s05",
+  "field": "effective_date",
+  "raw": "October 1st",
+  "result": {
+   "norm": "2026-10-01",
+   "display": "Thursday, October 1st"
+  },
+  "spokenForms": [
+   "Thursday, October 1st",
+   "October 1st",
+   "Thursday"
+  ],
+  "display": "Thursday, October 1st"
+ },
+ {
+  "scenario": "s05",
+  "field": "premium_new_monthly_usd",
+  "raw": "204",
+  "result": {
+   "norm": "204.00",
+   "display": "$204 a month"
+  },
+  "spokenForms": [
+   "$204"
+  ],
+  "display": "$204 a month"
+ },
+ {
+  "scenario": "s05",
+  "field": "premium_new_monthly_usd",
+  "raw": "$204 a month",
+  "result": {
+   "norm": "204.00",
+   "display": "$204 a month"
+  },
+  "spokenForms": [
+   "$204"
+  ],
+  "display": "$204 a month"
+ },
+ {
+  "scenario": "s05",
+  "field": "premium_change_monthly_usd",
+  "raw": "71",
+  "result": {
+   "norm": "71.00",
+   "display": "$71 a month"
+  },
+  "spokenForms": [
+   "$71"
+  ],
+  "display": "$71 a month"
+ },
+ {
+  "scenario": "s05",
+  "field": "premium_change_monthly_usd",
+  "raw": "up $71",
+  "result": {
+   "norm": "71.00",
+   "display": "$71 a month"
+  },
+  "spokenForms": [
+   "$71"
+  ],
+  "display": "$71 a month"
+ },
+ {
+  "scenario": "s05",
+  "field": "amount_due_today_usd",
+  "raw": "34.1",
+  "result": {
+   "norm": "34.10",
+   "display": "$34.10"
+  },
+  "spokenForms": [
+   "$34.10"
+  ],
+  "display": "$34.10"
+ },
+ {
+  "scenario": "s05",
+  "field": "amount_due_today_usd",
+  "raw": "$34.10 due today",
+  "result": {
+   "norm": "34.10",
+   "display": "$34.10"
+  },
+  "spokenForms": [
+   "$34.10"
+  ],
+  "display": "$34.10"
+ },
+ {
+  "scenario": "s06",
+  "field": "driver_full_name",
+  "raw": "Zoe Morris",
+  "result": {
+   "norm": "zoe morris",
+   "display": "Zoe Morris"
+  },
+  "spokenForms": [
+   "Zoe Morris",
+   "Zoe"
+  ],
+  "display": "Zoe Morris"
+ },
+ {
+  "scenario": "s06",
+  "field": "driver_full_name",
+  "raw": "Zoe, Z-O-E, Morris",
+  "result": {
+   "norm": "zoe morris",
+   "display": "Zoe Morris"
+  },
+  "spokenForms": [
+   "Zoe Morris",
+   "Zoe"
+  ],
+  "display": "Zoe Morris"
+ },
+ {
+  "scenario": "s06",
+  "field": "driver_dob",
+  "raw": "2010-04-30",
+  "result": {
+   "norm": "2010-04-30",
+   "display": "April 30th, 2010"
+  },
+  "spokenForms": [
+   "April 30th, 2010",
+   "April 30th",
+   "2010"
+  ],
+  "display": "April 30th, 2010"
+ },
+ {
+  "scenario": "s06",
+  "field": "driver_dob",
+  "raw": "April 30th, 2010",
+  "result": {
+   "norm": "2010-04-30",
+   "display": "April 30th, 2010"
+  },
+  "spokenForms": [
+   "April 30th, 2010",
+   "April 30th",
+   "2010"
+  ],
+  "display": "April 30th, 2010"
+ },
+ {
+  "scenario": "s06",
+  "field": "driver_age",
+  "raw": "16",
+  "result": {
+   "norm": "16",
+   "display": "16"
+  },
+  "spokenForms": [
+   "16"
+  ],
+  "display": "16"
+ },
+ {
+  "scenario": "s06",
+  "field": "driver_age",
+  "raw": "she just turned sixteen",
+  "result": {
+   "norm": "16",
+   "display": "16"
+  },
+  "spokenForms": [
+   "16"
+  ],
+  "display": "16"
+ },
+ {
+  "scenario": "s06",
+  "field": "driver_relation",
+  "raw": "child",
+  "result": {
+   "norm": "child",
+   "display": "child"
+  },
+  "spokenForms": [
+   "daughter",
+   "son",
+   "child",
+   "kid"
+  ],
+  "display": "child"
+ },
+ {
+  "scenario": "s06",
+  "field": "driver_relation",
+  "raw": "my daughter",
+  "result": {
+   "norm": "child",
+   "display": "child (daughter)"
+  },
+  "spokenForms": [
+   "daughter",
+   "son",
+   "child",
+   "kid"
+  ],
+  "display": "child (daughter)"
+ },
+ {
+  "scenario": "s06",
+  "field": "license_state",
+  "raw": "CO",
+  "result": {
+   "norm": "CO",
+   "display": "Colorado (CO)"
+  },
+  "spokenForms": [
+   "Colorado"
+  ],
+  "display": "Colorado (CO)"
+ },
+ {
+  "scenario": "s06",
+  "field": "license_state",
+  "raw": "Colorado",
+  "result": {
+   "norm": "CO",
+   "display": "Colorado (CO)"
+  },
+  "spokenForms": [
+   "Colorado"
+  ],
+  "display": "Colorado (CO)"
+ },
+ {
+  "scenario": "s06",
+  "field": "license_status",
+  "raw": "provisional",
+  "result": {
+   "norm": "provisional",
+   "display": "probationary license"
+  },
+  "spokenForms": [
+   "probationary",
+   "provisional",
+   "junior",
+   "intermediate",
+   "graduated"
+  ],
+  "display": "probationary license"
+ },
+ {
+  "scenario": "s06",
+  "field": "license_status",
+  "raw": "her minor's license, from yesterday",
+  "result": null,
+  "spokenForms": null,
+  "display": null
+ },
+ {
+  "scenario": "s06",
+  "field": "incidents_3y",
+  "raw": "none",
+  "result": {
+   "norm": "none",
+   "display": "none"
+  },
+  "spokenForms": [
+   "no tickets",
+   "no accidents",
+   "clean record"
+  ],
+  "display": "none"
+ },
+ {
+  "scenario": "s06",
+  "field": "incidents_3y",
+  "raw": "nothing, she's been driving one day",
+  "result": {
+   "norm": "none",
+   "display": "none"
+  },
+  "spokenForms": [
+   "no tickets",
+   "no accidents",
+   "clean record"
+  ],
+  "display": "none"
+ },
+ {
+  "scenario": "s06",
+  "field": "vehicle_assignment",
+  "raw": "veh2",
+  "result": {
+   "norm": "veh2",
+   "display": "2017 Chevrolet Equinox"
+  },
+  "spokenForms": [
+   "Equinox",
+   "2017 Chevrolet Equinox",
+   "Chevrolet Equinox"
+  ],
+  "display": "2017 Chevrolet Equinox"
+ },
+ {
+  "scenario": "s06",
+  "field": "vehicle_assignment",
+  "raw": "the Equinox",
+  "result": {
+   "norm": "veh2",
+   "display": "2017 Chevrolet Equinox"
+  },
+  "spokenForms": [
+   "Equinox",
+   "2017 Chevrolet Equinox",
+   "Chevrolet Equinox"
+  ],
+  "display": "2017 Chevrolet Equinox"
+ },
+ {
+  "scenario": "s06",
+  "field": "operator_type",
+  "raw": "primary",
+  "result": {
+   "norm": "primary",
+   "display": "primary"
+  },
+  "spokenForms": [
+   "primary",
+   "every day",
+   "main driver",
+   "mainly"
+  ],
+  "display": "primary"
+ },
+ {
+  "scenario": "s06",
+  "field": "operator_type",
+  "raw": "that's going to be her car",
+  "result": {
+   "norm": "primary",
+   "display": "primary"
+  },
+  "spokenForms": [
+   "primary",
+   "every day",
+   "main driver",
+   "mainly"
+  ],
+  "display": "primary"
+ },
+ {
+  "scenario": "s06",
+  "field": "garaging_zip",
+  "raw": "80220",
+  "result": {
+   "norm": "80220",
+   "display": "80220"
+  },
+  "spokenForms": [
+   "80220",
+   "8 0 2 2 0"
+  ],
+  "display": "80220"
+ },
+ {
+  "scenario": "s06",
+  "field": "garaging_zip",
+  "raw": "at home, 80220",
+  "result": {
+   "norm": "80220",
+   "display": "80220"
+  },
+  "spokenForms": [
+   "80220",
+   "8 0 2 2 0"
+  ],
+  "display": "80220"
+ },
+ {
+  "scenario": "s06",
+  "field": "effective_date",
+  "raw": "2026-09-29",
+  "result": {
+   "norm": "2026-09-29",
+   "display": "Tuesday, September 29th"
+  },
+  "spokenForms": [
+   "Tuesday, September 29th",
+   "September 29th",
+   "Tuesday"
+  ],
+  "display": "Tuesday, September 29th"
+ },
+ {
+  "scenario": "s06",
+  "field": "effective_date",
+  "raw": "Tuesday, the 29th",
+  "result": {
+   "norm": "2026-09-29",
+   "display": "Tuesday, September 29th"
+  },
+  "spokenForms": [
+   "Tuesday, September 29th",
+   "September 29th",
+   "Tuesday"
+  ],
+  "display": "Tuesday, September 29th"
+ },
+ {
+  "scenario": "s06",
+  "field": "good_student_discount",
+  "raw": "eligible",
+  "result": {
+   "norm": "eligible",
+   "display": "eligible"
+  },
+  "spokenForms": [
+   "eligible"
+  ],
+  "display": "eligible"
+ },
+ {
+  "scenario": "s06",
+  "field": "good_student_discount",
+  "raw": "3.4 GPA",
+  "result": null,
+  "spokenForms": null,
+  "display": null
+ },
+ {
+  "scenario": "s06",
+  "field": "driver_training_discount",
+  "raw": "eligible",
+  "result": {
+   "norm": "eligible",
+   "display": "eligible"
+  },
+  "spokenForms": [
+   "eligible"
+  ],
+  "display": "eligible"
+ },
+ {
+  "scenario": "s06",
+  "field": "driver_training_discount",
+  "raw": "oh, and she finished driver's ed last month",
+  "result": null,
+  "spokenForms": null,
+  "display": null
+ },
+ {
+  "scenario": "s06",
+  "field": "coverage_change",
+  "raw": "raise liability limits to 100/300/100",
+  "result": {
+   "norm": "raise liability limits to 100/300/100",
+   "display": "raise liability limits to 100/300/100"
+  },
+  "spokenForms": [
+   "raise liability limits to 100/300/100"
+  ],
+  "display": "raise liability limits to 100/300/100"
+ },
+ {
+  "scenario": "s06",
+  "field": "coverage_change",
+  "raw": "yes, let's do the higher limits",
+  "result": {
+   "norm": "yes, let's do the higher limits",
+   "display": "yes, let's do the higher limits"
+  },
+  "spokenForms": [
+   "yes, let's do the higher limits"
+  ],
+  "display": "yes, let's do the higher limits"
+ },
+ {
+  "scenario": "s06",
+  "field": "premium_new_monthly_usd",
+  "raw": "219",
+  "result": {
+   "norm": "219.00",
+   "display": "$219 a month"
+  },
+  "spokenForms": [
+   "$219"
+  ],
+  "display": "$219 a month"
+ },
+ {
+  "scenario": "s06",
+  "field": "premium_new_monthly_usd",
+  "raw": "$219 a month with the higher limits",
+  "result": {
+   "norm": "219.00",
+   "display": "$219 a month"
+  },
+  "spokenForms": [
+   "$219"
+  ],
+  "display": "$219 a month"
+ },
+ {
+  "scenario": "s06",
+  "field": "premium_change_monthly_usd",
+  "raw": "55",
+  "result": {
+   "norm": "55.00",
+   "display": "$55 a month"
+  },
+  "spokenForms": [
+   "$55"
+  ],
+  "display": "$55 a month"
+ },
+ {
+  "scenario": "s06",
+  "field": "premium_change_monthly_usd",
+  "raw": "up $55",
+  "result": {
+   "norm": "55.00",
+   "display": "$55 a month"
+  },
+  "spokenForms": [
+   "$55"
+  ],
+  "display": "$55 a month"
+ },
+ {
+  "scenario": "s07",
+  "field": "driver_full_name",
+  "raw": "Claire Bennett",
+  "result": {
+   "norm": "claire bennett",
+   "display": "Claire Bennett"
+  },
+  "spokenForms": [
+   "Claire Bennett",
+   "Claire"
+  ],
+  "display": "Claire Bennett"
+ },
+ {
+  "scenario": "s07",
+  "field": "driver_full_name",
+  "raw": "Claire, C-L-A-I-R-E, Bennett",
+  "result": {
+   "norm": "claire bennett",
+   "display": "Claire Bennett"
+  },
+  "spokenForms": [
+   "Claire Bennett",
+   "Claire"
+  ],
+  "display": "Claire Bennett"
+ },
+ {
+  "scenario": "s07",
+  "field": "driver_dob",
+  "raw": "2006-07-03",
+  "result": {
+   "norm": "2006-07-03",
+   "display": "July 3rd, 2006"
+  },
+  "spokenForms": [
+   "July 3rd, 2006",
+   "July 3rd",
+   "2006"
+  ],
+  "display": "July 3rd, 2006"
+ },
+ {
+  "scenario": "s07",
+  "field": "driver_dob",
+  "raw": "July 3rd, 2006",
+  "result": {
+   "norm": "2006-07-03",
+   "display": "July 3rd, 2006"
+  },
+  "spokenForms": [
+   "July 3rd, 2006",
+   "July 3rd",
+   "2006"
+  ],
+  "display": "July 3rd, 2006"
+ },
+ {
+  "scenario": "s07",
+  "field": "driver_age",
+  "raw": "20",
+  "result": {
+   "norm": "20",
+   "display": "20"
+  },
+  "spokenForms": [
+   "20"
+  ],
+  "display": "20"
+ },
+ {
+  "scenario": "s07",
+  "field": "driver_age",
+  "raw": "she's twenty",
+  "result": {
+   "norm": "20",
+   "display": "20"
+  },
+  "spokenForms": [
+   "20"
+  ],
+  "display": "20"
+ },
+ {
+  "scenario": "s07",
+  "field": "driver_relation",
+  "raw": "child",
+  "result": {
+   "norm": "child",
+   "display": "child"
+  },
+  "spokenForms": [
+   "daughter",
+   "son",
+   "child",
+   "kid"
+  ],
+  "display": "child"
+ },
+ {
+  "scenario": "s07",
+  "field": "driver_relation",
+  "raw": "my daughter",
+  "result": {
+   "norm": "child",
+   "display": "child (daughter)"
+  },
+  "spokenForms": [
+   "daughter",
+   "son",
+   "child",
+   "kid"
+  ],
+  "display": "child (daughter)"
+ },
+ {
+  "scenario": "s07",
+  "field": "license_state",
+  "raw": "MI",
+  "result": {
+   "norm": "MI",
+   "display": "Michigan (MI)"
+  },
+  "spokenForms": [
+   "Michigan"
+  ],
+  "display": "Michigan (MI)"
+ },
+ {
+  "scenario": "s07",
+  "field": "license_state",
+  "raw": "Michigan",
+  "result": {
+   "norm": "MI",
+   "display": "Michigan (MI)"
+  },
+  "spokenForms": [
+   "Michigan"
+  ],
+  "display": "Michigan (MI)"
+ },
+ {
+  "scenario": "s07",
+  "field": "license_status",
+  "raw": "full",
+  "result": {
+   "norm": "full",
+   "display": "full license"
+  },
+  "spokenForms": [
+   "full license",
+   "fully licensed"
+  ],
+  "display": "full license"
+ },
+ {
+  "scenario": "s07",
+  "field": "license_status",
+  "raw": "full license, she got it in July",
+  "result": {
+   "norm": "full",
+   "display": "full license"
+  },
+  "spokenForms": [
+   "full license",
+   "fully licensed"
+  ],
+  "display": "full license"
+ },
+ {
+  "scenario": "s07",
+  "field": "incidents_3y",
+  "raw": "none",
+  "result": {
+   "norm": "none",
+   "display": "none"
+  },
+  "spokenForms": [
+   "no tickets",
+   "no accidents",
+   "clean record"
+  ],
+  "display": "none"
+ },
+ {
+  "scenario": "s07",
+  "field": "incidents_3y",
+  "raw": "none",
+  "result": {
+   "norm": "none",
+   "display": "none"
+  },
+  "spokenForms": [
+   "no tickets",
+   "no accidents",
+   "clean record"
+  ],
+  "display": "none"
+ },
+ {
+  "scenario": "s07",
+  "field": "vehicle_assignment",
+  "raw": "all",
+  "result": {
+   "norm": "all",
+   "display": "all your vehicles"
+  },
+  "spokenForms": [
+   "all"
+  ],
+  "display": "all your vehicles"
+ },
+ {
+  "scenario": "s07",
+  "field": "vehicle_assignment",
+  "raw": "whichever car is free",
+  "result": null,
+  "spokenForms": null,
+  "display": null
+ },
+ {
+  "scenario": "s07",
+  "field": "operator_type",
+  "raw": "occasional",
+  "result": {
+   "norm": "occasional",
+   "display": "occasional"
+  },
+  "spokenForms": [
+   "occasional",
+   "occasionally",
+   "sometimes"
+  ],
+  "display": "occasional"
+ },
+ {
+  "scenario": "s07",
+  "field": "operator_type",
+  "raw": "just when she's home on break",
+  "result": null,
+  "spokenForms": null,
+  "display": null
+ },
+ {
+  "scenario": "s07",
+  "field": "garaging_zip",
+  "raw": "48104",
+  "result": {
+   "norm": "48104",
+   "display": "48104"
+  },
+  "spokenForms": [
+   "48104",
+   "4 8 1 0 4"
+  ],
+  "display": "48104"
+ },
+ {
+  "scenario": "s07",
+  "field": "garaging_zip",
+  "raw": "48104",
+  "result": {
+   "norm": "48104",
+   "display": "48104"
+  },
+  "spokenForms": [
+   "48104",
+   "4 8 1 0 4"
+  ],
+  "display": "48104"
+ },
+ {
+  "scenario": "s07",
+  "field": "effective_date",
+  "raw": "2026-12-18",
+  "result": {
+   "norm": "2026-12-18",
+   "display": "Friday, December 18th"
+  },
+  "spokenForms": [
+   "Friday, December 18th",
+   "December 18th",
+   "Friday"
+  ],
+  "display": "Friday, December 18th"
+ },
+ {
+  "scenario": "s07",
+  "field": "effective_date",
+  "raw": "December 18th, when she flies home",
+  "result": {
+   "norm": "2026-12-18",
+   "display": "Friday, December 18th"
+  },
+  "spokenForms": [
+   "Friday, December 18th",
+   "December 18th",
+   "Friday"
+  ],
+  "display": "Friday, December 18th"
+ },
+ {
+  "scenario": "s07",
+  "field": "distant_student_discount",
+  "raw": "eligible",
+  "result": {
+   "norm": "eligible",
+   "display": "eligible"
+  },
+  "spokenForms": [
+   "eligible"
+  ],
+  "display": "eligible"
+ },
+ {
+  "scenario": "s07",
+  "field": "distant_student_discount",
+  "raw": "she's at school in Tempe, about 1,900 miles away, no car there",
+  "result": {
+   "norm": "not_eligible",
+   "display": "not eligible"
+  },
+  "spokenForms": [
+   "not eligible"
+  ],
+  "display": "not eligible"
+ },
+ {
+  "scenario": "s07",
+  "field": "premium_new_monthly_usd",
+  "raw": "121",
+  "result": {
+   "norm": "121.00",
+   "display": "$121 a month"
+  },
+  "spokenForms": [
+   "$121"
+  ],
+  "display": "$121 a month"
+ },
+ {
+  "scenario": "s07",
+  "field": "premium_new_monthly_usd",
+  "raw": "$121 a month from December",
+  "result": {
+   "norm": "121.00",
+   "display": "$121 a month"
+  },
+  "spokenForms": [
+   "$121"
+  ],
+  "display": "$121 a month"
+ },
+ {
+  "scenario": "s07",
+  "field": "premium_change_monthly_usd",
+  "raw": "19",
+  "result": {
+   "norm": "19.00",
+   "display": "$19 a month"
+  },
+  "spokenForms": [
+   "$19"
+  ],
+  "display": "$19 a month"
+ },
+ {
+  "scenario": "s07",
+  "field": "premium_change_monthly_usd",
+  "raw": "up $19",
+  "result": {
+   "norm": "19.00",
+   "display": "$19 a month"
+  },
+  "spokenForms": [
+   "$19"
+  ],
+  "display": "$19 a month"
+ },
+ {
+  "scenario": "s08",
+  "field": "driver_full_name",
+  "raw": "Walter Hughes",
+  "result": {
+   "norm": "walter hughes",
+   "display": "Walter Hughes"
+  },
+  "spokenForms": [
+   "Walter Hughes",
+   "Walter"
+  ],
+  "display": "Walter Hughes"
+ },
+ {
+  "scenario": "s08",
+  "field": "driver_full_name",
+  "raw": "Walter Hughes, H-U-G-H-E-S",
+  "result": {
+   "norm": "walter hughes",
+   "display": "Walter Hughes"
+  },
+  "spokenForms": [
+   "Walter Hughes",
+   "Walter"
+  ],
+  "display": "Walter Hughes"
+ },
+ {
+  "scenario": "s08",
+  "field": "driver_dob",
+  "raw": "1948-01-17",
+  "result": {
+   "norm": "1948-01-17",
+   "display": "January 17th, 1948"
+  },
+  "spokenForms": [
+   "January 17th, 1948",
+   "January 17th",
+   "1948"
+  ],
+  "display": "January 17th, 1948"
+ },
+ {
+  "scenario": "s08",
+  "field": "driver_dob",
+  "raw": "January 17th, 1948",
+  "result": {
+   "norm": "1948-01-17",
+   "display": "January 17th, 1948"
+  },
+  "spokenForms": [
+   "January 17th, 1948",
+   "January 17th",
+   "1948"
+  ],
+  "display": "January 17th, 1948"
+ },
+ {
+  "scenario": "s08",
+  "field": "driver_age",
+  "raw": "78",
+  "result": {
+   "norm": "78",
+   "display": "78"
+  },
+  "spokenForms": [
+   "78"
+  ],
+  "display": "78"
+ },
+ {
+  "scenario": "s08",
+  "field": "driver_age",
+  "raw": "he's seventy-eight",
+  "result": {
+   "norm": "78",
+   "display": "78"
+  },
+  "spokenForms": [
+   "78"
+  ],
+  "display": "78"
+ },
+ {
+  "scenario": "s08",
+  "field": "driver_relation",
+  "raw": "parent",
+  "result": {
+   "norm": "parent",
+   "display": "parent"
+  },
+  "spokenForms": [
+   "mother",
+   "father",
+   "mom",
+   "dad",
+   "parent"
+  ],
+  "display": "parent"
+ },
+ {
+  "scenario": "s08",
+  "field": "driver_relation",
+  "raw": "my father",
+  "result": {
+   "norm": "parent",
+   "display": "parent (father)"
+  },
+  "spokenForms": [
+   "mother",
+   "father",
+   "mom",
+   "dad",
+   "parent"
+  ],
+  "display": "parent (father)"
+ },
+ {
+  "scenario": "s08",
+  "field": "license_state",
+  "raw": "FL",
+  "result": {
+   "norm": "FL",
+   "display": "Florida (FL)"
+  },
+  "spokenForms": [
+   "Florida"
+  ],
+  "display": "Florida (FL)"
+ },
+ {
+  "scenario": "s08",
+  "field": "license_state",
+  "raw": "Florida, he's lived here thirty years",
+  "result": {
+   "norm": "FL",
+   "display": "Florida (FL)"
+  },
+  "spokenForms": [
+   "Florida"
+  ],
+  "display": "Florida (FL)"
+ },
+ {
+  "scenario": "s08",
+  "field": "license_status",
+  "raw": "full",
+  "result": {
+   "norm": "full",
+   "display": "full license"
+  },
+  "spokenForms": [
+   "full license",
+   "fully licensed"
+  ],
+  "display": "full license"
+ },
+ {
+  "scenario": "s08",
+  "field": "license_status",
+  "raw": "regular license",
+  "result": {
+   "norm": "full",
+   "display": "full license"
+  },
+  "spokenForms": [
+   "full license",
+   "fully licensed"
+  ],
+  "display": "full license"
+ },
+ {
+  "scenario": "s08",
+  "field": "incidents_3y",
+  "raw": "none",
+  "result": {
+   "norm": "none",
+   "display": "none"
+  },
+  "spokenForms": [
+   "no tickets",
+   "no accidents",
+   "clean record"
+  ],
+  "display": "none"
+ },
+ {
+  "scenario": "s08",
+  "field": "incidents_3y",
+  "raw": "no, he's a careful driver",
+  "result": {
+   "norm": "none",
+   "display": "none"
+  },
+  "spokenForms": [
+   "no tickets",
+   "no accidents",
+   "clean record"
+  ],
+  "display": "none"
+ },
+ {
+  "scenario": "s08",
+  "field": "vehicle_assignment",
+  "raw": "veh2",
+  "result": {
+   "norm": "veh2",
+   "display": "2015 Nissan Altima"
+  },
+  "spokenForms": [
+   "Altima",
+   "2015 Nissan Altima",
+   "Nissan Altima"
+  ],
+  "display": "2015 Nissan Altima"
+ },
+ {
+  "scenario": "s08",
+  "field": "vehicle_assignment",
+  "raw": "the Altima",
+  "result": {
+   "norm": "veh2",
+   "display": "2015 Nissan Altima"
+  },
+  "spokenForms": [
+   "Altima",
+   "2015 Nissan Altima",
+   "Nissan Altima"
+  ],
+  "display": "2015 Nissan Altima"
+ },
+ {
+  "scenario": "s08",
+  "field": "operator_type",
+  "raw": "occasional",
+  "result": {
+   "norm": "occasional",
+   "display": "occasional"
+  },
+  "spokenForms": [
+   "occasional",
+   "occasionally",
+   "sometimes"
+  ],
+  "display": "occasional"
+ },
+ {
+  "scenario": "s08",
+  "field": "operator_type",
+  "raw": "a couple of times a week, church and errands",
+  "result": null,
+  "spokenForms": null,
+  "display": null
+ },
+ {
+  "scenario": "s08",
+  "field": "garaging_zip",
+  "raw": "33647",
+  "result": {
+   "norm": "33647",
+   "display": "33647"
+  },
+  "spokenForms": [
+   "33647",
+   "3 3 6 4 7"
+  ],
+  "display": "33647"
+ },
+ {
+  "scenario": "s08",
+  "field": "garaging_zip",
+  "raw": "here at my house, 33647",
+  "result": {
+   "norm": "33647",
+   "display": "33647"
+  },
+  "spokenForms": [
+   "33647",
+   "3 3 6 4 7"
+  ],
+  "display": "33647"
+ },
+ {
+  "scenario": "s08",
+  "field": "effective_date",
+  "raw": "2026-09-28",
+  "result": {
+   "norm": "2026-09-28",
+   "display": "Monday, September 28th"
+  },
+  "spokenForms": [
+   "Monday, September 28th",
+   "September 28th",
+   "Monday"
+  ],
+  "display": "Monday, September 28th"
+ },
+ {
+  "scenario": "s08",
+  "field": "effective_date",
+  "raw": "Monday, the 28th",
+  "result": {
+   "norm": "2026-09-28",
+   "display": "Monday, September 28th"
+  },
+  "spokenForms": [
+   "Monday, September 28th",
+   "September 28th",
+   "Monday"
+  ],
+  "display": "Monday, September 28th"
+ },
+ {
+  "scenario": "s08",
+  "field": "mature_driver_discount",
+  "raw": "pending_proof",
+  "result": {
+   "norm": "pending_proof",
+   "display": "pending proof"
+  },
+  "spokenForms": [
+   "pending proof"
+  ],
+  "display": "pending proof"
+ },
+ {
+  "scenario": "s08",
+  "field": "mature_driver_discount",
+  "raw": "he took a senior driver safety course last year; I'd have to find the certificate",
+  "result": {
+   "norm": "pending_proof",
+   "display": "pending proof"
+  },
+  "spokenForms": [
+   "pending proof"
+  ],
+  "display": "pending proof"
+ },
+ {
+  "scenario": "s08",
+  "field": "premium_new_monthly_usd",
+  "raw": "171",
+  "result": {
+   "norm": "171.00",
+   "display": "$171 a month"
+  },
+  "spokenForms": [
+   "$171"
+  ],
+  "display": "$171 a month"
+ },
+ {
+  "scenario": "s08",
+  "field": "premium_new_monthly_usd",
+  "raw": "$171 a month",
+  "result": {
+   "norm": "171.00",
+   "display": "$171 a month"
+  },
+  "spokenForms": [
+   "$171"
+  ],
+  "display": "$171 a month"
+ },
+ {
+  "scenario": "s08",
+  "field": "premium_change_monthly_usd",
+  "raw": "24",
+  "result": {
+   "norm": "24.00",
+   "display": "$24 a month"
+  },
+  "spokenForms": [
+   "$24"
+  ],
+  "display": "$24 a month"
+ },
+ {
+  "scenario": "s08",
+  "field": "premium_change_monthly_usd",
+  "raw": "up $24",
+  "result": {
+   "norm": "24.00",
+   "display": "$24 a month"
+  },
+  "spokenForms": [
+   "$24"
+  ],
+  "display": "$24 a month"
+ },
+ {
+  "scenario": "s09",
+  "field": "driver_full_name",
+  "raw": "Ethan Nguyen",
+  "result": {
+   "norm": "ethan nguyen",
+   "display": "Ethan Nguyen"
+  },
+  "spokenForms": [
+   "Ethan Nguyen",
+   "Ethan"
+  ],
+  "display": "Ethan Nguyen"
+ },
+ {
+  "scenario": "s09",
+  "field": "driver_full_name",
+  "raw": "Ethan Nguyen, N-G-U-Y-E-N",
+  "result": {
+   "norm": "ethan nguyen",
+   "display": "Ethan Nguyen"
+  },
+  "spokenForms": [
+   "Ethan Nguyen",
+   "Ethan"
+  ],
+  "display": "Ethan Nguyen"
+ },
+ {
+  "scenario": "s09",
+  "field": "driver_dob",
+  "raw": "2011-01-26",
+  "result": {
+   "norm": "2011-01-26",
+   "display": "January 26th, 2011"
+  },
+  "spokenForms": [
+   "January 26th, 2011",
+   "January 26th",
+   "2011"
+  ],
+  "display": "January 26th, 2011"
+ },
+ {
+  "scenario": "s09",
+  "field": "driver_dob",
+  "raw": "January 26th, 2011",
+  "result": {
+   "norm": "2011-01-26",
+   "display": "January 26th, 2011"
+  },
+  "spokenForms": [
+   "January 26th, 2011",
+   "January 26th",
+   "2011"
+  ],
+  "display": "January 26th, 2011"
+ },
+ {
+  "scenario": "s09",
+  "field": "driver_age",
+  "raw": "15",
+  "result": {
+   "norm": "15",
+   "display": "15"
+  },
+  "spokenForms": [
+   "15"
+  ],
+  "display": "15"
+ },
+ {
+  "scenario": "s09",
+  "field": "driver_age",
+  "raw": "he's fifteen",
+  "result": {
+   "norm": "15",
+   "display": "15"
+  },
+  "spokenForms": [
+   "15"
+  ],
+  "display": "15"
+ },
+ {
+  "scenario": "s09",
+  "field": "driver_relation",
+  "raw": "child",
+  "result": {
+   "norm": "child",
+   "display": "child"
+  },
+  "spokenForms": [
+   "daughter",
+   "son",
+   "child",
+   "kid"
+  ],
+  "display": "child"
+ },
+ {
+  "scenario": "s09",
+  "field": "driver_relation",
+  "raw": "my son",
+  "result": {
+   "norm": "child",
+   "display": "child (son)"
+  },
+  "spokenForms": [
+   "daughter",
+   "son",
+   "child",
+   "kid"
+  ],
+  "display": "child (son)"
+ },
+ {
+  "scenario": "s09",
+  "field": "license_state",
+  "raw": "WA",
+  "result": {
+   "norm": "WA",
+   "display": "Washington (WA)"
+  },
+  "spokenForms": [
+   "Washington"
+  ],
+  "display": "Washington (WA)"
+ },
+ {
+  "scenario": "s09",
+  "field": "license_state",
+  "raw": "Washington",
+  "result": {
+   "norm": "WA",
+   "display": "Washington (WA)"
+  },
+  "spokenForms": [
+   "Washington"
+  ],
+  "display": "Washington (WA)"
+ },
+ {
+  "scenario": "s09",
+  "field": "license_status",
+  "raw": "learner_permit",
+  "result": {
+   "norm": "learner_permit",
+   "display": "learner's permit"
+  },
+  "spokenForms": [
+   "learner",
+   "permit"
+  ],
+  "display": "learner's permit"
+ },
+ {
+  "scenario": "s09",
+  "field": "license_status",
+  "raw": "just the learner's permit, he got it Tuesday",
+  "result": {
+   "norm": "learner_permit",
+   "display": "learner's permit"
+  },
+  "spokenForms": [
+   "learner",
+   "permit"
+  ],
+  "display": "learner's permit"
+ },
+ {
+  "scenario": "s09",
+  "field": "incidents_3y",
+  "raw": "none",
+  "result": {
+   "norm": "none",
+   "display": "none"
+  },
+  "spokenForms": [
+   "no tickets",
+   "no accidents",
+   "clean record"
+  ],
+  "display": "none"
+ },
+ {
+  "scenario": "s09",
+  "field": "incidents_3y",
+  "raw": "no",
+  "result": {
+   "norm": "none",
+   "display": "none"
+  },
+  "spokenForms": [
+   "no tickets",
+   "no accidents",
+   "clean record"
+  ],
+  "display": "none"
+ },
+ {
+  "scenario": "s09",
+  "field": "vehicle_assignment",
+  "raw": "veh1",
+  "result": {
+   "norm": "veh1",
+   "display": "2018 Subaru Outback"
+  },
+  "spokenForms": [
+   "Outback",
+   "2018 Subaru Outback",
+   "Subaru Outback"
+  ],
+  "display": "2018 Subaru Outback"
+ },
+ {
+  "scenario": "s09",
+  "field": "vehicle_assignment",
+  "raw": "the Outback, with me in the passenger seat",
+  "result": {
+   "norm": "veh1",
+   "display": "2018 Subaru Outback"
+  },
+  "spokenForms": [
+   "Outback",
+   "2018 Subaru Outback",
+   "Subaru Outback"
+  ],
+  "display": "2018 Subaru Outback"
+ },
+ {
+  "scenario": "s09",
+  "field": "operator_type",
+  "raw": "occasional",
+  "result": {
+   "norm": "occasional",
+   "display": "occasional"
+  },
+  "spokenForms": [
+   "occasional",
+   "occasionally",
+   "sometimes"
+  ],
+  "display": "occasional"
+ },
+ {
+  "scenario": "s09",
+  "field": "operator_type",
+  "raw": "just practice drives on weekends",
+  "result": {
+   "norm": "occasional",
+   "display": "occasional"
+  },
+  "spokenForms": [
+   "occasional",
+   "occasionally",
+   "sometimes"
+  ],
+  "display": "occasional"
+ },
+ {
+  "scenario": "s09",
+  "field": "garaging_zip",
+  "raw": "98406",
+  "result": {
+   "norm": "98406",
+   "display": "98406"
+  },
+  "spokenForms": [
+   "98406",
+   "9 8 4 0 6"
+  ],
+  "display": "98406"
+ },
+ {
+  "scenario": "s09",
+  "field": "garaging_zip",
+  "raw": "at home, 98406",
+  "result": {
+   "norm": "98406",
+   "display": "98406"
+  },
+  "spokenForms": [
+   "98406",
+   "9 8 4 0 6"
+  ],
+  "display": "98406"
+ },
+ {
+  "scenario": "s09",
+  "field": "effective_date",
+  "raw": "2026-09-25",
+  "result": {
+   "norm": "2026-09-25",
+   "display": "Friday, September 25th"
+  },
+  "spokenForms": [
+   "Friday, September 25th",
+   "September 25th",
+   "Friday"
+  ],
+  "display": "Friday, September 25th"
+ },
+ {
+  "scenario": "s09",
+  "field": "effective_date",
+  "raw": "today, he wants to practice this weekend",
+  "result": {
+   "norm": "2026-09-25",
+   "display": "Friday, September 25th"
+  },
+  "spokenForms": [
+   "Friday, September 25th",
+   "September 25th",
+   "Friday"
+  ],
+  "display": "Friday, September 25th"
+ },
+ {
+  "scenario": "s09",
+  "field": "premium_new_monthly_usd",
+  "raw": "134",
+  "result": {
+   "norm": "134.00",
+   "display": "$134 a month"
+  },
+  "spokenForms": [
+   "$134"
+  ],
+  "display": "$134 a month"
+ },
+ {
+  "scenario": "s09",
+  "field": "premium_new_monthly_usd",
+  "raw": "stays at $134 a month",
+  "result": {
+   "norm": "134.00",
+   "display": "$134 a month"
+  },
+  "spokenForms": [
+   "$134"
+  ],
+  "display": "$134 a month"
+ },
+ {
+  "scenario": "s09",
+  "field": "premium_change_monthly_usd",
+  "raw": "0",
+  "result": {
+   "norm": "0.00",
+   "display": "$0 a month"
+  },
+  "spokenForms": [
+   "$0"
+  ],
+  "display": "$0 a month"
+ },
+ {
+  "scenario": "s09",
+  "field": "premium_change_monthly_usd",
+  "raw": "no change while he's on the permit",
+  "result": null,
+  "spokenForms": null,
+  "display": null
+ },
+ {
+  "scenario": "s10",
+  "field": "driver_full_name",
+  "raw": "Alex Rivera",
+  "result": {
+   "norm": "alex rivera",
+   "display": "Alex Rivera"
+  },
+  "spokenForms": [
+   "Alex Rivera",
+   "Alex"
+  ],
+  "display": "Alex Rivera"
+ },
+ {
+  "scenario": "s10",
+  "field": "driver_full_name",
+  "raw": "Alex Rivera, R-I-V-E-R-A",
+  "result": {
+   "norm": "alex rivera",
+   "display": "Alex Rivera"
+  },
+  "spokenForms": [
+   "Alex Rivera",
+   "Alex"
+  ],
+  "display": "Alex Rivera"
+ },
+ {
+  "scenario": "s10",
+  "field": "driver_dob",
+  "raw": "1997-11-04",
+  "result": {
+   "norm": "1997-11-04",
+   "display": "November 4th, 1997"
+  },
+  "spokenForms": [
+   "November 4th, 1997",
+   "November 4th",
+   "1997"
+  ],
+  "display": "November 4th, 1997"
+ },
+ {
+  "scenario": "s10",
+  "field": "driver_dob",
+  "raw": "November 4th, 1997",
+  "result": {
+   "norm": "1997-11-04",
+   "display": "November 4th, 1997"
+  },
+  "spokenForms": [
+   "November 4th, 1997",
+   "November 4th",
+   "1997"
+  ],
+  "display": "November 4th, 1997"
+ },
+ {
+  "scenario": "s10",
+  "field": "driver_age",
+  "raw": "28",
+  "result": {
+   "norm": "28",
+   "display": "28"
+  },
+  "spokenForms": [
+   "28"
+  ],
+  "display": "28"
+ },
+ {
+  "scenario": "s10",
+  "field": "driver_age",
+  "raw": "twenty-eight",
+  "result": {
+   "norm": "28",
+   "display": "28"
+  },
+  "spokenForms": [
+   "28"
+  ],
+  "display": "28"
+ },
+ {
+  "scenario": "s10",
+  "field": "driver_relation",
+  "raw": "domestic_partner",
+  "result": {
+   "norm": "domestic_partner",
+   "display": "domestic partner"
+  },
+  "spokenForms": [
+   "partner"
+  ],
+  "display": "domestic partner"
+ },
+ {
+  "scenario": "s10",
+  "field": "driver_relation",
+  "raw": "my partner, we live together",
+  "result": {
+   "norm": "domestic_partner",
+   "display": "domestic partner"
+  },
+  "spokenForms": [
+   "partner"
+  ],
+  "display": "domestic partner"
+ },
+ {
+  "scenario": "s10",
+  "field": "license_state",
+  "raw": "MN",
+  "result": {
+   "norm": "MN",
+   "display": "Minnesota (MN)"
+  },
+  "spokenForms": [
+   "Minnesota"
+  ],
+  "display": "Minnesota (MN)"
+ },
+ {
+  "scenario": "s10",
+  "field": "license_state",
+  "raw": "Minnesota",
+  "result": {
+   "norm": "MN",
+   "display": "Minnesota (MN)"
+  },
+  "spokenForms": [
+   "Minnesota"
+  ],
+  "display": "Minnesota (MN)"
+ },
+ {
+  "scenario": "s10",
+  "field": "license_status",
+  "raw": "full",
+  "result": {
+   "norm": "full",
+   "display": "full license"
+  },
+  "spokenForms": [
+   "full license",
+   "fully licensed"
+  ],
+  "display": "full license"
+ },
+ {
+  "scenario": "s10",
+  "field": "license_status",
+  "raw": "regular license",
+  "result": {
+   "norm": "full",
+   "display": "full license"
+  },
+  "spokenForms": [
+   "full license",
+   "fully licensed"
+  ],
+  "display": "full license"
+ },
+ {
+  "scenario": "s10",
+  "field": "incidents_3y",
+  "raw": "one speeding ticket, March 2025",
+  "result": {
+   "norm": "one speeding ticket, march 2025",
+   "display": "one speeding ticket, March 2025"
+  },
+  "spokenForms": [
+   "one speeding ticket, march 2025"
+  ],
+  "display": "one speeding ticket, March 2025"
+ },
+ {
+  "scenario": "s10",
+  "field": "incidents_3y",
+  "raw": "one speeding ticket, March of last year",
+  "result": {
+   "norm": "one speeding ticket, march of last year",
+   "display": "one speeding ticket, March of last year"
+  },
+  "spokenForms": [
+   "one speeding ticket, march of last year"
+  ],
+  "display": "one speeding ticket, March of last year"
+ },
+ {
+  "scenario": "s10",
+  "field": "vehicle_assignment",
+  "raw": "veh1",
+  "result": {
+   "norm": "veh1",
+   "display": "2019 Jeep Cherokee"
+  },
+  "spokenForms": [
+   "Cherokee",
+   "2019 Jeep Cherokee",
+   "Jeep Cherokee"
+  ],
+  "display": "2019 Jeep Cherokee"
+ },
+ {
+  "scenario": "s10",
+  "field": "vehicle_assignment",
+  "raw": "the Jeep",
+  "result": {
+   "norm": "veh1",
+   "display": "2019 Jeep Cherokee"
+  },
+  "spokenForms": [
+   "Cherokee",
+   "2019 Jeep Cherokee",
+   "Jeep Cherokee"
+  ],
+  "display": "2019 Jeep Cherokee"
+ },
+ {
+  "scenario": "s10",
+  "field": "operator_type",
+  "raw": "primary",
+  "result": {
+   "norm": "primary",
+   "display": "primary"
+  },
+  "spokenForms": [
+   "primary",
+   "every day",
+   "main driver",
+   "mainly"
+  ],
+  "display": "primary"
+ },
+ {
+  "scenario": "s10",
+  "field": "operator_type",
+  "raw": "every weekday to work, yeah",
+  "result": null,
+  "spokenForms": null,
+  "display": null
+ },
+ {
+  "scenario": "s10",
+  "field": "garaging_zip",
+  "raw": "55410",
+  "result": {
+   "norm": "55410",
+   "display": "55410"
+  },
+  "spokenForms": [
+   "55410",
+   "5 5 4 1 0"
+  ],
+  "display": "55410"
+ },
+ {
+  "scenario": "s10",
+  "field": "garaging_zip",
+  "raw": "at home, 55410",
+  "result": {
+   "norm": "55410",
+   "display": "55410"
+  },
+  "spokenForms": [
+   "55410",
+   "5 5 4 1 0"
+  ],
+  "display": "55410"
+ },
+ {
+  "scenario": "s10",
+  "field": "effective_date",
+  "raw": "2026-10-01",
+  "result": {
+   "norm": "2026-10-01",
+   "display": "Thursday, October 1st"
+  },
+  "spokenForms": [
+   "Thursday, October 1st",
+   "October 1st",
+   "Thursday"
+  ],
+  "display": "Thursday, October 1st"
+ },
+ {
+  "scenario": "s10",
+  "field": "effective_date",
+  "raw": "October 1st",
+  "result": {
+   "norm": "2026-10-01",
+   "display": "Thursday, October 1st"
+  },
+  "spokenForms": [
+   "Thursday, October 1st",
+   "October 1st",
+   "Thursday"
+  ],
+  "display": "Thursday, October 1st"
+ },
+ {
+  "scenario": "s10",
+  "field": "premium_new_monthly_usd",
+  "raw": "187",
+  "result": {
+   "norm": "187.00",
+   "display": "$187 a month"
+  },
+  "spokenForms": [
+   "$187"
+  ],
+  "display": "$187 a month"
+ },
+ {
+  "scenario": "s10",
+  "field": "premium_new_monthly_usd",
+  "raw": "$187 a month",
+  "result": {
+   "norm": "187.00",
+   "display": "$187 a month"
+  },
+  "spokenForms": [
+   "$187"
+  ],
+  "display": "$187 a month"
+ },
+ {
+  "scenario": "s10",
+  "field": "premium_change_monthly_usd",
+  "raw": "41",
+  "result": {
+   "norm": "41.00",
+   "display": "$41 a month"
+  },
+  "spokenForms": [
+   "$41"
+  ],
+  "display": "$41 a month"
+ },
+ {
+  "scenario": "s10",
+  "field": "premium_change_monthly_usd",
+  "raw": "up $41",
+  "result": {
+   "norm": "41.00",
+   "display": "$41 a month"
+  },
+  "spokenForms": [
+   "$41"
+  ],
+  "display": "$41 a month"
+ },
+ {
+  "scenario": "s11",
+  "field": "driver_full_name",
+  "raw": "Omar Hassan",
+  "result": {
+   "norm": "omar hassan",
+   "display": "Omar Hassan"
+  },
+  "spokenForms": [
+   "Omar Hassan",
+   "Omar"
+  ],
+  "display": "Omar Hassan"
+ },
+ {
+  "scenario": "s11",
+  "field": "driver_full_name",
+  "raw": "Omar, O-M-A-R, Hassan",
+  "result": {
+   "norm": "omar hassan",
+   "display": "Omar Hassan"
+  },
+  "spokenForms": [
+   "Omar Hassan",
+   "Omar"
+  ],
+  "display": "Omar Hassan"
+ },
+ {
+  "scenario": "s11",
+  "field": "driver_dob",
+  "raw": "2002-02-11",
+  "result": {
+   "norm": "2002-02-11",
+   "display": "February 11th, 2002"
+  },
+  "spokenForms": [
+   "February 11th, 2002",
+   "February 11th",
+   "2002"
+  ],
+  "display": "February 11th, 2002"
+ },
+ {
+  "scenario": "s11",
+  "field": "driver_dob",
+  "raw": "February 11th, 2002",
+  "result": {
+   "norm": "2002-02-11",
+   "display": "February 11th, 2002"
+  },
+  "spokenForms": [
+   "February 11th, 2002",
+   "February 11th",
+   "2002"
+  ],
+  "display": "February 11th, 2002"
+ },
+ {
+  "scenario": "s11",
+  "field": "driver_age",
+  "raw": "24",
+  "result": {
+   "norm": "24",
+   "display": "24"
+  },
+  "spokenForms": [
+   "24"
+  ],
+  "display": "24"
+ },
+ {
+  "scenario": "s11",
+  "field": "driver_age",
+  "raw": "he's twenty-four",
+  "result": {
+   "norm": "24",
+   "display": "24"
+  },
+  "spokenForms": [
+   "24"
+  ],
+  "display": "24"
+ },
+ {
+  "scenario": "s11",
+  "field": "driver_relation",
+  "raw": "sibling",
+  "result": {
+   "norm": "sibling",
+   "display": "sibling"
+  },
+  "spokenForms": [
+   "brother",
+   "sister",
+   "sibling"
+  ],
+  "display": "sibling"
+ },
+ {
+  "scenario": "s11",
+  "field": "driver_relation",
+  "raw": "my younger brother",
+  "result": {
+   "norm": "sibling",
+   "display": "sibling (brother)"
+  },
+  "spokenForms": [
+   "brother",
+   "sister",
+   "sibling"
+  ],
+  "display": "sibling (brother)"
+ },
+ {
+  "scenario": "s11",
+  "field": "license_state",
+  "raw": "MI",
+  "result": {
+   "norm": "MI",
+   "display": "Michigan (MI)"
+  },
+  "spokenForms": [
+   "Michigan"
+  ],
+  "display": "Michigan (MI)"
+ },
+ {
+  "scenario": "s11",
+  "field": "license_state",
+  "raw": "Michigan, he just moved from Detroit",
+  "result": {
+   "norm": "MI",
+   "display": "Michigan (MI)"
+  },
+  "spokenForms": [
+   "Michigan"
+  ],
+  "display": "Michigan (MI)"
+ },
+ {
+  "scenario": "s11",
+  "field": "license_status",
+  "raw": "full",
+  "result": {
+   "norm": "full",
+   "display": "full license"
+  },
+  "spokenForms": [
+   "full license",
+   "fully licensed"
+  ],
+  "display": "full license"
+ },
+ {
+  "scenario": "s11",
+  "field": "license_status",
+  "raw": "full license",
+  "result": {
+   "norm": "full",
+   "display": "full license"
+  },
+  "spokenForms": [
+   "full license",
+   "fully licensed"
+  ],
+  "display": "full license"
+ },
+ {
+  "scenario": "s11",
+  "field": "incidents_3y",
+  "raw": "none",
+  "result": {
+   "norm": "none",
+   "display": "none"
+  },
+  "spokenForms": [
+   "no tickets",
+   "no accidents",
+   "clean record"
+  ],
+  "display": "none"
+ },
+ {
+  "scenario": "s11",
+  "field": "incidents_3y",
+  "raw": "no tickets",
+  "result": {
+   "norm": "none",
+   "display": "none"
+  },
+  "spokenForms": [
+   "no tickets",
+   "no accidents",
+   "clean record"
+  ],
+  "display": "none"
+ },
+ {
+  "scenario": "s11",
+  "field": "vehicle_assignment",
+  "raw": "veh2",
+  "result": {
+   "norm": "veh2",
+   "display": "2013 Mazda Mazda3"
+  },
+  "spokenForms": [
+   "Mazda3",
+   "2013 Mazda Mazda3",
+   "Mazda Mazda3"
+  ],
+  "display": "2013 Mazda Mazda3"
+ },
+ {
+  "scenario": "s11",
+  "field": "vehicle_assignment",
+  "raw": "oh, and he'll mostly drive the Mazda",
+  "result": {
+   "norm": "veh2",
+   "display": "2013 Mazda Mazda3"
+  },
+  "spokenForms": [
+   "Mazda3",
+   "2013 Mazda Mazda3",
+   "Mazda Mazda3"
+  ],
+  "display": "2013 Mazda Mazda3"
+ },
+ {
+  "scenario": "s11",
+  "field": "operator_type",
+  "raw": "primary",
+  "result": {
+   "norm": "primary",
+   "display": "primary"
+  },
+  "spokenForms": [
+   "primary",
+   "every day",
+   "main driver",
+   "mainly"
+  ],
+  "display": "primary"
+ },
+ {
+  "scenario": "s11",
+  "field": "operator_type",
+  "raw": "pretty much every day",
+  "result": {
+   "norm": "primary",
+   "display": "primary"
+  },
+  "spokenForms": [
+   "primary",
+   "every day",
+   "main driver",
+   "mainly"
+  ],
+  "display": "primary"
+ },
+ {
+  "scenario": "s11",
+  "field": "garaging_zip",
+  "raw": "37215",
+  "result": {
+   "norm": "37215",
+   "display": "37215"
+  },
+  "spokenForms": [
+   "37215",
+   "3 7 2 1 5"
+  ],
+  "display": "37215"
+ },
+ {
+  "scenario": "s11",
+  "field": "garaging_zip",
+  "raw": "here at the house, 37215",
+  "result": {
+   "norm": "37215",
+   "display": "37215"
+  },
+  "spokenForms": [
+   "37215",
+   "3 7 2 1 5"
+  ],
+  "display": "37215"
+ },
+ {
+  "scenario": "s11",
+  "field": "effective_date",
+  "raw": "2026-09-26",
+  "result": {
+   "norm": "2026-09-26",
+   "display": "Saturday, September 26th"
+  },
+  "spokenForms": [
+   "Saturday, September 26th",
+   "September 26th",
+   "Saturday"
+  ],
+  "display": "Saturday, September 26th"
+ },
+ {
+  "scenario": "s11",
+  "field": "effective_date",
+  "raw": "starting tomorrow, Saturday the 26th",
+  "result": {
+   "norm": "2026-09-26",
+   "display": "Saturday, September 26th"
+  },
+  "spokenForms": [
+   "Saturday, September 26th",
+   "September 26th",
+   "Saturday"
+  ],
+  "display": "Saturday, September 26th"
+ },
+ {
+  "scenario": "s11",
+  "field": "premium_new_monthly_usd",
+  "raw": "176",
+  "result": {
+   "norm": "176.00",
+   "display": "$176 a month"
+  },
+  "spokenForms": [
+   "$176"
+  ],
+  "display": "$176 a month"
+ },
+ {
+  "scenario": "s11",
+  "field": "premium_new_monthly_usd",
+  "raw": "$176 a month",
+  "result": {
+   "norm": "176.00",
+   "display": "$176 a month"
+  },
+  "spokenForms": [
+   "$176"
+  ],
+  "display": "$176 a month"
+ },
+ {
+  "scenario": "s11",
+  "field": "premium_change_monthly_usd",
+  "raw": "37",
+  "result": {
+   "norm": "37.00",
+   "display": "$37 a month"
+  },
+  "spokenForms": [
+   "$37"
+  ],
+  "display": "$37 a month"
+ },
+ {
+  "scenario": "s11",
+  "field": "premium_change_monthly_usd",
+  "raw": "up $37",
+  "result": {
+   "norm": "37.00",
+   "display": "$37 a month"
+  },
+  "spokenForms": [
+   "$37"
+  ],
+  "display": "$37 a month"
+ },
+ {
+  "scenario": "s12",
+  "field": "driver_full_name",
+  "raw": "Ava O'Brien",
+  "result": {
+   "norm": "ava o'brien",
+   "display": "Ava O'Brien"
+  },
+  "spokenForms": [
+   "Ava O'Brien",
+   "Ava"
+  ],
+  "display": "Ava O'Brien"
+ },
+ {
+  "scenario": "s12",
+  "field": "driver_full_name",
+  "raw": "Ava, A-V-A, O'Brien",
+  "result": {
+   "norm": "ava o'brien",
+   "display": "Ava O'Brien"
+  },
+  "spokenForms": [
+   "Ava O'Brien",
+   "Ava"
+  ],
+  "display": "Ava O'Brien"
+ },
+ {
+  "scenario": "s12",
+  "field": "driver_dob",
+  "raw": "2010-02-19",
+  "result": {
+   "norm": "2010-02-19",
+   "display": "February 19th, 2010"
+  },
+  "spokenForms": [
+   "February 19th, 2010",
+   "February 19th",
+   "2010"
+  ],
+  "display": "February 19th, 2010"
+ },
+ {
+  "scenario": "s12",
+  "field": "driver_dob",
+  "raw": "February 19th, 2010",
+  "result": {
+   "norm": "2010-02-19",
+   "display": "February 19th, 2010"
+  },
+  "spokenForms": [
+   "February 19th, 2010",
+   "February 19th",
+   "2010"
+  ],
+  "display": "February 19th, 2010"
+ },
+ {
+  "scenario": "s12",
+  "field": "driver_age",
+  "raw": "16",
+  "result": {
+   "norm": "16",
+   "display": "16"
+  },
+  "spokenForms": [
+   "16"
+  ],
+  "display": "16"
+ },
+ {
+  "scenario": "s12",
+  "field": "driver_age",
+  "raw": "sixteen",
+  "result": {
+   "norm": "16",
+   "display": "16"
+  },
+  "spokenForms": [
+   "16"
+  ],
+  "display": "16"
+ },
+ {
+  "scenario": "s12",
+  "field": "driver_relation",
+  "raw": "child",
+  "result": {
+   "norm": "child",
+   "display": "child"
+  },
+  "spokenForms": [
+   "daughter",
+   "son",
+   "child",
+   "kid"
+  ],
+  "display": "child"
+ },
+ {
+  "scenario": "s12",
+  "field": "driver_relation",
+  "raw": "my daughter",
+  "result": {
+   "norm": "child",
+   "display": "child (daughter)"
+  },
+  "spokenForms": [
+   "daughter",
+   "son",
+   "child",
+   "kid"
+  ],
+  "display": "child (daughter)"
+ },
+ {
+  "scenario": "s12",
+  "field": "license_state",
+  "raw": "ID",
+  "result": {
+   "norm": "ID",
+   "display": "Idaho (ID)"
+  },
+  "spokenForms": [
+   "Idaho"
+  ],
+  "display": "Idaho (ID)"
+ },
+ {
+  "scenario": "s12",
+  "field": "license_state",
+  "raw": "Idaho",
+  "result": {
+   "norm": "ID",
+   "display": "Idaho (ID)"
+  },
+  "spokenForms": [
+   "Idaho"
+  ],
+  "display": "Idaho (ID)"
+ },
+ {
+  "scenario": "s12",
+  "field": "license_status",
+  "raw": "provisional",
+  "result": {
+   "norm": "provisional",
+   "display": "probationary license"
+  },
+  "spokenForms": [
+   "probationary",
+   "provisional",
+   "junior",
+   "intermediate",
+   "graduated"
+  ],
+  "display": "probationary license"
+ },
+ {
+  "scenario": "s12",
+  "field": "license_status",
+  "raw": "her supervised-period license, the teen one",
+  "result": null,
+  "spokenForms": null,
+  "display": null
+ },
+ {
+  "scenario": "s12",
+  "field": "incidents_3y",
+  "raw": "none",
+  "result": {
+   "norm": "none",
+   "display": "none"
+  },
+  "spokenForms": [
+   "no tickets",
+   "no accidents",
+   "clean record"
+  ],
+  "display": "none"
+ },
+ {
+  "scenario": "s12",
+  "field": "incidents_3y",
+  "raw": "nope",
+  "result": {
+   "norm": "none",
+   "display": "none"
+  },
+  "spokenForms": [
+   "no tickets",
+   "no accidents",
+   "clean record"
+  ],
+  "display": "none"
+ },
+ {
+  "scenario": "s12",
+  "field": "vehicle_assignment",
+  "raw": "veh1",
+  "result": {
+   "norm": "veh1",
+   "display": "2018 Honda CR-V"
+  },
+  "spokenForms": [
+   "CR-V",
+   "2018 Honda CR-V",
+   "Honda CR-V"
+  ],
+  "display": "2018 Honda CR-V"
+ },
+ {
+  "scenario": "s12",
+  "field": "vehicle_assignment",
+  "raw": "the CR-V",
+  "result": {
+   "norm": "veh1",
+   "display": "2018 Honda CR-V"
+  },
+  "spokenForms": [
+   "CR-V",
+   "2018 Honda CR-V",
+   "Honda CR-V"
+  ],
+  "display": "2018 Honda CR-V"
+ },
+ {
+  "scenario": "s12",
+  "field": "operator_type",
+  "raw": "primary",
+  "result": {
+   "norm": "primary",
+   "display": "primary"
+  },
+  "spokenForms": [
+   "primary",
+   "every day",
+   "main driver",
+   "mainly"
+  ],
+  "display": "primary"
+ },
+ {
+  "scenario": "s12",
+  "field": "operator_type",
+  "raw": "she'll take it to school every day",
+  "result": {
+   "norm": "primary",
+   "display": "primary"
+  },
+  "spokenForms": [
+   "primary",
+   "every day",
+   "main driver",
+   "mainly"
+  ],
+  "display": "primary"
+ },
+ {
+  "scenario": "s12",
+  "field": "garaging_zip",
+  "raw": "83706",
+  "result": {
+   "norm": "83706",
+   "display": "83706"
+  },
+  "spokenForms": [
+   "83706",
+   "8 3 7 0 6"
+  ],
+  "display": "83706"
+ },
+ {
+  "scenario": "s12",
+  "field": "garaging_zip",
+  "raw": "at home, 83706",
+  "result": {
+   "norm": "83706",
+   "display": "83706"
+  },
+  "spokenForms": [
+   "83706",
+   "8 3 7 0 6"
+  ],
+  "display": "83706"
+ },
+ {
+  "scenario": "s12",
+  "field": "effective_date",
+  "raw": "2026-10-05",
+  "result": {
+   "norm": "2026-10-05",
+   "display": "Monday, October 5th"
+  },
+  "spokenForms": [
+   "Monday, October 5th",
+   "October 5th",
+   "Monday"
+  ],
+  "display": "Monday, October 5th"
+ },
+ {
+  "scenario": "s12",
+  "field": "effective_date",
+  "raw": "Monday, October 5th",
+  "result": {
+   "norm": "2026-10-05",
+   "display": "Monday, October 5th"
+  },
+  "spokenForms": [
+   "Monday, October 5th",
+   "October 5th",
+   "Monday"
+  ],
+  "display": "Monday, October 5th"
+ },
+ {
+  "scenario": "s12",
+  "field": "good_student_discount",
+  "raw": "eligible",
+  "result": {
+   "norm": "eligible",
+   "display": "eligible"
+  },
+  "spokenForms": [
+   "eligible"
+  ],
+  "display": "eligible"
+ },
+ {
+  "scenario": "s12",
+  "field": "good_student_discount",
+  "raw": "straight A's pretty much, a 3.8",
+  "result": null,
+  "spokenForms": null,
+  "display": null
+ },
+ {
+  "scenario": "s12",
+  "field": "premium_new_monthly_usd",
+  "raw": "183",
+  "result": {
+   "norm": "183.00",
+   "display": "$183 a month"
+  },
+  "spokenForms": [
+   "$183"
+  ],
+  "display": "$183 a month"
+ },
+ {
+  "scenario": "s12",
+  "field": "premium_change_monthly_usd",
+  "raw": "55",
+  "result": {
+   "norm": "55.00",
+   "display": "$55 a month"
+  },
+  "spokenForms": [
+   "$55"
+  ],
+  "display": "$55 a month"
+ },
+ {
+  "scenario": "s12",
+  "field": "amount_due_today_usd",
+  "raw": "21.7",
+  "result": {
+   "norm": "21.70",
+   "display": "$21.70"
+  },
+  "spokenForms": [
+   "$21.70"
+  ],
+  "display": "$21.70"
+ },
+ {
+  "scenario": "s13",
+  "field": "driver_full_name",
+  "raw": "Dominick Wells",
+  "result": {
+   "norm": "dominick wells",
+   "display": "Dominick Wells"
+  },
+  "spokenForms": [
+   "Dominick Wells",
+   "Dominick"
+  ],
+  "display": "Dominick Wells"
+ },
+ {
+  "scenario": "s13",
+  "field": "driver_full_name",
+  "raw": "Dominick Wells, D-O-M-I-N-I-C-K",
+  "result": {
+   "norm": "dominick wells",
+   "display": "Dominick Wells"
+  },
+  "spokenForms": [
+   "Dominick Wells",
+   "Dominick"
+  ],
+  "display": "Dominick Wells"
+ },
+ {
+  "scenario": "s13",
+  "field": "driver_dob",
+  "raw": "2004-04-08",
+  "result": {
+   "norm": "2004-04-08",
+   "display": "April 8th, 2004"
+  },
+  "spokenForms": [
+   "April 8th, 2004",
+   "April 8th",
+   "2004"
+  ],
+  "display": "April 8th, 2004"
+ },
+ {
+  "scenario": "s13",
+  "field": "driver_dob",
+  "raw": "April 8th, 2004",
+  "result": {
+   "norm": "2004-04-08",
+   "display": "April 8th, 2004"
+  },
+  "spokenForms": [
+   "April 8th, 2004",
+   "April 8th",
+   "2004"
+  ],
+  "display": "April 8th, 2004"
+ },
+ {
+  "scenario": "s13",
+  "field": "driver_age",
+  "raw": "22",
+  "result": {
+   "norm": "22",
+   "display": "22"
+  },
+  "spokenForms": [
+   "22"
+  ],
+  "display": "22"
+ },
+ {
+  "scenario": "s13",
+  "field": "driver_age",
+  "raw": "twenty-two",
+  "result": {
+   "norm": "22",
+   "display": "22"
+  },
+  "spokenForms": [
+   "22"
+  ],
+  "display": "22"
+ },
+ {
+  "scenario": "s13",
+  "field": "driver_relation",
+  "raw": "child",
+  "result": {
+   "norm": "child",
+   "display": "child"
+  },
+  "spokenForms": [
+   "daughter",
+   "son",
+   "child",
+   "kid"
+  ],
+  "display": "child"
+ },
+ {
+  "scenario": "s13",
+  "field": "driver_relation",
+  "raw": "my son",
+  "result": {
+   "norm": "child",
+   "display": "child (son)"
+  },
+  "spokenForms": [
+   "daughter",
+   "son",
+   "child",
+   "kid"
+  ],
+  "display": "child (son)"
+ },
+ {
+  "scenario": "s13",
+  "field": "license_state",
+  "raw": "MO",
+  "result": {
+   "norm": "MO",
+   "display": "Missouri (MO)"
+  },
+  "spokenForms": [
+   "Missouri"
+  ],
+  "display": "Missouri (MO)"
+ },
+ {
+  "scenario": "s13",
+  "field": "license_state",
+  "raw": "Missouri",
+  "result": {
+   "norm": "MO",
+   "display": "Missouri (MO)"
+  },
+  "spokenForms": [
+   "Missouri"
+  ],
+  "display": "Missouri (MO)"
+ },
+ {
+  "scenario": "s13",
+  "field": "license_status",
+  "raw": "full",
+  "result": {
+   "norm": "full",
+   "display": "full license"
+  },
+  "spokenForms": [
+   "full license",
+   "fully licensed"
+  ],
+  "display": "full license"
+ },
+ {
+  "scenario": "s13",
+  "field": "license_status",
+  "raw": "regular license",
+  "result": {
+   "norm": "full",
+   "display": "full license"
+  },
+  "spokenForms": [
+   "full license",
+   "fully licensed"
+  ],
+  "display": "full license"
+ },
+ {
+  "scenario": "s13",
+  "field": "incidents_3y",
+  "raw": "one at-fault accident, June 2025",
+  "result": {
+   "norm": "one at-fault accident, june 2025",
+   "display": "one at-fault accident, June 2025"
+  },
+  "spokenForms": [
+   "one at-fault accident, june 2025"
+  ],
+  "display": "one at-fault accident, June 2025"
+ },
+ {
+  "scenario": "s13",
+  "field": "incidents_3y",
+  "raw": "he rear-ended someone last June, 2025; nobody was hurt",
+  "result": {
+   "norm": "he rear-ended someone last june, 2025; nobody was hurt",
+   "display": "he rear-ended someone last June, 2025; nobody was hurt"
+  },
+  "spokenForms": [
+   "he rear-ended someone last june, 2025; nobody was hurt"
+  ],
+  "display": "he rear-ended someone last June, 2025; nobody was hurt"
+ },
+ {
+  "scenario": "s13",
+  "field": "vehicle_assignment",
+  "raw": "veh1",
+  "result": {
+   "norm": "veh1",
+   "display": "2021 Ram 1500"
+  },
+  "spokenForms": [
+   "1500",
+   "2021 Ram 1500",
+   "Ram 1500"
+  ],
+  "display": "2021 Ram 1500"
+ },
+ {
+  "scenario": "s13",
+  "field": "vehicle_assignment",
+  "raw": "the Ram, the truck",
+  "result": {
+   "norm": "veh1",
+   "display": "2021 Ram 1500"
+  },
+  "spokenForms": [
+   "1500",
+   "2021 Ram 1500",
+   "Ram 1500"
+  ],
+  "display": "2021 Ram 1500"
+ },
+ {
+  "scenario": "s13",
+  "field": "operator_type",
+  "raw": "primary",
+  "result": {
+   "norm": "primary",
+   "display": "primary"
+  },
+  "spokenForms": [
+   "primary",
+   "every day",
+   "main driver",
+   "mainly"
+  ],
+  "display": "primary"
+ },
+ {
+  "scenario": "s13",
+  "field": "operator_type",
+  "raw": "he'll drive it to his job every day",
+  "result": {
+   "norm": "primary",
+   "display": "primary"
+  },
+  "spokenForms": [
+   "primary",
+   "every day",
+   "main driver",
+   "mainly"
+  ],
+  "display": "primary"
+ },
+ {
+  "scenario": "s13",
+  "field": "garaging_zip",
+  "raw": "63109",
+  "result": {
+   "norm": "63109",
+   "display": "63109"
+  },
+  "spokenForms": [
+   "63109",
+   "6 3 1 0 9"
+  ],
+  "display": "63109"
+ },
+ {
+  "scenario": "s13",
+  "field": "garaging_zip",
+  "raw": "at home, 63109",
+  "result": {
+   "norm": "63109",
+   "display": "63109"
+  },
+  "spokenForms": [
+   "63109",
+   "6 3 1 0 9"
+  ],
+  "display": "63109"
+ },
+ {
+  "scenario": "s13",
+  "field": "effective_date",
+  "raw": "2026-09-28",
+  "result": {
+   "norm": "2026-09-28",
+   "display": "Monday, September 28th"
+  },
+  "spokenForms": [
+   "Monday, September 28th",
+   "September 28th",
+   "Monday"
+  ],
+  "display": "Monday, September 28th"
+ },
+ {
+  "scenario": "s13",
+  "field": "effective_date",
+  "raw": "Monday, the 28th",
+  "result": {
+   "norm": "2026-09-28",
+   "display": "Monday, September 28th"
+  },
+  "spokenForms": [
+   "Monday, September 28th",
+   "September 28th",
+   "Monday"
+  ],
+  "display": "Monday, September 28th"
+ },
+ {
+  "scenario": "s13",
+  "field": "underwriting_review",
+  "raw": "true",
+  "result": {
+   "norm": "true",
+   "display": "true"
+  },
+  "spokenForms": [
+   "true"
+  ],
+  "display": "true"
+ },
+ {
+  "scenario": "s13",
+  "field": "underwriting_review",
+  "raw": "because of the at-fault accident, underwriting has to review it; this price is an estimate until they approve",
+  "result": null,
+  "spokenForms": null,
+  "display": null
+ },
+ {
+  "scenario": "s13",
+  "field": "premium_new_monthly_usd",
+  "raw": "246",
+  "result": {
+   "norm": "246.00",
+   "display": "$246 a month"
+  },
+  "spokenForms": [
+   "$246"
+  ],
+  "display": "$246 a month"
+ },
+ {
+  "scenario": "s13",
+  "field": "premium_new_monthly_usd",
+  "raw": "an estimated $246 a month",
+  "result": {
+   "norm": "246.00",
+   "display": "$246 a month"
+  },
+  "spokenForms": [
+   "$246"
+  ],
+  "display": "$246 a month"
+ },
+ {
+  "scenario": "s13",
+  "field": "premium_change_monthly_usd",
+  "raw": "88",
+  "result": {
+   "norm": "88.00",
+   "display": "$88 a month"
+  },
+  "spokenForms": [
+   "$88"
+  ],
+  "display": "$88 a month"
+ },
+ {
+  "scenario": "s13",
+  "field": "premium_change_monthly_usd",
+  "raw": "about $88 more",
+  "result": {
+   "norm": "88.00",
+   "display": "$88 a month"
+  },
+  "spokenForms": [
+   "$88"
+  ],
+  "display": "$88 a month"
+ },
+ {
+  "scenario": "s14",
+  "field": "driver_full_name",
+  "raw": "Carmen Diaz",
+  "result": {
+   "norm": "carmen diaz",
+   "display": "Carmen Diaz"
+  },
+  "spokenForms": [
+   "Carmen Diaz",
+   "Carmen"
+  ],
+  "display": "Carmen Diaz"
+ },
+ {
+  "scenario": "s14",
+  "field": "driver_full_name",
+  "raw": "Carmen Diaz, D-I-A-Z",
+  "result": {
+   "norm": "carmen diaz",
+   "display": "Carmen Diaz"
+  },
+  "spokenForms": [
+   "Carmen Diaz",
+   "Carmen"
+  ],
+  "display": "Carmen Diaz"
+ },
+ {
+  "scenario": "s14",
+  "field": "driver_dob",
+  "raw": "1965-05-05",
+  "result": {
+   "norm": "1965-05-05",
+   "display": "May 5th, 1965"
+  },
+  "spokenForms": [
+   "May 5th, 1965",
+   "May 5th",
+   "1965"
+  ],
+  "display": "May 5th, 1965"
+ },
+ {
+  "scenario": "s14",
+  "field": "driver_dob",
+  "raw": "May 5th, 1965 (your mom may shout it first)",
+  "result": {
+   "norm": "1965-05-05",
+   "display": "May 5th, 1965"
+  },
+  "spokenForms": [
+   "May 5th, 1965",
+   "May 5th",
+   "1965"
+  ],
+  "display": "May 5th, 1965"
+ },
+ {
+  "scenario": "s14",
+  "field": "driver_age",
+  "raw": "61",
+  "result": {
+   "norm": "61",
+   "display": "61"
+  },
+  "spokenForms": [
+   "61"
+  ],
+  "display": "61"
+ },
+ {
+  "scenario": "s14",
+  "field": "driver_age",
+  "raw": "sixty-one",
+  "result": {
+   "norm": "61",
+   "display": "61"
+  },
+  "spokenForms": [
+   "61"
+  ],
+  "display": "61"
+ },
+ {
+  "scenario": "s14",
+  "field": "driver_relation",
+  "raw": "parent",
+  "result": {
+   "norm": "parent",
+   "display": "parent"
+  },
+  "spokenForms": [
+   "mother",
+   "father",
+   "mom",
+   "dad",
+   "parent"
+  ],
+  "display": "parent"
+ },
+ {
+  "scenario": "s14",
+  "field": "driver_relation",
+  "raw": "my mother",
+  "result": {
+   "norm": "parent",
+   "display": "parent (mother)"
+  },
+  "spokenForms": [
+   "mother",
+   "father",
+   "mom",
+   "dad",
+   "parent"
+  ],
+  "display": "parent (mother)"
+ },
+ {
+  "scenario": "s14",
+  "field": "license_state",
+  "raw": "FL",
+  "result": {
+   "norm": "FL",
+   "display": "Florida (FL)"
+  },
+  "spokenForms": [
+   "Florida"
+  ],
+  "display": "Florida (FL)"
+ },
+ {
+  "scenario": "s14",
+  "field": "license_state",
+  "raw": "still her Florida license",
+  "result": {
+   "norm": "FL",
+   "display": "Florida (FL)"
+  },
+  "spokenForms": [
+   "Florida"
+  ],
+  "display": "Florida (FL)"
+ },
+ {
+  "scenario": "s14",
+  "field": "license_status",
+  "raw": "full",
+  "result": {
+   "norm": "full",
+   "display": "full license"
+  },
+  "spokenForms": [
+   "full license",
+   "fully licensed"
+  ],
+  "display": "full license"
+ },
+ {
+  "scenario": "s14",
+  "field": "license_status",
+  "raw": "full license",
+  "result": {
+   "norm": "full",
+   "display": "full license"
+  },
+  "spokenForms": [
+   "full license",
+   "fully licensed"
+  ],
+  "display": "full license"
+ },
+ {
+  "scenario": "s14",
+  "field": "incidents_3y",
+  "raw": "none",
+  "result": {
+   "norm": "none",
+   "display": "none"
+  },
+  "spokenForms": [
+   "no tickets",
+   "no accidents",
+   "clean record"
+  ],
+  "display": "none"
+ },
+ {
+  "scenario": "s14",
+  "field": "incidents_3y",
+  "raw": "no tickets (your mom: 'never!')",
+  "result": {
+   "norm": "none",
+   "display": "none"
+  },
+  "spokenForms": [
+   "no tickets",
+   "no accidents",
+   "clean record"
+  ],
+  "display": "none"
+ },
+ {
+  "scenario": "s14",
+  "field": "vehicle_assignment",
+  "raw": "veh2",
+  "result": {
+   "norm": "veh2",
+   "display": "2015 Toyota Corolla"
+  },
+  "spokenForms": [
+   "Corolla",
+   "2015 Toyota Corolla",
+   "Toyota Corolla"
+  ],
+  "display": "2015 Toyota Corolla"
+ },
+ {
+  "scenario": "s14",
+  "field": "vehicle_assignment",
+  "raw": "the Corolla",
+  "result": {
+   "norm": "veh2",
+   "display": "2015 Toyota Corolla"
+  },
+  "spokenForms": [
+   "Corolla",
+   "2015 Toyota Corolla",
+   "Toyota Corolla"
+  ],
+  "display": "2015 Toyota Corolla"
+ },
+ {
+  "scenario": "s14",
+  "field": "operator_type",
+  "raw": "primary",
+  "result": {
+   "norm": "primary",
+   "display": "primary"
+  },
+  "spokenForms": [
+   "primary",
+   "every day",
+   "main driver",
+   "mainly"
+  ],
+  "display": "primary"
+ },
+ {
+  "scenario": "s14",
+  "field": "operator_type",
+  "raw": "it's basically hers now",
+  "result": {
+   "norm": "primary",
+   "display": "primary"
+  },
+  "spokenForms": [
+   "primary",
+   "every day",
+   "main driver",
+   "mainly"
+  ],
+  "display": "primary"
+ },
+ {
+  "scenario": "s14",
+  "field": "garaging_zip",
+  "raw": "28209",
+  "result": {
+   "norm": "28209",
+   "display": "28209"
+  },
+  "spokenForms": [
+   "28209",
+   "2 8 2 0 9"
+  ],
+  "display": "28209"
+ },
+ {
+  "scenario": "s14",
+  "field": "garaging_zip",
+  "raw": "here, 28209",
+  "result": {
+   "norm": "28209",
+   "display": "28209"
+  },
+  "spokenForms": [
+   "28209",
+   "2 8 2 0 9"
+  ],
+  "display": "28209"
+ },
+ {
+  "scenario": "s14",
+  "field": "effective_date",
+  "raw": "2026-09-26",
+  "result": {
+   "norm": "2026-09-26",
+   "display": "Saturday, September 26th"
+  },
+  "spokenForms": [
+   "Saturday, September 26th",
+   "September 26th",
+   "Saturday"
+  ],
+  "display": "Saturday, September 26th"
+ },
+ {
+  "scenario": "s14",
+  "field": "effective_date",
+  "raw": "Saturday, the 26th",
+  "result": {
+   "norm": "2026-09-26",
+   "display": "Saturday, September 26th"
+  },
+  "spokenForms": [
+   "Saturday, September 26th",
+   "September 26th",
+   "Saturday"
+  ],
+  "display": "Saturday, September 26th"
+ },
+ {
+  "scenario": "s14",
+  "field": "premium_new_monthly_usd",
+  "raw": "158",
+  "result": {
+   "norm": "158.00",
+   "display": "$158 a month"
+  },
+  "spokenForms": [
+   "$158"
+  ],
+  "display": "$158 a month"
+ },
+ {
+  "scenario": "s14",
+  "field": "premium_new_monthly_usd",
+  "raw": "$158 a month",
+  "result": {
+   "norm": "158.00",
+   "display": "$158 a month"
+  },
+  "spokenForms": [
+   "$158"
+  ],
+  "display": "$158 a month"
+ },
+ {
+  "scenario": "s14",
+  "field": "premium_change_monthly_usd",
+  "raw": "31",
+  "result": {
+   "norm": "31.00",
+   "display": "$31 a month"
+  },
+  "spokenForms": [
+   "$31"
+  ],
+  "display": "$31 a month"
+ },
+ {
+  "scenario": "s14",
+  "field": "premium_change_monthly_usd",
+  "raw": "up $31",
+  "result": {
+   "norm": "31.00",
+   "display": "$31 a month"
+  },
+  "spokenForms": [
+   "$31"
+  ],
+  "display": "$31 a month"
+ },
+ {
+  "scenario": "s14",
+  "field": "amount_due_today_usd",
+  "raw": "27.85",
+  "result": {
+   "norm": "27.85",
+   "display": "$27.85"
+  },
+  "spokenForms": [
+   "$27.85"
+  ],
+  "display": "$27.85"
+ },
+ {
+  "scenario": "s14",
+  "field": "amount_due_today_usd",
+  "raw": "$27.85 due today",
+  "result": {
+   "norm": "27.85",
+   "display": "$27.85"
+  },
+  "spokenForms": [
+   "$27.85"
+  ],
+  "display": "$27.85"
+ },
+ {
+  "scenario": "s15",
+  "field": "driver_full_name",
+  "raw": "Sophie Tran",
+  "result": {
+   "norm": "sophie tran",
+   "display": "Sophie Tran"
+  },
+  "spokenForms": [
+   "Sophie Tran",
+   "Sophie"
+  ],
+  "display": "Sophie Tran"
+ },
+ {
+  "scenario": "s15",
+  "field": "driver_full_name",
+  "raw": "Sophie Tran, T-R-A-N, she has her dad's last name",
+  "result": {
+   "norm": "sophie tran she has her dad's last name",
+   "display": "Sophie Tran She Has Her Dad'S Last Name"
+  },
+  "spokenForms": [
+   "Sophie Tran She Has Her Dad'S Last Name",
+   "Sophie"
+  ],
+  "display": "Sophie Tran She Has Her Dad'S Last Name"
+ },
+ {
+  "scenario": "s15",
+  "field": "driver_dob",
+  "raw": "2009-07-22",
+  "result": {
+   "norm": "2009-07-22",
+   "display": "July 22nd, 2009"
+  },
+  "spokenForms": [
+   "July 22nd, 2009",
+   "July 22nd",
+   "2009"
+  ],
+  "display": "July 22nd, 2009"
+ },
+ {
+  "scenario": "s15",
+  "field": "driver_age",
+  "raw": "17",
+  "result": {
+   "norm": "17",
+   "display": "17"
+  },
+  "spokenForms": [
+   "17"
+  ],
+  "display": "17"
+ },
+ {
+  "scenario": "s15",
+  "field": "driver_age",
+  "raw": "she's seventeen",
+  "result": {
+   "norm": "17",
+   "display": "17"
+  },
+  "spokenForms": [
+   "17"
+  ],
+  "display": "17"
+ },
+ {
+  "scenario": "s15",
+  "field": "driver_relation",
+  "raw": "stepchild",
+  "result": {
+   "norm": "stepchild",
+   "display": "stepchild"
+  },
+  "spokenForms": [
+   "stepdaughter",
+   "stepson",
+   "stepchild"
+  ],
+  "display": "stepchild"
+ },
+ {
+  "scenario": "s15",
+  "field": "driver_relation",
+  "raw": "my stepdaughter",
+  "result": {
+   "norm": "stepchild",
+   "display": "stepchild (stepdaughter)"
+  },
+  "spokenForms": [
+   "stepdaughter",
+   "stepson",
+   "stepchild"
+  ],
+  "display": "stepchild (stepdaughter)"
+ },
+ {
+  "scenario": "s15",
+  "field": "license_state",
+  "raw": "NE",
+  "result": {
+   "norm": "NE",
+   "display": "Nebraska (NE)"
+  },
+  "spokenForms": [
+   "Nebraska"
+  ],
+  "display": "Nebraska (NE)"
+ },
+ {
+  "scenario": "s15",
+  "field": "license_state",
+  "raw": "Nebraska",
+  "result": {
+   "norm": "NE",
+   "display": "Nebraska (NE)"
+  },
+  "spokenForms": [
+   "Nebraska"
+  ],
+  "display": "Nebraska (NE)"
+ },
+ {
+  "scenario": "s15",
+  "field": "license_status",
+  "raw": "provisional",
+  "result": {
+   "norm": "provisional",
+   "display": "probationary license"
+  },
+  "spokenForms": [
+   "probationary",
+   "provisional",
+   "junior",
+   "intermediate",
+   "graduated"
+  ],
+  "display": "probationary license"
+ },
+ {
+  "scenario": "s15",
+  "field": "license_status",
+  "raw": "her provisional one",
+  "result": {
+   "norm": "provisional",
+   "display": "probationary license"
+  },
+  "spokenForms": [
+   "probationary",
+   "provisional",
+   "junior",
+   "intermediate",
+   "graduated"
+  ],
+  "display": "probationary license"
+ },
+ {
+  "scenario": "s15",
+  "field": "incidents_3y",
+  "raw": "none",
+  "result": {
+   "norm": "none",
+   "display": "none"
+  },
+  "spokenForms": [
+   "no tickets",
+   "no accidents",
+   "clean record"
+  ],
+  "display": "none"
+ },
+ {
+  "scenario": "s15",
+  "field": "incidents_3y",
+  "raw": "none that I know of... no, none",
+  "result": {
+   "norm": "none",
+   "display": "none"
+  },
+  "spokenForms": [
+   "no tickets",
+   "no accidents",
+   "clean record"
+  ],
+  "display": "none"
+ },
+ {
+  "scenario": "s15",
+  "field": "vehicle_assignment",
+  "raw": "veh2",
+  "result": {
+   "norm": "veh2",
+   "display": "2017 Chevrolet Malibu"
+  },
+  "spokenForms": [
+   "Malibu",
+   "2017 Chevrolet Malibu",
+   "Chevrolet Malibu"
+  ],
+  "display": "2017 Chevrolet Malibu"
+ },
+ {
+  "scenario": "s15",
+  "field": "vehicle_assignment",
+  "raw": "the Malibu",
+  "result": {
+   "norm": "veh2",
+   "display": "2017 Chevrolet Malibu"
+  },
+  "spokenForms": [
+   "Malibu",
+   "2017 Chevrolet Malibu",
+   "Chevrolet Malibu"
+  ],
+  "display": "2017 Chevrolet Malibu"
+ },
+ {
+  "scenario": "s15",
+  "field": "operator_type",
+  "raw": "primary",
+  "result": {
+   "norm": "primary",
+   "display": "primary"
+  },
+  "spokenForms": [
+   "primary",
+   "every day",
+   "main driver",
+   "mainly"
+  ],
+  "display": "primary"
+ },
+ {
+  "scenario": "s15",
+  "field": "operator_type",
+  "raw": "she'll be driving it most days",
+  "result": null,
+  "spokenForms": null,
+  "display": null
+ },
+ {
+  "scenario": "s15",
+  "field": "garaging_zip",
+  "raw": "68114",
+  "result": {
+   "norm": "68114",
+   "display": "68114"
+  },
+  "spokenForms": [
+   "68114",
+   "6 8 1 1 4"
+  ],
+  "display": "68114"
+ },
+ {
+  "scenario": "s15",
+  "field": "garaging_zip",
+  "raw": "at home, 68114",
+  "result": {
+   "norm": "68114",
+   "display": "68114"
+  },
+  "spokenForms": [
+   "68114",
+   "6 8 1 1 4"
+  ],
+  "display": "68114"
+ },
+ {
+  "scenario": "s15",
+  "field": "effective_date",
+  "raw": "2026-10-02",
+  "result": {
+   "norm": "2026-10-02",
+   "display": "Friday, October 2nd"
+  },
+  "spokenForms": [
+   "Friday, October 2nd",
+   "October 2nd",
+   "Friday"
+  ],
+  "display": "Friday, October 2nd"
+ },
+ {
+  "scenario": "s15",
+  "field": "effective_date",
+  "raw": "next Friday, October 2nd",
+  "result": {
+   "norm": "2026-10-02",
+   "display": "Friday, October 2nd"
+  },
+  "spokenForms": [
+   "Friday, October 2nd",
+   "October 2nd",
+   "Friday"
+  ],
+  "display": "Friday, October 2nd"
+ },
+ {
+  "scenario": "s15",
+  "field": "good_student_discount",
+  "raw": "eligible",
+  "result": {
+   "norm": "eligible",
+   "display": "eligible"
+  },
+  "spokenForms": [
+   "eligible"
+  ],
+  "display": "eligible"
+ },
+ {
+  "scenario": "s15",
+  "field": "good_student_discount",
+  "raw": "she's got like a 3.2",
+  "result": null,
+  "spokenForms": null,
+  "display": null
+ },
+ {
+  "scenario": "s15",
+  "field": "premium_new_monthly_usd",
+  "raw": "167",
+  "result": {
+   "norm": "167.00",
+   "display": "$167 a month"
+  },
+  "spokenForms": [
+   "$167"
+  ],
+  "display": "$167 a month"
+ },
+ {
+  "scenario": "s15",
+  "field": "premium_new_monthly_usd",
+  "raw": "about $167 a month",
+  "result": {
+   "norm": "167.00",
+   "display": "$167 a month"
+  },
+  "spokenForms": [
+   "$167"
+  ],
+  "display": "$167 a month"
+ },
+ {
+  "scenario": "s15",
+  "field": "premium_change_monthly_usd",
+  "raw": "46",
+  "result": {
+   "norm": "46.00",
+   "display": "$46 a month"
+  },
+  "spokenForms": [
+   "$46"
+  ],
+  "display": "$46 a month"
+ },
+ {
+  "scenario": "s15",
+  "field": "premium_change_monthly_usd",
+  "raw": "up $46",
+  "result": {
+   "norm": "46.00",
+   "display": "$46 a month"
+  },
+  "spokenForms": [
+   "$46"
+  ],
+  "display": "$46 a month"
+ },
+ {
+  "scenario": "s16",
+  "field": "driver_full_name",
+  "raw": "Jordan Ellis",
+  "result": {
+   "norm": "jordan ellis",
+   "display": "Jordan Ellis"
+  },
+  "spokenForms": [
+   "Jordan Ellis",
+   "Jordan"
+  ],
+  "display": "Jordan Ellis"
+ },
+ {
+  "scenario": "s16",
+  "field": "driver_full_name",
+  "raw": "Jordan Ellis, E-L-L-I-S",
+  "result": {
+   "norm": "jordan ellis",
+   "display": "Jordan Ellis"
+  },
+  "spokenForms": [
+   "Jordan Ellis",
+   "Jordan"
+  ],
+  "display": "Jordan Ellis"
+ },
+ {
+  "scenario": "s16",
+  "field": "driver_dob",
+  "raw": "2000-03-30",
+  "result": {
+   "norm": "2000-03-30",
+   "display": "March 30th, 2000"
+  },
+  "spokenForms": [
+   "March 30th, 2000",
+   "March 30th",
+   "2000"
+  ],
+  "display": "March 30th, 2000"
+ },
+ {
+  "scenario": "s16",
+  "field": "driver_dob",
+  "raw": "March 30th, 2000",
+  "result": {
+   "norm": "2000-03-30",
+   "display": "March 30th, 2000"
+  },
+  "spokenForms": [
+   "March 30th, 2000",
+   "March 30th",
+   "2000"
+  ],
+  "display": "March 30th, 2000"
+ },
+ {
+  "scenario": "s16",
+  "field": "driver_age",
+  "raw": "26",
+  "result": {
+   "norm": "26",
+   "display": "26"
+  },
+  "spokenForms": [
+   "26"
+  ],
+  "display": "26"
+ },
+ {
+  "scenario": "s16",
+  "field": "driver_age",
+  "raw": "twenty-six",
+  "result": {
+   "norm": "26",
+   "display": "26"
+  },
+  "spokenForms": [
+   "26"
+  ],
+  "display": "26"
+ },
+ {
+  "scenario": "s16",
+  "field": "driver_relation",
+  "raw": "non_relative_resident",
+  "result": {
+   "norm": "non_relative_resident",
+   "display": "non relative resident"
+  },
+  "spokenForms": [
+   "roommate",
+   "housemate",
+   "lives with you"
+  ],
+  "display": "non relative resident"
+ },
+ {
+  "scenario": "s16",
+  "field": "driver_relation",
+  "raw": "my roommate, we share the apartment",
+  "result": {
+   "norm": "non_relative_resident",
+   "display": "non relative resident (roommate)"
+  },
+  "spokenForms": [
+   "roommate",
+   "housemate",
+   "lives with you"
+  ],
+  "display": "non relative resident (roommate)"
+ },
+ {
+  "scenario": "s16",
+  "field": "license_state",
+  "raw": "IN",
+  "result": {
+   "norm": "IN",
+   "display": "Indiana (IN)"
+  },
+  "spokenForms": [
+   "Indiana"
+  ],
+  "display": "Indiana (IN)"
+ },
+ {
+  "scenario": "s16",
+  "field": "license_state",
+  "raw": "Indiana",
+  "result": {
+   "norm": "IN",
+   "display": "Indiana (IN)"
+  },
+  "spokenForms": [
+   "Indiana"
+  ],
+  "display": "Indiana (IN)"
+ },
+ {
+  "scenario": "s16",
+  "field": "license_status",
+  "raw": "full",
+  "result": {
+   "norm": "full",
+   "display": "full license"
+  },
+  "spokenForms": [
+   "full license",
+   "fully licensed"
+  ],
+  "display": "full license"
+ },
+ {
+  "scenario": "s16",
+  "field": "license_status",
+  "raw": "regular license",
+  "result": {
+   "norm": "full",
+   "display": "full license"
+  },
+  "spokenForms": [
+   "full license",
+   "fully licensed"
+  ],
+  "display": "full license"
+ },
+ {
+  "scenario": "s16",
+  "field": "incidents_3y",
+  "raw": "none",
+  "result": {
+   "norm": "none",
+   "display": "none"
+  },
+  "spokenForms": [
+   "no tickets",
+   "no accidents",
+   "clean record"
+  ],
+  "display": "none"
+ },
+ {
+  "scenario": "s16",
+  "field": "incidents_3y",
+  "raw": "clean, as far as I know",
+  "result": {
+   "norm": "none",
+   "display": "none"
+  },
+  "spokenForms": [
+   "no tickets",
+   "no accidents",
+   "clean record"
+  ],
+  "display": "none"
+ },
+ {
+  "scenario": "s16",
+  "field": "vehicle_assignment",
+  "raw": "veh1",
+  "result": {
+   "norm": "veh1",
+   "display": "2020 Honda Civic"
+  },
+  "spokenForms": [
+   "Civic",
+   "2020 Honda Civic",
+   "Honda Civic"
+  ],
+  "display": "2020 Honda Civic"
+ },
+ {
+  "scenario": "s16",
+  "field": "vehicle_assignment",
+  "raw": "my Civic, it's the only car",
+  "result": {
+   "norm": "veh1",
+   "display": "2020 Honda Civic"
+  },
+  "spokenForms": [
+   "Civic",
+   "2020 Honda Civic",
+   "Honda Civic"
+  ],
+  "display": "2020 Honda Civic"
+ },
+ {
+  "scenario": "s16",
+  "field": "operator_type",
+  "raw": "occasional",
+  "result": {
+   "norm": "occasional",
+   "display": "occasional"
+  },
+  "spokenForms": [
+   "occasional",
+   "occasionally",
+   "sometimes"
+  ],
+  "display": "occasional"
+ },
+ {
+  "scenario": "s16",
+  "field": "operator_type",
+  "raw": "a few times a week",
+  "result": null,
+  "spokenForms": null,
+  "display": null
+ },
+ {
+  "scenario": "s16",
+  "field": "garaging_zip",
+  "raw": "46220",
+  "result": {
+   "norm": "46220",
+   "display": "46220"
+  },
+  "spokenForms": [
+   "46220",
+   "4 6 2 2 0"
+  ],
+  "display": "46220"
+ },
+ {
+  "scenario": "s16",
+  "field": "garaging_zip",
+  "raw": "the apartment lot, 46220",
+  "result": {
+   "norm": "46220",
+   "display": "46220"
+  },
+  "spokenForms": [
+   "46220",
+   "4 6 2 2 0"
+  ],
+  "display": "46220"
+ },
+ {
+  "scenario": "s16",
+  "field": "effective_date",
+  "raw": "2026-09-25",
+  "result": {
+   "norm": "2026-09-25",
+   "display": "Friday, September 25th"
+  },
+  "spokenForms": [
+   "Friday, September 25th",
+   "September 25th",
+   "Friday"
+  ],
+  "display": "Friday, September 25th"
+ },
+ {
+  "scenario": "s16",
+  "field": "effective_date",
+  "raw": "actually, can it be today?",
+  "result": {
+   "norm": "2026-09-25",
+   "display": "Friday, September 25th"
+  },
+  "spokenForms": [
+   "Friday, September 25th",
+   "September 25th",
+   "Friday"
+  ],
+  "display": "Friday, September 25th"
+ },
+ {
+  "scenario": "s16",
+  "field": "premium_new_monthly_usd",
+  "raw": "121",
+  "result": {
+   "norm": "121.00",
+   "display": "$121 a month"
+  },
+  "spokenForms": [
+   "$121"
+  ],
+  "display": "$121 a month"
+ },
+ {
+  "scenario": "s16",
+  "field": "premium_new_monthly_usd",
+  "raw": "$121 a month",
+  "result": {
+   "norm": "121.00",
+   "display": "$121 a month"
+  },
+  "spokenForms": [
+   "$121"
+  ],
+  "display": "$121 a month"
+ },
+ {
+  "scenario": "s16",
+  "field": "premium_change_monthly_usd",
+  "raw": "17",
+  "result": {
+   "norm": "17.00",
+   "display": "$17 a month"
+  },
+  "spokenForms": [
+   "$17"
+  ],
+  "display": "$17 a month"
+ },
+ {
+  "scenario": "s16",
+  "field": "premium_change_monthly_usd",
+  "raw": "up $17",
+  "result": {
+   "norm": "17.00",
+   "display": "$17 a month"
+  },
+  "spokenForms": [
+   "$17"
+  ],
+  "display": "$17 a month"
+ },
+ {
+  "scenario": "s17",
+  "field": "driver_full_name",
+  "raw": "Rohan Iyer",
+  "result": {
+   "norm": "rohan iyer",
+   "display": "Rohan Iyer"
+  },
+  "spokenForms": [
+   "Rohan Iyer",
+   "Rohan"
+  ],
+  "display": "Rohan Iyer"
+ },
+ {
+  "scenario": "s17",
+  "field": "driver_full_name",
+  "raw": "Rohan, R-O-H-A-N, Iyer, I-Y-E-R",
+  "result": {
+   "norm": "rohan iyer",
+   "display": "Rohan Iyer"
+  },
+  "spokenForms": [
+   "Rohan Iyer",
+   "Rohan"
+  ],
+  "display": "Rohan Iyer"
+ },
+ {
+  "scenario": "s17",
+  "field": "driver_dob",
+  "raw": "2009-01-09",
+  "result": {
+   "norm": "2009-01-09",
+   "display": "January 9th, 2009"
+  },
+  "spokenForms": [
+   "January 9th, 2009",
+   "January 9th",
+   "2009"
+  ],
+  "display": "January 9th, 2009"
+ },
+ {
+  "scenario": "s17",
+  "field": "driver_dob",
+  "raw": "January 9th, 2009",
+  "result": {
+   "norm": "2009-01-09",
+   "display": "January 9th, 2009"
+  },
+  "spokenForms": [
+   "January 9th, 2009",
+   "January 9th",
+   "2009"
+  ],
+  "display": "January 9th, 2009"
+ },
+ {
+  "scenario": "s17",
+  "field": "driver_age",
+  "raw": "17",
+  "result": {
+   "norm": "17",
+   "display": "17"
+  },
+  "spokenForms": [
+   "17"
+  ],
+  "display": "17"
+ },
+ {
+  "scenario": "s17",
+  "field": "driver_age",
+  "raw": "seventeen",
+  "result": {
+   "norm": "17",
+   "display": "17"
+  },
+  "spokenForms": [
+   "17"
+  ],
+  "display": "17"
+ },
+ {
+  "scenario": "s17",
+  "field": "driver_relation",
+  "raw": "child",
+  "result": {
+   "norm": "child",
+   "display": "child"
+  },
+  "spokenForms": [
+   "daughter",
+   "son",
+   "child",
+   "kid"
+  ],
+  "display": "child"
+ },
+ {
+  "scenario": "s17",
+  "field": "driver_relation",
+  "raw": "my son",
+  "result": {
+   "norm": "child",
+   "display": "child (son)"
+  },
+  "spokenForms": [
+   "daughter",
+   "son",
+   "child",
+   "kid"
+  ],
+  "display": "child (son)"
+ },
+ {
+  "scenario": "s17",
+  "field": "license_state",
+  "raw": "CA",
+  "result": {
+   "norm": "CA",
+   "display": "California (CA)"
+  },
+  "spokenForms": [
+   "California"
+  ],
+  "display": "California (CA)"
+ },
+ {
+  "scenario": "s17",
+  "field": "license_state",
+  "raw": "California",
+  "result": {
+   "norm": "CA",
+   "display": "California (CA)"
+  },
+  "spokenForms": [
+   "California"
+  ],
+  "display": "California (CA)"
+ },
+ {
+  "scenario": "s17",
+  "field": "license_status",
+  "raw": "provisional",
+  "result": {
+   "norm": "provisional",
+   "display": "probationary license"
+  },
+  "spokenForms": [
+   "probationary",
+   "provisional",
+   "junior",
+   "intermediate",
+   "graduated"
+  ],
+  "display": "probationary license"
+ },
+ {
+  "scenario": "s17",
+  "field": "license_status",
+  "raw": "provisional, since March",
+  "result": {
+   "norm": "provisional",
+   "display": "probationary license"
+  },
+  "spokenForms": [
+   "probationary",
+   "provisional",
+   "junior",
+   "intermediate",
+   "graduated"
+  ],
+  "display": "probationary license"
+ },
+ {
+  "scenario": "s17",
+  "field": "incidents_3y",
+  "raw": "one speeding ticket, August 2026",
+  "result": {
+   "norm": "one speeding ticket, august 2026",
+   "display": "one speeding ticket, August 2026"
+  },
+  "spokenForms": [
+   "one speeding ticket, august 2026"
+  ],
+  "display": "one speeding ticket, August 2026"
+ },
+ {
+  "scenario": "s17",
+  "field": "incidents_3y",
+  "raw": "one speeding ticket last month, fifteen over",
+  "result": {
+   "norm": "one speeding ticket last month, fifteen over",
+   "display": "one speeding ticket last month, fifteen over"
+  },
+  "spokenForms": [
+   "one speeding ticket last month, fifteen over"
+  ],
+  "display": "one speeding ticket last month, fifteen over"
+ },
+ {
+  "scenario": "s17",
+  "field": "vehicle_assignment",
+  "raw": "veh1",
+  "result": {
+   "norm": "veh1",
+   "display": "2016 Toyota Prius"
+  },
+  "spokenForms": [
+   "Prius",
+   "2016 Toyota Prius",
+   "Toyota Prius"
+  ],
+  "display": "2016 Toyota Prius"
+ },
+ {
+  "scenario": "s17",
+  "field": "vehicle_assignment",
+  "raw": "the Prius",
+  "result": {
+   "norm": "veh1",
+   "display": "2016 Toyota Prius"
+  },
+  "spokenForms": [
+   "Prius",
+   "2016 Toyota Prius",
+   "Toyota Prius"
+  ],
+  "display": "2016 Toyota Prius"
+ },
+ {
+  "scenario": "s17",
+  "field": "operator_type",
+  "raw": "primary",
+  "result": {
+   "norm": "primary",
+   "display": "primary"
+  },
+  "spokenForms": [
+   "primary",
+   "every day",
+   "main driver",
+   "mainly"
+  ],
+  "display": "primary"
+ },
+ {
+  "scenario": "s17",
+  "field": "operator_type",
+  "raw": "he takes it to school and his job",
+  "result": null,
+  "spokenForms": null,
+  "display": null
+ },
+ {
+  "scenario": "s17",
+  "field": "garaging_zip",
+  "raw": "95818",
+  "result": {
+   "norm": "95818",
+   "display": "95818"
+  },
+  "spokenForms": [
+   "95818",
+   "9 5 8 1 8"
+  ],
+  "display": "95818"
+ },
+ {
+  "scenario": "s17",
+  "field": "garaging_zip",
+  "raw": "at home, 95818",
+  "result": {
+   "norm": "95818",
+   "display": "95818"
+  },
+  "spokenForms": [
+   "95818",
+   "9 5 8 1 8"
+  ],
+  "display": "95818"
+ },
+ {
+  "scenario": "s17",
+  "field": "effective_date",
+  "raw": "2026-09-30",
+  "result": {
+   "norm": "2026-09-30",
+   "display": "Wednesday, September 30th"
+  },
+  "spokenForms": [
+   "Wednesday, September 30th",
+   "September 30th",
+   "Wednesday"
+  ],
+  "display": "Wednesday, September 30th"
+ },
+ {
+  "scenario": "s17",
+  "field": "effective_date",
+  "raw": "Wednesday, the 30th",
+  "result": {
+   "norm": "2026-09-30",
+   "display": "Wednesday, September 30th"
+  },
+  "spokenForms": [
+   "Wednesday, September 30th",
+   "September 30th",
+   "Wednesday"
+  ],
+  "display": "Wednesday, September 30th"
+ },
+ {
+  "scenario": "s17",
+  "field": "good_student_discount",
+  "raw": "eligible",
+  "result": {
+   "norm": "eligible",
+   "display": "eligible"
+  },
+  "spokenForms": [
+   "eligible"
+  ],
+  "display": "eligible"
+ },
+ {
+  "scenario": "s17",
+  "field": "good_student_discount",
+  "raw": "3.4 GPA",
+  "result": null,
+  "spokenForms": null,
+  "display": null
+ },
+ {
+  "scenario": "s17",
+  "field": "premium_new_monthly_usd",
+  "raw": "238",
+  "result": {
+   "norm": "238.00",
+   "display": "$238 a month"
+  },
+  "spokenForms": [
+   "$238"
+  ],
+  "display": "$238 a month"
+ },
+ {
+  "scenario": "s17",
+  "field": "premium_new_monthly_usd",
+  "raw": "$238 a month",
+  "result": {
+   "norm": "238.00",
+   "display": "$238 a month"
+  },
+  "spokenForms": [
+   "$238"
+  ],
+  "display": "$238 a month"
+ },
+ {
+  "scenario": "s17",
+  "field": "premium_change_monthly_usd",
+  "raw": "105",
+  "result": {
+   "norm": "105.00",
+   "display": "$105 a month"
+  },
+  "spokenForms": [
+   "$105"
+  ],
+  "display": "$105 a month"
+ },
+ {
+  "scenario": "s17",
+  "field": "premium_change_monthly_usd",
+  "raw": "up $105, the ticket adds a surcharge",
+  "result": {
+   "norm": "105.00",
+   "display": "$105 a month"
+  },
+  "spokenForms": [
+   "$105"
+  ],
+  "display": "$105 a month"
+ },
+ {
+  "scenario": "s17",
+  "field": "amount_due_today_usd",
+  "raw": "29.6",
+  "result": {
+   "norm": "29.60",
+   "display": "$29.60"
+  },
+  "spokenForms": [
+   "$29.60"
+  ],
+  "display": "$29.60"
+ },
+ {
+  "scenario": "s17",
+  "field": "amount_due_today_usd",
+  "raw": "$29.60 due today",
+  "result": {
+   "norm": "29.60",
+   "display": "$29.60"
+  },
+  "spokenForms": [
+   "$29.60"
+  ],
+  "display": "$29.60"
+ },
+ {
+  "scenario": "s18",
+  "field": "driver_full_name",
+  "raw": "Leah Kim",
+  "result": {
+   "norm": "leah kim",
+   "display": "Leah Kim"
+  },
+  "spokenForms": [
+   "Leah Kim",
+   "Leah"
+  ],
+  "display": "Leah Kim"
+ },
+ {
+  "scenario": "s18",
+  "field": "driver_full_name",
+  "raw": "Leah, L-E-A-H, Kim",
+  "result": {
+   "norm": "leah kim",
+   "display": "Leah Kim"
+  },
+  "spokenForms": [
+   "Leah Kim",
+   "Leah"
+  ],
+  "display": "Leah Kim"
+ },
+ {
+  "scenario": "s18",
+  "field": "driver_dob",
+  "raw": "2008-05-12",
+  "result": {
+   "norm": "2008-05-12",
+   "display": "May 12th, 2008"
+  },
+  "spokenForms": [
+   "May 12th, 2008",
+   "May 12th",
+   "2008"
+  ],
+  "display": "May 12th, 2008"
+ },
+ {
+  "scenario": "s18",
+  "field": "driver_dob",
+  "raw": "May 12th, 2008",
+  "result": {
+   "norm": "2008-05-12",
+   "display": "May 12th, 2008"
+  },
+  "spokenForms": [
+   "May 12th, 2008",
+   "May 12th",
+   "2008"
+  ],
+  "display": "May 12th, 2008"
+ },
+ {
+  "scenario": "s18",
+  "field": "driver_age",
+  "raw": "18",
+  "result": {
+   "norm": "18",
+   "display": "18"
+  },
+  "spokenForms": [
+   "18"
+  ],
+  "display": "18"
+ },
+ {
+  "scenario": "s18",
+  "field": "driver_age",
+  "raw": "eighteen",
+  "result": {
+   "norm": "18",
+   "display": "18"
+  },
+  "spokenForms": [
+   "18"
+  ],
+  "display": "18"
+ },
+ {
+  "scenario": "s18",
+  "field": "driver_relation",
+  "raw": "child",
+  "result": {
+   "norm": "child",
+   "display": "child"
+  },
+  "spokenForms": [
+   "daughter",
+   "son",
+   "child",
+   "kid"
+  ],
+  "display": "child"
+ },
+ {
+  "scenario": "s18",
+  "field": "driver_relation",
+  "raw": "my daughter",
+  "result": {
+   "norm": "child",
+   "display": "child (daughter)"
+  },
+  "spokenForms": [
+   "daughter",
+   "son",
+   "child",
+   "kid"
+  ],
+  "display": "child (daughter)"
+ },
+ {
+  "scenario": "s18",
+  "field": "license_state",
+  "raw": "WI",
+  "result": {
+   "norm": "WI",
+   "display": "Wisconsin (WI)"
+  },
+  "spokenForms": [
+   "Wisconsin"
+  ],
+  "display": "Wisconsin (WI)"
+ },
+ {
+  "scenario": "s18",
+  "field": "license_state",
+  "raw": "Wisconsin",
+  "result": {
+   "norm": "WI",
+   "display": "Wisconsin (WI)"
+  },
+  "spokenForms": [
+   "Wisconsin"
+  ],
+  "display": "Wisconsin (WI)"
+ },
+ {
+  "scenario": "s18",
+  "field": "license_status",
+  "raw": "full",
+  "result": {
+   "norm": "full",
+   "display": "full license"
+  },
+  "spokenForms": [
+   "full license",
+   "fully licensed"
+  ],
+  "display": "full license"
+ },
+ {
+  "scenario": "s18",
+  "field": "license_status",
+  "raw": "full license",
+  "result": {
+   "norm": "full",
+   "display": "full license"
+  },
+  "spokenForms": [
+   "full license",
+   "fully licensed"
+  ],
+  "display": "full license"
+ },
+ {
+  "scenario": "s18",
+  "field": "incidents_3y",
+  "raw": "none",
+  "result": {
+   "norm": "none",
+   "display": "none"
+  },
+  "spokenForms": [
+   "no tickets",
+   "no accidents",
+   "clean record"
+  ],
+  "display": "none"
+ },
+ {
+  "scenario": "s18",
+  "field": "incidents_3y",
+  "raw": "none",
+  "result": {
+   "norm": "none",
+   "display": "none"
+  },
+  "spokenForms": [
+   "no tickets",
+   "no accidents",
+   "clean record"
+  ],
+  "display": "none"
+ },
+ {
+  "scenario": "s18",
+  "field": "vehicle_assignment",
+  "raw": "veh2",
+  "result": {
+   "norm": "veh2",
+   "display": "2015 Volkswagen Jetta"
+  },
+  "spokenForms": [
+   "Jetta",
+   "2015 Volkswagen Jetta",
+   "Volkswagen Jetta"
+  ],
+  "display": "2015 Volkswagen Jetta"
+ },
+ {
+  "scenario": "s18",
+  "field": "vehicle_assignment",
+  "raw": "the Jetta",
+  "result": {
+   "norm": "veh2",
+   "display": "2015 Volkswagen Jetta"
+  },
+  "spokenForms": [
+   "Jetta",
+   "2015 Volkswagen Jetta",
+   "Volkswagen Jetta"
+  ],
+  "display": "2015 Volkswagen Jetta"
+ },
+ {
+  "scenario": "s18",
+  "field": "operator_type",
+  "raw": "primary",
+  "result": {
+   "norm": "primary",
+   "display": "primary"
+  },
+  "spokenForms": [
+   "primary",
+   "every day",
+   "main driver",
+   "mainly"
+  ],
+  "display": "primary"
+ },
+ {
+  "scenario": "s18",
+  "field": "operator_type",
+  "raw": "it'll be her car at school",
+  "result": {
+   "norm": "primary",
+   "display": "primary"
+  },
+  "spokenForms": [
+   "primary",
+   "every day",
+   "main driver",
+   "mainly"
+  ],
+  "display": "primary"
+ },
+ {
+  "scenario": "s18",
+  "field": "garaging_zip",
+  "raw": "53211",
+  "result": {
+   "norm": "53211",
+   "display": "53211"
+  },
+  "spokenForms": [
+   "53211",
+   "5 3 2 1 1"
+  ],
+  "display": "53211"
+ },
+ {
+  "scenario": "s18",
+  "field": "effective_date",
+  "raw": "2026-09-27",
+  "result": {
+   "norm": "2026-09-27",
+   "display": "Sunday, September 27th"
+  },
+  "spokenForms": [
+   "Sunday, September 27th",
+   "September 27th",
+   "Sunday"
+  ],
+  "display": "Sunday, September 27th"
+ },
+ {
+  "scenario": "s18",
+  "field": "effective_date",
+  "raw": "this Sunday, the 27th, move-in day",
+  "result": {
+   "norm": "2026-09-27",
+   "display": "Sunday, September 27th"
+  },
+  "spokenForms": [
+   "Sunday, September 27th",
+   "September 27th",
+   "Sunday"
+  ],
+  "display": "Sunday, September 27th"
+ },
+ {
+  "scenario": "s18",
+  "field": "good_student_discount",
+  "raw": "eligible",
+  "result": {
+   "norm": "eligible",
+   "display": "eligible"
+  },
+  "spokenForms": [
+   "eligible"
+  ],
+  "display": "eligible"
+ },
+ {
+  "scenario": "s18",
+  "field": "good_student_discount",
+  "raw": "3.5 in high school",
+  "result": null,
+  "spokenForms": null,
+  "display": null
+ },
+ {
+  "scenario": "s18",
+  "field": "premium_new_monthly_usd",
+  "raw": "149",
+  "result": {
+   "norm": "149.00",
+   "display": "$149 a month"
+  },
+  "spokenForms": [
+   "$149"
+  ],
+  "display": "$149 a month"
+ },
+ {
+  "scenario": "s18",
+  "field": "premium_new_monthly_usd",
+  "raw": "$149 a month, based on your home ZIP for now",
+  "result": {
+   "norm": "149.00",
+   "display": "$149 a month"
+  },
+  "spokenForms": [
+   "$149"
+  ],
+  "display": "$149 a month"
+ },
+ {
+  "scenario": "s18",
+  "field": "premium_change_monthly_usd",
+  "raw": "31",
+  "result": {
+   "norm": "31.00",
+   "display": "$31 a month"
+  },
+  "spokenForms": [
+   "$31"
+  ],
+  "display": "$31 a month"
+ },
+ {
+  "scenario": "s18",
+  "field": "premium_change_monthly_usd",
+  "raw": "up $31",
+  "result": {
+   "norm": "31.00",
+   "display": "$31 a month"
+  },
+  "spokenForms": [
+   "$31"
+  ],
+  "display": "$31 a month"
+ },
+ {
+  "scenario": "s19",
+  "field": "driver_full_name",
+  "raw": "Arjun Agarwal",
+  "result": {
+   "norm": "arjun agarwal",
+   "display": "Arjun Agarwal"
+  },
+  "spokenForms": [
+   "Arjun Agarwal",
+   "Arjun"
+  ],
+  "display": "Arjun Agarwal"
+ },
+ {
+  "scenario": "s19",
+  "field": "driver_full_name",
+  "raw": "uska naam Arjun hai, A-R-J-U-N, Agarwal",
+  "result": {
+   "norm": "uska naam arjun hai agarwal",
+   "display": "Uska Naam Arjun Hai Agarwal"
+  },
+  "spokenForms": [
+   "Uska Naam Arjun Hai Agarwal",
+   "Uska"
+  ],
+  "display": "Uska Naam Arjun Hai Agarwal"
+ },
+ {
+  "scenario": "s19",
+  "field": "driver_dob",
+  "raw": "2009-06-18",
+  "result": {
+   "norm": "2009-06-18",
+   "display": "June 18th, 2009"
+  },
+  "spokenForms": [
+   "June 18th, 2009",
+   "June 18th",
+   "2009"
+  ],
+  "display": "June 18th, 2009"
+ },
+ {
+  "scenario": "s19",
+  "field": "driver_dob",
+  "raw": "date of birth hai eighteenth June, two thousand nine",
+  "result": {
+   "norm": "2009-06-18",
+   "display": "June 18th, 2009"
+  },
+  "spokenForms": [
+   "June 18th, 2009",
+   "June 18th",
+   "2009"
+  ],
+  "display": "June 18th, 2009"
+ },
+ {
+  "scenario": "s19",
+  "field": "driver_age",
+  "raw": "17",
+  "result": {
+   "norm": "17",
+   "display": "17"
+  },
+  "spokenForms": [
+   "17"
+  ],
+  "display": "17"
+ },
+ {
+  "scenario": "s19",
+  "field": "driver_age",
+  "raw": "woh seventeen ka hai",
+  "result": {
+   "norm": "17",
+   "display": "17"
+  },
+  "spokenForms": [
+   "17"
+  ],
+  "display": "17"
+ },
+ {
+  "scenario": "s19",
+  "field": "driver_relation",
+  "raw": "child",
+  "result": {
+   "norm": "child",
+   "display": "child"
+  },
+  "spokenForms": [
+   "daughter",
+   "son",
+   "child",
+   "kid"
+  ],
+  "display": "child"
+ },
+ {
+  "scenario": "s19",
+  "field": "driver_relation",
+  "raw": "mera beta, my son",
+  "result": {
+   "norm": "child",
+   "display": "child (son)"
+  },
+  "spokenForms": [
+   "daughter",
+   "son",
+   "child",
+   "kid"
+  ],
+  "display": "child (son)"
+ },
+ {
+  "scenario": "s19",
+  "field": "license_state",
+  "raw": "NJ",
+  "result": {
+   "norm": "NJ",
+   "display": "New Jersey (NJ)"
+  },
+  "spokenForms": [
+   "New Jersey"
+  ],
+  "display": "New Jersey (NJ)"
+ },
+ {
+  "scenario": "s19",
+  "field": "license_state",
+  "raw": "New Jersey",
+  "result": {
+   "norm": "NJ",
+   "display": "New Jersey (NJ)"
+  },
+  "spokenForms": [
+   "New Jersey"
+  ],
+  "display": "New Jersey (NJ)"
+ },
+ {
+  "scenario": "s19",
+  "field": "license_status",
+  "raw": "provisional",
+  "result": {
+   "norm": "provisional",
+   "display": "probationary license"
+  },
+  "spokenForms": [
+   "probationary",
+   "provisional",
+   "junior",
+   "intermediate",
+   "graduated"
+  ],
+  "display": "probationary license"
+ },
+ {
+  "scenario": "s19",
+  "field": "license_status",
+  "raw": "probationary license, pichhle hafte mila",
+  "result": {
+   "norm": "provisional",
+   "display": "probationary license"
+  },
+  "spokenForms": [
+   "probationary",
+   "provisional",
+   "junior",
+   "intermediate",
+   "graduated"
+  ],
+  "display": "probationary license"
+ },
+ {
+  "scenario": "s19",
+  "field": "incidents_3y",
+  "raw": "none",
+  "result": {
+   "norm": "none",
+   "display": "none"
+  },
+  "spokenForms": [
+   "no tickets",
+   "no accidents",
+   "clean record"
+  ],
+  "display": "none"
+ },
+ {
+  "scenario": "s19",
+  "field": "incidents_3y",
+  "raw": "nahi, koi ticket nahi",
+  "result": {
+   "norm": "nahi, koi ticket nahi",
+   "display": "nahi, koi ticket nahi"
+  },
+  "spokenForms": [
+   "nahi, koi ticket nahi"
+  ],
+  "display": "nahi, koi ticket nahi"
+ },
+ {
+  "scenario": "s19",
+  "field": "vehicle_assignment",
+  "raw": "all",
+  "result": {
+   "norm": "all",
+   "display": "all your vehicles"
+  },
+  "spokenForms": [
+   "all"
+  ],
+  "display": "all your vehicles"
+ },
+ {
+  "scenario": "s19",
+  "field": "vehicle_assignment",
+  "raw": "dono cars, kabhi RAV4, kabhi Accord",
+  "result": null,
+  "spokenForms": null,
+  "display": null
+ },
+ {
+  "scenario": "s19",
+  "field": "operator_type",
+  "raw": "occasional",
+  "result": {
+   "norm": "occasional",
+   "display": "occasional"
+  },
+  "spokenForms": [
+   "occasional",
+   "occasionally",
+   "sometimes"
+  ],
+  "display": "occasional"
+ },
+ {
+  "scenario": "s19",
+  "field": "operator_type",
+  "raw": "mostly weekends pe, occasionally",
+  "result": {
+   "norm": "occasional",
+   "display": "occasional"
+  },
+  "spokenForms": [
+   "occasional",
+   "occasionally",
+   "sometimes"
+  ],
+  "display": "occasional"
+ },
+ {
+  "scenario": "s19",
+  "field": "garaging_zip",
+  "raw": "08820",
+  "result": {
+   "norm": "08820",
+   "display": "08820"
+  },
+  "spokenForms": [
+   "08820",
+   "0 8 8 2 0"
+  ],
+  "display": "08820"
+ },
+ {
+  "scenario": "s19",
+  "field": "garaging_zip",
+  "raw": "ghar pe hi, zero-eight-eight-two-zero",
+  "result": {
+   "norm": "08820",
+   "display": "08820"
+  },
+  "spokenForms": [
+   "08820",
+   "0 8 8 2 0"
+  ],
+  "display": "08820"
+ },
+ {
+  "scenario": "s19",
+  "field": "effective_date",
+  "raw": "2026-09-28",
+  "result": {
+   "norm": "2026-09-28",
+   "display": "Monday, September 28th"
+  },
+  "spokenForms": [
+   "Monday, September 28th",
+   "September 28th",
+   "Monday"
+  ],
+  "display": "Monday, September 28th"
+ },
+ {
+  "scenario": "s19",
+  "field": "effective_date",
+  "raw": "Monday se, twenty-eighth September",
+  "result": {
+   "norm": "2026-09-28",
+   "display": "Monday, September 28th"
+  },
+  "spokenForms": [
+   "Monday, September 28th",
+   "September 28th",
+   "Monday"
+  ],
+  "display": "Monday, September 28th"
+ },
+ {
+  "scenario": "s19",
+  "field": "good_student_discount",
+  "raw": "eligible",
+  "result": {
+   "norm": "eligible",
+   "display": "eligible"
+  },
+  "spokenForms": [
+   "eligible"
+  ],
+  "display": "eligible"
+ },
+ {
+  "scenario": "s19",
+  "field": "good_student_discount",
+  "raw": "uska GPA three point nine hai",
+  "result": null,
+  "spokenForms": null,
+  "display": null
+ },
+ {
+  "scenario": "s19",
+  "field": "premium_new_monthly_usd",
+  "raw": "212",
+  "result": {
+   "norm": "212.00",
+   "display": "$212 a month"
+  },
+  "spokenForms": [
+   "$212"
+  ],
+  "display": "$212 a month"
+ },
+ {
+  "scenario": "s19",
+  "field": "premium_new_monthly_usd",
+  "raw": "$212 a month",
+  "result": {
+   "norm": "212.00",
+   "display": "$212 a month"
+  },
+  "spokenForms": [
+   "$212"
+  ],
+  "display": "$212 a month"
+ },
+ {
+  "scenario": "s19",
+  "field": "premium_change_monthly_usd",
+  "raw": "56",
+  "result": {
+   "norm": "56.00",
+   "display": "$56 a month"
+  },
+  "spokenForms": [
+   "$56"
+  ],
+  "display": "$56 a month"
+ },
+ {
+  "scenario": "s19",
+  "field": "premium_change_monthly_usd",
+  "raw": "up $56",
+  "result": {
+   "norm": "56.00",
+   "display": "$56 a month"
+  },
+  "spokenForms": [
+   "$56"
+  ],
+  "display": "$56 a month"
+ },
+ {
+  "scenario": "s20",
+  "field": "driver_full_name",
+  "raw": "Kavya Mehta",
+  "result": {
+   "norm": "kavya mehta",
+   "display": "Kavya Mehta"
+  },
+  "spokenForms": [
+   "Kavya Mehta",
+   "Kavya"
+  ],
+  "display": "Kavya Mehta"
+ },
+ {
+  "scenario": "s20",
+  "field": "driver_full_name",
+  "raw": "Kavya, K-A-V-Y-A, Mehta",
+  "result": {
+   "norm": "kavya mehta",
+   "display": "Kavya Mehta"
+  },
+  "spokenForms": [
+   "Kavya Mehta",
+   "Kavya"
+  ],
+  "display": "Kavya Mehta"
+ },
+ {
+  "scenario": "s20",
+  "field": "driver_dob",
+  "raw": "1995-02-14",
+  "result": {
+   "norm": "1995-02-14",
+   "display": "February 14th, 1995"
+  },
+  "spokenForms": [
+   "February 14th, 1995",
+   "February 14th",
+   "1995"
+  ],
+  "display": "February 14th, 1995"
+ },
+ {
+  "scenario": "s20",
+  "field": "driver_dob",
+  "raw": "fourteenth February, nineteen ninety-five",
+  "result": {
+   "norm": "1995-02-14",
+   "display": "February 14th, 1995"
+  },
+  "spokenForms": [
+   "February 14th, 1995",
+   "February 14th",
+   "1995"
+  ],
+  "display": "February 14th, 1995"
+ },
+ {
+  "scenario": "s20",
+  "field": "driver_age",
+  "raw": "31",
+  "result": {
+   "norm": "31",
+   "display": "31"
+  },
+  "spokenForms": [
+   "31"
+  ],
+  "display": "31"
+ },
+ {
+  "scenario": "s20",
+  "field": "driver_age",
+  "raw": "thirty-one",
+  "result": {
+   "norm": "31",
+   "display": "31"
+  },
+  "spokenForms": [
+   "31"
+  ],
+  "display": "31"
+ },
+ {
+  "scenario": "s20",
+  "field": "driver_relation",
+  "raw": "spouse",
+  "result": {
+   "norm": "spouse",
+   "display": "spouse"
+  },
+  "spokenForms": [
+   "wife",
+   "husband",
+   "spouse"
+  ],
+  "display": "spouse"
+ },
+ {
+  "scenario": "s20",
+  "field": "driver_relation",
+  "raw": "meri wife",
+  "result": {
+   "norm": "spouse",
+   "display": "spouse (wife)"
+  },
+  "spokenForms": [
+   "wife",
+   "husband",
+   "spouse"
+  ],
+  "display": "spouse (wife)"
+ },
+ {
+  "scenario": "s20",
+  "field": "license_state",
+  "raw": "TX",
+  "result": {
+   "norm": "TX",
+   "display": "Texas (TX)"
+  },
+  "spokenForms": [
+   "Texas"
+  ],
+  "display": "Texas (TX)"
+ },
+ {
+  "scenario": "s20",
+  "field": "license_state",
+  "raw": "Texas",
+  "result": {
+   "norm": "TX",
+   "display": "Texas (TX)"
+  },
+  "spokenForms": [
+   "Texas"
+  ],
+  "display": "Texas (TX)"
+ },
+ {
+  "scenario": "s20",
+  "field": "license_status",
+  "raw": "full",
+  "result": {
+   "norm": "full",
+   "display": "full license"
+  },
+  "spokenForms": [
+   "full license",
+   "fully licensed"
+  ],
+  "display": "full license"
+ },
+ {
+  "scenario": "s20",
+  "field": "license_status",
+  "raw": "full license mil gaya last month",
+  "result": {
+   "norm": "full",
+   "display": "full license"
+  },
+  "spokenForms": [
+   "full license",
+   "fully licensed"
+  ],
+  "display": "full license"
+ },
+ {
+  "scenario": "s20",
+  "field": "incidents_3y",
+  "raw": "none",
+  "result": {
+   "norm": "none",
+   "display": "none"
+  },
+  "spokenForms": [
+   "no tickets",
+   "no accidents",
+   "clean record"
+  ],
+  "display": "none"
+ },
+ {
+  "scenario": "s20",
+  "field": "incidents_3y",
+  "raw": "koi ticket nahi, US mein koi history nahi",
+  "result": {
+   "norm": "koi ticket nahi, us mein koi history nahi",
+   "display": "koi ticket nahi, US mein koi history nahi"
+  },
+  "spokenForms": [
+   "koi ticket nahi, us mein koi history nahi"
+  ],
+  "display": "koi ticket nahi, US mein koi history nahi"
+ },
+ {
+  "scenario": "s20",
+  "field": "vehicle_assignment",
+  "raw": "veh2",
+  "result": {
+   "norm": "veh2",
+   "display": "2019 Honda Civic"
+  },
+  "spokenForms": [
+   "Civic",
+   "2019 Honda Civic",
+   "Honda Civic"
+  ],
+  "display": "2019 Honda Civic"
+ },
+ {
+  "scenario": "s20",
+  "field": "vehicle_assignment",
+  "raw": "Civic, woh uski car hogi",
+  "result": {
+   "norm": "veh2",
+   "display": "2019 Honda Civic"
+  },
+  "spokenForms": [
+   "Civic",
+   "2019 Honda Civic",
+   "Honda Civic"
+  ],
+  "display": "2019 Honda Civic"
+ },
+ {
+  "scenario": "s20",
+  "field": "operator_type",
+  "raw": "primary",
+  "result": {
+   "norm": "primary",
+   "display": "primary"
+  },
+  "spokenForms": [
+   "primary",
+   "every day",
+   "main driver",
+   "mainly"
+  ],
+  "display": "primary"
+ },
+ {
+  "scenario": "s20",
+  "field": "operator_type",
+  "raw": "roz office jayegi usse",
+  "result": null,
+  "spokenForms": null,
+  "display": null
+ },
+ {
+  "scenario": "s20",
+  "field": "garaging_zip",
+  "raw": "75024",
+  "result": {
+   "norm": "75024",
+   "display": "75024"
+  },
+  "spokenForms": [
+   "75024",
+   "7 5 0 2 4"
+  ],
+  "display": "75024"
+ },
+ {
+  "scenario": "s20",
+  "field": "garaging_zip",
+  "raw": "ghar pe, seven-five-zero-two-four",
+  "result": {
+   "norm": "75024",
+   "display": "75024"
+  },
+  "spokenForms": [
+   "75024",
+   "7 5 0 2 4"
+  ],
+  "display": "75024"
+ },
+ {
+  "scenario": "s20",
+  "field": "effective_date",
+  "raw": "2026-09-28",
+  "result": {
+   "norm": "2026-09-28",
+   "display": "Monday, September 28th"
+  },
+  "spokenForms": [
+   "Monday, September 28th",
+   "September 28th",
+   "Monday"
+  ],
+  "display": "Monday, September 28th"
+ },
+ {
+  "scenario": "s20",
+  "field": "effective_date",
+  "raw": "Monday se, twenty-eighth",
+  "result": {
+   "norm": "2026-09-28",
+   "display": "Monday, September 28th"
+  },
+  "spokenForms": [
+   "Monday, September 28th",
+   "September 28th",
+   "Monday"
+  ],
+  "display": "Monday, September 28th"
+ },
+ {
+  "scenario": "s20",
+  "field": "driver_training_discount",
+  "raw": "pending_proof",
+  "result": {
+   "norm": "pending_proof",
+   "display": "pending proof"
+  },
+  "spokenForms": [
+   "pending proof"
+  ],
+  "display": "pending proof"
+ },
+ {
+  "scenario": "s20",
+  "field": "driver_training_discount",
+  "raw": "haan, woh defensive driving course kar legi",
+  "result": null,
+  "spokenForms": null,
+  "display": null
+ },
+ {
+  "scenario": "s20",
+  "field": "premium_new_monthly_usd",
+  "raw": "205",
+  "result": {
+   "norm": "205.00",
+   "display": "$205 a month"
+  },
+  "spokenForms": [
+   "$205"
+  ],
+  "display": "$205 a month"
+ },
+ {
+  "scenario": "s20",
+  "field": "premium_new_monthly_usd",
+  "raw": "$205 a month",
+  "result": {
+   "norm": "205.00",
+   "display": "$205 a month"
+  },
+  "spokenForms": [
+   "$205"
+  ],
+  "display": "$205 a month"
+ },
+ {
+  "scenario": "s20",
+  "field": "premium_change_monthly_usd",
+  "raw": "57",
+  "result": {
+   "norm": "57.00",
+   "display": "$57 a month"
+  },
+  "spokenForms": [
+   "$57"
+  ],
+  "display": "$57 a month"
+ },
+ {
+  "scenario": "s20",
+  "field": "premium_change_monthly_usd",
+  "raw": "$57 zyada",
+  "result": {
+   "norm": "57.00",
+   "display": "$57 a month"
+  },
+  "spokenForms": [
+   "$57"
+  ],
+  "display": "$57 a month"
+ },
+ {
+  "scenario": "s21",
+  "field": "driver_full_name",
+  "raw": "Marcus Hill",
+  "result": {
+   "norm": "marcus hill",
+   "display": "Marcus Hill"
+  },
+  "spokenForms": [
+   "Marcus Hill",
+   "Marcus"
+  ],
+  "display": "Marcus Hill"
+ },
+ {
+  "scenario": "s21",
+  "field": "driver_full_name",
+  "raw": "Marcus Hill, H-I-L-L",
+  "result": {
+   "norm": "marcus hill",
+   "display": "Marcus Hill"
+  },
+  "spokenForms": [
+   "Marcus Hill",
+   "Marcus"
+  ],
+  "display": "Marcus Hill"
+ },
+ {
+  "scenario": "s21",
+  "field": "driver_dob",
+  "raw": "2006-03-15",
+  "result": {
+   "norm": "2006-03-15",
+   "display": "March 15th, 2006"
+  },
+  "spokenForms": [
+   "March 15th, 2006",
+   "March 15th",
+   "2006"
+  ],
+  "display": "March 15th, 2006"
+ },
+ {
+  "scenario": "s21",
+  "field": "driver_dob",
+  "raw": "March 15th, 2006",
+  "result": {
+   "norm": "2006-03-15",
+   "display": "March 15th, 2006"
+  },
+  "spokenForms": [
+   "March 15th, 2006",
+   "March 15th",
+   "2006"
+  ],
+  "display": "March 15th, 2006"
+ },
+ {
+  "scenario": "s21",
+  "field": "driver_age",
+  "raw": "20",
+  "result": {
+   "norm": "20",
+   "display": "20"
+  },
+  "spokenForms": [
+   "20"
+  ],
+  "display": "20"
+ },
+ {
+  "scenario": "s21",
+  "field": "driver_age",
+  "raw": "he's twenty",
+  "result": {
+   "norm": "20",
+   "display": "20"
+  },
+  "spokenForms": [
+   "20"
+  ],
+  "display": "20"
+ },
+ {
+  "scenario": "s21",
+  "field": "driver_relation",
+  "raw": "other_relative",
+  "result": {
+   "norm": "other_relative",
+   "display": "other relative"
+  },
+  "spokenForms": [
+   "niece",
+   "nephew",
+   "cousin",
+   "grandchild",
+   "granddaughter",
+   "grandson",
+   "relative"
+  ],
+  "display": "other relative"
+ },
+ {
+  "scenario": "s21",
+  "field": "driver_relation",
+  "raw": "my nephew, my sister's son",
+  "result": {
+   "norm": "other_relative",
+   "display": "other relative (nephew)"
+  },
+  "spokenForms": [
+   "niece",
+   "nephew",
+   "cousin",
+   "grandchild",
+   "granddaughter",
+   "grandson",
+   "relative"
+  ],
+  "display": "other relative (nephew)"
+ },
+ {
+  "scenario": "s21",
+  "field": "license_state",
+  "raw": "VA",
+  "result": {
+   "norm": "VA",
+   "display": "Virginia (VA)"
+  },
+  "spokenForms": [
+   "Virginia"
+  ],
+  "display": "Virginia (VA)"
+ },
+ {
+  "scenario": "s21",
+  "field": "license_state",
+  "raw": "Virginia",
+  "result": {
+   "norm": "VA",
+   "display": "Virginia (VA)"
+  },
+  "spokenForms": [
+   "Virginia"
+  ],
+  "display": "Virginia (VA)"
+ },
+ {
+  "scenario": "s21",
+  "field": "license_status",
+  "raw": "full",
+  "result": {
+   "norm": "full",
+   "display": "full license"
+  },
+  "spokenForms": [
+   "full license",
+   "fully licensed"
+  ],
+  "display": "full license"
+ },
+ {
+  "scenario": "s21",
+  "field": "license_status",
+  "raw": "full license",
+  "result": {
+   "norm": "full",
+   "display": "full license"
+  },
+  "spokenForms": [
+   "full license",
+   "fully licensed"
+  ],
+  "display": "full license"
+ },
+ {
+  "scenario": "s21",
+  "field": "incidents_3y",
+  "raw": "none",
+  "result": {
+   "norm": "none",
+   "display": "none"
+  },
+  "spokenForms": [
+   "no tickets",
+   "no accidents",
+   "clean record"
+  ],
+  "display": "none"
+ },
+ {
+  "scenario": "s21",
+  "field": "incidents_3y",
+  "raw": "clean",
+  "result": {
+   "norm": "none",
+   "display": "none"
+  },
+  "spokenForms": [
+   "no tickets",
+   "no accidents",
+   "clean record"
+  ],
+  "display": "none"
+ },
+ {
+  "scenario": "s21",
+  "field": "vehicle_assignment",
+  "raw": "veh2",
+  "result": {
+   "norm": "veh2",
+   "display": "2014 Ford Fusion"
+  },
+  "spokenForms": [
+   "Fusion",
+   "2014 Ford Fusion",
+   "Ford Fusion"
+  ],
+  "display": "2014 Ford Fusion"
+ },
+ {
+  "scenario": "s21",
+  "field": "vehicle_assignment",
+  "raw": "the Fusion",
+  "result": {
+   "norm": "veh2",
+   "display": "2014 Ford Fusion"
+  },
+  "spokenForms": [
+   "Fusion",
+   "2014 Ford Fusion",
+   "Ford Fusion"
+  ],
+  "display": "2014 Ford Fusion"
+ },
+ {
+  "scenario": "s21",
+  "field": "operator_type",
+  "raw": "primary",
+  "result": {
+   "norm": "primary",
+   "display": "primary"
+  },
+  "spokenForms": [
+   "primary",
+   "every day",
+   "main driver",
+   "mainly"
+  ],
+  "display": "primary"
+ },
+ {
+  "scenario": "s21",
+  "field": "operator_type",
+  "raw": "every day to school",
+  "result": {
+   "norm": "primary",
+   "display": "primary"
+  },
+  "spokenForms": [
+   "primary",
+   "every day",
+   "main driver",
+   "mainly"
+  ],
+  "display": "primary"
+ },
+ {
+  "scenario": "s21",
+  "field": "garaging_zip",
+  "raw": "23225",
+  "result": {
+   "norm": "23225",
+   "display": "23225"
+  },
+  "spokenForms": [
+   "23225",
+   "2 3 2 2 5"
+  ],
+  "display": "23225"
+ },
+ {
+  "scenario": "s21",
+  "field": "garaging_zip",
+  "raw": "at the house, 23225",
+  "result": {
+   "norm": "23225",
+   "display": "23225"
+  },
+  "spokenForms": [
+   "23225",
+   "2 3 2 2 5"
+  ],
+  "display": "23225"
+ },
+ {
+  "scenario": "s21",
+  "field": "effective_date",
+  "raw": "2026-09-26",
+  "result": {
+   "norm": "2026-09-26",
+   "display": "Saturday, September 26th"
+  },
+  "spokenForms": [
+   "Saturday, September 26th",
+   "September 26th",
+   "Saturday"
+  ],
+  "display": "Saturday, September 26th"
+ },
+ {
+  "scenario": "s21",
+  "field": "effective_date",
+  "raw": "oh, starting tomorrow",
+  "result": {
+   "norm": "2026-09-26",
+   "display": "Saturday, September 26th"
+  },
+  "spokenForms": [
+   "Saturday, September 26th",
+   "September 26th",
+   "Saturday"
+  ],
+  "display": "Saturday, September 26th"
+ },
+ {
+  "scenario": "s21",
+  "field": "premium_new_monthly_usd",
+  "raw": "193",
+  "result": {
+   "norm": "193.00",
+   "display": "$193 a month"
+  },
+  "spokenForms": [
+   "$193"
+  ],
+  "display": "$193 a month"
+ },
+ {
+  "scenario": "s21",
+  "field": "premium_new_monthly_usd",
+  "raw": "$193 a month",
+  "result": {
+   "norm": "193.00",
+   "display": "$193 a month"
+  },
+  "spokenForms": [
+   "$193"
+  ],
+  "display": "$193 a month"
+ },
+ {
+  "scenario": "s21",
+  "field": "premium_change_monthly_usd",
+  "raw": "51",
+  "result": {
+   "norm": "51.00",
+   "display": "$51 a month"
+  },
+  "spokenForms": [
+   "$51"
+  ],
+  "display": "$51 a month"
+ },
+ {
+  "scenario": "s21",
+  "field": "premium_change_monthly_usd",
+  "raw": "up $51",
+  "result": {
+   "norm": "51.00",
+   "display": "$51 a month"
+  },
+  "spokenForms": [
+   "$51"
+  ],
+  "display": "$51 a month"
+ },
+ {
+  "scenario": "s22",
+  "field": "driver_full_name",
+  "raw": "Gabriela Santos",
+  "result": {
+   "norm": "gabriela santos",
+   "display": "Gabriela Santos"
+  },
+  "spokenForms": [
+   "Gabriela Santos",
+   "Gabriela"
+  ],
+  "display": "Gabriela Santos"
+ },
+ {
+  "scenario": "s22",
+  "field": "driver_full_name",
+  "raw": "Gabriela Santos, G-A-B-R-I-E-L-A",
+  "result": {
+   "norm": "gabriela santos",
+   "display": "Gabriela Santos"
+  },
+  "spokenForms": [
+   "Gabriela Santos",
+   "Gabriela"
+  ],
+  "display": "Gabriela Santos"
+ },
+ {
+  "scenario": "s22",
+  "field": "driver_dob",
+  "raw": "1991-06-27",
+  "result": {
+   "norm": "1991-06-27",
+   "display": "June 27th, 1991"
+  },
+  "spokenForms": [
+   "June 27th, 1991",
+   "June 27th",
+   "1991"
+  ],
+  "display": "June 27th, 1991"
+ },
+ {
+  "scenario": "s22",
+  "field": "driver_dob",
+  "raw": "June 27th, 1991",
+  "result": {
+   "norm": "1991-06-27",
+   "display": "June 27th, 1991"
+  },
+  "spokenForms": [
+   "June 27th, 1991",
+   "June 27th",
+   "1991"
+  ],
+  "display": "June 27th, 1991"
+ },
+ {
+  "scenario": "s22",
+  "field": "driver_age",
+  "raw": "35",
+  "result": {
+   "norm": "35",
+   "display": "35"
+  },
+  "spokenForms": [
+   "35"
+  ],
+  "display": "35"
+ },
+ {
+  "scenario": "s22",
+  "field": "driver_age",
+  "raw": "thirty-five",
+  "result": {
+   "norm": "35",
+   "display": "35"
+  },
+  "spokenForms": [
+   "35"
+  ],
+  "display": "35"
+ },
+ {
+  "scenario": "s22",
+  "field": "driver_relation",
+  "raw": "non_relative_nonresident",
+  "result": {
+   "norm": "non_relative_nonresident",
+   "display": "non relative nonresident"
+  },
+  "spokenForms": [
+   "doesn't live with you",
+   "not related"
+  ],
+  "display": "non relative nonresident"
+ },
+ {
+  "scenario": "s22",
+  "field": "driver_relation",
+  "raw": "our nanny, she doesn't live with us",
+  "result": {
+   "norm": "non_relative_nonresident",
+   "display": "non relative nonresident"
+  },
+  "spokenForms": [
+   "doesn't live with you",
+   "not related"
+  ],
+  "display": "non relative nonresident"
+ },
+ {
+  "scenario": "s22",
+  "field": "license_state",
+  "raw": "VT",
+  "result": {
+   "norm": "VT",
+   "display": "Vermont (VT)"
+  },
+  "spokenForms": [
+   "Vermont"
+  ],
+  "display": "Vermont (VT)"
+ },
+ {
+  "scenario": "s22",
+  "field": "license_state",
+  "raw": "Vermont, she just moved down",
+  "result": {
+   "norm": "VT",
+   "display": "Vermont (VT)"
+  },
+  "spokenForms": [
+   "Vermont"
+  ],
+  "display": "Vermont (VT)"
+ },
+ {
+  "scenario": "s22",
+  "field": "license_status",
+  "raw": "full",
+  "result": {
+   "norm": "full",
+   "display": "full license"
+  },
+  "spokenForms": [
+   "full license",
+   "fully licensed"
+  ],
+  "display": "full license"
+ },
+ {
+  "scenario": "s22",
+  "field": "license_status",
+  "raw": "full license, she's been driving fifteen years",
+  "result": {
+   "norm": "full",
+   "display": "full license"
+  },
+  "spokenForms": [
+   "full license",
+   "fully licensed"
+  ],
+  "display": "full license"
+ },
+ {
+  "scenario": "s22",
+  "field": "incidents_3y",
+  "raw": "none",
+  "result": {
+   "norm": "none",
+   "display": "none"
+  },
+  "spokenForms": [
+   "no tickets",
+   "no accidents",
+   "clean record"
+  ],
+  "display": "none"
+ },
+ {
+  "scenario": "s22",
+  "field": "incidents_3y",
+  "raw": "clean, I checked",
+  "result": {
+   "norm": "none",
+   "display": "none"
+  },
+  "spokenForms": [
+   "no tickets",
+   "no accidents",
+   "clean record"
+  ],
+  "display": "none"
+ },
+ {
+  "scenario": "s22",
+  "field": "vehicle_assignment",
+  "raw": "veh1",
+  "result": {
+   "norm": "veh1",
+   "display": "2023 Honda Odyssey"
+  },
+  "spokenForms": [
+   "Odyssey",
+   "2023 Honda Odyssey",
+   "Honda Odyssey"
+  ],
+  "display": "2023 Honda Odyssey"
+ },
+ {
+  "scenario": "s22",
+  "field": "vehicle_assignment",
+  "raw": "the minivan, the Odyssey",
+  "result": {
+   "norm": "veh1",
+   "display": "2023 Honda Odyssey"
+  },
+  "spokenForms": [
+   "Odyssey",
+   "2023 Honda Odyssey",
+   "Honda Odyssey"
+  ],
+  "display": "2023 Honda Odyssey"
+ },
+ {
+  "scenario": "s22",
+  "field": "operator_type",
+  "raw": "occasional",
+  "result": {
+   "norm": "occasional",
+   "display": "occasional"
+  },
+  "spokenForms": [
+   "occasional",
+   "occasionally",
+   "sometimes"
+  ],
+  "display": "occasional"
+ },
+ {
+  "scenario": "s22",
+  "field": "operator_type",
+  "raw": "weekdays, school runs",
+  "result": null,
+  "spokenForms": null,
+  "display": null
+ },
+ {
+  "scenario": "s22",
+  "field": "garaging_zip",
+  "raw": "12203",
+  "result": {
+   "norm": "12203",
+   "display": "12203"
+  },
+  "spokenForms": [
+   "12203",
+   "1 2 2 0 3"
+  ],
+  "display": "12203"
+ },
+ {
+  "scenario": "s22",
+  "field": "garaging_zip",
+  "raw": "it stays at our house, 12203",
+  "result": {
+   "norm": "12203",
+   "display": "12203"
+  },
+  "spokenForms": [
+   "12203",
+   "1 2 2 0 3"
+  ],
+  "display": "12203"
+ },
+ {
+  "scenario": "s22",
+  "field": "effective_date",
+  "raw": "2026-09-28",
+  "result": {
+   "norm": "2026-09-28",
+   "display": "Monday, September 28th"
+  },
+  "spokenForms": [
+   "Monday, September 28th",
+   "September 28th",
+   "Monday"
+  ],
+  "display": "Monday, September 28th"
+ },
+ {
+  "scenario": "s22",
+  "field": "effective_date",
+  "raw": "Monday, the 28th, her first day",
+  "result": {
+   "norm": "2026-09-28",
+   "display": "Monday, September 28th"
+  },
+  "spokenForms": [
+   "Monday, September 28th",
+   "September 28th",
+   "Monday"
+  ],
+  "display": "Monday, September 28th"
+ },
+ {
+  "scenario": "s22",
+  "field": "premium_new_monthly_usd",
+  "raw": "186",
+  "result": {
+   "norm": "186.00",
+   "display": "$186 a month"
+  },
+  "spokenForms": [
+   "$186"
+  ],
+  "display": "$186 a month"
+ },
+ {
+  "scenario": "s22",
+  "field": "premium_new_monthly_usd",
+  "raw": "$186 a month",
+  "result": {
+   "norm": "186.00",
+   "display": "$186 a month"
+  },
+  "spokenForms": [
+   "$186"
+  ],
+  "display": "$186 a month"
+ },
+ {
+  "scenario": "s22",
+  "field": "premium_change_monthly_usd",
+  "raw": "25",
+  "result": {
+   "norm": "25.00",
+   "display": "$25 a month"
+  },
+  "spokenForms": [
+   "$25"
+  ],
+  "display": "$25 a month"
+ },
+ {
+  "scenario": "s22",
+  "field": "premium_change_monthly_usd",
+  "raw": "up $25",
+  "result": {
+   "norm": "25.00",
+   "display": "$25 a month"
+  },
+  "spokenForms": [
+   "$25"
+  ],
+  "display": "$25 a month"
+ }
+]
