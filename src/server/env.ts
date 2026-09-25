@@ -96,6 +96,7 @@ export const EnvSchema = z.object({
   VA_KEYTERMS: flag01("1"), // G1: T-D1-0 passed 4/4 with keyterms (DESIGN §7 env table: 1 once T-D1-0 passes)
   VA_VOICE: z.string().min(1).default("alba"),
   PAY_TOOL_MODE: z.enum(["hold", "push"]).default("push"), // G1: T-D1-1 failed (silent reply.create mid-hold) → §5.8 fallback
+  DISCLOSURE_TAX_SUFFIX: flag01("0"), // G2: off (T-D1-9 — Polar's total_amount equals the disclosed amount, tax 0)
   FEATURE_BE_CUSTOMER: flag01("0"),
 });
 
