@@ -246,26 +246,9 @@ export class PaymentService {
     return (await this.deps.store.transition(id, "timeout", "timeout")) ?? p;
   }
 
-  /** The #15 body (+ WP6 extras). */
+  /** The #15 body (+ WP6 extras): `paymentViewOf` plus the close-stage payload once succeeded. */
   async toView(p: PaymentRecord): Promise<PaymentViewExt> {
-    const livePolar = p.provider === "polar" && !p.simulated && !!p.checkoutUrl;
-    const view: PaymentViewExt = {
-      id: p.id,
-      status: p.status,
-      statusSource: p.statusSource,
-      amountCents: p.amountCents,
-      totalAmountCents: p.totalAmountCents,
-      provider: p.provider,
-      simulated: p.simulated,
-      ...(livePolar ? { checkoutUrl: p.checkoutUrl! } : {}),
-      embed: livePolar ? { url: p.checkoutUrl!, origin: polarOriginOf(p.checkoutUrl!) } : null,
-      ...(p.failureReason ? { failureReason: p.failureReason } : {}),
-      updatedAt: p.updatedAt.toISOString(),
-      label: labelOf(p),
-      esignedAt: p.esignConsentAt ? p.esignConsentAt.toISOString() : null,
-    };
-    const tr = finalToolResult(p);
-    if (tr) view.toolResult = tr;
+    const view = paymentViewOf(p);
     if (p.status === "succeeded" && this.deps.stagePayloadFor) {
       try {
         const sp = await this.deps.stagePayloadFor(p);
@@ -276,6 +259,33 @@ export class PaymentService {
     }
     return view;
   }
+}
+
+/**
+ * The pure `PaymentView` of a payments row (no Polar call, no stage payload, no extras): what route #15 returns
+ * minus `stagePayload`. For WP3's route #4 `payment` summary (wp3-to-wp6 item 3):
+ * `paymentViewOf(toPaymentRecord(row))`.
+ */
+export function paymentViewOf(p: PaymentRecord): PaymentViewExt {
+  const livePolar = p.provider === "polar" && !p.simulated && !!p.checkoutUrl;
+  const view: PaymentViewExt = {
+    id: p.id,
+    status: p.status,
+    statusSource: p.statusSource,
+    amountCents: p.amountCents,
+    totalAmountCents: p.totalAmountCents,
+    provider: p.provider,
+    simulated: p.simulated,
+    ...(livePolar ? { checkoutUrl: p.checkoutUrl! } : {}),
+    embed: livePolar ? { url: p.checkoutUrl!, origin: polarOriginOf(p.checkoutUrl!) } : null,
+    ...(p.failureReason ? { failureReason: p.failureReason } : {}),
+    updatedAt: p.updatedAt.toISOString(),
+    label: labelOf(p),
+    esignedAt: p.esignConsentAt ? p.esignConsentAt.toISOString() : null,
+  };
+  const tr = finalToolResult(p);
+  if (tr) view.toolResult = tr;
+  return view;
 }
 
 /** Server-built final `tool.result` of the held pay tool (G0 `PaymentView.toolResult`); null while not terminal. */

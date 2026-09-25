@@ -7,7 +7,8 @@ import { describe, expect, it } from "vitest";
 
 import type { PaymentStatus } from "@/core/contracts/case";
 import { allowedFrom, canTransition, formatUsd, usdToCents } from "@/server/payments/machine";
-import { PaymentService, POLAR_UNAVAILABLE_LABEL, receiptOf, SERVER_POLL_INTERVAL_MS, type PaymentsMode } from "@/server/payments/service";
+import { PaymentService, paymentViewOf, POLAR_UNAVAILABLE_LABEL, receiptOf, SERVER_POLL_INTERVAL_MS, type PaymentsMode } from "@/server/payments/service";
+import type { PaymentRecord } from "@/server/payments/store";
 import { buildCheckoutCreate, validatedEmbedOrigin } from "@/server/polar/client";
 import { clock, FakePolar, MemoryPaymentStore, policy } from "../tools/helpers";
 
@@ -225,5 +226,29 @@ describe("PaymentService", () => {
     expect(v.checkoutUrl).toBe("https://sandbox.polar.sh/checkout/co_1");
     await svc.simulate(p.id);
     expect((await svc.view(p.id)).embed).toBeNull();
+  });
+});
+
+describe("paymentViewOf (pure; WP3 route #4 summary, wp3-to-wp6 item 3)", () => {
+  const row = (o: Partial<PaymentRecord>): PaymentRecord => ({
+    id: "pay_ABC123xyz", caseId: "c1", takeoverId: "t1", provider: "polar", amountCents: 2340, checkoutId: "co_1",
+    checkoutUrl: "https://sandbox.polar.sh/checkout/polar_c_1", totalAmountCents: 2340, taxAmountCents: 0, simulated: false,
+    status: "open", statusSource: null, failureReason: null, esignConsentAt: null, esignName: null,
+    createdAt: new Date(0), updatedAt: new Date(1000), ...o,
+  });
+  it("open Polar checkout: embed + hosted URL, no tool result", () => {
+    const v = paymentViewOf(row({}));
+    expect(v.embed).toEqual({ url: "https://sandbox.polar.sh/checkout/polar_c_1", origin: "https://sandbox.polar.sh" });
+    expect(v.checkoutUrl).toBe("https://sandbox.polar.sh/checkout/polar_c_1");
+    expect(v.toolResult).toBeUndefined();
+    expect(v.stagePayload).toBeUndefined();
+  });
+  it("succeeded by webhook: paid tool result verified by the webhook; simulated rows hide the embed", () => {
+    const v = paymentViewOf(row({ status: "succeeded", statusSource: "webhook" }));
+    expect(v.toolResult).toEqual({ status: "paid", amount: "$23.40", receipt: receiptOf("pay_ABC123xyz"), verified_by: "polar_webhook" });
+    expect(v.label).toBe("Verified by Polar webhook");
+    const s = paymentViewOf(row({ status: "succeeded", statusSource: "mock", simulated: true, provider: "mock" }));
+    expect(s.embed).toBeNull();
+    expect(s.toolResult).toMatchObject({ status: "paid", verified_by: "simulated" });
   });
 });
