@@ -129,3 +129,121 @@ The optional trailing `spec?: IntentSpec` parameters (§2 rule 9), `LEGACY_BATON
 - The interrupted run had already started WP14a·3 and left three committed, self-contained T3 commits on top: `63b3636` (optional trailing `spec?: IntentSpec` on the WP1 core functions, `LEGACY_BATON_SPEC` in `src/core/intents/baton-legacy-spec.ts`, `relay/spec-link.ts`, `accountFor`/`policyFor`), `90c0bcc` (spec-injection parity suite `parity-spec.test.ts`, `spec-generic.test.ts`) and `b46ebcb` (non-removable safety block, `safety.test.ts`). Kept as they are; WP14a·3 continues from them (still open: `brand-denylist.ts`, the rest of the P§4.6 corpus, the remaining lint rules, the WP16 requests, and a WP14a·3 notes section).
 - **§2 rule 9:** those three commits change WP1 core signatures (all additive: one optional trailing parameter each; no point-free callback use of the widened functions in any worktree, checked), so they **merge only after G2**. Before G2 merge `27ec817`, not `wp/wp14a`.
 - Re-verified at `b46ebcb`: typecheck clean; `npm test` **71 files, 962/962 passed** with Postgres up (Docker's `baton-pg` is running again, so no `SKIP_DB_TESTS`); `snapshot-legacy.ts --check` → "oracle up to date". Live spend $0.
+
+## WP14a·3: spec injection, safety block, all lint rules (B1/K1/K2 first), parity corpus, WP16 seams (D1 Fri Sep 25)
+
+Branch `wp/wp14a`. The unit was interrupted once by a usage limit. On resume the worktree was clean, `git merge main` was a no-op (main = `175a6b7`), and the three T3 commits from the resume check above were kept unchanged.
+
+| Commit | What |
+|---|---|
+| `63b3636`, `90c0bcc`, `b46ebcb` | (before the interruption) The optional trailing `spec?: IntentSpec` on the WP1 core functions, `LEGACY_BATON_SPEC`, the spec-link seam, the spec parity suite and the non-removable safety block |
+| `f18822e` | **B1, K1, K2**: `src/core/relay/brand-denylist.ts` and `LintOptions` |
+| `8358762` | The rest of P§3.4: C2, S2, S3, F1, F2, X1, X2, G2, W3 and W2. Adds `src/core/relay/canned.ts` (the 4 canned states) and `mergedListeningKeyterms` |
+| `d4d70e3` | Parity corpus: WP1's committed first-update fixtures and WP8's QA fixture call |
+| `b7395fb` | WP16 seams in core: `tool-args.ts` (`validateToolArgs`), `lookup-table.ts` and `connector-rules.ts` (the lint mirrors for S3 and L2). Also `cannedCaseState` for WP14b's binding |
+
+### Done
+
+- **Spec injection (TASKS-v2 §2 rule 9).** It adds only optional trailing parameters; no existing parameter or return type changed. `parity-spec.test.ts` proves the results equal with no spec, with `LEGACY_BATON_SPEC` and with the compiled Baton spec.
+- **Safety block (`safety.ts`).** Every non-flagship prompt carries it, including a relay whose custom `promptTemplate` tries to drop or spoof it. Baton's prompt has none.
+- **Lint implements every P§3.4 rule.** `LINT_RULES_PENDING` is now `[]`, and issues come out in the order of the rule table.
+- **B1** (`brand-denylist.ts`):
+  - **Lists:** 703 entries in four lists: the gallery domains (dental, telecom, payments, e-sign), the top-50 US banks, the top-50 US insurers and the Fortune 500.
+  - **Matching** uses tokens on word boundaries. It folds case, accents and "and"/"&", and it never builds a RegExp from a string.
+  - **Three tiers keep ordinary English out:**
+    - `exact` names match in any case.
+    - `capitalized` names need capitals in prose: "Target" fails, "target date" passes.
+    - `name` words always fail in a sample's `org.name`. In prose they fail only as a possessive or after a cue word ("Nationwide's assistant", "calling from Frontier"), so "Nationwide 5G coverage" passes.
+  - **Acronyms** outside the `exact` tier must be written in capitals, so "sign-ups" is not UPS.
+  - **Surnames and place names** ("Lincoln", "Erie", "Root", "Cox") are listed only in multi-word forms, so "Root & Crown Dental" is legal.
+  - **Checked texts:**
+    - each sample's `org.name`;
+    - `meta.title` and `meta.tagline`;
+    - `persona.tone` and `persona.extraRules`;
+    - the subject and the greeting;
+    - the disclosures: title, text and tokens;
+    - the `promptTemplate`;
+    - the handoff lines;
+    - the SMS and document templates.
+  - **Templates:** B1 skips template vars but reads across section boundaries, so "Wells{?x}{/?} Fargo" is caught.
+  - **Not checked:** field phrases, stage goals and sample data, because a port-in may name the carrier the customer is leaving.
+  - `replaceDenylistedBrands` is exported for the drafting post-fix.
+- **K1/K2** need context that is not in the blueprint:
+  - **Options:** `lintBlueprint(bp, opts?)` and `lintBlueprintJson(json, opts?)` take an optional `LintOptions` (additive): `visibility`, `pinnedPublication`, `secretIds`, `flagship` and `simSampleRateHz`.
+  - **K2 fails a `null` ref** on a used `http_action` header, and on any `completion_webhook`: a webhook always runs and is always signed. With `secretIds` set, K2 also fails refs to missing or expired secrets. An `http_action` with a null `hmacSecret` is allowed; it is simply unsigned.
+  - **Consequence:** a gallery relay cannot carry a completion webhook.
+- **The compiled rules** compile the relay and render it for every sample × the 4 canned states:
+  - **When they run:** only when L1–L3, S1 and X3 pass. Any throw becomes an issue, so lint never throws.
+  - **G2:**
+    - the opening is ≤ 14 words;
+    - the greeting is ≤ `maxWords` after drops;
+    - `next.confirm` uses `{phrase.confirm}` and `next.ask` uses `{phrase.ask}`.
+  - **W3:** the first VERIFIED value comes within 24 words. `greetingFirstFactWord` measures it by rendering with marked field values.
+  - **X1:**
+    - the extractor schema is strict;
+    - the prompt is ≤ 6000 characters at the longest stage, checked for the all-verified and nothing states;
+    - the case-JSON cap is ≤ 2400.
+  - **X2:** at most 100 merged keyterms of ≤ 50 characters, counted before capping, and a `scenarioPrompt` of ≤ 1750 characters.
+- **C2:** every disclosure asks a question ("?"), and its text contains at least one of its critical tokens.
+  - "Consent exactly when an act stage follows" means two things:
+    - the disclosure that gates the act stage (the exit of the stage before it, or the act connector's `requiresDisclosure`) must have consent;
+    - a consent disclosure with no act stage after it fails.
+  - Baton is correct on both: `esign_consent` is true and `premium_change` is false.
+- **S2, S3, F1, F2 and W2** follow the table. Two additions:
+  - S3 also mirrors WP16's runtime refusals: dropped headers, and URLs with a bad port, userinfo, localhost, a single-label host or a non-public IP literal.
+  - L2 also loads each `lookup_table` connector's data against its table definition.
+- **Baton lints clean,** with no errors and no warnings. This holds with no options and with `{flagship, visibility:"gallery", pinned, secretIds:[], simSampleRateHz:8000}`. Linting Baton takes 3.5 ms p50 in Node.
+- **`canned.ts`** provides two builders:
+  - `cannedSnapshot(bp, state, account)` returns fields only (for the Studio and lint);
+  - `cannedCaseState(compiled, account, state)` returns a full `CaseState` (for WP14b's `KernelBinding.cannedSnapshot`).
+- **Parity corpus additions:**
+  - `parity-wp1-fixtures.test.ts`: the Baton blueprint reproduces WP1's committed `first-update-{confirm,disclose}.{s01,s02}.json` byte for byte.
+  - `parity-qa-fixtures.test.ts`: WP8's QA fixture call (their transcript, timeline and snapshots through `buildQaInput`) gives equal `computeQa` results with no spec, the legacy spec and the compiled spec.
+  - The rest of the corpus was already covered: the named snapshots, the 200 random snapshots, normalize over the 22 scenarios, the WP3 dialog inputs and the extractor version.
+- **WP16 seams** (answers `wp16-to-wp14a.md` §1–3):
+  - `src/core/relay/tool-args.ts`: `validateToolArgs`, with WP16's exact semantics.
+  - `src/core/relay/lookup-table.ts`: WP16's parser, made isomorphic with `utf8Bytes`.
+  - `src/core/relay/connector-rules.ts`: the lint mirrors of the runtime's refusals.
+  - Their §4 (the P§4.4 tool-result fixture) needs `RelayToolService` from WP16·2; see `requests/wp14a-to-wp16.md`.
+
+### Decisions (additive; object via a request file)
+
+1. `lintBlueprint` and `lintBlueprintJson` take an optional second argument, `LintOptions`. One-argument calls are unchanged, so WP14b's port keeps working.
+2. `LINT_RULES_PENDING` is now `[]`. It stays exported so callers that check it still compile.
+3. **G2's 14-word opening applies to every relay.**
+   - The mini fixture's opening is now 14 words ("… not a person. This call is recorded.").
+   - **WP14b's blank relay has a 15–17-word opening, so it fails G2.** `requests/wp14a-to-wp14b.md` suggests an opening that uses `{rep.firstName}`; with it, all 7 industries lint clean.
+4. Canned states work like this:
+   - `one_pending` and `one_missing` change the first required, non-rep-only field in next-step priority.
+   - Optional fields stay MISSING.
+   - Values come from each field's first example that normalizes, otherwise from a per-type sample.
+5. The header and URL mirrors report under **S3**, and lookup-table load errors under **L2**. No new lint codes.
+
+### Tests
+
+- Typecheck is clean.
+- **`npm test`: 75 files, 1082/1082 passed** (Postgres up).
+- `tests/unit/core/relay` has 14 files and 340 tests.
+  - These include 80 lint fixtures (fail or warn), each firing exactly one rule.
+  - Together they cover every code except SCHEMA and K1, which have their own tests.
+- `snapshot-legacy.ts --check` reports "oracle up to date".
+
+### Live spend
+
+$0: no AssemblyAI, OpenAI or Zerops calls.
+
+### What the integrator must do
+
+1. **After G2**, merge `wp/wp14a` at `b7395fb` or later with `--no-ff`. It must wait for G2 because the spec-injection commits change WP1 signatures (additively; §2 rule 9).
+2. Then re-run `npx tsx scripts/relay/snapshot-legacy.ts --check` on the merged main.
+3. `27ec817` (WP14a·2) can still be merged on its own before G2.
+4. After the merge:
+   - WP16 re-exports `validateToolArgs` and imports the core `lookup-table.ts` (`requests/wp14a-to-wp16.md`).
+   - WP14b binds `cannedCaseState`, passes `LintOptions` from the relay row and the workspace's secret ids, and shortens the blank relay's opening (`requests/wp14a-to-wp14b.md`).
+
+### Left for WP14a·4 (T4, D2 AM)
+
+- The P§4.7 contract-widening commit, including `ToolOutcome.nextStep` and `CaseStateSchema.intent`. `cannedCaseState` and the kernel still use the `"add_driver"` literal.
+- The browser compile-time benchmark (acceptance 7).
+- The P§4.4 Dental tool-result fixture, written against WP16·2's `RelayToolService`.
+- The `TUNING_8K` request from WP9, if one arrives.
