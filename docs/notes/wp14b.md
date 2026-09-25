@@ -293,7 +293,7 @@ is swapped in one place after their merge.
 `npm run typecheck` is clean. `npm test` passes **871/871** (71 files; +29). The local `baton-pg` container was
 restarted: Docker Desktop was not running.
 
-- **`tests/unit/server/engine/engine-pure.test.ts`** (12):
+- **`tests/unit/server/engine/engine-pure.test.ts`** (11):
   - the factory LRU: shared misses, eviction order, a 404 is not cached, no kernel → 503 not cached then a late
     binding works, a throwing compile is retried, `forVersion(null)` = the flagship file;
   - the catalog: order, the gallery-sim hash mapping and its fallback, no resolver;
