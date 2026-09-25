@@ -24,7 +24,7 @@ import { compileExtractor } from "./extractor";
 import { formatValue } from "./formatters";
 import { blueprintHash, hash8 } from "./migrate";
 import { DEFAULT_PROMPT_HEAD, DEFAULT_PROMPT_TAIL, defaultRulesBlock } from "./prompt-default";
-import { safetyBlock } from "./safety";
+import { neutralizePromptBody, safetyBlock, safetyExempt } from "./safety";
 import {
   fieldState, knownValue, lookupTableOf, makeScope, renderIn, renderTracked, type Fields, type ScopeSlots,
 } from "./scope";
@@ -122,6 +122,8 @@ export function compileRelay(bp: Blueprint, opts: CompileRelayOptions = {}): Ker
   const spec = buildIntentSpec(bp, { hash });
   const T = spec.templates;
   const flagship = opts.flagship ?? false;
+  /** The safety block is dropped only for the flagship Baton template (relay/safety.ts `safetyExempt`). */
+  const exempt = safetyExempt(bp, flagship);
   const disclosures = new Map(bp.playbook.disclosures.map((d) => [d.id, d]));
   const connectorsById = new Map(bp.connectors.map((c) => [c.id, c]));
   const stageByRuntime = new Map(bp.playbook.stages.map((s) => [STAGE_KIND_TO_STAGE[s.kind] as Stage, s]));
@@ -302,8 +304,8 @@ export function compileRelay(bp: Blueprint, opts: CompileRelayOptions = {}): Ker
     const body = bp.playbook.promptTemplate !== null
       ? renderIn(T, bp.playbook.promptTemplate, scope)
       : [renderIn(T, DEFAULT_PROMPT_HEAD, scope), defaultRulesBlock(account.org.repFirstName, bp.playbook.persona.extraRules), renderIn(T, DEFAULT_PROMPT_TAIL, scope)].join("\n\n");
-    const safety = flagship ? "" : `\n\n${safetyBlock(bp, account)}`;
-    return `${body}${safety}\n\n${deployMarkerLine(o.deployId)}`;
+    if (exempt) return `${body}\n\n${deployMarkerLine(o.deployId)}`;
+    return `${neutralizePromptBody(body)}\n\n${safetyBlock(bp, account)}\n\n${deployMarkerLine(o.deployId)}`;
   };
 
   // ------------------------------------------------------------------------------------------ tools
