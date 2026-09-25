@@ -19,7 +19,8 @@ export interface SessionApi {
   /** #5b; `keepalive` on pagehide. Never throws. */
   releaseRun(runId: string, caseToken: string, keepalive?: boolean): Promise<void>;
   verification(takeoverId: string, token: string): Promise<VerificationView>;
-  peaks(url: string): Promise<unknown>;
+  /** A public JSON asset (peaks, cached turns); null on any failure (the page degrades, never breaks). */
+  getJson(url: string): Promise<unknown>;
 }
 
 type FetchLike = (input: string, init?: RequestInit) => Promise<Response>;
@@ -71,6 +72,13 @@ export function createHttpApi(o: { fetch?: FetchLike; visitorToken?: () => strin
       }
     },
     verification: (id, token) => call(`/api/verifications/${encodeURIComponent(id)}`, { method: "GET", headers: headers(token) }, (b) => VerificationViewSchema.parse(b)),
-    peaks: (url) => call(url, { method: "GET" }, (b) => b),
+    async getJson(url) {
+      try {
+        const res = await f(url, { method: "GET" });
+        return res.ok ? ((await res.json()) as unknown) : null;
+      } catch {
+        return null;
+      }
+    },
   };
 }

@@ -15,7 +15,10 @@ import { clipWindow } from "./clip-window";
 
 export const DUCK_LEVEL = 0.2;
 
-export function clipWindowFor(ev: Evidence, turn: Pick<TurnInput, "words" | "startMs" | "endMs"> | null, durationMs: number): { fromMs: number; toMs: number } {
+/** What the clip window reads from a turn (a `TurnInput` fits). */
+export type ClipTurn = { words: readonly Pick<TurnInput["words"][number], "startMs" | "endMs">[]; startMs: number; endMs: number };
+
+export function clipWindowFor(ev: Evidence, turn: ClipTurn | null, durationMs: number): { fromMs: number; toMs: number } {
   const async = ev.source === "async_ch1" || ev.source === "async_ch2";
   const t = turn ?? { words: [], startMs: ev.startMs, endMs: ev.endMs };
   return clipWindow(ev, t, async ? "async" : "stream", durationMs);
@@ -24,7 +27,7 @@ export function clipWindowFor(ev: Evidence, turn: Pick<TurnInput, "words" | "sta
 export interface EvidencePlaybackDeps {
   playback: Pick<CallPlayback, "playSpan" | "duck"> | null;
   durationMs: number;
-  turnOf(turnId: string): Pick<TurnInput, "words" | "startMs" | "endMs"> | null;
+  turnOf(turnId: string): ClipTurn | null;
   /** AI half: plays `GET /api/va-sessions/[id]/audio#t=from,to` (WP8 route); resolves when done. */
   playAiClip?: (ev: Evidence, w: { fromMs: number; toMs: number }) => Promise<void>;
 }

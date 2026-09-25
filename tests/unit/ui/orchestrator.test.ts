@@ -1,13 +1,16 @@
 import { describe, expect, it } from "vitest";
 
 import type { CreateCaseRequest, CreateCaseResponse, StartRunRequest } from "@/core/contracts/api";
-import type { QaResult } from "@/core/contracts/events";
+import { BatonError } from "@/core/contracts/errors";
+import type { BatonEvent, QaResult } from "@/core/contracts/events";
+import type { TakeoverClientView, TakeoverControllerExt } from "@/core/contracts/ext/wp5-takeover";
 import type { RunPlan } from "@/core/contracts/run";
 import type { CallManifestEntry } from "@/core/contracts/scenario";
-import type { CallPlayback, CallTick, CaseSync, PageLifecycle } from "@/core/contracts/services";
+import type { CallPlayback, CallTick, CaseSync } from "@/core/contracts/services";
+import type { TurnInput } from "@/core/contracts/turns";
 import { emptyCaseState, S01_POLICY } from "@/client/fixtures/builder";
 import type { SessionApi } from "@/client/session/api";
-import { CallSession, type SessionControllers, type SttManagerLike, type TakeoverControllerLike } from "@/client/session/orchestrator";
+import { CallSession, type LifecycleLike, type SessionContext, type SessionControllers, type SttManagerLike } from "@/client/session/orchestrator";
 import { createConsoleStore } from "@/client/store/store";
 
 const CALL: CallManifestEntry = {
@@ -17,7 +20,24 @@ const CALL: CallManifestEntry = {
   recordedAiBundle: "s01-a", customerTailPack: null, assets: { rep: "/calls/s01/rep.x.ulaw", customer: "/calls/s01/customer.x.ulaw", peaks: "/calls/s01/peaks.x.json" },
 };
 
-function fakeApi(plan: Partial<RunPlan> = {}) {
+/** Cached finals: the rep turn arriving at 79.9 s is the newest clean cut before the 81.5 s target (WP4 expressStart). */
+const CACHED = {
+  callId: "s01-take2", variant: "pc_ctx", transcribedAt: "2026-09-20T10:00:00Z",
+  channels: {
+    rep: [
+      { recvMs: 79_900, message: { type: "Turn", end_of_turn: true, transcript: "So the effective date is Friday.", words: [{ start: 77_000, end: 79_400 }] } },
+      { recvMs: 90_000, message: { type: "Turn", end_of_turn: true, transcript: "Great.", words: [{ start: 88_000, end: 89_000 }] } },
+    ],
+    customer: [{ recvMs: 60_000, message: { type: "Turn", end_of_turn: true, transcript: "Yes.", words: [{ start: 59_000, end: 59_500 }] } }],
+  },
+};
+
+const QA: QaResult = {
+  provisional: false, reAsked: 0, newlyAsked: 0, pendingConfirmed: 1, verifiedReconfirmed: 0, disclosures: [], clickToFirstAudibleMs: 4100,
+  deadAirAfterRepMs: 420, turnLatencyP50Ms: 2300, payment: "simulated", handedBack: false, aiSeconds: 90, adviceFlags: 0, details: [],
+};
+
+function fakeApi(plan: Partial<RunPlan> = {}, o: { cached?: boolean; verification?: "completed" | "404" } = {}) {
   const log: string[] = [];
   let n = 0;
   const api: SessionApi = {
@@ -28,6 +48,7 @@ function fakeApi(plan: Partial<RunPlan> = {}) {
       const res: CreateCaseResponse = {
         caseId: `case${n}`, caseToken: `tok${n}`, policy: S01_POLICY, call: CALL, state: emptyCaseState(`case${n}`),
         assets: CALL.assets as NonNullable<CallManifestEntry["assets"]>, cachedTurnsUrl: "/data/cached-turns/s01-take2.json",
+        ...(n === 1 ? { visitorToken: "vt1" } : {}),
       };
       return res;
     },
@@ -38,25 +59,66 @@ function fakeApi(plan: Partial<RunPlan> = {}) {
     async releaseRun(runId, token, keepalive) {
       log.push(`release ${runId} ${token} keepalive=${!!keepalive}`);
     },
-    async verification() {
-      log.push("verification");
+    async verification(id, token) {
+      log.push(`verification ${id} ${token}`);
+      if (o.verification === "404") throw new BatonError("E_NOT_FOUND", "no verification");
       return { status: "completed", qa: QA, elapsedMs: 18_000 };
     },
-    peaks: async () => ({ ratePerSec: 50, rep: [0.1], customer: [0.2] }),
+    async getJson(url: string) {
+      log.push(`get ${url}`);
+      if (url.includes("cached-turns")) return o.cached ? CACHED : null;
+      if (url.includes("peaks")) return { ratePerSec: 50, rep: [0.1], customer: [0.2] };
+      return null;
+    },
   };
   return { api, log };
 }
 
-const QA: QaResult = {
-  provisional: false, reAsked: 0, newlyAsked: 0, pendingConfirmed: 1, verifiedReconfirmed: 0, disclosures: [], clickToFirstAudibleMs: 4100,
-  deadAirAfterRepMs: 420, turnLatencyP50Ms: 2300, payment: "simulated", handedBack: false, aiSeconds: 90, adviceFlags: 0, details: [],
-};
+class FakeTakeover implements TakeoverControllerExt {
+  readonly phase = "idle" as const;
+  manualPassAllowed = true;
+  armed = false;
+  finals: string[] = [];
+  cbs = new Set<() => void>();
+  v: TakeoverClientView = { phase: "idle", manualPassAllowed: true, passes: 0, lastOutcome: null, pass: null, notice: null, verificationJobId: null };
+  constructor(private readonly log: string[]) {}
+  async arm(src: "manual" | "auto_handoff") {
+    this.log.push(`arm ${src}`);
+    this.armed = true;
+  }
+  abort() {}
+  endCall(reason: string) {
+    this.log.push(`endCall ${reason}`);
+  }
+  noteFinal(t: { turnId: string }) {
+    this.finals.push(t.turnId);
+  }
+  armInfo() {
+    return { armed: this.armed, tArmMs: this.armed ? 100_000 : null };
+  }
+  view() {
+    return this.v;
+  }
+  subscribe(cb: () => void) {
+    this.cbs.add(cb);
+    return () => void this.cbs.delete(cb);
+  }
+  dispose() {
+    this.log.push("takeover.dispose");
+  }
+  /** WP5: /end answered → the verification job id appears on the view. */
+  ended(takeoverId: string) {
+    this.v = { ...this.v, phase: "done", pass: { takeoverId } as TakeoverClientView["pass"], verificationJobId: "job_1" };
+    for (const cb of [...this.cbs]) cb();
+  }
+}
 
-function fakeControllers(o: { sttResult?: "live" | "queued" | "denied" } = {}) {
+function fakeControllers(o: { sttResult?: "live" | "queued" | "denied"; whenRunning?: boolean } = {}) {
   const log: string[] = [];
   let tickCb: ((t: CallTick) => void) | null = null;
   let endedCb: (() => void) | null = null;
-  let takeoverEnded: ((e: { takeoverId: string; takeoverToken: string; outcome: string }) => void) | null = null;
+  let sink: SessionContext["sink"] | null = null;
+  const sttStatus: SttManagerLike["status"] = { rep: "idle", customer: "idle" };
   const playback = {
     start: (from: number) => void log.push(`play.start ${from}`),
     stop: () => void log.push("play.stop"),
@@ -70,25 +132,27 @@ function fakeControllers(o: { sttResult?: "live" | "queued" | "denied" } = {}) {
     playHandoffClip: async () => ({ endCtxMs: 0 }),
   } as unknown as CallPlayback;
   const stt = {
-    open: async (p: { startOffsetMs: number }) => (log.push(`stt.open ${p.startOffsetMs}`), o.sttResult ?? "live"),
+    open: async (p: { startOffsetMs: number; seedAgentContext?: string }) => {
+      log.push(`stt.open ${p.startOffsetMs}${p.seedAgentContext ? ` seed="${p.seedAgentContext}"` : ""}`);
+      const r = o.sttResult ?? "live";
+      const st = r === "live" ? "open" : r === "denied" ? "cached" : "queued";
+      sttStatus.rep = st;
+      sttStatus.customer = st;
+      return r;
+    },
     feed: () => void log.push("stt.feed"),
     hasOpenPartial: () => false,
     forceEndpoint: () => {},
     pause: async () => void log.push("stt.pause"),
     resume: async () => void log.push("stt.resume"),
     terminateAll: async () => (log.push("stt.terminateAll"), []),
-    status: { rep: "open", customer: "open" },
+    status: sttStatus,
+    providerSessionIds: { rep: "s-rep", customer: "s-cus" },
     finishAfterSilence: async () => void log.push("stt.finish"),
     dispose: () => void log.push("stt.dispose"),
   } as unknown as SttManagerLike;
-  const takeover: TakeoverControllerLike = {
-    arm: async (src) => void log.push(`arm ${src}`),
-    phase: "idle",
-    abort: () => {},
-    manualPassAllowed: true,
-    onEnded: (cb) => ((takeoverEnded = cb), () => {}),
-  };
-  const lifecycle: PageLifecycle & { attachContext(): void } = {
+  const takeover = new FakeTakeover(log);
+  const lifecycle: LifecycleLike = {
     onPause: () => () => {},
     onResume: () => () => {},
     isIOS: false,
@@ -99,21 +163,42 @@ function fakeControllers(o: { sttResult?: "live" | "queued" | "denied" } = {}) {
       ({
         ctx: {} as AudioContext,
         unlockSync: () => void log.push("unlockSync"),
+        whenRunning: async () => o.whenRunning ?? true,
         nowMs: () => 0,
         setAudioSession: () => {},
         loadCall: async () => (log.push("loadCall"), playback),
-        createVaOutput: () => { throw new Error("unused"); },
-        createFeeder: () => { throw new Error("unused"); },
-        openMic: () => { throw new Error("unused"); },
+        createVaOutput: () => {
+          throw new Error("unused");
+        },
+        createFeeder: () => {
+          throw new Error("unused");
+        },
+        openMic: () => {
+          throw new Error("unused");
+        },
         playPcm24k: async () => {},
       }) as never,
     lifecycle: () => lifecycle,
-    createCaseSync: () => ({ enqueue: () => {}, drain: async () => ({ completedTurnIds: [], pendingTurnIds: [], waitedMs: 0 }), state: null, onState: () => () => {} }) as CaseSync,
-    createCachedReplay: () => ({ ensureLoaded: async () => {}, activate: (ch, from, reason) => void log.push(`cached.activate ${ch} ${from} ${reason}`) }),
-    createStt: () => stt,
-    createTakeover: (c) => (log.push(`createTakeover plan=${c.plan.runId}`), takeover),
+    createHumanHalf: (c) => {
+      sink = c.sink;
+      log.push(`human ${c.create.caseId} start=${c.startOffsetMs}`);
+      return {
+        caseSync: { enqueue: () => {}, drain: async () => ({ completedTurnIds: [], pendingTurnIds: [], waitedMs: 0 }), state: null, onState: () => () => {} } as CaseSync,
+        cached: { ensureLoaded: async () => {}, activate: (ch, from, reason) => void log.push(`cached.activate ${ch} ${from} ${reason}`) },
+        stt,
+      };
+    },
+    createTakeover: (c) => {
+      log.push(`createTakeover ${c.plan.runId} mode=${c.mode}`);
+      return { ctl: takeover, token: () => "tt_1", askForRep: () => void log.push("askForRep"), setSessionIds: (ids) => void log.push(`hud.ids ${ids.rep}/${ids.customer}`) };
+    },
   };
-  return { controllers, log, tick: (t: CallTick) => tickCb?.(t), end: () => endedCb?.(), takeoverEnded: (e: { takeoverId: string; takeoverToken: string; outcome: string }) => takeoverEnded?.(e), takeover };
+  return {
+    controllers, log, takeover, sttStatus,
+    tick: (t: CallTick) => tickCb?.(t),
+    end: () => endedCb?.(),
+    emit: (ev: BatonEvent) => sink?.emit(ev),
+  };
 }
 
 const flush = async () => {
@@ -121,34 +206,68 @@ const flush = async () => {
   await new Promise((r) => setTimeout(r, 0));
 };
 
-describe("CallSession orchestrator", () => {
-  it("prepare: /api/cases (Express prefill) → /api/runs → context + run plan on the store", async () => {
+const turn = (turnId: string, channel: "rep" | "customer", startMs: number, endMs: number): TurnInput => ({
+  caseId: "case1", turnId, channel, text: "hello there", startMs, endMs, words: [], source: "stt_live", recvMs: endMs + 400, cut: false, late: false,
+});
+
+describe("CallSession orchestrator (real-controller seams)", () => {
+  it("prepare: Express by default → WP4 expressStart cut from cached turns + peaks → /api/cases {prefill = cut} → /api/runs", async () => {
     const store = createConsoleStore();
-    const { api, log } = fakeApi();
+    const { api, log } = fakeApi({}, { cached: true });
     const s = new CallSession({ callId: "s01-take2", call: CALL, api, store, controllers: null, now: () => 1 });
     await s.prepare();
-    expect(log).toEqual(["createCase prefill=81500", "startRun case1 express=true tok1"]);
+    expect(log).toEqual([
+      "get /data/cached-turns/s01-take2.json", "get /calls/s01/peaks.x.json", "createCase prefill=79900", "startRun case1 express=true tok1",
+    ]);
+    expect(s.debug.express).toMatchObject({ startOffsetMs: 79_900, snappedTo: "turn_boundary", seedAgentContext: "So the effective date is Friday." });
+    expect(s.visitorToken).toBe("vt1");
     const st = store.getState();
     expect(st.phase).toBe("preflight");
-    expect(st.context?.durationMs).toBe(121_000);
     expect(st.context?.peaks?.rep).toEqual([0.1]);
     expect(st.plan?.runId).toBe("run-case1");
   });
 
-  it("start: unlockSync runs synchronously in the click, before any await; then load → STT open → play", async () => {
+  it("without cached turns the cut is the unsnapped target (decision point − 25 s)", async () => {
+    const { api, log } = fakeApi();
+    const s = new CallSession({ callId: "s01-take2", call: CALL, api, store: createConsoleStore(), controllers: null, now: () => 1 });
+    await s.prepare();
+    expect(log).toContain("createCase prefill=81500");
+  });
+
+  it("start: unlockSync in the click; then human half → takeover → STT open with the seed → play from the cut", async () => {
     const store = createConsoleStore();
-    const { api } = fakeApi();
+    const { api } = fakeApi({}, { cached: true });
     const f = fakeControllers();
     const s = new CallSession({ callId: "s01-take2", call: CALL, api, store, controllers: f.controllers, now: () => 5 });
     await s.prepare();
     s.start("express");
     expect(f.log).toEqual(["unlockSync", "lifecycle.attach"]); // nothing async has run yet
     await flush();
-    expect(f.log).toEqual(["unlockSync", "lifecycle.attach", "loadCall", "stt.open 81500", "createTakeover plan=run-case1", "play.start 81500"]);
-    expect(store.getState().started).toMatchObject({ kind: "express", startOffsetMs: 81_500 });
-    f.tick({ callMs: 81_600, playing: true, rep: new Uint8Array(), customer: new Uint8Array() });
+    expect(f.log).toEqual([
+      "unlockSync", "lifecycle.attach", "loadCall", "human case1 start=79900", "createTakeover run-case1 mode=watch",
+      `stt.open 79900 seed="So the effective date is Friday."`, "hud.ids s-rep/s-cus", "play.start 79900",
+    ]);
+    expect(store.getState().started).toMatchObject({ kind: "express", startOffsetMs: 79_900 });
+    expect(store.getState().sessionIds).toEqual({ rep: "s-rep", customer: "s-cus" });
+    f.tick({ callMs: 80_000, playing: true, rep: new Uint8Array(), customer: new Uint8Array() });
     expect(f.log).toContain("stt.feed");
-    expect(store.getState().clock.callMs).toBe(81_600);
+    expect(store.getState().clock.callMs).toBe(80_000);
+    // a second click does nothing
+    s.start("express");
+    expect(f.log.filter((l) => l === "unlockSync")).toHaveLength(1);
+  });
+
+  it("every stt.final reaches the store AND TakeoverController.noteFinal (the cut-turn marker)", async () => {
+    const store = createConsoleStore();
+    const { api } = fakeApi();
+    const f = fakeControllers();
+    const s = new CallSession({ callId: "s01-take2", call: CALL, api, store, controllers: f.controllers, now: () => 5 });
+    await s.prepare();
+    s.start("express");
+    await flush();
+    f.emit({ t: 6, type: "stt.final", turn: turn("rep-3", "rep", 82_000, 84_000) });
+    expect(f.takeover.finals).toEqual(["rep-3"]);
+    expect(store.getState().human.map((l) => l.turnId)).toContain("rep-3");
   });
 
   it("the full call re-creates the case without the prefill and releases the Express run first", async () => {
@@ -159,26 +278,72 @@ describe("CallSession orchestrator", () => {
     await s.prepare();
     s.start("full");
     await flush();
-    expect(log).toEqual([
+    expect(log.filter((l) => !l.startsWith("get "))).toEqual([
       "createCase prefill=81500", "startRun case1 express=true tok1", "release run-case1 tok1 keepalive=false", "createCase prefill=0", "startRun case2 express=false tok2",
     ]);
     expect(f.log).toContain("play.start 0");
+    expect(store.getState().started).toMatchObject({ kind: "full", startOffsetMs: 0 });
   });
 
-  it("a cached plan or a denied STT open goes to the labelled cached replay", async () => {
-    for (const [plan, stt] of [[{ sttHalf: "cached" as const, reason: "budget" }, "live"], [{}, "denied"]] as const) {
-      const store = createConsoleStore();
-      const { api } = fakeApi(plan);
-      const f = fakeControllers({ sttResult: stt });
-      const s = new CallSession({ callId: "s01-take2", call: CALL, api, store, controllers: f.controllers, now: () => 5 });
-      await s.prepare();
-      s.start("express");
-      await flush();
-      expect(f.log.some((l) => l.startsWith("cached.activate both 81500"))).toBe(true);
-    }
+  it("a cached plan goes to the labelled cached replay; a denied open leaves it to WP4 (no double activation)", async () => {
+    const a = fakeApi({ sttHalf: "cached", reason: "budget" });
+    const f = fakeControllers();
+    const s = new CallSession({ callId: "s01-take2", call: CALL, api: a.api, store: createConsoleStore(), controllers: f.controllers, now: () => 5 });
+    await s.prepare();
+    s.start("express");
+    await flush();
+    expect(f.log).toContain("cached.activate both 81500 budget");
+    expect(f.log.some((l) => l.startsWith("stt.open"))).toBe(false);
+
+    const b = fakeApi();
+    const g = fakeControllers({ sttResult: "denied" });
+    const s2 = new CallSession({ callId: "s01-take2", call: CALL, api: b.api, store: createConsoleStore(), controllers: g.controllers, now: () => 5 });
+    await s2.prepare();
+    s2.start("express");
+    await flush();
+    expect(g.log.some((l) => l.startsWith("cached.activate"))).toBe(false);
+    expect(g.log).toContain("play.start 81500");
   });
 
-  it("pass arms a manual takeover only when allowed; evidence ducks and plays the padded span", async () => {
+  it("queued: playback waits until both channels are live, or the judge picks the cached replay", async () => {
+    const store = createConsoleStore();
+    const { api } = fakeApi();
+    const f = fakeControllers({ sttResult: "queued" });
+    const s = new CallSession({ callId: "s01-take2", call: CALL, api, store, controllers: f.controllers, now: () => 5 });
+    await s.prepare();
+    s.start("express");
+    await flush();
+    expect(f.log.some((l) => l.startsWith("play.start"))).toBe(false);
+    f.sttStatus.rep = "open";
+    f.sttStatus.customer = "open";
+    f.emit({ t: 7, type: "stt.status", channel: "customer", status: "open" });
+    await flush();
+    expect(f.log).toContain("play.start 81500");
+
+    const g = fakeControllers({ sttResult: "queued" });
+    const s2 = new CallSession({ callId: "s01-take2", call: CALL, api: fakeApi().api, store: createConsoleStore(), controllers: g.controllers, now: () => 5 });
+    await s2.prepare();
+    s2.start("express");
+    await flush();
+    s2.watchCachedNow();
+    await flush();
+    expect(g.log).toEqual(expect.arrayContaining(["stt.terminateAll", "play.start 81500"]));
+    expect(g.log.some((l) => l.startsWith("cached.activate both 81500"))).toBe(true);
+  });
+
+  it("an AudioContext that is not running after 300 ms shows 'Tap to enable sound'", async () => {
+    const store = createConsoleStore();
+    const f = fakeControllers({ whenRunning: false });
+    const s = new CallSession({ callId: "s01-take2", call: CALL, api: fakeApi().api, store, controllers: f.controllers, now: () => 5 });
+    await s.prepare();
+    s.start("express");
+    await flush();
+    expect(store.getState().audioLocked).toBe(true);
+    s.unlockAudio();
+    expect(store.getState().audioLocked).toBe(false);
+  });
+
+  it("pass re-unlocks audio and arms WP5 only when allowed; Ask for rep / End call reach the takeover", async () => {
     const store = createConsoleStore();
     const { api } = fakeApi();
     const f = fakeControllers();
@@ -188,17 +353,19 @@ describe("CallSession orchestrator", () => {
     await flush();
     s.pass();
     await flush();
-    expect(f.log).toContain("arm manual");
-    await s.playEvidence({ channel: "rep", turnId: "rep-4", startMs: 90_000, endMs: 90_500, quote: "Friday", source: "stt_live" });
-    expect(f.log.slice(-3)).toEqual(["duck 0.2", "span rep 89500 91000", "duck 1"]);
-    (f.takeover as { manualPassAllowed: boolean }).manualPassAllowed = false;
+    expect(f.log.slice(-2)).toEqual(["unlockSync", "arm manual"]);
+    f.takeover.manualPassAllowed = false;
     const before = f.log.length;
     s.pass();
-    await flush();
     expect(f.log.length).toBe(before);
+    s.askForDaniel();
+    s.endCall();
+    expect(f.log.slice(-2)).toEqual(["askForRep", "endCall user_end"]);
+    await s.playEvidence({ channel: "rep", turnId: "rep-4", startMs: 90_000, endMs: 90_500, quote: "Friday", source: "stt_live" });
+    expect(f.log.slice(-3)).toEqual(["duck 0.2", "span rep 89500 91000", "duck 1"]);
   });
 
-  it("takeover end → verification poll → verified QA on the store", async () => {
+  it("WP5 /end → verificationJobId on the view → poll #20 with the takeover token → verified QA", async () => {
     const store = createConsoleStore();
     const { api, log } = fakeApi();
     const f = fakeControllers();
@@ -206,14 +373,28 @@ describe("CallSession orchestrator", () => {
     await s.prepare();
     s.start("express");
     await flush();
-    f.takeoverEnded({ takeoverId: "tk1", takeoverToken: "tt", outcome: "completed" });
+    f.takeover.ended("tko_1");
+    f.takeover.ended("tko_1"); // a second view change never starts a second poll
     await flush();
-    expect(log).toContain("verification");
+    expect(log.filter((l) => l.startsWith("verification"))).toEqual(["verification tko_1 tt_1"]);
     expect(store.getState().qa.status).toBe("verified");
     expect(store.getState().qa.verified?.pendingConfirmed).toBe(1);
   });
 
-  it("recording end without a pass → call-ended + hold release; pagehide releases with keepalive once", async () => {
+  it("a 404 from #20 (no VA recording) keeps the provisional numbers with a plain reason", async () => {
+    const store = createConsoleStore();
+    const { api } = fakeApi({}, { verification: "404" });
+    const f = fakeControllers();
+    const s = new CallSession({ callId: "s01-take2", call: CALL, api, store, controllers: f.controllers, now: () => 5, verifyPollMs: 1 });
+    await s.prepare();
+    s.start("express");
+    await flush();
+    f.takeover.ended("tko_1");
+    await flush();
+    expect(store.getState().qa).toMatchObject({ status: "failed", reason: "there is no recording to verify" });
+  });
+
+  it("recording end without a pass → call-ended; the takeover controller owns the hold release (rule 8)", async () => {
     const store = createConsoleStore();
     const { api, log } = fakeApi();
     const f = fakeControllers();
@@ -224,26 +405,41 @@ describe("CallSession orchestrator", () => {
     f.end();
     await flush();
     expect(store.getState().callEnded).toBe(true);
-    expect(log.filter((l) => l.startsWith("release"))).toEqual(["release run-case1 tok1 keepalive=false"]);
-    s.dispose();
-    expect(log.filter((l) => l.startsWith("release"))).toHaveLength(1);
-    expect(f.log).toContain("stt.dispose");
-
-    const store2 = createConsoleStore();
-    const a2 = fakeApi();
-    const s2 = new CallSession({ callId: "s01-take2", call: CALL, api: a2.api, store: store2, controllers: null, now: () => 5 });
-    await s2.prepare();
-    s2.dispose();
-    expect(a2.log.at(-1)).toBe("release run-case1 tok1 keepalive=true");
+    expect(f.log).toContain("stt.finish");
+    expect(log.filter((l) => l.startsWith("release"))).toEqual([]);
+    // unmount (in-app navigation) with no pass: the unused hold is released (idempotent server-side), the controller detached
+    s.dispose("unmount");
+    expect(log.filter((l) => l.startsWith("release"))).toEqual(["release run-case1 tok1 keepalive=true"]);
+    expect(f.log).toEqual(expect.arrayContaining(["stt.dispose", "takeover.dispose"]));
   });
 
-  it("without wired controllers, Start explains instead of failing silently", async () => {
+  it("pagehide after the start leaves the release to WP5's own pagehide handler and never detaches it early", async () => {
+    const { api, log } = fakeApi();
+    const f = fakeControllers();
+    const s = new CallSession({ callId: "s01-take2", call: CALL, api, store: createConsoleStore(), controllers: f.controllers, now: () => 5 });
+    await s.prepare();
+    s.start("express");
+    await flush();
+    s.dispose("pagehide");
+    expect(log.filter((l) => l.startsWith("release"))).toEqual([]);
+    expect(f.log).not.toContain("takeover.dispose");
+    expect(f.log).toContain("stt.dispose");
+  });
+
+  it("pagehide before any start releases the run hold with a keepalive fetch", async () => {
+    const a = fakeApi();
+    const s = new CallSession({ callId: "s01-take2", call: CALL, api: a.api, store: createConsoleStore(), controllers: null, now: () => 5 });
+    await s.prepare();
+    s.dispose("pagehide");
+    expect(a.log.at(-1)).toBe("release run-case1 tok1 keepalive=true");
+  });
+
+  it("without controllers (no Web Audio), Start explains instead of failing silently", async () => {
     const store = createConsoleStore();
-    const { api } = fakeApi();
-    const s = new CallSession({ callId: "s01-take2", call: CALL, api, store, controllers: null, now: () => 5 });
+    const s = new CallSession({ callId: "s01-take2", call: CALL, api: fakeApi().api, store, controllers: null, now: () => 5 });
     await s.prepare();
     s.start("express");
     expect(store.getState().phase).toBe("error");
-    expect(store.getState().error?.message).toMatch(/not wired/);
+    expect(store.getState().error?.message).toMatch(/not available/);
   });
 });
