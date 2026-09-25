@@ -26,6 +26,8 @@ import {
 import { formatValue } from "./formatters";
 import { BRAND_LIST_LABEL, findDenylistedBrands, type BrandSite } from "./brand-denylist";
 import { cannedSnapshot, type CannedState } from "./canned";
+import { connectorUrlProblem, isForbiddenDeclaredHeader } from "./connector-rules";
+import { parseLookupTable } from "./lookup-table";
 import { compileRelay, mergedListeningKeyterms, type KernelRelay } from "./compile";
 import { assertStrictSchema, STRICT_ENUM_MAX, StrictSchemaError } from "./extractor";
 import { makeScope, type Fields } from "./scope";
@@ -248,6 +250,13 @@ function lintL2(bp: Blueprint, ix: Index): LintIssue[] {
         if (!cols.has(c)) out.push(err("L2", [...p, "lookup", "matchColumns", j], `table "${f.lookup!.table}" has no column "${c}"`));
       });
     }
+  });
+  bp.connectors.forEach((c, i) => {
+    if (c.type !== "lookup_table") return;
+    const def = bp.context.tables.find((t) => t.id === c.table);   // unknown table: L3
+    if (def && !def.columns.includes(c.keyColumn)) out.push(err("L2", ["connectors", i, "keyColumn"], `keyColumn "${c.keyColumn}" is not a column of table "${def.id}"`));
+    const r = parseLookupTable({ format: c.format, data: c.data, keyColumn: c.keyColumn, expectColumns: def?.columns });
+    if (!r.ok) out.push(err("L2", ["connectors", i, "data"], `the ${c.format.toUpperCase()} of lookup "${c.id}" does not load: ${r.errors.slice(0, 3).join("; ")}${r.errors.length > 3 ? "; …" : ""}`));
   });
   bp.context.tables.forEach((t, i) => {
     const cols = new Set(t.columns);
@@ -572,9 +581,21 @@ function lintS2(bp: Blueprint, ix: Index): LintIssue[] {
   return out;
 }
 
-/** A side-effect `http_action` runs only in act or close stages. (`completion_webhook` has no tool name by schema.) */
+/**
+ * A side-effect `http_action` runs only in act or close stages (`completion_webhook` has no tool name by schema).
+ * Also the runtime's refusals, mirrored (relay/connector-rules.ts): declared headers it would drop, and URLs it would
+ * refuse (port, userinfo, localhost, single-label or non-public IP-literal hosts).
+ */
 function lintS3(bp: Blueprint): LintIssue[] {
   const out: LintIssue[] = [];
+  bp.connectors.forEach((c, i) => {
+    if (c.type !== "http_action" && c.type !== "completion_webhook") return;
+    const why = connectorUrlProblem(c.url);
+    if (why) out.push(err("S3", ["connectors", i, "url"], `connector "${c.id}": ${why}; the runtime refuses this destination`));
+    if (c.type === "http_action") c.headers.forEach((h, j) => {
+      if (isForbiddenDeclaredHeader(h.name)) out.push(err("S3", ["connectors", i, "headers", j, "name"], `header "${h.name}" of connector "${c.id}" is set by the runtime and would be dropped; remove it`));
+    });
+  });
   const effects = new Map(bp.connectors.filter((c) => c.type === "http_action" && c.sideEffect).map((c) => [(c as { toolName: string }).toolName, c.id]));
   bp.playbook.stages.forEach((s, i) => {
     if (s.kind === "act" || s.kind === "close") return;

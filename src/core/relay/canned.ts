@@ -10,11 +10,13 @@
  * account (so a lookup example like "the Civic" becomes the row id), else from a per-type sample value. Baton's
  * canned states match the parity corpus's `canned:*` snapshots (scripts/relay/parity-corpus.ts).
  */
-import type { FieldState } from "../contracts/case";
+import type { CaseState, FieldState } from "../contracts/case";
 import type { AccountRecord, Blueprint, BlueprintField } from "../contracts/v2/blueprint";
 import { CANNED_STATES, type CannedState, type IntentSpec } from "../contracts/v2/relay";
-import { buildIntentSpec } from "./spec";
+import type { CompiledRelay } from "../contracts/v2/services";
 import type { Fields } from "./scope";
+import { buildIntentSpec } from "./spec";
+import { readinessFor } from "./spec-link";
 
 export { CANNED_STATES, type CannedState };
 
@@ -90,4 +92,19 @@ export function cannedSnapshot(bp: Blueprint, state: CannedState, account: Accou
     fields[f.id] = fieldState(f, status, v);
   }
   return { fields } as unknown as Fields;
+}
+
+/**
+ * A full `CaseState` in a canned state for a kernel-compiled relay (WP14b's `KernelBinding.cannedSnapshot`; the
+ * server's compiled view renders greetings, prompts, tools and the first update from it, as the Studio does).
+ * Readiness follows the relay's required fields. `intent` stays the v1 literal until the P§4.7 widening.
+ */
+export function cannedCaseState(compiled: CompiledRelay, account: AccountRecord, state: CannedState, caseId = `case_canned_${state}`): CaseState {
+  const bp = compiled.blueprint;
+  if (!bp) throw new Error("cannedCaseState needs a kernel-compiled relay (compileRelay), not the legacy engine");
+  const snap = cannedSnapshot(bp, state, account, compiled.spec);
+  return {
+    caseId, intent: "add_driver", version: 0, callClockMs: 0, fields: snap.fields,
+    readiness: readinessFor(compiled.spec, snap), conflicts: [], stage: null, disclosuresGiven: [], payment: null, confirmationNumber: null,
+  };
 }

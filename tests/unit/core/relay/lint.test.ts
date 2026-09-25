@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { BlueprintSchema, CANNED_STATES, type Blueprint } from "@/core/contracts/v2";
-import { cannedFocusField, cannedSnapshot } from "@/core/relay/canned";
+import { cannedCaseState, cannedFocusField, cannedSnapshot } from "@/core/relay/canned";
 import { compileRelay } from "@/core/relay/compile";
 import { LINT_CODES } from "@/core/contracts/v2";
 import { greetingFirstFactWord, hasLintErrors, LINT_RULES_PENDING, lintBlueprint, lintBlueprintJson } from "@/core/relay/lint";
@@ -329,6 +329,24 @@ describe("compiled rules (G2, W3, X1, X2, W2) and the canned snapshots", () => {
     }
     expect(lintBlueprint(bp)).toEqual([]);
     expect(lintBlueprint(bp, { flagship: true, visibility: "gallery", pinnedPublication: true, secretIds: [], simSampleRateHz: 8000 })).toEqual([]);
+  });
+
+  it("cannedCaseState: a full CaseState per canned state that takes over at every stage (WP14b's binding)", () => {
+    for (const bp of [miniBlueprint(), baton()]) {
+      const k = compileRelay(bp);
+      const a = bp.context.samples[0]!;
+      for (const st of CANNED_STATES) {
+        const cs = cannedCaseState(k, a, st);
+        expect(cs.caseId).toBe(`case_canned_${st}`);
+        expect(cs.readiness.requiredTotal).toBe(bp.fields.filter((f) => f.required).length);
+        expect(cs.readiness.ready).toBe(st === "all_verified");
+        for (const s of bp.playbook.stages) {
+          const stage = ({ confirm: "confirm", disclose: "disclose", act: "pay", close: "close" } as const)[s.kind];
+          expect(() => k.takeover(cs, a, { deployId: "canned", stage, keytermsEnabled: true }), `${bp.meta.slug}/${st}/${stage}`).not.toThrow();
+        }
+      }
+    }
+    expect(() => cannedCaseState({ ...compileRelay(miniBlueprint()), blueprint: null }, miniBlueprint().context.samples[0]!, "nothing")).toThrow(/kernel-compiled/);
   });
 
   it("W2 warns on a wideband_16k preset over 8 kHz sims only when the sim rate is known", () => {
