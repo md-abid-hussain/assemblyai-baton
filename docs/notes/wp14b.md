@@ -183,7 +183,7 @@ is swapped in one place after their merge.
 | `9509d8e` | the kernel binding slot, `RelayCallCatalog`, the compiled view, relay runs on `/api/cases`, the default moderator, pure tests |
 | `3c7e6d7` | DB tests: relay runs, the compiled route, run resolution, the moderation policy |
 | `233ca12` | the platform-stub ipKey test |
-| (next two) | request updates (`wp14b-to-{wp14a,wp15,wp17}.md`), these notes |
+| `ae0dd23`, `f40bb0a`, `49becc2` | request updates (`wp14b-to-{wp14a,wp15,wp17}.md`), these notes. A resumed run re-verified typecheck and 871/871 after a no-op `git merge main` |
 
 ### Done
 
