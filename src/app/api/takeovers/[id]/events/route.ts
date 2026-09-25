@@ -1,5 +1,5 @@
 import { eventsHandler } from "@/server/takeovers/routes";
-import { takeoverRouteDeps } from "@/server/takeovers/wiring";
+import { takeoverRouteDeps } from "@/server/takeovers/default-deps";
 
 /**
  * #12 POST /api/takeovers/[id]/events (takeover token) → {ok:true}. Phase, timings, VA session id, HUD, provisional

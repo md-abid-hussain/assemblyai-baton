@@ -1,5 +1,5 @@
 import { armHandler } from "@/server/takeovers/routes";
-import { takeoverRouteDeps } from "@/server/takeovers/wiring";
+import { takeoverRouteDeps } from "@/server/takeovers/default-deps";
 
 /**
  * #9 POST /api/takeovers (case token) → ArmResponse {takeoverId, takeoverToken, leadMs}. Case status → armed.

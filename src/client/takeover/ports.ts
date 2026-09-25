@@ -3,7 +3,6 @@ import "client-only";
 import type {
   ArmRequest, ArmResponse, EndTakeoverRequest, EndTakeoverResponse, SessionReport, TakeoverEventsRequest, VaTokenRequest, VaTokenResponse,
 } from "@/core/contracts/api";
-import type { Stage } from "@/core/contracts/case";
 import type { ErrorCode, FallbackKind } from "@/core/contracts/errors";
 import type { CallHandoff } from "@/core/contracts/scenario";
 import type { AudioEngine, CallPlayback, CaseSync, EventSink, LatencyHud, SttChannelManager } from "@/core/contracts/services";
@@ -22,7 +21,8 @@ import type { CompiledTakeover, DrainReport } from "@/core/contracts/takeover";
 export type VaSessionEvent =
   | { type: "ready"; sessionId: string; ctxMs: number }
   | { type: "first_audible"; replyId: string; ctxMs: number; greeting: boolean }
-  | { type: "stage"; stage: Stage }
+  /** The stage id (a string, so stages from any relay blueprint pass through; the controller only forwards it). */
+  | { type: "stage"; stage: string }
   | { type: "paying"; on: boolean }
   | { type: "hand_back"; reason: string; summary: string }
   | { type: "close_ready" }

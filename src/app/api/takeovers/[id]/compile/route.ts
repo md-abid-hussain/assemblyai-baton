@@ -1,5 +1,5 @@
 import { compileHandler } from "@/server/takeovers/routes";
-import { takeoverRouteDeps } from "@/server/takeovers/wiring";
+import { takeoverRouteDeps } from "@/server/takeovers/default-deps";
 
 /**
  * #11 POST /api/takeovers/[id]/compile (takeover token) {drain} → CompiledTakeover, checked by validateFirstUpdate

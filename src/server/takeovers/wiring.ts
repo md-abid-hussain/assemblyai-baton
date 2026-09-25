@@ -19,8 +19,10 @@ import { DrizzleTakeoverStore } from "./store";
  *   WP3  CaseRepository.freezeSnapshot                             (src/server/cases)
  *   WP8  enqueueVerification                                       (src/server/jobs/verify-takeover.ts; stub → null)
  *
- * At G1 the integrator calls `setTakeoverRouteDeps(buildTakeoverRouteDeps({...}))` once (docs/notes/wp5.md has the
- * exact snippet). Until then every takeover route answers 500 E_INTERNAL "not wired", never a crash.
+ * The production graph is `default-deps.ts`: the route files import it, and on import it installs a factory that builds
+ * the deps lazily on the first request (so env and DB are read at request time, not at build time). Tests import this
+ * module only and inject fakes with `setTakeoverRouteDeps`. With neither, every takeover route answers 500 E_INTERNAL
+ * "not wired", never a crash.
  */
 
 const takeoverLog = log.child({ component: "takeovers" });
@@ -93,16 +95,26 @@ function unwiredDeps(): TakeoverRouteDeps {
   };
 }
 
-type Holder = { deps: TakeoverRouteDeps | null };
+type Holder = { deps: TakeoverRouteDeps | null; factory?: (() => TakeoverRouteDeps) | null };
 // Survive `next dev` hot reloads.
 const g = globalThis as typeof globalThis & { __batonTakeoverDeps?: Holder };
-const holder: Holder = (g.__batonTakeoverDeps ??= { deps: null });
+const holder: Holder = (g.__batonTakeoverDeps ??= { deps: null, factory: null });
 
-/** Install the route dependencies (G1 wiring, or a test). `null` resets to "not wired". */
+/** Install the route dependencies (a test, or an explicit override). `null` resets to the default factory, if any. */
 export function setTakeoverRouteDeps(d: TakeoverRouteDeps | null): void {
   holder.deps = d;
 }
 
+/**
+ * Install the lazy production factory (`default-deps.ts` does this on import). It runs on the first request that finds
+ * no deps; if it throws (a missing env var), the request answers E_INTERNAL and the next request tries again.
+ */
+export function setDefaultTakeoverRouteDeps(factory: (() => TakeoverRouteDeps) | null): void {
+  holder.factory = factory;
+}
+
 export function takeoverRouteDeps(): TakeoverRouteDeps {
-  return holder.deps ?? unwiredDeps();
+  if (holder.deps) return holder.deps;
+  if (holder.factory) return (holder.deps = holder.factory());
+  return unwiredDeps();
 }

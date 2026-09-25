@@ -1,5 +1,5 @@
 import { endHandler } from "@/server/takeovers/routes";
-import { takeoverRouteDeps } from "@/server/takeovers/wiring";
+import { takeoverRouteDeps } from "@/server/takeovers/default-deps";
 
 /**
  * #13 POST /api/takeovers/[id]/end (takeover token; on pagehide via a keepalive fetch, G0) {outcome, vaSessionId,
