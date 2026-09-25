@@ -27,3 +27,11 @@ Until then: WP2 should mint the browser VA token with `expires_in_seconds` ≥ ~
 ## 2. G1/G2 wiring of the Voice Agent controller
 
 See `docs/notes/wp5b.md` §5 ("What the integrator must wire").
+
+---
+
+## Integrator status (G1, 2026-09-25)
+
+- §1 **done**: `openVoiceAgentNode({ auth: { kind: "token", expiresInSeconds, connectDelayMs?, restBase? } })` (two $0 unit tests). T-D1-3 part B is yours to run (live, ≈ $0.003).
+- §2: G2 wiring (WP5/WP7/WP6/WP11); env defaults `PAY_TOOL_MODE=push` and `VA_KEYTERMS=1` set at G1.
+Details: `docs/notes/g1.md` ("Integrator requests: disposition").
