@@ -47,6 +47,11 @@ export function useCountdown(active: boolean, seconds: number, onDone: () => voi
   return left;
 }
 
+/** Whether the `?express=1` countdown runs: Express is possible, the case and run plan are ready, nobody chose yet. */
+export function expressCountdownActive(o: { autoStart: "express" | null | undefined; decisionPointMs: number | null | undefined; planReady: boolean; phase: string; cancelled: boolean }): boolean {
+  return o.autoStart === "express" && o.decisionPointMs !== null && o.decisionPointMs !== undefined && o.planReady && o.phase === "preflight" && !o.cancelled;
+}
+
 export function PreflightCard() {
   const actions = useActions();
   const env = useConsoleEnv();
@@ -54,8 +59,7 @@ export function PreflightCard() {
   const plan = useBaton((s) => s.plan);
   const phase = useBaton((s) => s.phase);
   const [cancelled, setCancelled] = useState(false);
-  const canExpress = !!ctx && ctx.decisionPointMs !== null;
-  const counting = env.autoStart === "express" && canExpress && !!plan && phase === "preflight" && !cancelled;
+  const counting = expressCountdownActive({ autoStart: env.autoStart, decisionPointMs: ctx?.decisionPointMs, planReady: !!plan, phase, cancelled });
   const left = useCountdown(counting, EXPRESS_COUNTDOWN_S, () => actions.start("express"));
   const [ios, setIos] = useState(false);
   useEffect(() => {
@@ -137,7 +141,7 @@ export function PreflightCard() {
   );
 }
 
-function ExpressCountdownCard(p: { left: number; minutes: number | null; title: string; onNow(): void; onFull(): void; onCancel(): void; ios: boolean }) {
+export function ExpressCountdownCard(p: { left: number; minutes: number | null; title: string; onNow(): void; onFull(): void; onCancel(): void; ios: boolean }) {
   const pct = Math.max(0, Math.min(1, p.left / EXPRESS_COUNTDOWN_S));
   return (
     <section aria-labelledby="pre-h" className="bt-panel bt-rise w-full max-w-xl overflow-hidden">

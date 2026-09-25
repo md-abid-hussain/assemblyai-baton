@@ -15,12 +15,13 @@ import type { CaseState } from "@/core/contracts/case";
 import { compileTakeover } from "@/core/compiler";
 import type { QaResult } from "@/core/contracts/events";
 import type { CallManifestEntry } from "@/core/contracts/scenario";
-import type { CallPlayback, CallTick } from "@/core/contracts/services";
+import type { CallPlayback, CallTick, MicSource } from "@/core/contracts/services";
 import type { DrainReport } from "@/core/contracts/takeover";
 import { emptyCaseState, S01_POLICY } from "@/client/fixtures/builder";
 import { buildS01 } from "@/client/fixtures/s01";
 import type { SessionApi } from "@/client/session/api";
 import { CallSession, type SessionControllers } from "@/client/session/orchestrator";
+import type { ToolPortsFactory } from "@/client/session/tool-ports";
 import { askForRepInstructions, createHumanHalf, wireTakeover } from "@/client/session/wiring";
 import { createConsoleStore } from "@/client/store/store";
 import type { TakeoverApi } from "@/client/takeover";
@@ -79,7 +80,7 @@ afterEach(() => {
   intervals = [];
 });
 
-function world() {
+function world(o: { toolPorts?: ToolPortsFactory; openMic?: () => Promise<MicSource> } = {}) {
   const log: string[] = [];
   const store = createConsoleStore();
   const snapshot = snapshotBeforePass();
@@ -199,6 +200,7 @@ function world() {
       return f;
     },
     openMic: async () => {
+      if (o.openMic) return o.openMic();
       throw new Error("unused");
     },
     playPcm24k: async () => ({ endCtxMs: 0 }),
@@ -218,7 +220,7 @@ function world() {
           queueMicrotask(() => ws.open());
           return ws;
         },
-        toolPorts: () => ({ callTool: async () => ({ result: { ok: true } }), pollPayment: async () => { throw new Error("unused"); } }),
+        toolPorts: o.toolPorts ?? (() => ({ callTool: async () => ({ result: { ok: true } }), pollPayment: async () => { throw new Error("unused"); } })),
       }),
   };
   const session = new CallSession({ callId: "s01-take2", call: CALL, api, store, controllers, now: () => performance.now(), verifyPollMs: 5 });
@@ -289,4 +291,98 @@ describe("WP7·1: /call over the real WP4 / WP5 / WP5b controllers", () => {
     expect(log.some((l) => l.startsWith("page.release"))).toBe(false);
     session.dispose("unmount");
   }, 15_000);
+});
+
+/** Express → Start → one live rep final → Pass → greeting audible → ACTIVE (the steps of the test above, condensed). */
+async function passToActive(w: ReturnType<typeof world>): Promise<FakeSocket> {
+  const { session, store, log } = w;
+  await session.prepare();
+  session.start("express");
+  await until(() => log.includes("play.start 81500"));
+  intervals.push(setInterval(w.tick, 50));
+  await until(() => w.connect.latest("rep").frames.length > 0);
+  w.connect.latest("rep").turn(0, "So Friday works", [[100, 400], [450, 700], [750, 1000]], true);
+  await until(() => store.getState().human.length > 0);
+  session.pass();
+  await until(() => w.sockets.length === 1 && w.sockets[0]!.types().includes("session.update"));
+  const ws = w.sockets[0]!;
+  const upd = ws.control.find((m) => m.type === "session.update") as { session: { greeting: string } };
+  ws.server({ type: "reply.started", reply_id: "r1" });
+  for (let i = 0; i < 3; i++) ws.server({ type: "reply.audio", reply_id: "r1", data: pcmChunkB64(8000) });
+  ws.server({ type: "transcript.agent", reply_id: "r1", text: upd.session.greeting });
+  ws.server({ type: "reply.done", reply_id: "r1", status: "completed" });
+  await until(() => store.getState().takeover.phase === "active");
+  return ws;
+}
+
+describe("WP7·2: the G2 slice's phone and mic over the real controllers", () => {
+  it("pay tool → SMS on the phone's event list, the pay link and takeover token for MockPhone, onState → store, a server success reaches the phone", async () => {
+    const calls: string[] = [];
+    let status: "created" | "succeeded" = "created";
+    const toolPorts: ToolPortsFactory = ({ takeoverToken }) => ({
+      callTool: async (name) => {
+        calls.push(`${name} ${takeoverToken()}`);
+        if (name !== "send_esign_and_pay_link") return { result: { ok: true } };
+        return { result: { status: "link_sent" }, ui: { sms: "Harborview: Review & sign your change: https://x.test/pay/pay_1", link: "https://x.test/pay/pay_1", paymentId: "pay_1" } };
+      },
+      pollPayment: async (id) => {
+        calls.push(`poll ${id}`);
+        return {
+          id, status, statusSource: status === "succeeded" ? "mock" : null, amountCents: 4600, totalAmountCents: 4600, provider: "mock", simulated: status === "succeeded",
+          embed: null, updatedAt: new Date().toISOString(),
+          ...(status === "succeeded" ? { toolResult: { status: "paid" as const, amount: "$46.00", receipt: "R-1", verified_by: "simulated" as const } } : {}),
+        };
+      },
+    });
+    const w = world({ toolPorts });
+    const { session, store } = w;
+    expect(session.phoneAuth()).toEqual({ paymentId: null, takeoverToken: "", visitorToken: null });
+    const ws = await passToActive(w);
+
+    ws.server({ type: "tool.call", call_id: "c_pay", name: "send_esign_and_pay_link", arguments: { consent: true } });
+    await until(() => store.phoneEvents().some((e) => e.type === "phone.sms"));
+    expect(calls).toContain("send_esign_and_pay_link tt_secret_1"); // WP6 ports get the takeover-scoped token
+    expect(session.phoneAuth()).toMatchObject({ paymentId: "pay_1", takeoverToken: "tt_secret_1" });
+    expect(store.getState().phone.sms[0]?.text).toContain("Review & sign");
+    await until(() => ws.control.some((m) => m.type === "tool.result"));
+    expect(JSON.stringify(ws.control.find((m) => m.type === "tool.result"))).toContain("link_sent"); // push mode
+
+    // MockPhone onState → the store (narrator / floating pill) and the VA's progress-aware hold
+    const before = store.phoneEvents();
+    session.setPhoneState("esign");
+    expect(store.getState().phone.state).toBe("esign");
+    expect(store.phoneEvents()).not.toBe(before); // a new list identity per phone event (React re-renders the phone)
+    const identity = store.phoneEvents();
+    store.dispatch({ t: 1, type: "stt.partial", channel: "rep", turnOrder: 9, text: "x" } as never);
+    expect(store.phoneEvents()).toBe(identity); // unrelated events never re-render the phone
+
+    // the server says succeeded (simulate or webhook) → a `payment` event the phone follows
+    status = "succeeded";
+    await until(() => store.phoneEvents().some((e) => e.type === "payment" && e.status === "succeeded"), 6000);
+    expect(calls).toContain("poll pay_1");
+    session.dispose("unmount");
+  }, 20_000);
+
+  it("Use my mic (no WP11 customer input): WP4 openMic(24 kHz) → the VA's feeder; off stops it; a denied mic is a plain error", async () => {
+    const opened: number[] = [];
+    let stopped = 0;
+    const mic: MicSource = { onFrame: () => () => {}, stop: async () => void stopped++, energyDb: () => -80 };
+    const w = world({ openMic: async () => (opened.push(1), mic) });
+    await passToActive(w);
+    expect(await w.session.toggleMic(true)).toBe(true);
+    expect(opened).toHaveLength(1);
+    expect(w.feeders.at(-1)?.mic).toBe(mic);
+    expect(await w.session.toggleMic(true)).toBe(true); // idempotent
+    expect(opened).toHaveLength(1);
+    expect(await w.session.toggleMic(false)).toBe(false);
+    expect(stopped).toBe(1);
+    expect(w.feeders.at(-1)?.mic).toBeNull();
+    w.session.dispose("unmount");
+
+    const denied = world({ openMic: async () => Promise.reject(new DOMException("denied", "NotAllowedError")) });
+    await passToActive(denied);
+    expect(await denied.session.toggleMic(true)).toBe(false);
+    expect(denied.store.getState().error?.code).toBe("E_MIC_DENIED");
+    denied.session.dispose("unmount");
+  }, 20_000);
 });
