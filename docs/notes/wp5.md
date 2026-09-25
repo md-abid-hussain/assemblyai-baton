@@ -2,14 +2,16 @@
 
 Owner: WP5. Branch `wp/wp5`. Round 1 (gate G1), 2026-09-25.
 
-**Status: ready for G1.**
+**Status: round 1 done, G1 merged in, routes wired.** `main` (with the G1 merge of WP1, WP2, WP3, WP4, WP5b and WP8)
+is merged into `wp/wp5`.
 
 - `npm run typecheck` is clean. That includes Next's generated route checks in `.next/types` after a build.
-- `npm test` passes: 19 files, 397 tests, 22 skipped.
-  - WP5 adds 6 files: 125 tests pass and 22 skip.
-  - The 22 skipped tests are acceptance 2. They need WP1's compiler, which reaches this tree at G1.
-  - With `BATON_WP1_ROOT=../wp1` all 22 pass, run against WP1's real compiler.
-- `next build --webpack` compiles the four routes.
+- WP5's 9 test files pass: **153 tests, none skipped** (`tests/unit/core/protocol/**`, `tests/unit/server/takeovers/**`).
+  - Acceptance 2 now runs in-tree on WP1's merged compiler (22 tests). `BATON_WP1_ROOT` is gone.
+  - A G1 integration test runs the four routes over Postgres with WP1, WP2 and WP3 real (§3).
+- The full suite: 75 files, 906 tests (9 skipped: `RUN_LIVE` integration tests). Two tests from other WPs are flaky
+  under load and fail in about half of the full runs, with or without WP5's files (§7). Everything else passes.
+- `next build --webpack` builds every route, including the four takeover routes over the real graph.
 - Everything is committed on `wp/wp5`.
 - Live spend: **$0**. WP5 made no AssemblyAI, OpenAI or Twilio calls and did no deploys.
 
@@ -24,16 +26,18 @@ Owner: WP5. Branch `wp/wp5`. Round 1 (gate G1), 2026-09-25.
 | `src/server/takeovers/service.ts` | `TakeoverServiceImpl` (TASKS §2 `TakeoverService`): arm, compile (freeze → WP1 compile → `validateFirstUpdate`), recordEvents (heartbeat, failure), end (idempotent, safety-net release, WP8 enqueue), `computeLeadMs` |
 | `src/server/takeovers/store.ts` | `TakeoverStore` + `DrizzleTakeoverStore`. The arm transaction locks the case row. Every jsonb write merges. `end` is idempotent and sets the case status. There is also the lead-history query |
 | `src/server/takeovers/routes.ts` | Handler factories for #9, #11, #12 and #13 over `TakeoverRouteDeps`. They validate with zod, authorize through the injected `requireCase`, rate-limit (failing open) and map `ApiError` |
-| `src/server/takeovers/wiring.ts` | `buildTakeoverRouteDeps(parts)`, `setTakeoverRouteDeps`, `takeoverRouteDeps()` and `takeoverConfigFromEnv()`. Before G1 the routes answer `500 E_INTERNAL "not wired"` |
-| `src/app/api/takeovers/{route, [id]/compile, [id]/events, [id]/end}/route.ts` | One line each; `runtime="nodejs"`, `dynamic="force-dynamic"` |
+| `src/server/takeovers/wiring.ts` | `buildTakeoverRouteDeps(parts)`, `setTakeoverRouteDeps` (tests, overrides), `setDefaultTakeoverRouteDeps` (a lazy factory), `takeoverRouteDeps()` and `takeoverConfigFromEnv()`. With neither set, the routes answer `500 E_INTERNAL "not wired"` |
+| `src/server/takeovers/default-deps.ts` | **The G1 wiring (composition root).** On import it installs a factory over WP1's compiler, WP2's auth and limits, WP3's `getCaseRepository` and WP8's `enqueueVerification`. It runs on the first request, so env and DB are read at request time. It is the only WP5 module that names another WP's implementation |
+| `src/app/api/takeovers/{route, [id]/compile, [id]/events, [id]/end}/route.ts` | One line each, over `default-deps`; `runtime="nodejs"`, `dynamic="force-dynamic"` |
 | `src/core/contracts/ext/wp5-takeover.ts` | Additive types: `TakeoverControllerExt` (`view`, `subscribe`, `endCall`, `noteFinal`, `armInfo`, `dispose`) and `TakeoverClientView` |
 
 Tests (all $0):
 
-- `tests/unit/core/protocol/takeover-machine.test.ts` (74) and `_harness.ts`;
+- `tests/unit/core/protocol/takeover-machine.test.ts` (75) and `_harness.ts`;
 - `tests/unit/core/protocol/controller.test.ts` (13). This is the controller and HTTP API with fakes. It sits in the protocol folder because `tests/unit/client/takeover/**` is not in the ownership map;
-- `tests/unit/server/takeovers/{service (17), routes (14), store.pg (6, real Postgres), compile-scenarios (22 + 1)}.test.ts`;
-- `_fakes.ts` and `_db.ts` (a throwaway migrated database per file; it skips without `DATABASE_URL`).
+- `tests/unit/core/protocol/va-session-compat.test.ts` (2): a type-level check that WP5b's merged `VoiceAgentControllerImpl` is a `VaSession` and every `VaControllerEvent` is a `VaSessionEvent`, so the page passes it to `createVa` with no adapter;
+- `tests/unit/server/takeovers/{service (17), routes (14), store.pg (6, real Postgres), compile-scenarios (22), default-deps (3), g1-integration.pg (1, real Postgres)}.test.ts`;
+- `_fakes.ts`, `_scenarios.ts` (the kit scenarios as synthetic calls through WP1's `applyExtraction`) and `_db.ts` (a throwaway migrated database per file; the Postgres suites skip without `DATABASE_URL`).
 
 ## 2. Decisions (where WP5 goes beyond or departs from DESIGN §5.5)
 
@@ -118,8 +122,8 @@ Tests (all $0):
 | # | Item | Status | Evidence |
 |---|---|---|---|
 | 1 | Machine unit tests: every transition and timeout (fake clock); ForceEndpoint only after `SEAL_TAIL_MS`; retry at most once with `attempt:1`; `pagehide` from every state releases the run; auto-baton; recorded runs never arm manually | **PASS** | `takeover-machine.test.ts` (74) covers every phase transition and every deadline at t−1 and t. There is one pagehide case per phase (14). ForceEndpoint: none in ARMED, none before +250 ms, only channels with open partials, once. Mints are asserted to be exactly `[0, 1]`. `controller.test.ts` (13) checks the same paths end to end through the executor, including the wire order |
-| 2 | `/compile` returns a config that passes `validateFirstUpdate` for s01, s02, s05 at 3 pass points each | **PASS against WP1's real compiler** (`BATON_WP1_ROOT=../wp1`). It skips in this tree until WP1 is merged at G1, then runs automatically | `compile-scenarios.test.ts`: 3 scenarios × {early, middle, handoff} × keyterms {off, on} go through route #11. The JSON is parsed with `CompiledTakeoverSchema` and validated again from `buildFirstUpdate(parsed)`. Plus a hold-mode case, and a check that the snapshot grows along the call. Numbers in §5 |
-| 3 | G2 vertical slice: `/dev/audio` or `/call/<s01>` → Pass → greeting audible, with the correct snapshot | **PENDING: needs other WPs and a browser.** WP1, WP2, WP3 and WP4 must be merged and wired at G1/G2 (§6). WP5b's VA controller is needed in the browser. It runs on the user's desktop browser at D2 10:00 | The controller runs end to end against fakes. A type check proves the exact G1 wiring snippet (§6.1) compiles against the current WP1, WP2, WP3 and WP8 worktrees. A second check proves WP5b's `VoiceAgentControllerImpl` satisfies `VaSession` |
+| 2 | `/compile` returns a config that passes `validateFirstUpdate` for s01, s02, s05 at 3 pass points each | **PASS, in-tree, on WP1's merged compiler** | `compile-scenarios.test.ts`: 3 scenarios × {early, middle, handoff} × keyterms {off, on} go through route #11. The JSON is parsed with `CompiledTakeoverSchema` and validated again from `buildFirstUpdate(parsed)`. Plus a hold-mode case, and a check that the snapshot grows along the call. Numbers in §5. **G1 over Postgres** (`g1-integration.pg.test.ts`): s01 at the middle point goes arm → compile → events → end → arm again through the four handlers with WP1 (compiler and engine), WP2 (real tokens, `requireCase`) and WP3 (`PgCaseRepository`, real `freezeSnapshot`) real. The frozen snapshot has exactly the fields VERIFIED by tArm, the first update validates, the case goes `armed` → `ai_active` → `handed_back`, `protocol` keeps WP3's `freeze` beside WP5's keys, `/end` enqueues with the stored `sess_…`, and a second pass arms |
+| 3 | G2 vertical slice: `/dev/audio` or `/call/<s01>` → Pass → greeting audible, with the correct snapshot | **PENDING: needs a page and a browser (G2).** The server half is wired and tested on real Postgres (above). The page glue (§6.2) mounts the controller on `/dev/audio` at D2 10:00; it needs a desktop browser and a live VA session (about $0.05) | The controller runs end to end against fakes. `va-session-compat.test.ts` proves WP5b's merged controller plugs in as a `VaSession`. WP4's `BrowserAudioEngine`, `CallPlayer`, `LiveSttChannelManager` and `HttpCaseSync` implement the contract interfaces the controller's deps are typed with |
 
 ## 4. Day-1 tests
 
@@ -157,40 +161,39 @@ identical with keyterms on):
   a planner look, but it is not WP5's to change.
 - **Postgres 17** (docker `baton-pg`, a throwaway database per test file): the 6 store tests pass. Three concurrent
   arms of one case give exactly one `ok` and two `conflict`. A fractional `tArm` (61234.625) round-trips.
-- **Built routes smoke** (`next start -p 3105`, webpack build):
+- **Built routes smoke** (round 1, before the G1 wiring; `next start -p 3105`, webpack build):
   - `POST /api/takeovers {}` → 400 `E_BAD_REQUEST`, because the body is validated before auth.
-  - `POST /api/takeovers/abc/end` → 500 `E_INTERNAL` "not wired yet (G1)".
+  - `POST /api/takeovers/abc/end` → 500 `E_INTERNAL` "not wired yet (G1)". Since the G1 wiring, `default-deps.test.ts`
+    shows the same routes answer from WP2's real `requireCase` (401 `E_CASE_TOKEN`, 403 for another takeover's token).
   - The server was stopped afterwards.
+- **G1 integration over Postgres**: the whole arm → compile → events → end → arm test takes about 1 s, most of it the
+  throwaway database's migration.
 
 ## 6. What the integrator must wire
 
-### 6.1 G1: the routes (one call, in `src/server/takeovers/wiring.ts` or any module the routes import)
+### 6.1 G1: the routes (done by WP5)
 
-This snippet type-checks against the current WP1, WP2, WP3 and WP8 worktrees:
+`src/server/takeovers/default-deps.ts` wires routes #9 and #11–#13 over WP1, WP2, WP3 and WP8, as `wp5-to-integrator.md`
+offered. The route files import it. Nothing is needed from the integrator for the routes themselves, but two things on
+`main` still affect them:
 
-```ts
-import { buildFirstUpdate, compileTakeover, validateFirstUpdate } from "../../core/compiler";   // WP1
-import { issueCaseToken, requireCase } from "../auth";                                          // WP2
-import { getLimitsAuthority, getRateLimiter, vaSessionIdFor } from "../limits";                 // WP2
-import { getCaseRepository } from "../cases";                                                   // WP3
-import { enqueueVerification } from "../jobs/verify-takeover";                                  // WP8 (omit → null job)
-import { getDb } from "../db";
+1. **WP3's `src/server/cases/defaults.ts` still binds the pre-G1 stub case engine** (the server logs `case engine is the
+   pre-G1 stub`). `freezeSnapshot` re-derives the takeover snapshot with that engine. Until the file is swapped for
+   the WP1 binding in `wp3-to-integrator.md` §1, the compiled snapshot comes from the stub's simplified derivation (no
+   age rule, no REP_ONLY check). WP5's G1 test binds WP1's engine the same way and passes. **This is the one G1 item
+   that changes what the AI half is told.**
+2. **Env.** `compileTakeover` reads `BATON_DEPLOY_ID`, `VA_VOICE`, `VA_KEYTERMS`, `PAY_TOOL_MODE` and `VA_SESSION_CAP_*`
+   through `takeoverConfigFromEnv()`. WP5b's Day-1 results say to use **`PAY_TOOL_MODE=push`** and **`VA_KEYTERMS=1`**.
+   `env.ts` and `.env.example` still default to `hold`/`0`. Set them on Zerops, or change the defaults.
 
-setTakeoverRouteDeps(buildTakeoverRouteDeps({
-  getDb, requireCase: (req, want) => requireCase(req, want), issueCaseToken: (i) => issueCaseToken(i),
-  getLimitsAuthority, getRateLimiter, vaSessionIdFor, caseRepository: getCaseRepository,
-  compileTakeover, buildFirstUpdate, validateFirstUpdate, enqueueVerification,
-}));
-```
+WP8's `verify-takeover` module is imported by `default-deps`, so its import-time `installVerifyTakeover()` runs when a
+takeover route loads. The job runner still needs WP8's step in `installBuiltinSteps()` (`wp8-to-integrator.md` §2) for
+the ticker.
 
-The simplest place for it: make `takeoverRouteDeps()` in `wiring.ts` build this lazily when nothing was set (WP5 does
-it right after the G1 merge if the integrator prefers).
-
-**Env.**
-- `compileTakeover` reads `BATON_DEPLOY_ID`, `VA_VOICE`, `VA_KEYTERMS`, `PAY_TOOL_MODE` and `VA_SESSION_CAP_*` through
-  `takeoverConfigFromEnv()`.
-- WP5b's Day-1 results say to use **`PAY_TOOL_MODE=push`** and **`VA_KEYTERMS=1`**. `env.ts` still defaults to
-  `hold`/`0`. Set them in `.env.example` and on Zerops, or change the defaults.
+**Platform note (Changeover).** WP5's service, machine and controller take the snapshot, the policy and the compiled
+config only through the contracts (`CaseRepository.freezeSnapshot`, `CompileTakeoverFn`, `CompiledTakeover`). A
+compiler driven by a relay blueprint replaces the three WP1 functions in `default-deps.ts` and nothing else. The VA
+`stage` event is typed as a plain string id for the same reason.
 
 ### 6.2 G2 (D2 10:00, WP5 glue): the controller on `/dev/audio` and then `/call` (WP7)
 
@@ -225,6 +228,15 @@ compiledBy}.
   a clip source (WP11 TTS or the tail pack); add it at G2 as an optional dep.
 - **Passes 2 and 3 after a hand-back.** The server allows them. Route #10's attempt 0 uses the run's `vaHoldId`, which
   the first pass consumed. That is WP2's call; see `requests/wp5-to-wp2.md`.
+- **Two flaky tests from other WPs** fail in about half of the full `npm test` runs on this machine, with or without
+  WP5's files, and pass when rerun:
+  - WP3 `tests/unit/server/cases/extract-service.test.ts` "batches only a backlog…" (the order of the batched turn
+    ids varies);
+  - WP2 `tests/unit/server/jobs/runner.test.ts` "the lease makes concurrent advances run the step once" (the step ran
+    3 times).
+
+  They look like races under parallel Postgres load. They are not WP5's to fix. The owners should look at them
+  before G1 CI relies on a green run.
 - **Turbopack cannot build in a worktree** whose `node_modules` is a junction ("Symlink [project]/node_modules is
   invalid"). `next build --webpack` works. `main`, with a real `node_modules`, is unaffected.
 - **WP3's drain latency** (their note): luna's p50 of about 2.1 s is above `DRAIN_MAX_MS` of 2000. Most in-flight
@@ -235,8 +247,8 @@ compiledBy}.
 
 ## 8. Change requests filed
 
-- `docs/notes/requests/wp5-to-integrator.md`: the G1 wiring, env defaults, test-folder ownership, and the Turbopack
-  worktree note.
+- `docs/notes/requests/wp5-to-integrator.md`: the routes are wired (no action), WP3's engine binding still open, env
+  defaults, test-folder ownership, the Turbopack worktree note, and the flaky tests of other WPs.
 - `docs/notes/requests/wp5-to-wp2.md`: VA slots for passes 2 and 3, route #7 with the takeover token, the /end release.
 - `docs/notes/requests/wp5-to-wp5b.md`: the retry and session reports are WP5's; the events the controller relies on.
 - `docs/notes/requests/wp5-to-wp7.md`: mounting the controller on `/call`.
@@ -256,6 +268,6 @@ Requests to WP5 that are already satisfied:
 
 ```bash
 npm run typecheck && npm test                               # $0; the Postgres suite needs DATABASE_URL (.env) or skips
-BATON_WP1_ROOT=../wp1 npx vitest run tests/unit/server/takeovers/compile-scenarios.test.ts   # acceptance 2 before G1
-WP5_REPORT=1 BATON_WP1_ROOT=../wp1 npx vitest run tests/unit/server/takeovers/compile-scenarios.test.ts --reporter=verbose   # the §5 table
+npx vitest run tests/unit/core/protocol tests/unit/server/takeovers     # WP5 only: 9 files, 153 tests
+WP5_REPORT=1 npx vitest run tests/unit/server/takeovers/compile-scenarios.test.ts --reporter=verbose   # the §5 table
 ```
