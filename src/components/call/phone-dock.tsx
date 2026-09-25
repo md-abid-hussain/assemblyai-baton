@@ -180,7 +180,7 @@ export function FloatingPhone() {
   const header = (
     <div className="mb-1.5 flex w-full items-center justify-between gap-2">
       {yourTurn ? (
-        <span className="bt-attention rounded-full bg-(--ai) px-3 py-1 text-xs font-bold text-white">Your turn: tap the text</span>
+        <span className="bt-attention rounded-full bg-(--ai) px-3 py-1 text-xs font-bold text-(--bt-accent-ink)">Your turn: tap the text</span>
       ) : (
         <span className="rounded-full bg-(--bt-panel) px-3 py-1 text-xs font-semibold shadow">{customer}&apos;s phone</span>
       )}

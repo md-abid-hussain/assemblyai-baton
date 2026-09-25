@@ -101,7 +101,7 @@ export function NarratorStrip() {
         {n.text}
       </p>
       {started && dur ? (
-        <span className="bt-mono hidden shrink-0 items-center gap-1 text-xs text-(--bt-muted) sm:inline-flex" aria-label={`Call clock ${formatMmSs(clock.callMs)} of ${formatMmSs(dur)}`}>
+        <span role="timer" className="bt-mono hidden shrink-0 items-center gap-1 text-xs text-(--bt-muted) sm:inline-flex" aria-label={`Call clock ${formatMmSs(clock.callMs)} of ${formatMmSs(dur)}`}>
           <PlayIcon className={cn("size-3", clock.playing ? "fill-current text-(--bt-live)" : "")} aria-hidden="true" />
           {formatMmSs(clock.callMs)} / {formatMmSs(dur)}
         </span>
@@ -125,7 +125,7 @@ export function Banners() {
           <span className="min-w-0 flex-1">
             <strong>{copy.title}.</strong> {copy.body}
           </span>
-          <button type="button" onClick={() => actions.retry()} className="inline-flex h-8 items-center gap-1 rounded-md bg-(--conflict) px-3 text-xs font-semibold text-white">
+          <button type="button" onClick={() => actions.retry()} className="inline-flex h-8 items-center gap-1 rounded-md bg-(--conflict-fg) px-3 text-xs font-semibold text-(--bt-accent-ink)">
             <RotateCcwIcon className="size-3.5" aria-hidden="true" /> Try again
           </button>
           {hasBundle ? (
@@ -166,11 +166,11 @@ export function ProvenanceBanner({ className }: { className?: string }) {
   const ready = useBaton((s) => !!s.context);
   if (!ready) return null;
   return (
-    <div role="note" aria-label="Where this run comes from" className={cn("flex flex-wrap items-center gap-x-3 gap-y-0.5 border-b border-(--bt-line) bg-(--bt-panel) px-4 py-1 text-[11.5px] leading-snug", className)}>
+    <div role="note" aria-label="Where this run comes from" className={cn("flex flex-wrap items-center gap-x-3 border-b border-(--bt-line) bg-(--bt-panel) px-4 text-[11.5px] leading-snug", className)}>
       {segs.map((g) => (
         <Tooltip key={g.key}>
           <TooltipTrigger asChild>
-            <span tabIndex={0} className="inline-flex items-baseline gap-1 rounded focus-visible:ring-2 focus-visible:ring-(--ai) focus-visible:outline-none">
+            <span tabIndex={0} className="inline-flex min-h-6 items-center gap-1 rounded focus-visible:ring-2 focus-visible:ring-(--ai) focus-visible:outline-none">
               <span className="text-(--bt-muted)">{g.label}:</span>
               <span className="font-semibold text-(--bt-ink)">{g.value}</span>
             </span>

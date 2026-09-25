@@ -106,7 +106,7 @@ export function CallTimeline({ className }: { className?: string }) {
         ))}
         {tArm !== null ? (
           <div className="absolute inset-y-0 w-0.5 bg-(--ai)" style={{ left: pct(tArm) }} aria-hidden="true">
-            <span className="bt-display absolute -top-px left-1 rounded-b bg-(--ai) px-1 text-[9px] font-bold whitespace-nowrap text-white">PASS {formatCallClock(tArm)}</span>
+            <span className="bt-display absolute -top-px left-1 rounded-b bg-(--ai) px-1 text-[9px] font-bold whitespace-nowrap text-(--bt-accent-ink)">PASS {formatCallClock(tArm)}</span>
 
           </div>
         ) : null}

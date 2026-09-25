@@ -135,7 +135,7 @@ export function ProtocolStepper() {
             <span
               className={cn(
                 "flex size-6 shrink-0 items-center justify-center rounded-full border text-[11px] font-bold",
-                st.status === "done" && "border-(--ai) bg-(--ai) text-white",
+                st.status === "done" && "border-(--ai) bg-(--ai) text-(--bt-accent-ink)",
                 st.status === "active" && "border-(--ai) text-(--ai-fg)",
                 st.status === "pending" && "border-(--bt-line-strong) text-(--bt-faint)",
               )}
@@ -213,7 +213,7 @@ function HoldCountdown({ item }: { item: ToolRailItem }) {
       <div className="mt-1 h-1 overflow-hidden rounded-full bg-(--bt-line)" role="progressbar" aria-label="Payment hold" aria-valuenow={Math.round(pct)} aria-valuemin={0} aria-valuemax={100}>
         <div className="h-full rounded-full bg-(--ai) transition-[width] duration-500" style={{ width: `${pct}%` }} />
       </div>
-      <div className="mt-0.5 text-[10px] text-(--bt-faint)">{progress ? "Extends while you sign and pay, up to 3 min." : "Extends as soon as you open the text."}</div>
+      <div className="mt-0.5 text-[10px] text-(--bt-muted)">{progress ? "Extends while you sign and pay, up to 3 min." : "Extends as soon as you open the text."}</div>
     </div>
   );
 }
@@ -266,7 +266,7 @@ function SuggestionChip({ s, disabled }: { s: Suggestion; disabled: boolean }) {
       )}
     >
       {tryThis ? (
-        <span className="inline-flex shrink-0 items-center gap-0.5 rounded bg-(--conflict) px-1 text-[10px] font-bold tracking-wide text-white uppercase">
+        <span className="inline-flex shrink-0 items-center gap-0.5 rounded bg-(--conflict-fg) px-1 text-[10px] font-bold tracking-wide text-(--bt-accent-ink) uppercase">
           <SparklesIcon className="size-3" aria-hidden="true" /> Try this
         </span>
       ) : null}

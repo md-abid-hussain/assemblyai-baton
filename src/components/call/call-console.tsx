@@ -9,7 +9,7 @@
 import "../layout/console.css";
 
 import { MessagesSquareIcon, NotebookTabsIcon, SmartphoneIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { useBaton } from "@/client/store/hooks";
 import { isRecordedAi } from "@/client/store/selectors";
@@ -66,6 +66,7 @@ type Tab = "call" | "case" | "phone";
 
 function MobileConsole() {
   const [tab, setTab] = useState<Tab>("call");
+  const phonePanel = useRef<HTMLDivElement>(null);
   const smsCount = useBaton((s) => s.phone.sms.length);
   const phase = useBaton((s) => s.flowPhase);
   const passVisible = phase === "shadowing" || phase === "handed-back";
@@ -73,6 +74,12 @@ function MobileConsole() {
   useEffect(() => {
     if (smsCount > 0) setTab("phone"); // DESIGN §7.6: the Phone tab opens by itself on phone.sms
   }, [smsCount]);
+  useEffect(() => {
+    // The whole phone in view (under the sticky tabs) whenever the Phone tab opens.
+    if (tab !== "phone") return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    phonePanel.current?.scrollIntoView({ block: "end", behavior: reduce ? "auto" : "smooth" });
+  }, [tab]);
   const tabs: { id: Tab; label: string; Icon: typeof SmartphoneIcon }[] = [
     { id: "call", label: "Call", Icon: MessagesSquareIcon },
     { id: "case", label: "Case", Icon: NotebookTabsIcon },
@@ -87,20 +94,27 @@ function MobileConsole() {
             role="tab"
             id={`tab-${t.id}`}
             aria-selected={tab === t.id}
-            aria-controls={`panel-${t.id}`}
+            // Only the selected tab's panel is rendered: an aria-controls to a missing id is invalid.
+            aria-controls={tab === t.id ? `panel-${t.id}` : undefined}
             onClick={() => setTab(t.id)}
             className={cn("relative flex h-11 items-center justify-center gap-1.5 text-sm font-semibold", tab === t.id ? "text-(--bt-ink)" : "text-(--bt-muted)")}
           >
             <t.Icon className="size-4" aria-hidden="true" />
             {t.label}
-            {t.id === "phone" && smsCount > 0 && tab !== "phone" ? <span className="absolute top-2 right-[28%] size-2 rounded-full bg-(--ai)" aria-label="new text" /> : null}
+            {t.id === "phone" && smsCount > 0 && tab !== "phone" ? (
+              <>
+                <span aria-hidden="true" className="absolute top-2 right-[28%] size-2 rounded-full bg-(--ai)" />
+                <span className="sr-only">, new text</span>
+              </>
+            ) : null}
             {tab === t.id ? <span aria-hidden="true" className="absolute inset-x-6 bottom-0 h-0.5 rounded bg-(--ai)" /> : null}
           </button>
         ))}
       </div>
-      <div className="flex-1 pb-24">
+      <main className="flex-1 pb-24">
         {tab === "call" ? (
           <div role="tabpanel" id="panel-call" aria-labelledby="tab-call" className="space-y-3 p-3">
+            <h2 className="sr-only">The call</h2>
             <CallTimeline />
             <div className="bt-panel p-3">
               <ControlColumn showDockedPhone={false} />
@@ -118,11 +132,12 @@ function MobileConsole() {
           </div>
         ) : null}
         {tab === "phone" ? (
-          <div role="tabpanel" id="panel-phone" aria-labelledby="tab-phone" className="p-4">
+          <div ref={phonePanel} role="tabpanel" id="panel-phone" aria-labelledby="tab-phone" className="p-4">
+            <h2 className="sr-only">The customer&apos;s phone</h2>
             <DockedPhone />
           </div>
         ) : null}
-      </div>
+      </main>
       {passVisible && !recorded ? (
         <div className="fixed inset-x-0 bottom-0 z-30 border-t border-(--bt-line) bg-(--bt-panel)/95 p-3 backdrop-blur">
           <PassButton compact />

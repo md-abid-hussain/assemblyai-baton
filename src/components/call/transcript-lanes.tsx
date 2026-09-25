@@ -39,7 +39,7 @@ const HumanLine = memo(function HumanLine({ l, who }: { l: TranscriptLine; who: 
           <button
             type="button"
             onClick={() => void actions.playTurn(l)}
-            className="rounded p-0.5 text-(--bt-muted) opacity-0 group-hover:opacity-100 hover:text-(--bt-ink) focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-(--ai) focus-visible:outline-none"
+            className="-my-1 -mr-1.5 inline-flex size-6 items-center justify-center rounded text-(--bt-muted) opacity-0 group-hover:opacity-100 hover:text-(--bt-ink) focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-(--ai) focus-visible:outline-none"
             aria-label={`Play ${who}'s line at ${formatMmSs(l.startMs)}`}
           >
             <PlayIcon className="size-3 fill-current" aria-hidden="true" />
@@ -74,7 +74,12 @@ const Caption = memo(function Caption({ l, elapsedAtMount }: { l: TranscriptLine
           {w.text}{" "}
         </span>
       ))}
-      {l.interrupted ? <span aria-label="interrupted">—</span> : null}
+      {l.interrupted ? (
+        <span title="interrupted">
+          <span aria-hidden="true">—</span>
+          <span className="sr-only">(interrupted)</span>
+        </span>
+      ) : null}
     </p>
   );
 });
@@ -143,7 +148,7 @@ export function TranscriptLanes() {
           ) : null}
         </div>
       </header>
-      <div ref={scroller} className="bt-scroll min-h-0 flex-1 px-3 py-3" tabIndex={0} aria-label="Transcript, newest at the bottom">
+      <div ref={scroller} className="bt-scroll min-h-0 flex-1 px-3 py-3" tabIndex={0} role="region" aria-label="Transcript, newest at the bottom">
         {empty ? (
           <p className="mx-auto mt-10 max-w-64 text-center text-sm text-(--bt-muted)">
             Both speakers will appear here as the recording plays: one live AssemblyAI session per channel.

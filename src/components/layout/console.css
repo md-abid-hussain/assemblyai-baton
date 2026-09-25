@@ -13,7 +13,7 @@
   --bt-panel-2: oklch(0.985 0.003 250);
   --bt-ink: oklch(0.23 0.02 262);
   --bt-muted: oklch(0.47 0.018 262);
-  --bt-faint: oklch(0.6 0.014 262);
+  --bt-faint: oklch(0.53 0.014 262); /* ≥ 4.5:1 on every light panel and tint (WCAG AA small text) */
   --bt-line: oklch(0.905 0.008 262);
   --bt-line-strong: oklch(0.84 0.012 262);
   --bt-shadow: 0 1px 0 oklch(0.2 0.02 262 / 0.04), 0 8px 24px -12px oklch(0.2 0.02 262 / 0.18);
@@ -44,6 +44,8 @@
   --bt-live: oklch(0.62 0.17 150);
   --bt-cached: oklch(0.5 0.12 65);
   --bt-cached-bg: oklch(0.96 0.055 85);
+  /* Text on a filled accent (--ai, --rep, --conflict-fg, the Pass gradient): ≥ 4.5:1 in both themes. */
+  --bt-accent-ink: oklch(1 0 0);
 }
 
 .dark {
@@ -53,7 +55,7 @@
   --bt-panel-2: oklch(0.225 0.012 262);
   --bt-ink: oklch(0.95 0.006 262);
   --bt-muted: oklch(0.74 0.015 262);
-  --bt-faint: oklch(0.62 0.014 262);
+  --bt-faint: oklch(0.66 0.014 262); /* ≥ 4.5:1 on every dark panel and tint */
   --bt-line: oklch(0.3 0.014 262);
   --bt-line-strong: oklch(0.38 0.016 262);
   --bt-shadow: 0 1px 0 oklch(0 0 0 / 0.3), 0 10px 30px -14px oklch(0 0 0 / 0.7);
@@ -84,9 +86,14 @@
   --bt-live: oklch(0.74 0.16 150);
   --bt-cached: oklch(0.86 0.12 85);
   --bt-cached-bg: oklch(0.31 0.05 75);
+  --bt-accent-ink: oklch(0.17 0.01 262);
 }
 
 .bt-console {
+  /* Components embedded in the console (WP6's MockPhone) use the shadcn tokens: a muted text that stays ≥ 4.5:1 on
+     the phone's muted bubbles. */
+  --muted-foreground: oklch(0.5 0 0);
+  --success: oklch(0.52 0.14 149);
   background-color: var(--bt-bg);
   background-image:
     linear-gradient(var(--bt-grid) 1px, transparent 1px),
@@ -184,7 +191,7 @@
 }
 .bt-pass {
   background-image: linear-gradient(100deg, var(--rep) 0%, color-mix(in oklch, var(--rep) 55%, var(--ai)) 55%, var(--ai) 100%);
-  color: white;
+  color: var(--bt-accent-ink);
   box-shadow: 0 10px 24px -12px color-mix(in oklch, var(--ai) 70%, transparent), inset 0 1px 0 oklch(1 0 0 / 0.25);
 }
 .bt-pass:not(:disabled):hover {
@@ -217,6 +224,10 @@
 }
 .bt-attention {
   animation: bt-ring 1.6s ease-in-out infinite;
+}
+
+.dark .bt-console {
+  --muted-foreground: oklch(0.74 0 0);
 }
 
 /* WP6's MockPhone (300 × 580 px) floating over a laptop viewport: scaled with its layout box, so the whole phone and

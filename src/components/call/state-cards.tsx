@@ -172,10 +172,10 @@ export function ExpressCountdownCard(p: { left: number; minutes: number | null; 
           >
             <ZapIcon className="size-5" aria-hidden="true" /> Start now
           </button>
-          <button type="button" onClick={p.onFull} className="text-sm font-semibold text-(--rep-fg) underline underline-offset-2 focus-visible:ring-2 focus-visible:ring-(--ai) focus-visible:outline-none">
+          <button type="button" onClick={p.onFull} className="py-1 text-sm font-semibold text-(--rep-fg) underline underline-offset-2 focus-visible:ring-2 focus-visible:ring-(--ai) focus-visible:outline-none">
             Full call instead
           </button>
-          <button type="button" onClick={p.onCancel} className="ml-auto text-xs text-(--bt-muted) underline underline-offset-2 focus-visible:ring-2 focus-visible:ring-(--ai) focus-visible:outline-none">
+          <button type="button" onClick={p.onCancel} className="ml-auto py-1 text-xs text-(--bt-muted) underline underline-offset-2 focus-visible:ring-2 focus-visible:ring-(--ai) focus-visible:outline-none">
             Wait, let me choose
           </button>
         </div>
@@ -203,8 +203,9 @@ export function QueuedCard() {
       </div>
       <p className="text-sm">{copy.body}</p>
       {left !== null ? (
-        <div className="bt-display bt-num text-4xl font-bold text-(--rep-fg)" aria-label={`about ${Math.ceil(left / 1000)} seconds`}>
-          {Math.ceil(left / 1000)} s
+        <div className="bt-display bt-num text-4xl font-bold text-(--rep-fg)">
+          <span aria-hidden="true">{Math.ceil(left / 1000)} s</span>
+          <span className="sr-only">about {Math.ceil(left / 1000)} seconds</span>
         </div>
       ) : null}
       <button type="button" onClick={() => actions.watchCachedNow()} className="inline-flex h-9 items-center gap-1.5 rounded-md border border-(--bt-line-strong) px-3 text-sm font-semibold hover:bg-(--bt-panel-2)">
@@ -318,16 +319,26 @@ export function QaSheet() {
   const done = phase === "completed" || phase === "handed-back";
   const [open, setOpen] = useState(false);
   const shownFor = useRef(-1);
+  const trigger = useRef<HTMLButtonElement>(null);
   useEffect(() => {
     if (done && shownFor.current !== count) {
       shownFor.current = count;
       setOpen(true);
     }
   }, [done, count]);
+  useEffect(() => {
+    // While the sheet is open the console behind it is inert, not just aria-hidden (Radix): nothing behind the
+    // overlay stays focusable (axe aria-hidden-focus). The sheet itself is portalled outside the console.
+    const root = trigger.current?.closest(".bt-console");
+    if (!root || !open) return;
+    root.setAttribute("inert", "");
+    return () => root.removeAttribute("inert");
+  }, [open]);
   if (!done && !has) return null;
   return (
     <>
       <button
+        ref={trigger}
         type="button"
         onClick={() => setOpen(true)}
         className={cn("inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg border text-sm font-semibold", verified ? "border-(--verified)/50 bg-(--verified-bg) text-(--verified-fg)" : "border-(--bt-line-strong) bg-(--bt-panel)")}

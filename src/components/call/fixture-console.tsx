@@ -180,7 +180,7 @@ function DevBar({ player, name, basePath }: { player: FixturePlayer; name: strin
           <RotateCcwIcon className="size-3.5" aria-hidden="true" />
         </button>
         {[1, 2, 4, 8].map((x) => (
-          <button key={x} type="button" onClick={() => player.setSpeed(x)} className={cn("h-7 rounded px-1.5 font-semibold", player.speed === x ? "bg-(--ai) text-white" : "border border-(--bt-line-strong)")} aria-pressed={player.speed === x}>
+          <button key={x} type="button" onClick={() => player.setSpeed(x)} className={cn("h-7 rounded px-1.5 font-semibold", player.speed === x ? "bg-(--ai) text-(--bt-accent-ink)" : "border border-(--bt-line-strong)")} aria-pressed={player.speed === x}>
             {x}×
           </button>
         ))}
