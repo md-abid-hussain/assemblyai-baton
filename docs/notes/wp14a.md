@@ -85,7 +85,7 @@ Branch `wp/wp14a`; `git merge main` was a no-op (main = `175a6b7`, C2 already in
 | `9d69c50` | Kernel modules in `src/core/relay/`: `formatters`, `normalizers`, `spec` (`buildIntentSpec`), `scope`, `extractor`, `prompt-default`, `safety`, `account`, `migrate`, `compile` |
 | `0219b2b` | `data/relays/baton-add-driver.json`, the oracle `scripts/relay/{snapshot-legacy,parity-corpus}.ts`, `tests/fixtures/relay-parity/baton/*.json`, `parity-baton.test.ts` |
 | `839615d` | `kernel.test.ts` (generic relay = the mini dental fixture); the greeting now counts `{subject}`'s VERIFIED field as asserted |
-| next two | `repLinePatterns` cover every scripted handoff line; WP14b's `blueprintHash` vector pinned; the Baton JSON has no keys zod strips |
+| `5a7a63e`, `8b43695` | `repLinePatterns` cover every scripted handoff line; WP14b's `blueprintHash` vector pinned; the Baton JSON has no keys zod strips |
 
 ### Done
 
