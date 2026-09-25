@@ -26,6 +26,7 @@ import { HttpSttApi, type SttApi } from "../stt/api";
 import { LiveSttChannelManager, type SttConnect } from "../stt/channel-manager";
 import { createTakeoverController, HttpTakeoverApi, type TakeoverApi, type VaSession } from "../takeover";
 import { createVoiceAgentController, type VaControllerConfig, type VoiceAgentControllerImpl } from "../va/controller";
+import { createAiClipPlayer } from "./ai-clip";
 import type { HumanHalf, SessionContext, SessionControllers, TakeoverHandle } from "./orchestrator";
 import { createWp6ToolPorts, withPaymentTap, type ToolPortsFactory } from "./tool-ports";
 
@@ -60,6 +61,7 @@ export function createBrowserControllers(o: BrowserWiringOptions = {}): SessionC
     lifecycle: () => (lifecycle ??= createPageLifecycle()),
     createHumanHalf: (c) => createHumanHalf(c, o),
     createTakeover: (c) => wireTakeover(c, o),
+    playAiClip: createAiClipPlayer({ ...(o.transport?.fetch ? { fetchImpl: o.transport.fetch } : {}), ...(o.log ? { log: o.log } : {}) }),
   };
 }
 

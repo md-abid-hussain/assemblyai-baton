@@ -242,6 +242,13 @@
   .bt-phone-float { zoom: 0.78; }
 }
 
+/* WP6's near-black bezel disappears into the dark console: a hairline keeps the phone's silhouette. */
+.dark .bt-phone-float,
+.dark .bt-phone-docked > * {
+  outline: 1px solid oklch(1 0 0 / 0.18);
+  outline-offset: 0;
+}
+
 /* Recorded / greyed shadow lanes. */
 .bt-greyed {
   filter: grayscale(0.9);

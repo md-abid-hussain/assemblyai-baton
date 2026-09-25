@@ -137,7 +137,7 @@ function useMountedPhone(variant: "docked" | "floating"): ReactNode | null {
 /** Docked variant (right column ≥1600 px, the mobile Phone tab). */
 export function DockedPhone({ className }: { className?: string }) {
   const mounted = useMountedPhone("docked");
-  if (mounted) return <div className="flex justify-center">{mounted}</div>;
+  if (mounted) return <div className="bt-phone-docked flex justify-center">{mounted}</div>;
   return (
     <div className={cn("mx-auto h-[520px] w-[280px]", className)}>
       <PhoneFrame>

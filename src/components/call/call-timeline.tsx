@@ -70,7 +70,7 @@ export function CallTimeline({ className }: { className?: string }) {
       <div className="relative h-[70px] overflow-hidden rounded-lg border border-(--bt-line) bg-(--bt-panel)">
         {prefillTo > 0 ? (
           <div className="absolute inset-y-0 left-0 border-r border-dashed border-(--bt-cached)/60 bg-(--bt-cached-bg)/60" style={{ width: pct(prefillTo) }}>
-            <span className="absolute top-0.5 left-1 text-[9px] font-semibold text-(--bt-cached) uppercase">cached prefill</span>
+            <span className="absolute top-0.5 left-1 z-10 rounded bg-(--bt-panel)/90 px-1 text-[9px] leading-[14px] font-semibold tracking-wide text-(--bt-cached) uppercase shadow-sm">cached prefill</span>
           </div>
         ) : null}
         {tArm !== null ? <div className="bt-hatch absolute inset-y-0 right-0 border-l-2 border-(--ai)" style={{ left: pct(tArm) }} /> : null}

@@ -118,8 +118,8 @@ export interface SessionControllers {
   createHumanHalf(c: SessionContext): HumanHalf;
   createTakeover(c: SessionContext & { engine: AudioEngineLike; playback: CallPlayback; lifecycle: LifecycleLike | null } & HumanHalf): TakeoverHandle;
   createCustomerInput?(c: SessionContext): CustomerInput;
-  /** AI-half evidence clips (WP8 route #21 with the takeover token). */
-  playAiClip?(ev: Evidence, w: { fromMs: number; toMs: number }, takeoverToken: string | null): Promise<void>;
+  /** AI-half evidence clips (WP8 route #21 with the takeover token; src/client/session/ai-clip.ts). */
+  playAiClip?(ev: Evidence, w: { fromMs: number; toMs: number }, auth: { takeoverToken: string | null; vaSessionId: string | null }): Promise<void>;
 }
 
 // ------------------------------------------------------------------------------------------------ session
@@ -346,7 +346,15 @@ export class CallSession implements ConsoleActions {
         playback,
         durationMs: call.durationMs,
         turnOf: (id) => this.turnOf(id),
-        ...(c.playAiClip ? { playAiClip: (ev, w) => (c.playAiClip as NonNullable<SessionControllers["playAiClip"]>)(ev, w, handle.token()) } : {}),
+        ...(c.playAiClip
+          ? {
+              playAiClip: (ev, w) =>
+                (c.playAiClip as NonNullable<SessionControllers["playAiClip"]>)(ev, w, {
+                  takeoverToken: handle.token(),
+                  vaSessionId: handle.ctl.view().pass?.vaSessionId ?? this.store.getState().sessionIds.va ?? null,
+                }),
+            }
+          : {}),
       });
 
       const { stt } = human;
