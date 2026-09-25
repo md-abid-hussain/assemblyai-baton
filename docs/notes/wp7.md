@@ -112,6 +112,8 @@ uncommitted by the interruption; WP7·1 committed them first (`69a47fa`).
 Resumed after a usage-limit interruption: the uncommitted provisional-QA work was sound (typecheck and tests green)
 and was committed first (`459254b`), then `git merge main` (C2 contracts v2, clean). Commits: `e09690e`, `30df252`,
 `933a25c` (before the interruption), `459254b`, `86af305`, `e533e66`, `a908065`.
+A second resume found a clean tree at `34ebec8` with `main` already merged; typecheck and `npm test` (88 files,
+1120/1120) were re-run green and the saved browser pass (`report.json`, 44 states) was spot-checked. No code changed.
 
 ### Done
 
