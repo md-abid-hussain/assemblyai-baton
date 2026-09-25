@@ -22,9 +22,9 @@
  */
 import type { FieldId } from "../contracts/case";
 import type { CallLabels, CallManifestEntry, Scenario } from "../contracts/scenario";
-import { REQUIRED_FIELDS } from "../intents/add-driver.fields";
+import { intentSpecOf } from "./intent-spec";
 import { isDualChannel, type KitScenario, type KitSidecar } from "./kit";
-import { normalizeScenario, type NormalizeFieldFn } from "./normalize";
+import { normalizeScenario } from "./normalize";
 
 export const FEATURED_SCENARIO_ID = "s01";
 /** A picker "main" call must start within this many days of the call date (the AI half's 30-day guardrail). */
@@ -46,7 +46,8 @@ export interface PlanInput {
   takes: readonly TakeInput[];
   /** The kit manifest's chosen take per scenario id (advisory; compared, never trusted). */
   manifestChosen?: Readonly<Record<string, string | null>>;
-  normalizeField?: NormalizeFieldFn | null;
+  /** The landing default's scenario (default s01). */
+  featuredScenarioId?: string;
   /** `/replays/<bundleId>/` of a recorded AI bundle for this call (WP11), or null. */
   recordedAiBundle?: (callId: string, scenarioId: string) => string | null;
   /** `/tts/voice/<scenarioId>/manifest.json` (WP11 tail pack), or null. */
@@ -86,10 +87,10 @@ const addDays = (iso: string, days: number): string => {
 };
 
 /** §6.1: the hand-off line start; else the last acknowledged REQUIRED fact + 2 s; else null. */
-export function decisionPointMs(labels: CallLabels | null): number | null {
+export function decisionPointMs(labels: CallLabels | null, requiredFields: readonly FieldId[]): number | null {
   if (!labels) return null;
   if (labels.handoff) return labels.handoff.lineStartMs;
-  const required = new Set<FieldId>(REQUIRED_FIELDS);
+  const required = new Set<FieldId>(requiredFields);
   let last: number | null = null;
   for (const m of labels.mentions) {
     if (!required.has(m.field) || m.ackedAtMs === null) continue;
@@ -111,8 +112,12 @@ export function pickerTier(s: Scenario, o: { chosen: boolean; publishAudio: bool
 
 export function planCalls(input: PlanInput): CallPlan {
   const warnings: string[] = [];
-  const kitById = new Map(input.scenarios.map((s) => [s.id, s]));
-  const nf = input.normalizeField ? { normalizeField: input.normalizeField } : {};
+  const kitById = new Map<string, KitScenario>();
+  for (const s of input.scenarios) {
+    if (!intentSpecOf(s.intent)) warnings.push(`${s.id}: intent "${s.intent}" has no registered spec; scenario skipped`);
+    else kitById.set(s.id, s);
+  }
+  const featuredId = input.featuredScenarioId ?? FEATURED_SCENARIO_ID;
 
   const usableByScenario = new Map<string, KitSidecar[]>();
   const takeByBase = new Map<string, TakeInput>();
@@ -151,7 +156,8 @@ export function planCalls(input: PlanInput): CallPlan {
     const kit = kitById.get(sid)!;
     for (const sc of [...usableByScenario.get(sid)!].sort(byTake)) {
       const t = takeByBase.get(sc.base)!;
-      const scenario = normalizeScenario(kit, sc, { ...nf, onDrop: (f, v) => warnings.push(`${sc.base}: truth ${f}=${JSON.stringify(v)} did not normalize; dropped`) });
+      const scenario = normalizeScenario(kit, sc, { onDrop: (f, v, why) => warnings.push(`${sc.base}: fact ${f}=${JSON.stringify(v)} dropped (${why})`) });
+      const required = intentSpecOf(kit.intent)!.requiredFields;
       const dual = isDualChannel(sc);
       if (!dual) warnings.push(`${sc.base}: not a 2-channel recording (twilio.recording_channels=${sc.twilio.recording_channels ?? "missing"}); excluded from per-channel variants, eval and picker`);
       const chosen = chosenBase.get(sid) === sc.base;
@@ -170,7 +176,7 @@ export function planCalls(input: PlanInput): CallPlan {
         inEval: sc.review.status !== "discard" && labels?.reviewed === true && dual,
         featured: false,
         picker: pickerTier(scenario, { chosen, publishAudio, dualChannel: dual }),
-        decisionPointMs: decisionPointMs(labels),
+        decisionPointMs: decisionPointMs(labels, required),
         handoff: labels?.handoff ? { ...labels.handoff, declined: scenario.handoffResponse === "declines" } : null,
         recordedAiBundle: input.recordedAiBundle?.(sc.base, sid) ?? null,
         customerTailPack: input.customerTailPack?.(sid) ?? null,
@@ -180,12 +186,12 @@ export function planCalls(input: PlanInput): CallPlan {
   }
 
   // Featured: exactly one.
-  const s01 = calls.find((c) => c.chosen && c.entry.scenarioId === FEATURED_SCENARIO_ID && c.entry.publishAudio && c.dualChannel);
+  const s01 = calls.find((c) => c.chosen && c.entry.scenarioId === featuredId && c.entry.publishAudio && c.dualChannel);
   const featured = s01 ?? calls.find((c) => c.entry.picker === "main");
   if (featured) {
     featured.entry.featured = true;
     if (featured.entry.picker === "hidden") featured.entry.picker = "main";
-    if (!s01) warnings.push(`no publishable 2-channel ${FEATURED_SCENARIO_ID} take: featuring ${featured.entry.callId} instead (DESIGN I10)`);
+    if (!s01) warnings.push(`no publishable 2-channel ${featuredId} take: featuring ${featured.entry.callId} instead (DESIGN I10)`);
   } else if (calls.some((c) => c.entry.publishAudio)) {
     const first = calls.find((c) => c.entry.publishAudio && c.dualChannel);
     if (first) {
@@ -198,11 +204,11 @@ export function planCalls(input: PlanInput): CallPlan {
   }
 
   // One Scenario per kit scenario: the chosen take's overrides, or the plain design.
-  const scenarios: Scenario[] = [...input.scenarios]
+  const scenarios: Scenario[] = [...kitById.values()]
     .sort((a, b) => a.id.localeCompare(b.id))
     .map((kit) => {
       const chosen = calls.find((c) => c.chosen && c.entry.scenarioId === kit.id);
-      return chosen ? chosen.scenario : normalizeScenario(kit, null, { ...nf, onDrop: (f, v) => warnings.push(`${kit.id}: truth ${f}=${JSON.stringify(v)} did not normalize; dropped`) });
+      return chosen ? chosen.scenario : normalizeScenario(kit, null, { onDrop: (f, v, why) => warnings.push(`${kit.id}: fact ${f}=${JSON.stringify(v)} dropped (${why})`) });
     });
 
   return { calls, scenarios, warnings };

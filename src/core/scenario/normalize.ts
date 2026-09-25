@@ -1,7 +1,8 @@
 /**
  * scenario/normalize.ts - `normalizeScenario(kitScenario, sidecar)` → Baton `Scenario` (DESIGN §6.1).
  *
- * - facts `value` → `truth` through WP1's `normalizeField` (norm formats equal the kit formats; money → "142.00");
+ * - facts `value` → `truth` through the intent's production normalizer (WP1 `normalizeField` for add_driver; norm
+ *   formats equal the kit formats; money → "142.00");
  * - `status_at_handoff` → `expectedAtHandoff`;
  * - the take's `sidecar.review.fact_overrides` / `status_overrides` are applied ON TOP (the take's actual words win);
  * - `rep` + `customer` → `PolicyRecord` (same rules as WP1's fixtures and WP3's `policyFromKitScenario`:
@@ -10,21 +11,13 @@
  * - `rating` from the facts; `dueTodayUsd` = the kit's `amount_due_today_usd`, else prorated exactly like WP1's
  *   `resolveDueToday` (new − current) × daysLeft/daysInMonth from the effective date, min $0.50.
  *
- * `normalizeField` is INJECTED (WP1 owns it in src/core/intents/add-driver.ts). `kitValueNorm` is the fallback for
- * values that are already in the kit's canonical format (the kit validator guarantees that); a parity test pins it
- * against WP1's normalizer on all 22 scenarios whenever WP1's module is reachable.
+ * Field ids are never hard-coded here: the scenario's own `facts` keys are checked against its intent's spec.
  */
 import type { FieldId, FieldStatus, PolicyRecord } from "../contracts/case";
 import type { Scenario } from "../contracts/scenario";
-import { FIELD_IDS, FIELD_KIND } from "../intents/add-driver.fields";
+import { HANDOFF_RESPONSES, LANGUAGES, type HandoffResponse, type Language } from "../intents/add-driver.fields";
+import { ADD_DRIVER_SPEC, intentSpecOf, type IntentSpec } from "./intent-spec";
 import type { KitFactValue, KitScenario, KitSidecar } from "./kit";
-
-/** WP1's `normalizeField` signature (structural; WP1's function is assignable to it). */
-export type NormalizeFieldFn = (
-  field: FieldId,
-  raw: string | number | boolean | null | undefined,
-  ctx: { policy: PolicyRecord; callDate: string },
-) => { norm: string; display: string } | null;
 
 /** WP1's minimum amount due today (disclosures.ts MIN_DUE_TODAY_USD). */
 export const MIN_DUE_TODAY_USD = 0.5;
@@ -50,48 +43,11 @@ export function policyFromKit(s: Pick<KitScenario, "rep" | "customer" | "call_da
   };
 }
 
-/**
- * Fallback normalizer for values ALREADY in the kit's canonical format (kit validateScenario: ISO dates, 2-letter
- * states, 5-digit ZIPs, enum literals, vehicle ids, numbers for money). Mirrors WP1's norm formats: names lower-case,
- * money with 2 decimals, booleans "true"/"false", licence numbers upper-case alphanumerics.
- */
-export function kitValueNorm(field: FieldId, value: KitFactValue): string | null {
-  const kind = FIELD_KIND[field];
-  switch (kind.t) {
-    case "money":
-    case "signed_money": {
-      const n = typeof value === "number" ? value : Number(String(value).replace(/[$,\s]/g, ""));
-      if (!Number.isFinite(n)) return null;
-      if (kind.t === "money" && n < 0) return null;
-      return (Math.round(n * 100) / 100).toFixed(2);
-    }
-    case "boolean":
-      return typeof value === "boolean" ? String(value) : /^(true|false)$/i.test(String(value)) ? String(value).toLowerCase() : null;
-    case "int":
-      return Number.isInteger(Number(value)) ? String(Number(value)) : null;
-    case "state":
-      return String(value).toUpperCase();
-    default:
-      break;
-  }
-  const s = collapse(String(value));
-  if (!s) return null;
-  if (field === "driver_full_name") return collapse(s.normalize("NFKC").toLowerCase().replace(/[’‘]/g, "'"));
-  if (field === "license_number") return s.toUpperCase().replace(/[^A-Z0-9]/g, "") || null;
-  if (field === "incidents_3y" || field === "coverage_change") return s.toLowerCase().replace(/[’‘]/g, "'");
-  return s;
-}
-
 export interface NormalizeScenarioOptions {
-  /** WP1 `normalizeField`; the fallback is `kitValueNorm`. */
-  normalizeField?: NormalizeFieldFn | null;
-  /** Called for every fact whose value the normalizer rejected (kept out of `truth`). */
-  onDrop?: (field: FieldId, value: KitFactValue, why: string) => void;
-}
-
-function normTruth(field: FieldId, value: KitFactValue, policy: PolicyRecord, callDate: string, o: NormalizeScenarioOptions): string | null {
-  if (o.normalizeField) return o.normalizeField(field, String(value), { policy, callDate })?.norm ?? null;
-  return kitValueNorm(field, value);
+  /** Override the intent spec (tests); default: the spec registered for `kit.intent`. */
+  spec?: IntentSpec;
+  /** Called for every fact that is dropped (unknown field, or the normalizer rejected its value). */
+  onDrop?: (field: string, value: KitFactValue | undefined, why: string) => void;
 }
 
 /** Days in a month (1-based month). */
@@ -111,52 +67,68 @@ export function proratedDueTodayUsd(newMonthlyUsd: number, currentMonthlyUsd: nu
   return cents / 100;
 }
 
+const isLanguage = (x: string): x is Language => (LANGUAGES as readonly string[]).includes(x);
+const isHandoffResponse = (x: string): x is HandoffResponse => (HANDOFF_RESPONSES as readonly string[]).includes(x);
+
 /**
  * The kit scenario (+ the take's sidecar, when normalizing for one take) → Baton `Scenario`. Overrides win over the
- * scenario design. Throws when the result has no `premium_new_monthly_usd` (a required field of every kit scenario).
+ * scenario design. Throws on an unknown intent / language / hand-off response, or when the blueprint has a rating
+ * and the result has no new-premium truth.
  */
 export function normalizeScenario(kit: KitScenario, sidecar: Pick<KitSidecar, "review"> | null, o: NormalizeScenarioOptions = {}): Scenario {
+  const spec = o.spec ?? intentSpecOf(kit.intent);
+  if (!spec) throw new Error(`${kit.id}: no intent spec registered for intent "${kit.intent}"`);
+  if (spec.intent !== ADD_DRIVER_SPEC.intent) throw new Error(`${kit.id}: the Scenario contract only carries add_driver today (got ${spec.intent})`);
+  if (!isLanguage(kit.language)) throw new Error(`${kit.id}: unsupported language "${kit.language}"`);
+  const handoffResponse = kit.handoff.customer_response;
+  if (!isHandoffResponse(handoffResponse)) throw new Error(`${kit.id}: unsupported handoff.customer_response "${handoffResponse}"`);
   const policy = policyFromKit(kit);
   const callDate = kit.call_date;
+
   const values = new Map<FieldId, KitFactValue>();
   const statuses = new Map<FieldId, FieldStatus>();
-  for (const f of FIELD_IDS) {
-    const fact = kit.facts[f];
-    if (!fact) continue;
-    values.set(f, fact.value);
-    statuses.set(f, fact.status_at_handoff);
+  for (const [key, fact] of Object.entries(kit.facts)) {
+    if (!spec.isField(key)) {
+      o.onDrop?.(key, fact.value, `not a field of intent ${spec.intent}`);
+      continue;
+    }
+    values.set(key, fact.value);
+    statuses.set(key, fact.status_at_handoff);
   }
-  for (const [f, v] of Object.entries(sidecar?.review.fact_overrides ?? {}) as [FieldId, KitFactValue | undefined][]) {
-    if (v !== undefined) values.set(f, v);
+  for (const [key, v] of Object.entries(sidecar?.review.fact_overrides ?? {})) {
+    if (!spec.isField(key)) o.onDrop?.(key, v, `override of an unknown field (intent ${spec.intent})`);
+    else values.set(key, v);
   }
-  for (const [f, st] of Object.entries(sidecar?.review.status_overrides ?? {}) as [FieldId, FieldStatus | undefined][]) {
-    if (st !== undefined) statuses.set(f, st);
+  for (const [key, st] of Object.entries(sidecar?.review.status_overrides ?? {})) {
+    if (!spec.isField(key)) o.onDrop?.(key, undefined, `status override of an unknown field (intent ${spec.intent})`);
+    else statuses.set(key, st);
   }
 
   const truth: Partial<Record<FieldId, string>> = {};
-  for (const f of FIELD_IDS) {
-    const v = values.get(f);
-    if (v === undefined) continue;
-    const n = normTruth(f, v, policy, callDate, o);
-    if (n === null) o.onDrop?.(f, v, "normalizer returned null");
-    else truth[f] = n;
-  }
   const expectedAtHandoff: Partial<Record<FieldId, FieldStatus>> = {};
-  for (const f of FIELD_IDS) {
+  for (const f of spec.fieldIds) {
+    const v = values.get(f);
+    if (v !== undefined) {
+      const n = spec.normalize(f, v, { policy, callDate });
+      if (n === null) o.onDrop?.(f, v, "normalizer returned null");
+      else truth[f] = n;
+    }
     const st = statuses.get(f);
     if (st) expectedAtHandoff[f] = st;
   }
 
-  const money = (f: FieldId): number | null => {
-    const t = truth[f];
+  const money = (f: FieldId | null | undefined): number | null => {
+    const t = f ? truth[f] : undefined;
     return t === undefined ? null : Number(t);
   };
-  const newMonthlyUsd = money("premium_new_monthly_usd");
-  if (newMonthlyUsd === null) throw new Error(`${kit.id}: no premium_new_monthly_usd truth (required by the kit schema)`);
-  const changeMonthlyUsd = money("premium_change_monthly_usd");
-  const dueToday = money("amount_due_today_usd");
-  const eff = truth.effective_date;
-  const dueTodayUsd = dueToday ?? proratedDueTodayUsd(newMonthlyUsd, kit.customer.current_premium_monthly_usd, eff && /^\d{4}-\d{2}-\d{2}$/.test(eff) ? eff : callDate);
+  const rf = spec.ratingFields;
+  const newMonthlyUsd = money(rf?.newMonthly);
+  if (newMonthlyUsd === null) throw new Error(`${kit.id}: no ${rf?.newMonthly ?? "new-premium"} truth (required by the kit schema)`);
+  const changeMonthlyUsd = money(rf?.changeMonthly);
+  const dueToday = money(rf?.dueToday);
+  const eff = rf?.effectiveDate ? truth[rf.effectiveDate] : undefined;
+  const from = eff && /^\d{4}-\d{2}-\d{2}$/.test(eff) ? eff : callDate;
+  const dueTodayUsd = dueToday ?? proratedDueTodayUsd(newMonthlyUsd, kit.customer.current_premium_monthly_usd, from);
 
   return {
     id: kit.id,
@@ -168,7 +140,7 @@ export function normalizeScenario(kit: KitScenario, sidecar: Pick<KitSidecar, "r
     truth,
     expectedAtHandoff,
     plannedHandoffS: kit.handoff.approx_at_s,
-    handoffResponse: kit.handoff.customer_response,
+    handoffResponse,
     rating: { newMonthlyUsd, changeMonthlyUsd, dueTodayUsd },
     traps: [...kit.eval.traps],
   };

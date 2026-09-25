@@ -7,7 +7,7 @@
  * never break `calls:build`; a missing REQUIRED field fails loudly with the file name.
  */
 import { z } from "zod";
-import { FIELD_IDS, FIELD_STATUSES, HANDOFF_RESPONSES, LANGUAGES } from "../intents/add-driver.fields";
+import { FIELD_STATUSES } from "../intents/add-driver.fields";
 
 export const KIT_ROLES = ["rep", "customer"] as const;
 export type KitRole = (typeof KIT_ROLES)[number];
@@ -15,7 +15,11 @@ export type KitRole = (typeof KIT_ROLES)[number];
 const FactValueSchema = z.union([z.string(), z.number(), z.boolean()]);
 export type KitFactValue = z.infer<typeof FactValueSchema>;
 
-const FieldIdKey = z.enum(FIELD_IDS);
+/**
+ * Fact keys stay plain strings here: the scenario's `intent` names the blueprint whose field ids apply
+ * (`intent-spec.ts`); an unknown key is warned about and dropped by `normalizeScenario`, never a parse failure.
+ */
+const FieldKey = z.string().min(1);
 const StatusSchema = z.enum(FIELD_STATUSES);
 
 export const KitFactSchema = z
@@ -37,8 +41,8 @@ export const KitScenarioSchema = z
     schema_version: z.literal(1),
     id: z.string().regex(/^s\d{2}$/),
     title: z.string(),
-    intent: z.literal("add_driver"),
-    language: z.enum(LANGUAGES),
+    intent: z.string(),
+    language: z.string(),
     call_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
     rep: z.object({ name: z.string(), agency: z.string() }).loose(),
     customer: z
@@ -52,12 +56,12 @@ export const KitScenarioSchema = z
         current_premium_monthly_usd: z.number(),
       })
       .loose(),
-    facts: z.partialRecord(FieldIdKey, KitFactSchema),
+    facts: z.record(FieldKey, KitFactSchema),
     handoff: z
       .object({
         at_beat: z.number().optional(),
         line: z.string(),
-        customer_response: z.enum(HANDOFF_RESPONSES),
+        customer_response: z.string(),
         customer_says: z.string().optional(),
         after: z.string().optional(),
         approx_at_s: z.number(),
@@ -81,8 +85,8 @@ export const KitSidecarSchema = z
       .object({
         status: z.enum(["unreviewed", "keep", "discard"]),
         notes: z.array(z.string()).default([]),
-        fact_overrides: z.partialRecord(FieldIdKey, FactValueSchema).default({}),
-        status_overrides: z.partialRecord(FieldIdKey, StatusSchema).default({}),
+        fact_overrides: z.record(FieldKey, FactValueSchema).default({}),
+        status_overrides: z.record(FieldKey, StatusSchema).default({}),
       })
       .loose(),
     channel_map: z.object({ "1": z.enum(KIT_ROLES), "2": z.enum(KIT_ROLES) }),
