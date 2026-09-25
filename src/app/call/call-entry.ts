@@ -17,14 +17,15 @@ async function manifest(): Promise<CallManifestEntry[]> {
   try {
     const raw = JSON.parse(await readFile(path.join(process.cwd(), "src", "generated", "calls.json"), "utf8")) as unknown;
     const list = Array.isArray(raw) ? raw : ((raw as { calls?: unknown[] } | null)?.calls ?? []);
-    cache = list.flatMap((x) => {
+    const parsed = list.flatMap((x) => {
       const r = CallManifestEntrySchema.safeParse(x);
       return r.success ? [r.data] : [];
     });
+    if (parsed.length > 0) cache = parsed; // an empty or missing manifest is re-read on the next request
+    return parsed;
   } catch {
-    cache = [];
+    return [];
   }
-  return cache;
 }
 
 export async function lookupCall(callId: string | null): Promise<{ entry: CallManifestEntry | null; featuredId: string | null; known: boolean }> {
