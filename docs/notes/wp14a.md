@@ -74,3 +74,51 @@ $0. No AssemblyAI or OpenAI calls, no Zerops access.
 5. Then `scripts/relay/snapshot-legacy.ts` and the parity fixtures.
 
 Lint `TYPE_NORMALIZERS` already admits Baton's kinds (incidents → text/`insurance.incidents`, vehicle → lookup/`insurance.vehicle`, age → integer/`insurance.age`, relation/license status/discounts → enum/`insurance.*`).
+
+## WP14a·2: kernel compilers, Baton JSON, ≤ 40-word greeting, recorded rep line, compile parity (D1 Fri Sep 25)
+
+Branch `wp/wp14a`; `git merge main` was a no-op (main = `175a6b7`, C2 already in). The unit was interrupted by a usage limit once; the resumed run committed the pending kernel tests and finished.
+
+| Commit | What |
+|---|---|
+| `bbe308f` | **Legacy greeting ≤ 40 words first** (before the oracle), push-mode pay texts; closes `requests/wp5b-to-wp1.md` (resolution section in that file). WP1's greeting tests and first-update fixtures updated |
+| `9d69c50` | Kernel modules in `src/core/relay/`: `formatters`, `normalizers`, `spec` (`buildIntentSpec`), `scope`, `extractor`, `prompt-default`, `safety`, `account`, `migrate`, `compile` |
+| `0219b2b` | `data/relays/baton-add-driver.json`, the oracle `scripts/relay/{snapshot-legacy,parity-corpus}.ts`, `tests/fixtures/relay-parity/baton/*.json`, `parity-baton.test.ts` |
+| `839615d` | `kernel.test.ts` (generic relay = the mini dental fixture); the greeting now counts `{subject}`'s VERIFIED field as asserted |
+| next two | `repLinePatterns` cover every scripted handoff line; WP14b's `blueprintHash` vector pinned; the Baton JSON has no keys zod strips |
+
+### Done
+
+- **Legacy greeting (P§3.4 G2):** 13-word opening ("Hi Priya, I'm Daniel's AI assistant, not a person. This call is recorded."), the facts ("I'll finish adding Maya to the 2021 Honda Civic, starting …, at $142 a month."), "Ask for Daniel anytime.", one next step. Over 40 words the clauses drop date → vehicle → premium. s01 = 39 words, s02 = 40.
+- **Kernel** (`compileRelay(bp, { flagship?, versionId?, relayId? })` → `CompiledRelay`; `compileRelayTakeover`): greeting (clauses, `dropOrder`, `asserted` tracked through VERIFIED/REP guards and `{subject}`), case JSON (legacy cap order), prompt (flagship: the Baton text; otherwise the generated default or `promptTemplate`, **always with the safety block** before the deploy marker), tools per stage (built-ins + `confirmTool` + connector tools), disclosures, named values, `nextStage`, extractor (generated field guide, strict format, input builder, `assertStrictSchema`), listening, `UiSpec`, first update (`validateFirstUpdate` gained an optional `toolNames`). `normalizers.ts` wraps the unchanged legacy `insurance.*` functions (now exported from `add-driver.ts`); `account.ts` has `policyToAccount`, `storedAccount`, `accountFromStored`; `migrate.ts` has `canonicalJson`, `blueprintHash`, `hash8`, `migrateBlueprint`.
+- **Baton JSON:** clause ids `date`, `vehicle`, `premium` (dropOrder 0/1/2). `handoff.repLine` = **"OK if my assistant finishes the paperwork? I'll be one tap away if you need me."** (the s01 recording line). `repLinePatterns` = `\b(finish|finishes|wrap|wraps) (up )?the paperwork\b` and `\b(one tap away|stay on the line)\b`: they detect the recorded line, the older "stay on the line" wording and all 22 scenario handoff lines (s02 "wraps up …", s06 "finishes up …"), tested through `safeTest`.
+- **Parity (P§4.6, T2 scope), 0 diffs:** 17 named snapshots (s01/s02/s05 × 3 pass points, 4 canned, 4 WP1 states) with full texts, 200 seeded random snapshots (sha for prompts/disclosures), 300 phrases, 609 normalize inputs, 21 extractor inputs. Covered: `GreetingResult` deep-equal, ≤ 40 words and the first fact by word 24 (acceptance 6); case JSON; prompts at every stage (push mode + deploy marker); tools; first `session.update` (confirm, disclose); takeover; `nextStage` table; disclosures × tax suffix; values; extractor prompt/format/**`EXTRACTOR_VERSION_V3`**; normalize/display/spoken forms; phrases; keyterms for 22 scenarios. Listed difference: `promptVersion = relay:<hash8>`. `npx tsx scripts/relay/snapshot-legacy.ts --check` → "oracle up to date".
+- Node timing: `BlueprintSchema.parse` + `compileRelay(baton)` p50 0.9 ms (first call 26 ms); the Chromium benchmark stays in T4.
+
+### Decisions (additive v2 changes after C2; consumers with exhaustive switches must handle them)
+
+1. `FORMATTERS` gains `as_spoken` (the spoken words when known, else the value).
+2. `FieldSchema.setBy` gains `rep_or_customer`: either party counts, but the field is not in the `update_case_field` enum (Baton: age, start date, discounts, coverage).
+3. The greeting's `asserted` includes a field stated through `{subject}` (the mini dental greeting asserts `treatment`, `patient_name`).
+4. Lint L3 accepts the P§5 context paths `table.<id>` and `table.<id>.<col>`; lint C1 renders with the kernel formatters.
+
+### Tests
+
+Typecheck clean. `npm test`: 68 files, **810 passed, 124 skipped, 0 failed with `SKIP_DB_TESTS=1`**. Without the flag, the 16 real-Postgres suites (server/cases, limits, jobs, registry, runs, verify) fail with `ECONNREFUSED 127.0.0.1:55432`: Docker Desktop is not running here, so the `baton-pg` container is down. This is environmental and none of those suites touch WP14a paths. `tests/unit/core/relay`: 7 files, 193 tests.
+
+### Live spend
+
+$0 (no AssemblyAI, OpenAI or Zerops calls).
+
+### Requests to WP14a picked up for WP14a·3
+
+- `wp14b-to-wp14a.md`: §1 **done** (vector pinned in `kernel.test.ts`; same definition); §2 **done** (no stripped keys, tested); §3 signatures kept: `lintBlueprintJson(json) → { blueprint, issues }`, `blueprintHash(bp) → string`; §4 the blank relay goes through full lint in T3.
+- `wp16-to-wp14a.md`: `validateToolArgs` with WP16's signature and semantics, the `lookup_table` parser moved into `src/core/relay/`, lint mirrors of the header/URL refusals, and the P§4.4 tool-result fixture: all T3/T4.
+
+### What the integrator must do
+
+Merge `wp/wp14a` with `--no-ff` whenever convenient (not a G2 exit criterion). After the merge, WP14b·2 swaps its kernel port to `lintBlueprintJson` + `blueprintHash`. Re-run `npx tsx scripts/relay/snapshot-legacy.ts --check` on merged main.
+
+### Where WP14a·3 starts
+
+The optional trailing `spec?: IntentSpec` parameters (§2 rule 9), `LEGACY_BATON_SPEC`, `brand-denylist.ts`, the full P§4.6 corpus (QA, derive), the remaining lint rules (C2, S2, S3, F1, F2, X1, X2, G2, W3, B1, K1, K2, W2), then the WP16 requests above.
