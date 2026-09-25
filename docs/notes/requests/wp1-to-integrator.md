@@ -32,3 +32,11 @@ The collector did not change any repo file.
 7. **§5.13 tag questions.** "…X. Is that right?" is merged into one sentence, so the greeting's own confirm counts
    as `pendingConfirmed`, as §5.13 step 2 intends.
 8. **§5.3 step 5.2.** The token-LCS ratio is LCS/|quote|: the share of the quote's tokens found, in order.
+
+---
+
+## Integrator status (G1, 2026-09-25)
+
+- §1: **not installed**. `@vitest/coverage-v8` is not in DESIGN §3.3; the planner decides whether to add it for the ≥90% gate.
+- §2: forwarded to the planner (DESIGN amendments); no code change at G1.
+Details: `docs/notes/g1.md` ("Integrator requests: disposition").

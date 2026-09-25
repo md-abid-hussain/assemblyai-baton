@@ -89,3 +89,11 @@ share the account-wide limits before the deploy.
 - The DB-backed unit tests (8 files) create and drop a throwaway database per file on the server of `DATABASE_URL`
   (or `TEST_DATABASE_URL`), so they need a role with `CREATEDB`. Without a URL they skip; `SKIP_DB_TESTS=1` forces
   the skip.
+
+---
+
+## Integrator status (G1, 2026-09-25)
+
+- §1 worker wired in `src/instrumentation.ts`; §2 `scripts/lib/remote.ts` registered by `scripts/lib/limits.ts`; §3 `sttParamsFor` → `buildSttParams` when call + policy are known; §5 WP8 imports in `installBuiltinSteps()` (plus `await wp8HooksReady()`).
+- §4 `[WIRE-CALLS]` open until WP9's manifest; §6 env: user action on Zerops; §7 Turbopack build confirmed on `main`.
+Details: `docs/notes/g1.md` ("Integrator requests: disposition").

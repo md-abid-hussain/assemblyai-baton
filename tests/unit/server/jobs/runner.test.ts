@@ -79,7 +79,8 @@ describe.skipIf(!HAS_DB)("DbJobRunner (real Postgres)", () => {
     let calls = 0;
     runner.register("va_audit", async () => {
       calls++;
-      await new Promise((r) => setTimeout(r, 50));
+      // G1: 50 ms was shorter than the losers' DB round trips under the full parallel suite (they then read "done").
+      await new Promise((r) => setTimeout(r, 500));
       return { state: null, next: "done" };
     });
     const id = await runner.enqueue("va_audit", "x");
@@ -106,6 +107,9 @@ describe.skipIf(!HAS_DB)("DbJobRunner (real Postgres)", () => {
 
   it("a stale VA slot enqueues verify_takeover once for its takeover (default handler)", async () => {
     await installBuiltinSteps(runner);
+    // G1: installBuiltinSteps now also wires WP8, whose stale-VA handler (on the global runner and DB) takes precedence.
+    // This test pins WP2's default enqueue on this runner, so drop WP8's handler (afterEach already resets it).
+    registerStaleVaHandler(null);
     const a = new DbLimitsAuthority({ db: t.db, config: defaultLimitsConfig(), now: clock.now });
     await a.vaAcquire({ takeoverId: "tkoZ", attempt: 0, capMs: 600_000, source: "judge", deployId: "dev-test" });
     await a.report({ sessionId: "va_tkoZ_0", kind: "va", event: "opened", providerSessionId: "sess_Z" });

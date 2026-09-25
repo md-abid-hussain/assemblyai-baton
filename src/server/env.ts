@@ -93,9 +93,9 @@ export const EnvSchema = z.object({
   VA_SESSION_CAP_MAX_MS: z.coerce.number().int().positive().default(420_000),
 
   // ---- Voice Agent and product switches ----
-  VA_KEYTERMS: flag01("0"),
+  VA_KEYTERMS: flag01("1"), // G1: T-D1-0 passed 4/4 with keyterms (DESIGN §7 env table: 1 once T-D1-0 passes)
   VA_VOICE: z.string().min(1).default("alba"),
-  PAY_TOOL_MODE: z.enum(["hold", "push"]).default("hold"),
+  PAY_TOOL_MODE: z.enum(["hold", "push"]).default("push"), // G1: T-D1-1 failed (silent reply.create mid-hold) → §5.8 fallback
   FEATURE_BE_CUSTOMER: flag01("0"),
 });
 

@@ -125,3 +125,11 @@ TASKS §6 lists "the verifier (sol) in the live path" as the second item to cut.
 - **To cut it:** in `buildCasesDeps` (`src/server/cases/index.ts`), make `verifierEnabled` default to `() => false`.
   That is a one-line change.
 - **What stays:** stored verifier results and the cached ablation are unaffected.
+
+---
+
+## Integrator status (G1, 2026-09-25)
+
+- §1 `defaults.ts` bound to WP1 + WP2 (your snippet verbatim); §3 `outputFileTracingIncludes` added.
+- §2 open until WP9's `src/generated/*.json` exist (then WP3 writes `src/server/data/generated.ts`, the integrator imports it at boot); §5 build confirmed on `main`; §6 noted.
+Details: `docs/notes/g1.md` ("Integrator requests: disposition").

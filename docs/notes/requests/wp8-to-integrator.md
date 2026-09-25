@@ -81,3 +81,11 @@ routes (see `docs/notes/wp8.md`).
 - WP8's `TestRunner` is a test double of WP2's `DbJobRunner`. After the merge, the three route/step suites can also
   run against the real runner. Swap it in the helper `harness()` if you want that coverage.
 - `tests/integration/async-verify.test.ts` (RUN_LIVE=1, ≈ $0.09) finds WP1's `computeQa` at `@/core/qa` once it is merged.
+
+---
+
+## Integrator status (G1, 2026-09-25)
+
+- §1 `wiring.ts` body pasted (hook registrations now awaitable via `wp8HooksReady()`); §2 imports added to `installBuiltinSteps()`; §5 `bundle/node_modules/ws` present.
+- §3 is WP5's; §4 env: user action on Zerops; §6 (real-runner suites) optional, not done.
+Details: `docs/notes/g1.md` ("Integrator requests: disposition").
