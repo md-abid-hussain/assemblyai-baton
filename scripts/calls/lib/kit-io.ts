@@ -22,6 +22,9 @@ import type { ChannelPcm } from "../../../src/core/scenario/assets";
 import { KitManifestSchema, KitScenarioSchema, KitSidecarSchema, parseKit, type KitScenario, type KitSidecar } from "../../../src/core/scenario/kit";
 import { parseSttCacheJsonl } from "../../../src/core/scenario/stt-cache";
 
+/** The 5 pilot takes (TASKS WP9 acceptance 3): the chosen takes of these scenarios (override: BATON_PILOT=s01,s02,…). */
+export const PILOT_SCENARIOS: readonly string[] = (process.env.BATON_PILOT ?? "s01,s02,s03,s05,s10").split(",").map((s) => s.trim()).filter(Boolean);
+
 export const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
 
 /** `<main>/.wt/<name>` → `<main>`; any other path is returned unchanged. */

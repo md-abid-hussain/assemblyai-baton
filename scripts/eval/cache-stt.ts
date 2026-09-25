@@ -27,10 +27,8 @@ import { takeAudioOf } from "../../src/core/scenario/assets";
 import { planCalls, type PlannedCall } from "../../src/core/scenario/build";
 import { isCompleteCache, serializeSttCacheRecord } from "../../src/core/scenario/stt-cache";
 import { downmixUlaw, estimateSttUsd, runSttCache, type OpenedChannel, type OpenedSessions, type RunnerSession } from "../../src/core/scenario/stt-run";
-import { loadKit, parseFlags, readSplit, readSttCache, resolvePaths, str, sttCachePath, type PipelinePaths } from "../calls/lib/kit-io";
+import { loadKit, parseFlags, PILOT_SCENARIOS, readSplit, readSttCache, resolvePaths, str, sttCachePath, type PipelinePaths } from "../calls/lib/kit-io";
 
-/** The 5 pilot takes (TASKS WP9 acceptance 3): the chosen takes of these scenarios. */
-export const PILOT_SCENARIOS = ["s01", "s02", "s03", "s05", "s10"] as const;
 
 export interface CacheTarget {
   call: PlannedCall;
