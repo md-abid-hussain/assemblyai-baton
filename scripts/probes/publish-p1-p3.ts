@@ -352,7 +352,7 @@ async function main(): Promise<void> {
     console.error("Refusing to run: live AssemblyAI calls need RUN_LIVE=1 (TASKS-v2 §2 rule 6).");
     process.exit(2);
   }
-  if (!process.env.BATON_DEPLOY_ID || !process.env.BATON_DEPLOY_ID.startsWith("dev-")) process.env.BATON_DEPLOY_ID = "dev-wp18";
+  if (!process.env.BATON_DEPLOY_ID || !process.env.BATON_DEPLOY_ID.startsWith("dev-")) process.env.BATON_DEPLOY_ID = "dev-probe";
   const deployId = process.env.BATON_DEPLOY_ID;
   const key = process.env.ASSEMBLYAI_API_KEY?.trim();
   if (!key) throw new Error("ASSEMBLYAI_API_KEY missing (value never printed)");
