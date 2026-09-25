@@ -12,7 +12,7 @@ import { relays, relayVersions } from "@/server/db/schema";
 import { blueprintHash } from "@/server/relays/canonical";
 import { RelayError } from "@/server/relays/http";
 import { applyJsonPatch } from "@/server/relays/json-patch";
-import type { Moderator } from "@/server/relays/moderation";
+import { ModerationUnavailableError, type Moderator } from "@/server/relays/moderation";
 import { PgRelayRegistry } from "@/server/relays/registry";
 import { MemoryGallerySource, type GalleryEntry } from "@/server/relays/seed";
 import { createTestDb, HAS_DB, type TestDb } from "../cases/helpers/test-db";
@@ -188,27 +188,85 @@ describe.skipIf(!HAS_DB)("PgRelayRegistry", () => {
     await expect(reg.setVisibility(await galleryId("dental-deposit"), WS_A, "private")).rejects.toMatchObject({ code: "E_READ_ONLY" });
   });
 
-  it("moderate: once per version (cached), a flagged result is stored; no moderator → E_INTERNAL", async () => {
+  it("moderate: gallery text is pre-cleared with no call; new text is checked once and stored; flagged is stored", async () => {
     const r = await reg.create(WS_A, { kind: "clone", relayId: await galleryId("dental-deposit") });
+    const s0 = await reg.snapshotVersion(r.id);
+    const before = moderator.calls.length;
+    expect(await reg.moderateForRun(s0.versionId, "test")).toEqual({ flagged: false, categories: [], via: "gallery_text" });
+    expect(await reg.moderateForRun(s0.versionId, "publish")).toEqual({ flagged: false, categories: [], via: "stored" });
+    const [row0] = await t.db.select({ m: relayVersions.moderation }).from(relayVersions).where(eq(relayVersions.id, s0.versionId));
+    expect(row0!.m).toMatchObject({ flagged: false, source: "seed" });
+    expect(moderator.calls).toHaveLength(before);
+    const bp = structuredClone(r.draft);
+    bp.meta.title = "Brightwater front desk";
+    await reg.saveDraft(r.id, WS_A, bp, 0);
     const s = await reg.snapshotVersion(r.id);
     expect(await reg.moderate(s.versionId)).toEqual({ flagged: false, categories: [] });
     expect(await reg.moderate(s.versionId)).toEqual({ flagged: false, categories: [] });
-    expect(moderator.calls).toHaveLength(1);
-    expect(moderator.calls[0]).toContain("Brightwater Dental");
-    const bp = structuredClone(r.draft);
+    expect(moderator.calls).toHaveLength(before + 1);
+    expect(moderator.calls.at(-1)).toContain("Brightwater front desk");
     bp.playbook.persona.tone = "FLAG-ME";
-    await reg.saveDraft(r.id, WS_A, bp, 0);
+    await reg.saveDraft(r.id, WS_A, bp, 1);
     const s2 = await reg.snapshotVersion(r.id);
     expect(await reg.moderate(s2.versionId)).toEqual({ flagged: true, categories: ["harassment"] });
     const [row] = await t.db.select({ m: relayVersions.moderation }).from(relayVersions).where(eq(relayVersions.id, s2.versionId));
     expect(row!.m).toMatchObject({ flagged: true, categories: ["harassment"], source: "openai" });
-    const bare = new PgRelayRegistry({ db: t.db });
-    const s3 = await (async () => {
-      const x = await bare.create(WS_A, { kind: "blank", industry: "other" });
-      return bare.snapshotVersion(x.id);
-    })();
-    await expect(bare.moderate(s3.versionId)).rejects.toBeInstanceOf(BatonError);
     await expect(reg.moderate("rv_none")).rejects.toMatchObject({ code: "E_NOT_FOUND" });
+  });
+
+  it("moderation unavailable (PLATFORM §7.4): Publish fails closed; a Test run fails open only for gallery-derived relays, unstored", async () => {
+    let down = true;
+    const flaky: Moderator = {
+      async check() {
+        if (down) throw new ModerationUnavailableError("down");
+        return { flagged: false, categories: [] };
+      },
+    };
+    const r2 = new PgRelayRegistry({ db: t.db, moderator: flaky });
+    const clone = await r2.create(WS_A, { kind: "clone", relayId: await galleryId("dental-deposit") });
+    const bp = structuredClone(clone.draft);
+    bp.meta.title = "Another desk entirely";
+    await r2.saveDraft(clone.id, WS_A, bp, 0);
+    const cv = (await r2.snapshotVersion(clone.id)).versionId;
+    expect(await r2.moderateForRun(cv, "test")).toEqual({ flagged: false, categories: [], via: "fail_open" });
+    await expect(r2.moderate(cv)).rejects.toMatchObject({ code: "E_MAINTENANCE" });
+    const blank = await r2.create(WS_A, { kind: "blank", industry: "other" });
+    const bv = (await r2.snapshotVersion(blank.id)).versionId;
+    await expect(r2.moderateForRun(bv, "test")).rejects.toMatchObject({ code: "E_MAINTENANCE" });
+    const bare = new PgRelayRegistry({ db: t.db }); // no moderator at all = unavailable
+    await expect(bare.moderateForRun(bv, "test")).rejects.toMatchObject({ code: "E_MAINTENANCE" });
+    expect(await bare.moderateForRun(cv, "test")).toMatchObject({ via: "fail_open" });
+    down = false;
+    expect(await r2.moderateForRun(cv, "test")).toEqual({ flagged: false, categories: [], via: "openai" }); // nothing was stored while down
+    expect(await r2.moderateForRun(cv, "publish")).toMatchObject({ via: "stored" });
+    const boom = new PgRelayRegistry({ db: t.db, moderator: { check: async () => { throw new Error("a bug, not an outage"); } } });
+    await expect(boom.moderateForRun(bv, "test")).rejects.toThrow("a bug, not an outage");
+  });
+
+  it("run resolution: owner draft → snapshot; reader → current version; presets by version id; isolation 404; canSeeVersion", async () => {
+    const dentalId = await galleryId("dental-deposit");
+    const g = await reg.runVersion((await reg.get(dentalId, WS_A))!.currentVersionId!);
+    expect(g).toMatchObject({ relaySlug: "dental-deposit", gallery: true, flagship: false, origin: "seed", preset: null });
+    const reader = await reg.resolveRun(WS_B, { relayId: "dental-deposit" });
+    expect(reader.versionId).toBe(g!.versionId);
+    const preset = (await reg.get(dentalId, WS_B))!.presets[0]!;
+    const pr = await reg.resolveRun(WS_B, { relayVersionId: preset.versionId });
+    expect(pr.preset).toMatchObject({ id: preset.id, baseVersionId: g!.versionId });
+    const mine = await reg.create(WS_A, { kind: "clone", relayId: dentalId });
+    const owned = await reg.resolveRun(WS_A, { relayId: mine.id });
+    expect(owned).toMatchObject({ relayId: mine.id, origin: "clone", gallery: false, version: 1 });
+    expect((await reg.resolveRun(WS_A, { relayId: mine.slug })).versionId).toBe(owned.versionId); // content-addressed
+    await expect(reg.resolveRun(WS_B, { relayId: mine.id })).rejects.toMatchObject({ code: "E_NOT_FOUND" });
+    await expect(reg.resolveRun(WS_B, { relayVersionId: owned.versionId })).rejects.toMatchObject({ code: "E_NOT_FOUND" });
+    await expect(reg.resolveRun(WS_A, { relayId: "baton-add-driver", relayVersionId: owned.versionId })).rejects.toMatchObject({ code: "E_NOT_FOUND" });
+    await expect(reg.resolveRun(WS_A, {})).rejects.toMatchObject({ code: "E_BAD_REQUEST" });
+    expect(await reg.canSeeVersion(WS_A, owned.versionId)).toBe(true);
+    expect(await reg.canSeeVersion(WS_B, owned.versionId)).toBe(false);
+    expect(await reg.canSeeVersion(WS_B, preset.versionId)).toBe(true);
+    expect(await reg.canSeeVersion(WS_B, "rv_nope")).toBe(false);
+    expect(await reg.galleryVersionFor("dental-deposit", g!.hash)).toBe(g!.versionId);
+    expect(await reg.galleryVersionFor("dental-deposit", "stale")).toBe(g!.versionId);
+    expect(await reg.galleryVersionFor(mine.slug, null)).toBeNull(); // not a gallery relay
   });
 
   it("remove: soft delete, gone from reads and lists; gallery relays cannot be removed", async () => {
