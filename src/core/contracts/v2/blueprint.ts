@@ -131,7 +131,10 @@ export const FieldSchema = z.object({
   enumValues: z.array(EnumValueSchema).max(20).optional(),                   // required iff type = "enum"
   lookup: z.object({ table: IdSchema, matchColumns: z.array(z.string()).min(1).max(4), allowAll: z.boolean() }).optional(),
   required: z.boolean(),
-  setBy: z.enum(["rep_only", "ai_allowed"]),              // rep_only: only a REP statement or a server value makes it VERIFIED
+  setBy: z.enum(["rep_only", "ai_allowed", "rep_or_customer"]),   // rep_only: only a REP statement or a server value makes it VERIFIED
+  // ai_allowed: either party, and the AI may set it with update_case_field (the tool enum, in field order).
+  // rep_or_customer (WP14a·2, additive): either party's statements count, but the AI cannot write it with
+  // update_case_field (Baton: age, the start date with its own confirm tool, the discounts and coverage).
   adviceDomain: z.boolean(),                              // a rep decision: the AI never raises or changes it (prompt → decided_by_rep)
   serverResolvable: z.object({ value: IdSchema }).optional(),   // never asked; a named value supplies it (Baton: the premium)
   promptVisibility: z.enum(["always", "when_known", "rep_verified_only"]),

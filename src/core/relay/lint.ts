@@ -3,7 +3,7 @@
  * in the browser on every change (debounced) and the server re-runs it on save, run and publish.
  * Errors block a run or publish; warnings don't.
  *
- * SKELETON (WP14a·1, C2): L1, L2, L3, G1, C1, S1, X3 are implemented. The rest (C2, S2, S3, F1, F2, X1, X2, G2, W3,
+ * SKELETON (WP14a·1, C2; formatters wired in WP14a·2): L1, L2, L3, G1, C1, S1, X3 are implemented. The rest (C2, S2, S3, F1, F2, X1, X2, G2, W3,
  * B1, K1, K2, W2) land in WP14a·3; `LINT_RULES_PENDING` lists them so callers can tell a clean skeleton result from a
  * full one. `lintBlueprintJson(json)` also maps `BlueprintSchema` parse failures to issues (`SCHEMA`, or `X3` for an
  * unsafe regex, naming the offending group).
@@ -20,6 +20,7 @@ import {
   parseTemplatePath, renderTemplate, TEMPLATE_OPTIONS, templateConds, templateVars, tryParseTemplate,
   type PathKind, type PathRef, type RenderScope, type TemplateCond, type TemplateNode,
 } from "./template";
+import { formatValue } from "./formatters";
 
 export const LINT_RULES_IMPLEMENTED = ["SCHEMA", "L1", "L2", "L3", "G1", "C1", "S1", "X3"] as const;
 export const LINT_RULES_PENDING = ["C2", "S2", "S3", "F1", "F2", "X1", "X2", "G2", "W3", "B1", "K1", "K2", "W2"] as const;
@@ -336,7 +337,15 @@ function lintL3(bp: Blueprint, ix: Index, parsed: Map<string, TemplateNode[]>): 
     if (p) out.push(err("L3", path, p));
   };
   bp.playbook.caseJson.header.forEach((h, i) => fromPath(h.from, ["playbook", "caseJson", "header", i, "from"]));
-  bp.extraction.context.forEach((c, i) => fromPath(c.from, ["extraction", "context", i, "from"]));
+  bp.extraction.context.forEach((c, i) => {
+    const path: Path = ["extraction", "context", i, "from"];
+    // PLATFORM §5: `table.<id>` → [{id,label}] and `table.<id>.<col>` → a string list are context paths too.
+    const tm = /^table\.([a-z][a-z0-9_]*)(?:\.([a-z0-9_]+))?$/.exec(c.from);
+    if (!tm) { fromPath(c.from, path); return; }
+    const cols = ix.tables.get(tm[1]!);
+    if (!cols) out.push(err("L3", path, `unknown table "${tm[1]}"`));
+    else if (tm[2] !== undefined && !cols.has(tm[2])) out.push(err("L3", path, `table "${tm[1]}" has no column "${tm[2]}"`));
+  });
   bp.playbook.caseJson.tables.forEach((t, i) => { if (!ix.tables.has(t.table)) out.push(err("L3", ["playbook", "caseJson", "tables", i, "table"], `unknown table "${t.table}"`)); });
   bp.listening.contextKeyterms.forEach((k, i) => { const p = keytermPathProblem(k, ix, false); if (p) out.push(err("L3", ["listening", "contextKeyterms", i], p)); });
   bp.playbook.vaKeyterms.forEach((k, i) => { const p = keytermPathProblem(k, ix, true); if (p) out.push(err("L3", ["playbook", "vaKeyterms", i], p)); });
@@ -405,12 +414,10 @@ function lintG1(bp: Blueprint, parsed: Map<string, TemplateNode[]>): LintIssue[]
 
 // ============================================================================================ C1 AI disclosure
 
-const titleCase = (s: string): string => s.toLowerCase().replace(/\b\p{L}/gu, (c) => c.toUpperCase());
-
 /**
  * A render scope over a sample account with NOTHING known about the case: every condition is false, every field,
- * value, subject, clause and phrase renders empty. Enough for the greeting opening (lint C1). Formatters beyond
- * the plain ones fall back to the raw value until relay/formatters.ts lands (WP14a·2).
+ * value, subject, clause and phrase renders empty. Enough for the greeting opening (lint C1). Formatters are the
+ * kernel's (relay/formatters.ts).
  */
 export function sampleOpeningScope(account: AccountRecord): RenderScope {
   return {
@@ -426,12 +433,7 @@ export function sampleOpeningScope(account: AccountRecord): RenderScope {
       }
     },
     test: () => false,
-    format(formatter, value) {
-      if (formatter === "lower") return value.toLowerCase();
-      if (formatter === "title") return titleCase(value);
-      if (formatter === "first_name") return value.trim().split(/\s+/)[0] ?? value;
-      return value;
-    },
+    format: (formatter, value) => formatValue(formatter, value, { account }),
   };
 }
 
