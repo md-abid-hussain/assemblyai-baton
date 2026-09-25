@@ -109,7 +109,10 @@ export function checkToolSchema(schema: unknown, where: string): void {
  * format other than PCM16 24 kHz; any tool that is not a known `function` tool with `execution_mode:"interactive"`
  * and `timeout_seconds` ≤ 30, or whose parameters use a keyword outside §5.8.
  */
-export function validateFirstUpdate(msg: { type: "session.update"; session: Record<string, unknown> }, opts: { keytermsEnabled: boolean }): void {
+export function validateFirstUpdate(
+  msg: { type: "session.update"; session: Record<string, unknown> },
+  opts: { keytermsEnabled: boolean; /** A relay's tool names (kernel, WP14a); default: the Baton TOOL_NAMES. */ toolNames?: readonly string[] },
+): void {
   if (!isObj(msg)) fail("message must be an object");
   keysSubset(msg as unknown as Record<string, unknown>, ["type", "session"], "message");
   if (msg.type !== "session.update") fail(`type must be "session.update"`);
@@ -152,7 +155,8 @@ export function validateFirstUpdate(msg: { type: "session.update"; session: Reco
     const tool = t as Record<string, unknown>;
     keysSubset(tool, ["type", "name", "description", "parameters", "execution_mode", "timeout_seconds"], where);
     if (tool.type !== "function") fail(`${where}.type must be "function"`);
-    if (!(TOOL_NAMES as readonly unknown[]).includes(tool.name)) fail(`${where}.name "${String(tool.name)}" is not a Baton tool`);
+    const known: readonly unknown[] = opts.toolNames ?? TOOL_NAMES;
+    if (!known.includes(tool.name)) fail(`${where}.name "${String(tool.name)}" is not a ${opts.toolNames ? "tool of this relay" : "Baton tool"}`);
     if (seen.has(tool.name as string)) fail(`${where}.name "${String(tool.name)}" is duplicated`);
     seen.add(tool.name as string);
     if (typeof tool.description !== "string" || !tool.description) fail(`${where}.description must be a non-empty string`);
@@ -166,7 +170,7 @@ export function validateFirstUpdate(msg: { type: "session.update"; session: Reco
 }
 
 /** Non-throwing variant for UIs and scripts. */
-export function firstUpdateErrors(msg: { type: "session.update"; session: Record<string, unknown> }, opts: { keytermsEnabled: boolean }): string | null {
+export function firstUpdateErrors(msg: { type: "session.update"; session: Record<string, unknown> }, opts: { keytermsEnabled: boolean; toolNames?: readonly string[] }): string | null {
   try {
     validateFirstUpdate(msg, opts);
     return null;

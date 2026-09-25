@@ -44,7 +44,9 @@ export const NORMALIZERS = ["text", "free_text_lower", "person_name", "date", "d
 export const FORMATTERS = ["raw", "title", "first_name", "lower", "spoken_date", "spoken_date_long", "spoken_dob",
   "spoken_zip", "spoken_chars", "spoken_money", "spoken_monthly", "state_name", "state_with_code", "enum_label",
   "enum_word", "lookup_label", "underscore_to_space", "insurance.relation_word", "insurance.relation_display",
-  "insurance.license_words", "insurance.license_adjective", "insurance.incidents_display"] as const;
+  "insurance.license_words", "insurance.license_adjective", "insurance.incidents_display",
+  "as_spoken",   // WP14a·2, additive: the words as spoken when known, else the value (legacy "as spoken" displays)
+] as const;
 export const BUILTIN_VALUES = ["insurance.monthly_premium", "insurance.due_today_prorated"] as const;
 export const HAND_BACK_REASONS_V2 = ["advice_requested", "customer_request", "conflict", "customer_declined",
   "out_of_scope", "payment_problem", "other"] as const;   // = contracts/tools.ts HAND_BACK_REASONS
