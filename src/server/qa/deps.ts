@@ -19,6 +19,7 @@ import "server-only";
 
 import type { AppFlags, JobRunner, RateLimiter, SpendLedger } from "../../core/contracts/services";
 import type { ComputeQa } from "../../core/contracts/ext/wp8-verify";
+import type { PublishedAgentRef } from "../../core/contracts/ext/wp18-audit";
 import { AssemblyAIAsyncClient, type Transcript, type TranscriptParams } from "../aai/async";
 import { defaultVaRest, type VaRestPort } from "../aai/va-rest";
 import { getDb, type Db } from "../db/client";
@@ -55,6 +56,11 @@ export interface Wp8Ports {
   /** Flip `mode=replay_only` with a reason (WP2 precedence rules). Returns whether the mode changed. */
   tripReplayOnly: ((reason: string) => Promise<boolean>) | null;
   config(): Wp8Config;
+  /**
+   * WP18 (tightened F6, PLATFORM §8.4): the publications' stored agents and active runs. Optional: when unset the
+   * audit reads `relay_publications` itself (and finds none while migration 0001 is not applied).
+   */
+  publishedAgents?: () => Promise<PublishedAgentRef[]>;
 }
 
 /** Sliding-window limiter for one process (the default until WP2's DB limiter is wired). */
