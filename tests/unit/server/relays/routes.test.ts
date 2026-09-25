@@ -27,7 +27,7 @@ describe.skipIf(!HAS_DB)("/api/relays routes", () => {
 
   beforeAll(async () => {
     restore = withSecrets();
-    t = await createTestDb("wp14b_routes");
+    t = await createTestDb("wp14b_routes", { poolMax: 4 });
     limiter = new DbRateLimiter(t.db);
     setRelaysDeps({ db: t.db, gallery: new MemoryGallerySource(galleryEntries()), rateLimiter: () => limiter });
   });

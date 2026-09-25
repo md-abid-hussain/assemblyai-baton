@@ -64,3 +64,33 @@ These use WP12's `enforceRates` and `DbRateLimiter`. The bucket names and number
 
 Clone-from-gallery is exempt. The global cap never refuses a create: at 400 live relays an idle one is archived, and at
 2000 any LRU one. If you centralize the limits config, move the numbers and keep the names.
+
+## 6. The DB unit suites exhaust Postgres `max_connections` after G2 (whole-repo flake, from WP14b·2)
+
+After the G2 merges the repo has ~25 unit files that call `createTestDb`. Vitest runs files in parallel (this box:
+32 CPUs), each file's pool is `max: 15` (`tests/unit/server/cases/helpers/test-db.ts`), and the local `baton-pg`
+container is the stock `max_connections = 100`. The suite then fails in a different place on every run - always
+`Hook timed out in 20000ms` in `beforeAll`/`afterAll` (`createTestDb`, `drop`), never an assertion.
+
+Measured on `wp/wp14b` (same commit, same machine, four runs):
+
+| Run | Command | Result |
+|---|---|---|
+| 1 | `npm test` | 9 files failed |
+| 2 | `npm test` | 17 files failed, 50 tests |
+| 3 | `npx vitest run --maxWorkers=4` | 0 infrastructure failures |
+| 4 | `npm test` (machine idle) | 0 infrastructure failures |
+
+So it is load-dependent, and it gets worse the more worktrees run tests against the one container at the same time.
+It is nobody's WP in particular; it will bite the G2/G3 integrator, who runs the whole suite on a busy machine.
+
+Pick whichever you prefer - any one of them is enough:
+
+1. `max_connections` on the dev container, e.g. `command: postgres -c max_connections=400` (cheapest, local only);
+2. a worker cap in `vitest.config.ts` (nobody's path in §4.1, so it is yours): `maxWorkers: 8` for the whole suite, or
+   `poolOptions.threads.maxThreads = 8`;
+3. drop the default `poolMax` in the three `test-db` helpers from 15 to ~4. Only the deliberate pool-exhaustion
+   acceptance needs 15, and it passes its own `poolMax`.
+
+WP14b·2 already did (3) for its own four DB files (`{ poolMax: 4 }`), which is why they are no longer among the
+casualties, but four files out of twenty-five cannot fix the aggregate.

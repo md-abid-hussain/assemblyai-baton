@@ -38,7 +38,7 @@ describe.skipIf(!HAS_DB)("PgRelayRegistry", () => {
   const moderator = new FakeModerator((txt) => txt.includes("FLAG-ME"));
 
   beforeAll(async () => {
-    t = await createTestDb("wp14b_registry");
+    t = await createTestDb("wp14b_registry", { poolMax: 4 });
     entries = galleryEntries();
     reg = new PgRelayRegistry({ db: t.db, gallery: new MemoryGallerySource(entries), moderator });
   });
@@ -288,7 +288,7 @@ describe.skipIf(!HAS_DB)("PgRelayRegistry global cap (LRU archive, PLATFORM §10
   let reg: PgRelayRegistry;
 
   beforeAll(async () => {
-    t = await createTestDb("wp14b_evict");
+    t = await createTestDb("wp14b_evict", { poolMax: 4 });
     reg = new PgRelayRegistry({ db: t.db, now, caps: { softLive: 3, hardLive: 5, idleMs: HOUR }, gallery: new MemoryGallerySource(galleryEntries()) });
     await reg.seedGallery();
   });

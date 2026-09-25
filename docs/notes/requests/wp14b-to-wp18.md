@@ -19,3 +19,24 @@ From WP14b·1 (D1 Fri Sep 25).
 5. **Moderation before publish:** `getRelaysDeps().registry.moderate(versionId)` returns `{flagged, categories}`,
    cached once per version in `relay_versions.moderation`. The OpenAI implementation lands in WP14b·2. Until then it
    throws `E_INTERNAL` for non-seed versions; seeded gallery versions are pre-marked clean.
+
+---
+
+## From WP14b·2 (D1 Fri Sep 25)
+
+6. **Moderation is live.** `getRelaysDeps().registry.moderate(versionId)` is the Publish policy of P§7.4: the stored
+   result, else the gallery-text pre-clear, else OpenAI `omni-moderation-latest` (free, a $0 ledger reserve → settle),
+   cached in `relay_versions.moderation`. **Publish fails closed**: when the endpoint is unavailable it throws
+   `ModerationUnavailableError` (`src/server/relays/moderation.ts`) and you should answer 503, not publish. Test runs
+   have their own policy (`moderateForRun(versionId, "test")`) and are not yours.
+7. **One of your test files was edited**, for the same reason as WP12's scaffold test in WP14b·1: migration 0001 is
+   this WP's deliverable. `tests/unit/server/verify/va-audit.test.ts`, the case
+   "readPublishedAgents is [] without relay_publications and reads the live rows once 0001 exists", created
+   `relay_publications` by hand; the migrated test database now already has it, so the create failed with
+   `42P07 relation "relay_publications" already exists`. One statement was added in front -
+   `drop table if exists relay_publications` - so the test still covers both branches (no table → `[]`, then the
+   table → the live rows). Nothing else in the file changed, and its hand-written DDL matches 0001 column for column.
+   If you would rather read the migrated table directly and drop the DDL, that is your call.
+8. **`PublicationLookup` is still `null`** in `buildRelaysDeps` (`publications: o.publications ?? null`).
+   `src/server/publish/**` is not on `main` after the G2 merge of `wp/wp18`, so there was nothing to bind. Item 1
+   above still stands: send a request, or bind your default yourself once the module lands.

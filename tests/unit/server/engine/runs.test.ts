@@ -50,7 +50,7 @@ describe.skipIf(!HAS_DB)("relay runs: POST /api/cases + GET /api/relays/:id/comp
 
   beforeAll(async () => {
     restore = withSecrets();
-    t = await createTestDb("wp14b_runs");
+    t = await createTestDb("wp14b_runs", { poolMax: 4 });
     const data = new MemoryCaseDataSource({ policies: { s01: policyOf("s01") }, calls: [callEntry("s01_take1")] });
     setCasesDeps({
       db: t.db, engine: stubEngine, platform: createStubPlatform(), extractor: new FakeExtractor(stubEngine), verifier: new FakeVerifier(() => []),
