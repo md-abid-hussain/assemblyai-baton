@@ -177,11 +177,11 @@ describe("compileRelay on a generic relay (mini dental)", () => {
     treatment: { status: "VERIFIED", value: "whitening", source: "rep", display: "Whitening" },
   });
 
-  it("lints clean except rules pending in WP14a·3", () => expect(lintBlueprint(bp)).toEqual([]));
+  it("lints clean (every PLATFORM §3.4 rule)", () => expect(lintBlueprint(bp)).toEqual([]));
 
   it("the greeting states only VERIFIED values and confirms the one PENDING value", () => {
     const g = k.greeting(st, account);
-    expect(g.text).toBe("Hi Maya, I'm Brightwater Dental's AI assistant, not a person, and this call is recorded. I have the Whitening booking for Maya. Say Sam anytime to go back. Can you confirm the appointment is on Friday, October 2nd?");
+    expect(g.text).toBe("Hi Maya, I'm Brightwater Dental's AI assistant, not a person. This call is recorded. I have the Whitening booking for Maya. Say Sam anytime to go back. Can you confirm the appointment is on Friday, October 2nd?");
     expect(g.asserted).toEqual(["treatment", "patient_name"]);
     expect(g.confirms).toBe("appointment_date");
     expect(g.nextStep).toEqual({ kind: "confirm", field: "appointment_date" });

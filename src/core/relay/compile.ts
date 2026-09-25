@@ -105,6 +105,16 @@ function accountPath(path: string, account: AccountRecord): string[] {
 const tableCols = (account: AccountRecord) => (t: string, cols: string[]): string[] =>
   (account.tables[t] ?? []).flatMap((r) => cols.map((c) => r[c] ?? ""));
 
+/**
+ * Listening keyterms after merging (the account's context terms, then the fixed ones), trimmed and deduplicated but
+ * NOT capped: lint X2 checks "≤ 100 terms of ≤ 50 chars" on this list; `listening()` then caps it for the STT URL.
+ */
+export function mergedListeningKeyterms(bp: Blueprint, account: AccountRecord): string[] {
+  const l = bp.listening;
+  const terms = [...expandPaths(l.contextKeyterms, (p) => accountPath(p, account), tableCols(account)), ...l.keyterms];
+  return dedupeTerms(terms, Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY);
+}
+
 /** `CompiledRelay` plus the kernel extras the tests, the Studio preview and WP14b use. */
 export interface KernelRelay extends CompiledRelay {
   spec: BlueprintSpec;

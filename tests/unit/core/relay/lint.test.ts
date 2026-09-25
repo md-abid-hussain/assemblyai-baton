@@ -1,6 +1,12 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import type { Blueprint } from "@/core/contracts/v2";
-import { hasLintErrors, lintBlueprint, lintBlueprintJson } from "@/core/relay/lint";
+import { BlueprintSchema, CANNED_STATES, type Blueprint } from "@/core/contracts/v2";
+import { cannedFocusField, cannedSnapshot } from "@/core/relay/canned";
+import { compileRelay } from "@/core/relay/compile";
+import { LINT_CODES } from "@/core/contracts/v2";
+import { greetingFirstFactWord, hasLintErrors, LINT_RULES_PENDING, lintBlueprint, lintBlueprintJson } from "@/core/relay/lint";
 import { parseTemplate, renderTemplate, type PathRef, type RenderScope } from "@/core/relay/template";
 import { miniBlueprint } from "./fixtures/mini-blueprint";
 
@@ -32,7 +38,7 @@ const FAIL_CASES: [string, string, (bp: Blueprint) => void][] = [
   ["L3 clause outside the summary", "L3", (bp) => { bp.playbook.greeting.optOut = "Say Sam{clause.date}."; }],
   ["L3 phrase.confirm outside next.confirm", "L3", (bp) => { bp.playbook.greeting.next.ask = "I need {phrase.confirm}."; }],
   ["L3 case.json outside the prompt", "L3", (bp) => { bp.playbook.stages[0]!.goal = "Use {case.json}."; }],
-  ["L3 unknown value in a disclosure", "L3", (bp) => { bp.playbook.disclosures[0]!.criticalTokens = ["{v.nope}"]; }],
+  ["L3 unknown value in a disclosure", "L3", (bp) => { bp.playbook.disclosures[0]!.criticalTokens = ["{v.nope}", "24 hours"]; }],
   ["L3 unknown clause", "L3", (bp) => { bp.playbook.greeting.summary = "{clause.vehicle}."; }],
   ["L3 bad context keyterm table column", "L3", (bp) => { bp.listening.contextKeyterms = ["table.treatments.price"]; }],
   ["L3 unknown vaKeyterm field", "L3", (bp) => { bp.playbook.vaKeyterms = ["f.ghost"]; }],
@@ -46,7 +52,7 @@ const FAIL_CASES: [string, string, (bp: Blueprint) => void][] = [
   ["G1 guard for another field", "G1", (bp) => { bp.playbook.greeting.clauses[0]!.text = "{?f.patient_name.verified} on {f.appointment_date|spoken_date}{/?}"; }],
   ["G1 pending guard is not enough", "G1", (bp) => { bp.playbook.greeting.clauses[0]!.text = "{?f.appointment_date.known} on {f.appointment_date|spoken_date}{/?}"; }],
   ["G1 unguarded field in the subject", "G1", (bp) => { bp.playbook.subject = "{f.patient_name|first_name}"; }],
-  ["G1 field in next.confirm", "G1", (bp) => { bp.playbook.greeting.next.confirm = "Can you confirm {f.appointment_date}?"; }],
+  ["G1 field in next.confirm", "G1", (bp) => { bp.playbook.greeting.next.confirm = "Can you confirm {phrase.confirm} for {f.appointment_date}?"; }],
   // C1
   ["C1 opening without the AI disclosure", "C1", (bp) => { bp.playbook.greeting.opening = "Hi {customer.firstName}, this call is recorded."; }],
   ["C1 opening without the recording notice", "C1", (bp) => { bp.playbook.greeting.opening = "Hi {customer.firstName}, I'm {org.name}'s AI assistant, not a person."; }],
@@ -58,6 +64,7 @@ const FAIL_CASES: [string, string, (bp: Blueprint) => void][] = [
   ["S1 get_disclosure without disclosures", "S1", (bp) => {
     bp.playbook.disclosures = [];
     bp.playbook.stages[1]!.exit = { kind: "end" };
+    bp.playbook.stages.splice(2, 1);   // no act stage, so C2 does not ask for a consent disclosure
     const c = bp.connectors[0]!; if (c.type === "payment_link") c.requiresDisclosure = null;
   }],
   ["S1 duplicate tool", "S1", (bp) => { bp.playbook.stages[0]!.tools.push("update_case_field"); }],
@@ -66,13 +73,59 @@ const FAIL_CASES: [string, string, (bp: Blueprint) => void][] = [
   ["X3 lookahead in an enum synonym", "X3", (bp) => { bp.fields[3]!.enumValues![0]!.synonyms = ["(?=new)new"]; }],
   ["X3 backreference in a rep-line pattern", "X3", (bp) => { bp.handoff.repLinePatterns = ["(hand) you\\1"]; }],
   ["X3 unsafe tool pattern", "X3", (bp) => { const c = bp.connectors[2]!; if (c.type === "http_action") c.params.properties.ref_code!.pattern = "(a|ab)*c"; }],
+  // C2
+  ["C2 disclosure without a question", "C2", (bp) => { bp.playbook.disclosures[0]!.text = "A deposit of {v.deposit|spoken_money} holds your appointment. It is refundable up to 24 hours before."; }],
+  ["C2 no critical token in the text", "C2", (bp) => { bp.playbook.disclosures[0]!.criticalTokens = ["fifty dollars"]; }],
+  ["C2 the act gate without consent", "C2", (bp) => { bp.playbook.disclosures[0]!.consent = false; }],
+  ["C2 consent with no act stage after it", "C2", (bp) => { bp.playbook.stages.splice(2, 1); }],
+  // S2
+  ["S2 exit on a connector the stage does not list", "S2", (bp) => { bp.playbook.stages[2]!.tools = ["send_deposit_link", "update_case_field", "hand_back_to_rep"]; bp.playbook.stages[2]!.exit = { kind: "connector_succeeded", connector: "booking_confirmation" }; }],
+  ["S2 act stage without an acting connector", "S2", (bp) => {
+    bp.playbook.stages[2]!.tools = ["send_confirmation", "update_case_field", "hand_back_to_rep"];
+    bp.playbook.stages[2]!.exit = { kind: "connector_succeeded", connector: "booking_confirmation" };
+  }],
+  ["S2 confirmation requires itself", "S2", (bp) => { const c = bp.connectors[1]!; if (c.type === "confirmation") c.requires = ["booking_confirmation"]; }],
+  ["S2 exit waits on a completion webhook", "S2", (bp) => {
+    bp.connectors.push({ type: "completion_webhook", id: "done_hook", label: "Done hook", url: "https://example.com/hook", hmacSecret: { $secret: "sec_0123456789abcdef" }, include: ["case"] });
+    bp.playbook.stages[3]!.exit = { kind: "connector_succeeded", connector: "done_hook" };
+  }],
+  // S3
+  ["S3 side-effect HTTP in a confirm stage", "S3", (bp) => {
+    const c = bp.connectors[2]!;
+    if (c.type === "http_action") { c.sideEffect = true; c.headers = []; }
+    bp.playbook.stages[0]!.tools.push("log_crm_note");
+  }],
+  // F1
+  ["F1 no required fields", "F1", (bp) => { for (const f of bp.fields) f.required = false; }],
+  ["F1 an advice field the AI may set", "F1", (bp) => { bp.fields[3]!.adviceDomain = true; }],
+  ["F1 a rep-only field with a confirm tool", "F1", (bp) => { bp.fields[1]!.setBy = "rep_only"; }],
+  ["F1 serverResolvable names a non-money value", "F1", (bp) => {
+    bp.values.push({ id: "clinic_line", label: "Clinic line", type: "text", ref: { kind: "fact", key: "clinic_phone" } });
+    bp.fields[2]!.serverResolvable = { value: "clinic_line" };
+  }],
+  // F2
+  ["F2 a required AI field without an ask phrase", "F2", (bp) => { bp.fields[0]!.phrases.ask = "  "; }],
+  // X1
+  ["X1 compiled prompt over 6000 characters", "X1", (bp) => {
+    bp.playbook.persona.extraRules = Array.from({ length: 10 }, (_, i) => `Rule ${i + 1}: keep every answer short, plain and kind. `.repeat(5).slice(0, 290));
+    bp.playbook.stages[1]!.goal = "Read the deposit terms verbatim and wait for a clear answer. ".repeat(38);
+  }],
+  ["X1 case JSON cap over 2400", "X1", (bp) => { bp.playbook.caseJson.maxChars = 3000; }],
+  // X2
+  ["X2 over 100 merged keyterms", "X2", (bp) => { bp.listening.keyterms = Array.from({ length: 100 }, (_, i) => `term ${i + 1}`); }],
+  ["X2 a keyterm over 50 characters", "X2", (bp) => { bp.listening.keyterms.push("an extremely long keyterm that no STT session would ever accept"); }],
+  ["X2 scenario prompt over 1750 characters", "X2", (bp) => { bp.listening.scenarioPrompt = "A dental front desk call. ".repeat(80); }],
+  // G2
+  ["G2 opening over 14 words", "G2", (bp) => { bp.playbook.greeting.opening = "Hi {customer.firstName}, I'm {org.name}'s AI assistant, not a person, and yes, this call is recorded."; }],
+  ["G2 greeting over maxWords after drops", "G2", (bp) => { bp.playbook.greeting.maxWords = 20; }],
+  ["G2 next.ask without {phrase.ask}", "G2", (bp) => { bp.playbook.greeting.next.ask = "To finish up, I just need one more thing."; }],
   // B1
   ["B1 real brand as a sample's business name", "B1", (bp) => { bp.context.samples[0]!.org.name = "Aspen Dental"; }],
   ["B1 real brand in the greeting opening", "B1", (bp) => {
-    bp.playbook.greeting.opening = "Hi {customer.firstName}, I'm Delta Dental's AI assistant, not a person, and this call is recorded.";
+    bp.playbook.greeting.opening = "Hi {customer.firstName}, I'm Delta Dental's AI assistant, not a person. This call is recorded.";
   }],
   ["B1 real brand in a disclosure", "B1", (bp) => { bp.playbook.disclosures[0]!.text = "Wells Fargo holds a deposit of {v.deposit|spoken_money}. Is that OK?"; }],
-  ["B1 brand split across a section", "B1", (bp) => { bp.playbook.disclosures[0]!.text = "Wells{?opt.tax_suffix}{/?} Fargo holds it. Is that OK?"; }],
+  ["B1 brand split across a section", "B1", (bp) => { bp.playbook.disclosures[0]!.text = "Wells{?opt.tax_suffix}{/?} Fargo holds {v.deposit|spoken_money}. Is that OK?"; }],
   ["B1 real brand in persona.extraRules", "B1", (bp) => { bp.playbook.persona.extraRules = ["Say you work for Chase."]; }],
   ["B1 real brand in meta.title", "B1", (bp) => { bp.meta.title = "Verizon plan change"; }],
   ["B1 real brand in an SMS template", "B1", (bp) => { const c = bp.connectors[1]!; if (c.type === "confirmation") c.smsTemplate = "PayPal: you're booked, {customer.firstName}."; }],
@@ -80,6 +133,20 @@ const FAIL_CASES: [string, string, (bp: Blueprint) => void][] = [
   ["K2 used http_action header secret unset", "K2", (bp) => { bp.playbook.stages[0]!.tools.push("log_crm_note"); }],
   ["K2 completion webhook without a signing secret", "K2", (bp) => {
     bp.connectors.push({ type: "completion_webhook", id: "done_hook", label: "Done hook", url: "https://example.com/hook", hmacSecret: null, include: ["case"] });
+  }],
+];
+
+/** Warning fixtures: exactly one rule warns, and nothing is an error. */
+const WARN_CASES: [string, string, (bp: Blueprint) => void][] = [
+  ["W3 the first fact after word 24", "W3", (bp) => {
+    bp.playbook.greeting.summary = "{?f.treatment.verified}We are nearly done with the booking, and it is for {f.treatment.display}.{/?}";
+    bp.playbook.greeting.optOut = "Say Sam anytime.";
+  }],
+  ["W2 a disclosure over 60 words", "W2", (bp) => {
+    bp.playbook.disclosures[0]!.text = `${"Please listen carefully to these deposit terms before you decide anything today. ".repeat(5)}A deposit of {v.deposit|spoken_money} holds your appointment. Is that OK?`;
+  }],
+  ["W2 an id_code field without examples", "W2", (bp) => {
+    bp.fields.push({ ...structuredClone(bp.fields[3]!), id: "member_id", label: "Member ID", type: "id_code", normalizer: "id_code", enumValues: undefined, examples: [], required: false });
   }],
 ];
 
@@ -96,6 +163,21 @@ describe("lint rules: one fail fixture each, the mini fixture passes", () => {
     expect(new Set(got.map((i) => i.code))).toEqual(new Set([code]));
     expect(hasLintErrors(got)).toBe(true);
     for (const i of got) expect(i.path.length).toBeGreaterThan(0);
+  });
+
+  it.each(WARN_CASES)("%s (warning)", (_name, code, mutate) => {
+    const bp = miniBlueprint();
+    mutate(bp);
+    const got = lintBlueprint(bp);
+    expect(got.map((i) => [i.code, i.severity])).toEqual([[code, "warn"]]);
+    expect(hasLintErrors(got)).toBe(false);
+  });
+
+  it("every PLATFORM §3.4 code has at least one fail fixture here", () => {
+    const covered = new Set([...FAIL_CASES, ...WARN_CASES].map(([, c]) => c));
+    for (const c of LINT_CODES.filter((x) => x !== "SCHEMA" && x !== "K1")) expect(covered.has(c), c).toBe(true);
+    expect(LINT_RULES_PENDING).toEqual([]);
+    expect(FAIL_CASES.length + WARN_CASES.length).toBeGreaterThanOrEqual(30);
   });
 
   it("G1 accepts the else branch of a negated guard and {?f.X.rep}", () => {
@@ -203,6 +285,80 @@ describe("B1, K1, K2 details", () => {
   it("lintBlueprintJson passes the options through", () => {
     const json = JSON.parse(JSON.stringify(withSecrets())) as unknown;
     expect(lintBlueprintJson(json, { visibility: "gallery" }).issues.map((i) => i.code)).toEqual(["K1", "K1", "K1"]);
+  });
+});
+
+describe("compiled rules (G2, W3, X1, X2, W2) and the canned snapshots", () => {
+  const ROOT = fileURLToPath(new URL("../../../../", import.meta.url));
+  const baton = (): Blueprint => BlueprintSchema.parse(JSON.parse(readFileSync(join(ROOT, "data", "relays", "baton-add-driver.json"), "utf8")));
+
+  it("canned snapshots: all verified, one pending, one missing, nothing", () => {
+    const bp = miniBlueprint();
+    const a = bp.context.samples[0]!;
+    const status = (st: (typeof CANNED_STATES)[number]) =>
+      Object.fromEntries(Object.entries((cannedSnapshot(bp, st, a) as { fields: Record<string, { status: string }> }).fields).map(([k, v]) => [k, v.status]));
+    expect(cannedFocusField(bp)).toBe("patient_name");
+    expect(status("all_verified")).toEqual({ patient_name: "VERIFIED", appointment_date: "VERIFIED", treatment: "VERIFIED", visit_kind: "MISSING" });
+    expect(status("one_pending")).toEqual({ patient_name: "PENDING", appointment_date: "VERIFIED", treatment: "VERIFIED", visit_kind: "MISSING" });
+    expect(status("one_missing")).toEqual({ patient_name: "MISSING", appointment_date: "VERIFIED", treatment: "VERIFIED", visit_kind: "MISSING" });
+    expect(new Set(Object.values(status("nothing")))).toEqual(new Set(["MISSING"]));
+    const all = cannedSnapshot(bp, "all_verified", a) as { fields: Record<string, { value: string | null; source: string | null }> };
+    expect(all.fields.treatment).toMatchObject({ value: "cleaning", source: "rep" });   // the first example, "Cleaning"
+  });
+
+  it("canned values normalize the examples against the sample (Baton: 'the Civic' → the vehicle id)", () => {
+    const bp = baton();
+    const a = bp.context.samples[0]!;
+    const all = cannedSnapshot(bp, "all_verified", a) as { fields: Record<string, { status: string; value: string | null; source: string | null }> };
+    expect(all.fields.vehicle_assignment).toMatchObject({ status: "VERIFIED", value: a.tables.vehicles![0]!.id });
+    expect(all.fields.premium_new_monthly_usd).toMatchObject({ status: "VERIFIED", value: "142.00", source: "rep" });
+    expect(all.fields.driver_full_name!.value).toBe("maya raman");
+  });
+
+  it("Baton: every sample × canned greeting is ≤ 40 words and states its first fact at word 17", () => {
+    const bp = baton();
+    const k = compileRelay(bp);
+    for (const a of bp.context.samples) {
+      for (const st of CANNED_STATES) {
+        const snap = cannedSnapshot(bp, st, a, k.spec);
+        const g = k.greeting(snap, a);
+        expect(g.wordCount, `${st}: ${g.text}`).toBeLessThanOrEqual(40);
+        if (st === "all_verified") expect(greetingFirstFactWord(bp, snap, a, g.dropped)).toBe(16);
+        if (st === "nothing") expect(greetingFirstFactWord(bp, snap, a, g.dropped)).toBeNull();
+      }
+    }
+    expect(lintBlueprint(bp)).toEqual([]);
+    expect(lintBlueprint(bp, { flagship: true, visibility: "gallery", pinnedPublication: true, secretIds: [], simSampleRateHz: 8000 })).toEqual([]);
+  });
+
+  it("W2 warns on a wideband_16k preset over 8 kHz sims only when the sim rate is known", () => {
+    const bp = miniBlueprint();
+    bp.listening.tuning = "wideband_16k";
+    expect(lintBlueprint(bp)).toEqual([]);
+    expect(lintBlueprint(bp, { simSampleRateHz: 16_000 })).toEqual([]);
+    expect(lintBlueprint(bp, { simSampleRateHz: 8_000 }).map((i) => [i.code, i.severity, i.path])).toEqual([["W2", "warn", ["listening", "tuning"]]]);
+  });
+
+  it("the compiled rules wait for the structural ones", () => {
+    const bp = miniBlueprint();
+    bp.playbook.greeting.maxWords = 20;                          // G2 on its own …
+    bp.playbook.greeting.optOut = "Call {fact.nope} anytime.";   // … but an L3 error blocks the compiled rules
+    expect(codes(bp)).toEqual(["L3"]);
+  });
+
+  it("G2 reports the worst render once, with its word count and state", () => {
+    const bp = miniBlueprint();
+    bp.playbook.greeting.maxWords = 20;
+    const [g2] = issues(bp, "G2");
+    expect(g2!.path).toEqual(["playbook", "greeting"]);
+    expect(g2!.message).toMatch(/is \d+ words \(sample #1, .*; \d of 4 canned renders over\)/);
+  });
+
+  it("X1 measures the prompt with the safety block unless the relay is the flagship", () => {
+    const bp = miniBlueprint();
+    bp.playbook.persona.extraRules = Array.from({ length: 10 }, (_, i) => `Rule ${i + 1}: keep every answer short, plain and kind. `.repeat(5).slice(0, 290));
+    bp.playbook.stages[1]!.goal = "Read the deposit terms verbatim and wait for a clear answer. ".repeat(38);
+    expect(issues(bp, "X1")[0]!.message).toMatch(/compiled prompt is \d+ characters at stage "disclose_deposit"/);
   });
 });
 

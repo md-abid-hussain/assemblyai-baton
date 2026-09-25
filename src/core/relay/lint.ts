@@ -3,10 +3,12 @@
  * in the browser on every change (debounced) and the server re-runs it on save, run and publish.
  * Errors block a run or publish; warnings don't.
  *
- * Implemented: L1, L2, L3, G1, C1, S1, X3 (WP14a·1), B1, K1, K2 (WP14a·3). `LINT_RULES_PENDING` lists the rules still
- * to land, so callers can tell a partial result from a full one. `lintBlueprintJson(json)` also maps `BlueprintSchema`
- * parse failures to issues (`SCHEMA`, or `X3` for an unsafe regex, naming the offending group). K1 and K2 need
- * context from outside the blueprint (visibility, pinned publications, the workspace's secret ids): pass `LintOptions`.
+ * Every PLATFORM §3.4 rule: L1, L2, L3, G1, C1, S1, X3 (WP14a·1), C2, S2, S3, F1, F2, X1, X2, G2, W3, B1, K1, K2, W2
+ * (WP14a·3). The compiled rules (G2, W3, X1, X2) compile the relay (`compileRelay`) and render it for every sample ×
+ * the 4 canned states (relay/canned.ts); they run only when the structural rules (L1-L3, S1, X3) pass.
+ * `lintBlueprintJson(json)` also maps `BlueprintSchema` parse failures to issues (`SCHEMA`, or `X3` for an unsafe
+ * regex, naming the offending group). K1, K2 and W2 need context from outside the blueprint (visibility, pinned
+ * publications, the workspace's secret ids, the sims' sample rate): pass `LintOptions`.
  *
  * Every blueprint regex is checked through contracts/v2/regex.ts and matched only through `safeTest()`.
  */
@@ -15,19 +17,31 @@ import {
   BlueprintSchema, FORMATTERS, type AccountRecord, type Blueprint, type BlueprintField, type SecretRef, type ValueRef,
 } from "../contracts/v2/blueprint";
 import { checkSafeRegexSource, checkSafeToolPattern, safeTest } from "../contracts/v2/regex";
-import { REQUIRED_STAGE_TOOLS, STAGE_KIND_ORDER, type LintIssue } from "../contracts/v2/relay";
+import { CANNED_STATES, REQUIRED_STAGE_TOOLS, SECONDS_PER_WORD, STAGE_KIND_ORDER, STAGE_KIND_TO_STAGE, type LintIssue } from "../contracts/v2/relay";
+import type { Stage } from "../contracts/case";
 import {
   parseTemplatePath, renderTemplate, TEMPLATE_OPTIONS, templateConds, templateVars, tryParseTemplate,
   type PathKind, type PathRef, type RenderScope, type TemplateCond, type TemplateNode,
 } from "./template";
 import { formatValue } from "./formatters";
 import { BRAND_LIST_LABEL, findDenylistedBrands, type BrandSite } from "./brand-denylist";
+import { cannedSnapshot, type CannedState } from "./canned";
+import { compileRelay, mergedListeningKeyterms, type KernelRelay } from "./compile";
+import { assertStrictSchema, STRICT_ENUM_MAX, StrictSchemaError } from "./extractor";
+import { makeScope, type Fields } from "./scope";
 
-export const LINT_RULES_IMPLEMENTED = ["SCHEMA", "L1", "L2", "L3", "G1", "C1", "S1", "X3", "B1", "K1", "K2"] as const;
-export const LINT_RULES_PENDING = ["C2", "S2", "S3", "F1", "F2", "X1", "X2", "G2", "W3", "W2"] as const;
+export const LINT_RULES_IMPLEMENTED = [
+  "SCHEMA", "L1", "L2", "L3", "G1", "C1", "C2", "S1", "S2", "S3", "F1", "F2", "X1", "X2", "X3", "G2", "W3", "B1", "K1", "K2", "W2",
+] as const;
+/** Every PLATFORM §3.4 rule is implemented (WP14a·3). Kept for callers that checked it. */
+export const LINT_RULES_PENDING = [] as const;
 
 type Path = (string | number)[];
 const err = (code: string, path: Path, message: string): LintIssue => ({ code, severity: "error", path, message });
+const warn = (code: string, path: Path, message: string): LintIssue => ({ code, severity: "warn", path, message });
+const key = (path: Path): string => JSON.stringify(path);
+const wordsOf = (s: string): string[] => s.trim().split(/\s+/).filter(Boolean);
+const normText = (s: string): string => s.replace(/\s+/g, " ").trim().toLowerCase();
 
 export const hasLintErrors = (issues: readonly LintIssue[]): boolean => issues.some((i) => i.severity === "error");
 
@@ -478,6 +492,139 @@ function lintS1(bp: Blueprint, ix: Index): LintIssue[] {
   return out;
 }
 
+// ============================================================================================ C2 disclosures
+
+/**
+ * Every disclosure asks the customer ("?") and carries a critical token that its text contains. `consent: true`
+ * exactly when an act stage follows: the disclosure that gates the act stage (the exit of the stage just before it,
+ * or the `requiresDisclosure` of its payment/e-sign connectors) must set it, and a disclosure read where no act stage
+ * follows must not. Baton: `esign_consent` (gate) true, `premium_change` false.
+ */
+function lintC2(bp: Blueprint): LintIssue[] {
+  const out: LintIssue[] = [];
+  const stages = bp.playbook.stages;
+  const actIdx = stages.findIndex((s) => s.kind === "act");
+  const byTool = connectorsByTool(bp);
+  const gates = new Set<string>();
+  if (actIdx >= 0) {
+    const prev = stages[actIdx - 1];
+    if (prev?.exit.kind === "disclosure_accepted") gates.add(prev.exit.disclosure);
+    for (const t of stages[actIdx]!.tools) {
+      const c = byTool.get(t);
+      if ((c?.type === "payment_link" || c?.type === "esign_mock") && c.requiresDisclosure) gates.add(c.requiresDisclosure);
+    }
+  }
+  bp.playbook.disclosures.forEach((d, i) => {
+    const p: Path = ["playbook", "disclosures", i];
+    if (!d.text.includes("?")) out.push(err("C2", [...p, "text"], `disclosure "${d.id}" must ask the customer a question ("?"), so a yes answers it`));
+    if (d.criticalTokens.length === 0) out.push(err("C2", [...p, "criticalTokens"], `disclosure "${d.id}" needs at least one critical token (the verbatim check)`));
+    else if (!d.criticalTokens.some((t) => normText(t) !== "" && normText(d.text).includes(normText(t)))) {
+      out.push(err("C2", [...p, "criticalTokens"], `none of the critical tokens of "${d.id}" appears in its text`));
+    }
+    const acceptedAt = stages.findIndex((s) => s.exit.kind === "disclosure_accepted" && s.exit.disclosure === d.id);
+    const readAt = acceptedAt >= 0 ? acceptedAt : stages.findIndex((s) => s.tools.includes("get_disclosure"));
+    const actFollows = actIdx >= 0 && readAt >= 0 && actIdx > readAt;
+    if (d.consent && !actFollows) out.push(err("C2", [...p, "consent"], `disclosure "${d.id}" sets consent: true but no act stage follows the stage that reads it`));
+    if (!d.consent && gates.has(d.id)) out.push(err("C2", [...p, "consent"], `disclosure "${d.id}" gates the act stage, so it must set consent: true (a yes to it is the consent to act)`));
+  });
+  if (actIdx >= 0 && !bp.playbook.disclosures.some((d) => d.consent)) {
+    out.push(err("C2", ["playbook", "stages", actIdx], `the act stage "${stages[actIdx]!.id}" needs a disclosure with consent: true accepted before it`));
+  }
+  return out;
+}
+
+// ============================================================================================ S2, S3 stages × connectors
+
+type AnyConnector = Blueprint["connectors"][number];
+function connectorsByTool(bp: Blueprint): Map<string, AnyConnector> {
+  const m = new Map<string, AnyConnector>();
+  for (const c of bp.connectors) if ("toolName" in c) m.set(c.toolName, c);
+  return m;
+}
+const acts = (c: AnyConnector | undefined): boolean =>
+  c?.type === "payment_link" || c?.type === "esign_mock" || (c?.type === "http_action" && c.sideEffect);
+
+/** `connector_succeeded` exits name a connector the stage lists; an act stage acts; `confirmation.requires` names connectors that can succeed first. */
+function lintS2(bp: Blueprint, ix: Index): LintIssue[] {
+  const out: LintIssue[] = [];
+  const byTool = connectorsByTool(bp);
+  bp.playbook.stages.forEach((s, i) => {
+    const p: Path = ["playbook", "stages", i];
+    if (s.exit.kind === "connector_succeeded") {
+      const c = ix.connectors.get(s.exit.connector);
+      if (c && !("toolName" in c)) out.push(err("S2", [...p, "exit", "connector"], `connector "${c.id}" has no tool, so stage "${s.id}" cannot wait for it to succeed`));
+      else if (c && "toolName" in c && !s.tools.includes(c.toolName)) {
+        out.push(err("S2", [...p, "exit", "connector"], `stage "${s.id}" exits when connector "${c.id}" succeeds, so it must list its tool "${c.toolName}"`));
+      }
+    }
+    if (s.kind === "act" && !s.tools.some((t) => acts(byTool.get(t)))) {
+      out.push(err("S2", [...p, "tools"], `the act stage "${s.id}" must list a payment, e-sign or side-effect HTTP connector tool`));
+    }
+  });
+  bp.connectors.forEach((c, i) => {
+    if (c.type !== "confirmation") return;
+    c.requires.forEach((r, j) => {
+      const t = ix.connectors.get(r);
+      if (r === c.id) out.push(err("S2", ["connectors", i, "requires", j], `confirmation "${c.id}" cannot require itself`));
+      else if (t?.type === "completion_webhook") out.push(err("S2", ["connectors", i, "requires", j], `"${r}" is a completion webhook: it fires after the case closes, so a confirmation cannot wait for it`));
+    });
+  });
+  return out;
+}
+
+/** A side-effect `http_action` runs only in act or close stages. (`completion_webhook` has no tool name by schema.) */
+function lintS3(bp: Blueprint): LintIssue[] {
+  const out: LintIssue[] = [];
+  const effects = new Map(bp.connectors.filter((c) => c.type === "http_action" && c.sideEffect).map((c) => [(c as { toolName: string }).toolName, c.id]));
+  bp.playbook.stages.forEach((s, i) => {
+    if (s.kind === "act" || s.kind === "close") return;
+    s.tools.forEach((t, j) => {
+      const id = effects.get(t);
+      if (id) out.push(err("S3", ["playbook", "stages", i, "tools", j], `"${t}" has side effects (connector "${id}"), so only act or close stages may list it ("${s.id}" is ${s.kind})`));
+    });
+  });
+  return out;
+}
+
+// ============================================================================================ F1, F2 fields
+
+export const REQUIRED_FIELDS_MIN = 1;
+export const REQUIRED_FIELDS_MAX = 12;
+
+/**
+ * 1–12 required fields; the AI never writes a rep decision: `adviceDomain` fields are never `ai_allowed`, and a
+ * `rep_only` field has no confirm tool (`update_case_field`'s enum is the `ai_allowed` fields, so rep_only fields are
+ * never in it by construction); `serverResolvable.value` names a money value.
+ */
+function lintF1(bp: Blueprint): LintIssue[] {
+  const out: LintIssue[] = [];
+  const required = bp.fields.filter((f) => f.required).length;
+  if (required < REQUIRED_FIELDS_MIN || required > REQUIRED_FIELDS_MAX) {
+    out.push(err("F1", ["fields"], `a relay needs ${REQUIRED_FIELDS_MIN}–${REQUIRED_FIELDS_MAX} required fields (this one has ${required})`));
+  }
+  const values = new Map(bp.values.map((v) => [v.id, v]));
+  bp.fields.forEach((f, i) => {
+    const p: Path = ["fields", i];
+    if (f.setBy === "rep_only" && f.confirmTool) out.push(err("F1", [...p, "confirmTool"], `rep-only field "${f.id}" cannot have a confirm tool: the AI must never set it`));
+    if (f.adviceDomain && f.setBy === "ai_allowed") out.push(err("F1", [...p, "setBy"], `"${f.id}" is a rep decision (adviceDomain), so it cannot be ai_allowed`));
+    const v = f.serverResolvable ? values.get(f.serverResolvable.value) : undefined;
+    if (v && v.type !== "money") out.push(err("F1", [...p, "serverResolvable", "value"], `value "${v.id}" is ${v.type}; serverResolvable must name a money value`));
+  });
+  return out;
+}
+
+/** Every required `ai_allowed` field can be asked and confirmed. */
+function lintF2(bp: Blueprint): LintIssue[] {
+  const out: LintIssue[] = [];
+  bp.fields.forEach((f, i) => {
+    if (!f.required || f.setBy !== "ai_allowed") return;
+    for (const k of ["ask", "confirm"] as const) {
+      if (!f.phrases[k] || f.phrases[k].trim() === "") out.push(err("F2", ["fields", i, "phrases", k], `required field "${f.id}" needs a ${k} phrase (the AI ${k}s it in the greeting)`));
+    }
+  });
+  return out;
+}
+
 // ============================================================================================ X3 safe regex grammar
 
 function lintX3(bp: Blueprint): LintIssue[] {
@@ -485,6 +632,185 @@ function lintX3(bp: Blueprint): LintIssue[] {
   for (const r of blueprintRegexes(bp)) {
     const c = r.tool ? checkSafeToolPattern(r.src) : checkSafeRegexSource(r.src);
     if (!c.ok) out.push(err("X3", r.path, `${r.tool ? "tool pattern" : "regex"} /${r.src}/: ${c.message}`));
+  }
+  return out;
+}
+
+// ============================================================================================ compiled rules: G2, W3, X1, X2, W2
+
+export const OPENING_MAX_WORDS = 14;
+export const FIRST_FACT_MAX_WORD = 24;
+export const PROMPT_LINT_MAX_CHARS = 6000;
+export const CASE_JSON_MAX_CHARS = 2400;
+export const KEYTERMS_LINT_MAX = 100;
+export const KEYTERM_LINT_MAX_CHARS = 50;
+export const SCENARIO_PROMPT_MAX_CHARS = 1750;
+export const DISCLOSURE_WARN_WORDS = 60;
+const LINT_DEPLOY_ID = "lint0000000";
+
+const MARK = "\u0001";
+
+/**
+ * The 0-based word index of the first field value the greeting states (W3), or null when it states none. Renders
+ * the opening and the summary (with its subject and kept clauses) through a scope that marks every field value.
+ */
+export function greetingFirstFactWord(bp: Blueprint, snapshot: Fields, account: AccountRecord, dropped: readonly string[] = []): number | null {
+  const nodes = (src: string): TemplateNode[] | null => { const r = tryParseTemplate(src); return r.ok ? r.nodes : null; };
+  const g = bp.playbook.greeting;
+  const clauses = new Map(g.clauses.map((c) => [c.id, c.text]));
+  let marked: RenderScope | null = null;
+  const render = (src: string | undefined): string => { const n = src === undefined ? null : nodes(src); return n && marked ? renderTemplate(n, marked) : ""; };
+  const base = makeScope({
+    bp, account, snapshot,
+    slots: {
+      subject: () => render(bp.playbook.subject),
+      clause: (id) => (dropped.includes(id) || !clauses.has(id) ? null : render(clauses.get(id))),
+    },
+  });
+  const m: RenderScope = {
+    resolve: (ref) => { const v = base.resolve(ref); return ref.kind === "field" && v !== null ? MARK + v : v; },
+    test: (c) => base.test(c),
+    format: (f, v, ref) => (ref.kind === "field" && v.startsWith(MARK) ? MARK + base.format(f, v.slice(1), ref) : base.format(f, v, ref)),
+  };
+  marked = m;
+  const text = [render(g.opening), render(g.summary)].map((t) => t.trim()).filter(Boolean).join(" ");
+  const idx = wordsOf(text).findIndex((w) => w.includes(MARK));
+  return idx >= 0 ? idx : null;
+}
+
+interface Render { sample: number; state: CannedState; snapshot: Fields; account: AccountRecord }
+
+function renders(bp: Blueprint, k: KernelRelay): Render[] {
+  const out: Render[] = [];
+  bp.context.samples.forEach((account, sample) => {
+    for (const state of CANNED_STATES) out.push({ sample, state, account, snapshot: cannedSnapshot(bp, state, account, k.spec) });
+  });
+  return out;
+}
+
+const where = (r: Render) => `sample #${r.sample + 1}, ${r.state.replace(/_/g, " ")}`;
+const message = (e: unknown): string => (e instanceof Error ? e.message : String(e));
+
+/**
+ * G2: the greeting fits `maxWords` after drops for every sample × canned state, the opening is ≤ 14 words, and the
+ * next-step sentences carry the one PENDING value (`{phrase.confirm}`) and the one ask (`{phrase.ask}`).
+ * W3 (warn): the first VERIFIED value is within the first 24 words.
+ */
+function lintG2W3(bp: Blueprint, k: KernelRelay, parsed: Map<string, TemplateNode[]>, rs: readonly Render[]): LintIssue[] {
+  const out: LintIssue[] = [];
+  const g = bp.playbook.greeting;
+  const opening = parsed.get(key(["playbook", "greeting", "opening"]));
+  if (opening) {
+    let worst: { n: number; text: string; sample: number } | null = null;
+    bp.context.samples.forEach((a, sample) => {
+      const text = renderTemplate(opening, sampleOpeningScope(a)).replace(/\s+/g, " ").trim();
+      const n = wordsOf(text).length;
+      if (n > OPENING_MAX_WORDS && (!worst || n > worst.n)) worst = { n, text, sample };
+    });
+    const w = worst as { n: number; text: string; sample: number } | null;
+    if (w) out.push(err("G2", ["playbook", "greeting", "opening"], `the opening is ${w.n} words for sample #${w.sample + 1} ("${w.text}"); keep it ≤ ${OPENING_MAX_WORDS} words with the AI disclosure`));
+  }
+  for (const which of ["confirm", "ask"] as const) {
+    const nodes = parsed.get(key(["playbook", "greeting", "next", which]));
+    if (nodes && !templateVars(nodes).some((v) => v.ref.kind === "phrase" && v.ref.which === which)) {
+      out.push(err("G2", ["playbook", "greeting", "next", which], `greeting.next.${which} must use {phrase.${which}}: the greeting ends with the single ${which === "confirm" ? "PENDING value to confirm" : "missing fact to ask for"}`));
+    }
+  }
+  let over: { r: Render; words: number; text: string } | null = null;
+  let overCount = 0;
+  let late: { r: Render; word: number } | null = null;
+  for (const r of rs) {
+    let res: ReturnType<KernelRelay["greeting"]>;
+    try { res = k.greeting(r.snapshot, r.account); } catch (e) {
+      out.push(err("G2", ["playbook", "greeting"], `the greeting does not render (${where(r)}): ${message(e)}`));
+      return out;
+    }
+    if (res.wordCount > g.maxWords) { overCount++; if (!over || res.wordCount > over.words) over = { r, words: res.wordCount, text: res.text }; }
+    if (res.asserted.length > 0) {
+      const w = greetingFirstFactWord(bp, r.snapshot, r.account, res.dropped);
+      if (w !== null && w >= FIRST_FACT_MAX_WORD && (!late || w > late.word)) late = { r, word: w };
+    }
+  }
+  if (over) {
+    out.push(err("G2", ["playbook", "greeting"], `the greeting is ${over.words} words (${where(over.r)}; ${overCount} of ${rs.length} canned renders over) after drops; the limit is maxWords = ${g.maxWords} (≈ ${(g.maxWords * SECONDS_PER_WORD).toFixed(0)} s): "${over.text}"`));
+  }
+  if (late) {
+    out.push(warn("W3", ["playbook", "greeting", "summary"], `the first VERIFIED fact is word ${late.word + 1} (${where(late.r)}, ≈ ${(late.word * SECONDS_PER_WORD).toFixed(1)} s); put it within the first ${FIRST_FACT_MAX_WORD} words`));
+  }
+  return out;
+}
+
+/** X1: extractor enum ≤ 24 and a strict schema; the compiled prompt ≤ 6000 chars at its longest stage; case JSON cap ≤ 2400. */
+function lintX1(bp: Blueprint, k: KernelRelay, rs: readonly Render[]): LintIssue[] {
+  const out: LintIssue[] = [];
+  if (bp.fields.length > STRICT_ENUM_MAX) out.push(err("X1", ["fields"], `the extractor field enum has ${bp.fields.length} values; keep it ≤ ${STRICT_ENUM_MAX}`));
+  try { assertStrictSchema(k.extractor.format); } catch (e) {
+    if (e instanceof StrictSchemaError) out.push(err("X1", ["fields"], `the extractor format is not a valid strict schema: ${e.message}`));
+    else throw e;
+  }
+  if (bp.playbook.caseJson.maxChars > CASE_JSON_MAX_CHARS) out.push(err("X1", ["playbook", "caseJson", "maxChars"], `caseJson.maxChars is ${bp.playbook.caseJson.maxChars}; keep it ≤ ${CASE_JSON_MAX_CHARS}`));
+  let longest: { len: number; stage: number; r: Render } | null = null;
+  for (const r of rs) {
+    if (r.state !== "all_verified" && r.state !== "nothing") continue;
+    bp.playbook.stages.forEach((s, i) => {
+      const len = k.prompt(r.snapshot, r.account, STAGE_KIND_TO_STAGE[s.kind] as Stage, { deployId: LINT_DEPLOY_ID }).length;
+      if (!longest || len > longest.len) longest = { len, stage: i, r };
+    });
+  }
+  const l = longest as { len: number; stage: number; r: Render } | null;
+  if (l && l.len > PROMPT_LINT_MAX_CHARS) {
+    const s = bp.playbook.stages[l.stage]!;
+    out.push(err("X1", bp.playbook.promptTemplate !== null ? ["playbook", "promptTemplate"] : ["playbook", "stages", l.stage, "goal"],
+      `the compiled prompt is ${l.len} characters at stage "${s.id}" (${where(l.r)}); keep it ≤ ${PROMPT_LINT_MAX_CHARS} (the Voice Agent cap is 8000)`));
+  }
+  return out;
+}
+
+/** X2: ≤ 100 merged keyterms (fixed + the sample's context terms) of ≤ 50 characters; `scenarioPrompt` ≤ 1750. */
+function lintX2(bp: Blueprint): LintIssue[] {
+  const out: LintIssue[] = [];
+  let most: { n: number; sample: number } | null = null;
+  let long: { term: string; sample: number } | null = null;
+  bp.context.samples.forEach((a, sample) => {
+    const terms = mergedListeningKeyterms(bp, a);
+    if (terms.length > KEYTERMS_LINT_MAX && (!most || terms.length > most.n)) most = { n: terms.length, sample };
+    const t = terms.find((x) => x.length > KEYTERM_LINT_MAX_CHARS);
+    if (t && !long) long = { term: t, sample };
+  });
+  const m = most as { n: number; sample: number } | null;
+  const lg = long as { term: string; sample: number } | null;
+  if (m) out.push(err("X2", ["listening", "keyterms"], `${m.n} keyterms after merging the context terms of sample #${m.sample + 1}; keep it ≤ ${KEYTERMS_LINT_MAX}`));
+  if (lg) {
+    const fixed = bp.listening.keyterms.findIndex((k) => k.trim() === lg.term);
+    out.push(err("X2", fixed >= 0 ? ["listening", "keyterms", fixed] : ["listening", "contextKeyterms"],
+      `keyterm "${lg.term.slice(0, 60)}" (sample #${lg.sample + 1}) is ${lg.term.length} characters; keyterms are ≤ ${KEYTERM_LINT_MAX_CHARS}`));
+  }
+  if (bp.listening.scenarioPrompt.length > SCENARIO_PROMPT_MAX_CHARS) {
+    out.push(err("X2", ["listening", "scenarioPrompt"], `scenarioPrompt is ${bp.listening.scenarioPrompt.length} characters; keep it ≤ ${SCENARIO_PROMPT_MAX_CHARS}`));
+  }
+  return out;
+}
+
+/**
+ * W2 (warn): a disclosure over 60 words (rendered with the first sample, all required fields VERIFIED, tax suffix
+ * on), an `id_code` field with no `examples`, and a `wideband_16k` tuning when the relay's simulated calls are 8 kHz.
+ */
+function lintW2(bp: Blueprint, k: KernelRelay | null, opts: LintOptions): LintIssue[] {
+  const out: LintIssue[] = [];
+  const account = bp.context.samples[0];
+  bp.playbook.disclosures.forEach((d, i) => {
+    let text = d.text;
+    if (k && account) {
+      try { text = k.disclosure(d.id, { snapshot: cannedSnapshot(bp, "all_verified", account, k.spec), account, opts: { taxSuffix: true } }).text; } catch { /* keep the source */ }
+    }
+    const n = wordsOf(text).length;
+    if (n > DISCLOSURE_WARN_WORDS) out.push(warn("W2", ["playbook", "disclosures", i, "text"], `disclosure "${d.id}" is ${n} words when read; over ${DISCLOSURE_WARN_WORDS} words loses the customer`));
+  });
+  bp.fields.forEach((f, i) => {
+    if (f.type === "id_code" && f.examples.length === 0) out.push(warn("W2", ["fields", i, "examples"], `id_code field "${f.id}" has no examples; the extractor and the confirm tool read codes better with one`));
+  });
+  if (bp.listening.tuning === "wideband_16k" && opts.simSampleRateHz !== undefined && opts.simSampleRateHz < 16_000) {
+    out.push(warn("W2", ["listening", "tuning"], `the wideband_16k preset on a relay whose simulated calls are ${opts.simSampleRateHz / 1000} kHz; use telephony_8k`));
   }
   return out;
 }
@@ -625,6 +951,10 @@ export interface LintOptions {
    * ref to a missing or expired secret. Omitted (the Studio's client-side lint): only null refs fail.
    */
   secretIds?: ReadonlySet<string> | readonly string[];
+  /** The relay row's flagship flag (Baton): its prompt is exempt from the kernel safety block, which X1 measures. */
+  flagship?: boolean;
+  /** The sample rate of the relay's simulated calls, when known. W2 warns on `wideband_16k` over 8 kHz sims. */
+  simSampleRateHz?: number;
 }
 
 function lintK1(bp: Blueprint, opts: LintOptions): LintIssue[] {
@@ -656,24 +986,66 @@ function lintK2(bp: Blueprint, opts: LintOptions): LintIssue[] {
 
 // ============================================================================================ entry points
 
+/** Rules whose errors mean the relay cannot be compiled meaningfully; the compiled rules wait for them. */
+const STRUCTURAL: ReadonlySet<string> = new Set(["L1", "L2", "L3", "S1", "X3"]);
+
 /**
- * Lint a parsed blueprint. Rule order: L1, L2, L3, G1, C1, S1, X3, B1, K1, K2. Never throws. `opts` carries the
- * context that is not in the blueprint (K1, K2); the client-side Studio lint may omit it.
+ * The compiled rules (G2, W3, X1, X2, and W2's rendered disclosure length) compile the relay and render it for every
+ * sample × canned state. They run only when the structural rules pass.
+ */
+function lintCompiled(bp: Blueprint, parsed: Map<string, TemplateNode[]>, opts: LintOptions): { k: KernelRelay | null; issues: LintIssue[] } {
+  let k: KernelRelay;
+  try { k = compileRelay(bp, { flagship: opts.flagship ?? false }); } catch (e) {
+    return { k: null, issues: [err("X1", ["playbook"], `the relay does not compile: ${message(e)}`)] };
+  }
+  let rs: Render[];
+  try { rs = renders(bp, k); } catch (e) {
+    return { k, issues: [err("G2", ["context", "samples"], `the canned snapshots cannot be built: ${message(e)}`)] };
+  }
+  const issues: LintIssue[] = [];
+  const guard = (code: string, path: Path, f: () => LintIssue[]) => {
+    try { issues.push(...f()); } catch (e) { issues.push(err(code, path, `this check could not run: ${message(e)}`)); }
+  };
+  guard("G2", ["playbook", "greeting"], () => lintG2W3(bp, k, parsed, rs));
+  guard("X1", ["playbook"], () => lintX1(bp, k, rs));
+  guard("X2", ["listening"], () => lintX2(bp));
+  return { k, issues };
+}
+
+/**
+ * Lint a parsed blueprint (PLATFORM §3.4). Never throws. Issue order follows the rule table: L1, L2, L3, G1, C1, C2,
+ * S1, S2, S3, F1, F2, X1, X2, X3, G2, W3, B1, K1, K2, W2. `opts` carries the context that is not in the blueprint
+ * (K1, K2, W2's sim rate, the flagship exemption X1 measures); the client-side Studio lint may omit it.
  */
 export function lintBlueprint(bp: Blueprint, opts: LintOptions = {}): LintIssue[] {
   const ix = indexOf(bp);
   const parsed = new Map<string, TemplateNode[]>();
-  return [
+  const head = [
     ...lintL1(bp),
     ...lintL2(bp, ix),
     ...lintL3(bp, ix, parsed),
     ...lintG1(bp, parsed),
     ...lintC1(bp, parsed),
+    ...lintC2(bp),
     ...lintS1(bp, ix),
-    ...lintX3(bp),
+    ...lintS2(bp, ix),
+    ...lintS3(bp),
+    ...lintF1(bp),
+    ...lintF2(bp),
+  ];
+  const x3 = lintX3(bp);
+  const blocked = [...head, ...x3].some((i) => i.severity === "error" && STRUCTURAL.has(i.code));
+  const compiled = blocked ? { k: null, issues: [] } : lintCompiled(bp, parsed, opts);
+  const pick = (...codes: string[]) => compiled.issues.filter((i) => codes.includes(i.code));
+  return [
+    ...head,
+    ...pick("X1", "X2"),
+    ...x3,
+    ...pick("G2", "W3"),
     ...lintB1(bp, parsed),
     ...lintK1(bp, opts),
     ...lintK2(bp, opts),
+    ...lintW2(bp, compiled.k, opts),
   ];
 }
 
