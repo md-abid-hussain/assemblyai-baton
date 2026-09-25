@@ -117,8 +117,15 @@ $0 (no AssemblyAI, OpenAI or Zerops calls).
 
 ### What the integrator must do
 
-Merge `wp/wp14a` with `--no-ff` whenever convenient (not a G2 exit criterion). After the merge, WP14b·2 swaps its kernel port to `lintBlueprintJson` + `blueprintHash`. Re-run `npx tsx scripts/relay/snapshot-legacy.ts --check` on merged main.
+Merge **`27ec817`** (the WP14a·2 tip, not the branch head; see "Resume check" below) with `--no-ff` whenever convenient (not a G2 exit criterion). After the merge, WP14b·2 swaps its kernel port to `lintBlueprintJson` + `blueprintHash`. Re-run `npx tsx scripts/relay/snapshot-legacy.ts --check` on merged main.
 
 ### Where WP14a·3 starts
 
 The optional trailing `spec?: IntentSpec` parameters (§2 rule 9), `LEGACY_BATON_SPEC`, `brand-denylist.ts`, the full P§4.6 corpus (QA, derive), the remaining lint rules (C2, S2, S3, F1, F2, X1, X2, G2, W3, B1, K1, K2, W2), then the WP16 requests above.
+
+### Resume check (D1 14:55, after the usage-limit interruption)
+
+- Worktree clean on arrival; `main` (`175a6b7`) is already an ancestor, so `git merge main` is a no-op. WP14a·2 was complete at **`27ec817`**.
+- The interrupted run had already started WP14a·3 and left three committed, self-contained T3 commits on top: `63b3636` (optional trailing `spec?: IntentSpec` on the WP1 core functions, `LEGACY_BATON_SPEC` in `src/core/intents/baton-legacy-spec.ts`, `relay/spec-link.ts`, `accountFor`/`policyFor`), `90c0bcc` (spec-injection parity suite `parity-spec.test.ts`, `spec-generic.test.ts`) and `b46ebcb` (non-removable safety block, `safety.test.ts`). Kept as they are; WP14a·3 continues from them (still open: `brand-denylist.ts`, the rest of the P§4.6 corpus, the remaining lint rules, the WP16 requests, and a WP14a·3 notes section).
+- **§2 rule 9:** those three commits change WP1 core signatures (all additive: one optional trailing parameter each; no point-free callback use of the widened functions in any worktree, checked), so they **merge only after G2**. Before G2 merge `27ec817`, not `wp/wp14a`.
+- Re-verified at `b46ebcb`: typecheck clean; `npm test` **71 files, 962/962 passed** with Postgres up (Docker's `baton-pg` is running again, so no `SKIP_DB_TESTS`); `snapshot-legacy.ts --check` → "oracle up to date". Live spend $0.
