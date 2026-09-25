@@ -31,6 +31,23 @@ export const EMBED_LOAD_TIMEOUT_MS = 12_000;
 /** After the iframe's `load` event, Polar's "loaded" message must follow within this long (a refused frame never sends it). */
 export const EMBED_AFTER_LOAD_MS = 4_000;
 
+/**
+ * Only what the SDK itself appends to <body> (`@polar-sh/checkout@0.4.1` `PolarEmbedCheckout.create`): the loader
+ * (a div holding `.polar-loader-spinner`) and the checkout iframe (a polar.sh URL). Never anything React or Next
+ * appends there in the same window (portals, the dev overlay): removing those crashes React ("removeChild").
+ */
+export function isPolarSdkNode(n: Element): boolean {
+  if (n instanceof HTMLIFrameElement) {
+    try {
+      const host = new URL(n.src).hostname;
+      return host === "polar.sh" || host.endsWith(".polar.sh");
+    } catch {
+      return false;
+    }
+  }
+  return n.tagName === "DIV" && n.querySelector(":scope > .polar-loader-spinner") !== null;
+}
+
 export async function openPolarEmbed(url: string, h: EmbedHandlers, opts: { theme?: "light" | "dark"; loadTimeoutMs?: number } = {}): Promise<EmbedHandle> {
   const { PolarEmbedCheckout } = await import("@polar-sh/checkout/embed");
   const injected: Element[] = [];
@@ -44,13 +61,14 @@ export async function openPolarEmbed(url: string, h: EmbedHandlers, opts: { them
   const mo = new MutationObserver((recs) => {
     for (const r of recs)
       r.addedNodes.forEach((n) => {
-        if (!(n instanceof Element)) return;
+        if (!(n instanceof Element) || !isPolarSdkNode(n)) return;
         injected.push(n);
         // A refused frame (frame-ancestors) still fires `load` (on an error page) but never posts "loaded": fail fast.
-        const frame = n instanceof HTMLIFrameElement ? n : n.querySelector("iframe");
-        frame?.addEventListener("load", () => {
-          afterLoadTimer = setTimeout(() => fail(new Error("embed_refused")), EMBED_AFTER_LOAD_MS);
-        });
+        if (n instanceof HTMLIFrameElement) {
+          n.addEventListener("load", () => {
+            afterLoadTimer = setTimeout(() => fail(new Error("embed_refused")), EMBED_AFTER_LOAD_MS);
+          });
+        }
       });
   });
   mo.observe(document.body, { childList: true });
@@ -61,7 +79,8 @@ export async function openPolarEmbed(url: string, h: EmbedHandlers, opts: { them
       timeout,
     ])) as unknown as EmbedCheckoutLike;
   } catch (e) {
-    for (const el of injected) el.remove();
+    for (const el of injected) if (el.isConnected) el.remove();
+    document.body.classList.remove("polar-no-scroll");
     throw e;
   } finally {
     clearTimeout(timer);
@@ -85,6 +104,7 @@ export async function openPolarEmbed(url: string, h: EmbedHandlers, opts: { them
         /* already gone */
       }
       for (const el of injected) if (el.isConnected) el.remove();
+      document.body.classList.remove("polar-no-scroll");
     },
   };
 }

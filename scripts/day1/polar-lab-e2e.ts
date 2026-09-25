@@ -1,8 +1,12 @@
 /**
  * scripts/day1/polar-lab-e2e.ts - the MockPhone against the real WP6 routes on `next dev` (port 3107) and the Polar
- * SANDBOX, driven by Playwright. Seed first with scripts/polar/lab-seed.ts, then:
+ * SANDBOX, driven by Playwright. Start the dev server with the same payment config as the seed, seed, then drive:
  *
+ *   PAYMENTS_MODE=polar APP_URL=http://localhost:3107 EMBED_ORIGINS=http://localhost:3107 npx next dev --webpack -p 3107
+ *   npx tsx --conditions=react-server scripts/polar/lab-seed.ts --mode polar
  *   npx tsx --conditions=react-server scripts/day1/polar-lab-e2e.ts "<lab URL printed by lab-seed>" [--pay hosted|simulate] [--headed]
+ *
+ * (`--webpack`: Turbopack refuses the worktree's node_modules junction, "points out of the filesystem root".)
  *
  * Steps: lock screen → thread → e-sign (consent + typed name, POST /esign) → pay sheet (Polar total) → "Pay with Polar
  * sandbox" (the embed; on a host that is not in Polar's Embedding list it must fail fast and fall back) → either the
@@ -65,6 +69,12 @@ async function main(): Promise<void> {
     await sleep(500);
     await page.screenshot({ path: resolve(out, "lab-2-esign.png") });
     await page.getByRole("checkbox").check();
+    // The e-sign summary (PaymentView extras) prefills the typed name; give a cold dev server time to answer.
+    const nameSel = "section[data-phone-state] form input:not([type=checkbox])";
+    for (let i = 0; i < 100 && !(await page.inputValue(nameSel)); i++) await sleep(200);
+    r.prefilledName = await page.inputValue(nameSel);
+    if (!r.prefilledName) await page.fill(nameSel, "Priya Raman");
+    r.esignSummary = (await page.textContent("section[data-phone-state] dl"))?.replace(/\s+/g, " ").slice(0, 240);
     await page.getByRole("button", { name: "Sign" }).click();
     await waitState("signed");
     mark("signed");
