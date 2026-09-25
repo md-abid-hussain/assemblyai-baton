@@ -14,6 +14,16 @@ export async function register(): Promise<void> {
     installProcessErrorLogging();
     const inprocWorker = process.env.ENABLE_INPROC_WORKER === "1";
     logBoot({ version: versionString(process.env), inprocWorker });
+    // [WIRE-CALLS] wired at G2. Routes #5/#5a (`src/server/runs/calls.ts`) read the WP9 call manifest through this
+    // lookup; without it they silently fall back to DEFAULT_CALL_DURATION_MS and lose the Express start, the handoff
+    // line and the call's audio format. `registerCallLookup` only stores the function, so this stays cheap at boot.
+    try {
+      const { registerCallLookup } = await import("./server/runs");
+      const { getCaseDataSource } = await import("./server/data");
+      registerCallLookup((id) => getCaseDataSource().getCall(id));
+    } catch (err) {
+      log.child({ component: "boot" }).error("call lookup failed to register", { err });
+    }
     if (inprocWorker) {
       // [WIRE-INPROC-WORKER] wired at G1. startInprocWorker() is idempotent per process (globalThis guard), so a
       // second instrumentation run in the same process is harmless.
