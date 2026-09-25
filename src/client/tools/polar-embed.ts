@@ -28,18 +28,32 @@ interface EmbedCheckoutLike {
 }
 
 export const EMBED_LOAD_TIMEOUT_MS = 12_000;
+/** After the iframe's `load` event, Polar's "loaded" message must follow within this long (a refused frame never sends it). */
+export const EMBED_AFTER_LOAD_MS = 4_000;
 
 export async function openPolarEmbed(url: string, h: EmbedHandlers, opts: { theme?: "light" | "dark"; loadTimeoutMs?: number } = {}): Promise<EmbedHandle> {
   const { PolarEmbedCheckout } = await import("@polar-sh/checkout/embed");
   const injected: Element[] = [];
-  const mo = new MutationObserver((recs) => {
-    for (const r of recs) r.addedNodes.forEach((n) => n instanceof Element && injected.push(n));
-  });
-  mo.observe(document.body, { childList: true });
   let timer: ReturnType<typeof setTimeout> | undefined;
+  let afterLoadTimer: ReturnType<typeof setTimeout> | undefined;
+  let fail: (e: Error) => void = () => undefined;
   const timeout = new Promise<never>((_, reject) => {
+    fail = reject;
     timer = setTimeout(() => reject(new Error("embed_load_timeout")), opts.loadTimeoutMs ?? EMBED_LOAD_TIMEOUT_MS);
   });
+  const mo = new MutationObserver((recs) => {
+    for (const r of recs)
+      r.addedNodes.forEach((n) => {
+        if (!(n instanceof Element)) return;
+        injected.push(n);
+        // A refused frame (frame-ancestors) still fires `load` (on an error page) but never posts "loaded": fail fast.
+        const frame = n instanceof HTMLIFrameElement ? n : n.querySelector("iframe");
+        frame?.addEventListener("load", () => {
+          afterLoadTimer = setTimeout(() => fail(new Error("embed_refused")), EMBED_AFTER_LOAD_MS);
+        });
+      });
+  });
+  mo.observe(document.body, { childList: true });
   let co: EmbedCheckoutLike;
   try {
     co = (await Promise.race([
@@ -51,6 +65,7 @@ export async function openPolarEmbed(url: string, h: EmbedHandlers, opts: { them
     throw e;
   } finally {
     clearTimeout(timer);
+    clearTimeout(afterLoadTimer);
     mo.disconnect();
   }
   co.addEventListener("success", (e) => {
