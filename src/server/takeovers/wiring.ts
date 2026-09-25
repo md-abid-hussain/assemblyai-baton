@@ -6,7 +6,7 @@ import type { Db } from "../db/client";
 import { env } from "../env";
 import { log } from "../log";
 import type { TakeoverAuth, TakeoverRouteDeps } from "./routes";
-import { TakeoverServiceImpl, type BuildFirstUpdateFn, type CompileTakeoverFn, type TakeoverCompileConfig } from "./service";
+import { TakeoverServiceImpl, type BuildFirstUpdateFn, type CompileTakeoverFn, type RelayCompileFn, type TakeoverCompileConfig } from "./service";
 import { DrizzleTakeoverStore } from "./store";
 
 /**
@@ -37,6 +37,8 @@ export interface TakeoverWiringParts {
   vaSessionIdFor: (takeoverId: string, attempt: 0 | 1) => string;
   caseRepository: () => Pick<CaseRepository, "freezeSnapshot">;
   compileTakeover: CompileTakeoverFn;
+  /** WP14b's compile port; omitted → every pass compiles through WP1 (the Baton path). */
+  relayCompile?: RelayCompileFn;
   buildFirstUpdate: BuildFirstUpdateFn;
   validateFirstUpdate: ValidateFirstUpdate;
   /** WP8; omitted → no verification job (null). */
@@ -65,6 +67,7 @@ export function buildTakeoverRouteDeps(p: TakeoverWiringParts): TakeoverRouteDep
     store,
     cases: { freezeSnapshot: (caseId, takeoverId, drain) => p.caseRepository().freezeSnapshot(caseId, takeoverId, drain) },
     compileTakeover: p.compileTakeover,
+    ...(p.relayCompile ? { relayCompile: p.relayCompile } : {}),
     buildFirstUpdate: p.buildFirstUpdate,
     validateFirstUpdate: p.validateFirstUpdate,
     issueTakeoverToken: p.issueCaseToken,

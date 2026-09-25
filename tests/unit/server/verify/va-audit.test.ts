@@ -184,6 +184,9 @@ d("F6 VA audit (DB)", () => {
   });
 
   it("v2.1: readPublishedAgents is [] without relay_publications and reads the live rows once 0001 exists", async () => {
+    // WP14b's drizzle/0001_relays.sql now creates relay_publications, so the migrated database already has it.
+    // Drop it to keep covering the pre-0001 path; the DDL below is 0001's, column for column.
+    await t.db.execute(sql`drop table if exists relay_publications`);
     expect(await readPublishedAgents(t.db)).toEqual([]);
     await t.db.execute(sql`create table relay_publications (
       id text primary key, relay_id text not null, version_id text not null, aai_agent_id text, share_slug text not null unique,

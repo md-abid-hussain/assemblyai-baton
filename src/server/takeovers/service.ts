@@ -8,8 +8,9 @@ import { BatonError } from "../../core/contracts/errors";
 import type { TakeoverPhase } from "../../core/contracts/events";
 import type { CaseRepository, EnqueueVerification, LimitsAuthority, TakeoverService, ValidateFirstUpdate } from "../../core/contracts/services";
 import { TAKEOVER_TIMING, type CompiledTakeover, type DrainReport, type TakeoverOutcome } from "../../core/contracts/takeover";
+import type { CompileTakeoverOptions } from "../../core/contracts/v2";
 import { newId } from "../../lib/ids";
-import { ARMABLE_CASE_STATUSES, type TakeoverStore } from "./store";
+import { ARMABLE_CASE_STATUSES, type TakeoverCase, type TakeoverStore } from "./store";
 
 /**
  * TakeoverService (TASKS §2; DESIGN §4.4 #9, #11–#13, §5.5.4 rules 2 and 5).
@@ -44,6 +45,17 @@ export type CompileTakeoverFn = (
 /** WP1 `buildFirstUpdate(compiled)` (src/core/compiler/first-update.ts). */
 export type BuildFirstUpdateFn = (compiled: CompiledTakeover) => { type: "session.update"; session: Record<string, unknown> };
 
+/**
+ * v2 compile port (TASKS-v2 §6 WP5, PLATFORM §4.7): the case's relay version compiles the pass, through
+ * `RelayEngineFactory.forVersion(case.relayVersionId).takeover(...)` (`src/server/engine/takeover-compile.ts`).
+ *
+ * `null` means "not a relay compile" and the service falls back to WP1's `compileTakeover`, which is exactly the
+ * Baton path: a case with no `relayVersionId`, or a server with no kernel bound. A failure to compile a version that
+ * IS a relay's throws instead, because a Baton compile of someone else's relay would be a wrong prompt, not a
+ * degraded one.
+ */
+export type RelayCompileFn = (i: { case: TakeoverCase; snapshot: CaseState; opts: CompileTakeoverOptions }) => Promise<CompiledTakeover | null>;
+
 export interface TakeoverCompileConfig {
   /** BATON_DEPLOY_ID (the prompt's deploy marker). */
   deployId: string;
@@ -63,6 +75,8 @@ export interface TakeoverServiceDeps {
   cases: Pick<CaseRepository, "freezeSnapshot">;
   /** WP1. */
   compileTakeover: CompileTakeoverFn;
+  /** WP14b: the relay-version compiler; omitted (or answering null) → WP1's `compileTakeover`. */
+  relayCompile?: RelayCompileFn;
   buildFirstUpdate: BuildFirstUpdateFn;
   validateFirstUpdate: ValidateFirstUpdate;
   /** WP2 `issueCaseToken({caseId, visitorId, takeoverId})` (the takeover-scoped case token, DESIGN §4.3). */
@@ -164,14 +178,17 @@ export class TakeoverServiceImpl implements TakeoverService {
     const started = this.now();
     const snapshot = await this.d.cases.freezeSnapshot(t.caseId, takeoverId, drain);
     const cfg = this.d.config;
-    const compiled = this.d.compileTakeover(snapshot, c.policy, {
+    const opts = {
       deployId: cfg.deployId,
       voice: cfg.voice,
       keytermsEnabled: cfg.keytermsEnabled,
       capEnv: cfg.capEnv,
-      compiledBy: "server",
+      compiledBy: "server" as const,
       payToolMode: cfg.payToolMode,
-    });
+    };
+    // The case's relay version compiles the pass (P§4.7); null = a Baton case, or no kernel → WP1's compiler.
+    const viaRelay = this.d.relayCompile ? await this.d.relayCompile({ case: c, snapshot, opts }) : null;
+    const compiled = viaRelay ?? this.d.compileTakeover(snapshot, c.policy, opts);
     // The contract (services.ts): validateFirstUpdate runs before the config leaves the server. Throws E_VA_CONFIG.
     this.d.validateFirstUpdate(this.d.buildFirstUpdate(compiled), { keytermsEnabled: cfg.keytermsEnabled });
     await this.d.store.saveCompiled(takeoverId, {
@@ -186,7 +203,12 @@ export class TakeoverServiceImpl implements TakeoverService {
           tCutMs: drain.tCutMs, capHit: drain.capHit, midUtterance: drain.midUtterance, waitedMs: drain.waitedMs,
           completed: drain.completedTurnIds.length, pending: drain.pendingTurnIds, cut: drain.cutTurnIds, timings: drain.timings,
         },
-        compile: { at: new Date(this.now()).toISOString(), ms: this.now() - started, by: "server", keyterms: compiled.keyterms.length, transcriptionMode: compiled.transcriptionMode },
+        compile: {
+          at: new Date(this.now()).toISOString(), ms: this.now() - started, by: "server", keyterms: compiled.keyterms.length,
+          transcriptionMode: compiled.transcriptionMode,
+          // Which compiler ran: the case's relay version, or WP1's Baton compiler (null). Read by the parity check.
+          relayVersionId: viaRelay ? c.relayVersionId : null,
+        },
       },
     });
     this.log("info", "takeover compiled", { takeoverId, stage: compiled.stage, promptVersion: compiled.promptVersion, vaSessionCapMs: compiled.vaSessionCapMs });
