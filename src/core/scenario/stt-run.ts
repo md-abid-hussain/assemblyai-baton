@@ -145,11 +145,14 @@ export async function runSttCache(i: SttRunInput, deps: SttRunDeps): Promise<Stt
         // The last frame may be short: pad it to a full frame of silence (never < 50 ms: close 3007).
         const frame = new Uint8Array(Math.max(len, Math.round(50 * bytesPerMs))).fill(silence);
         if (off < bytes.byteLength) frame.set(bytes.subarray(off, Math.min(off + len, bytes.byteLength)));
+        // Count the frame before sending: anything the server answers from now on has "heard" it.
+        const before = sentMs[c]!;
+        sentMs[c] = before + Math.max(ms, 50);
         if (!sessions[c]!.session.sendAudio(frame)) {
-          closedEarly = `${c} session closed at ${Math.round(sentMs[c]!)} ms`;
+          sentMs[c] = before;
+          closedEarly = `${c} session closed at ${Math.round(before)} ms`;
           break;
         }
-        sentMs[c] = sentMs[c]! + Math.max(ms, 50);
       }
       if (closedEarly) break;
       deps.onProgress?.({ sentMs: sentMs[channels[0]!]!, totalMs });
