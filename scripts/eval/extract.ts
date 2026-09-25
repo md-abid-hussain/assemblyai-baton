@@ -53,25 +53,48 @@ export function extractorArtefactsOf(version: PipelineVersion) {
 /** Rough luna cost per turn (≈1.5k input + 150 output tokens at $0.10/$0.50 per 1M). */
 const EST_USD_PER_TURN = 0.00025;
 
-async function runOne(paths: PipelinePaths, callId: string, version: PipelineVersion, variant: SttVariant, c: ReturnType<typeof planFromKit>[number]): Promise<{ usd: number; turns: number; failed: number }> {
-  const { createOpenAI } = await import("../../src/server/openai/client");
+/** WP1's engine with the version's extractor artefacts (what WP3's G1 `defaultEngine()` binds, per version). */
+export const wp1EngineFor = (version: PipelineVersion) =>
+  ({ impl: "wp1" as const, emptyCaseState, deriveCaseState, applyExtraction, verifierDisagreementEvents, buildExtractorInput, extractor: extractorArtefactsOf(version) });
+
+export interface ExtractDeps {
+  /** An OpenAI client (tests pass a fake); default: createOpenAI(OPENAI_API_KEY). */
+  client?: OpenAI;
+  ledger?: Ledger;
+  now?: () => string;
+}
+
+type OpenAI = import("openai").default;
+type Ledger = import("../../src/core/contracts/services").LimitsAuthority["ledger"];
+
+export async function extractCall(
+  paths: PipelinePaths,
+  c: ReturnType<typeof planFromKit>[number],
+  version: PipelineVersion,
+  variant: SttVariant,
+  deps: ExtractDeps = {},
+): Promise<{ usd: number; turns: number; failed: number; out: string }> {
+  const callId = c.entry.callId;
   const { OpenAIExtractor } = await import("../../src/server/openai/extractor");
-  const { loadEnv } = await import("../lib/load-env");
-  const { getLimitsAuthority } = await import("../lib/limits");
-  loadEnv();
-  const key = process.env.OPENAI_API_KEY?.trim();
-  if (!key) throw new Error("OPENAI_API_KEY missing (value never printed)");
+  let client = deps.client;
+  if (!client) {
+    const { createOpenAI } = await import("../../src/server/openai/client");
+    const { loadEnv } = await import("../lib/load-env");
+    loadEnv();
+    const key = process.env.OPENAI_API_KEY?.trim();
+    if (!key) throw new Error("OPENAI_API_KEY missing (value never printed)");
+    client = createOpenAI(key, { maxRetries: 0 });
+  }
   const caseId = `eval-${callId}`;
   const turns = cachedTurns(paths, callId, variant, caseId);
   if (!turns) throw new Error(`no complete ${variant} STT cache`);
-  const engine = { impl: "wp1" as const, emptyCaseState, deriveCaseState, applyExtraction, verifierDisagreementEvents, buildExtractorInput, extractor: extractorArtefactsOf(version) };
-  const extractor = new OpenAIExtractor({ client: createOpenAI(key, { maxRetries: 0 }), engine });
-  const ledger = getLimitsAuthority().ledger;
+  const extractor = new OpenAIExtractor({ client, engine: wp1EngineFor(version) });
+  const ledger = deps.ledger ?? (await import("../lib/limits")).getLimitsAuthority().ledger;
   const res = await ledger.reserve({ provider: "openai", action: `wp9_extract_${version}`, refId: callId, estUsd: turns.length * EST_USD_PER_TURN * 2, env: process.env.BATON_DEPLOY_ID ?? "dev-wp9" });
   if (!res.ok) throw new Error(`ledger refused (${res.code})`);
   try {
     const r = await replayExtraction(
-      { callId, version, variant, caseId, policy: c.scenario.policy, callDate: c.scenario.callDate, turns, createdAt: new Date().toISOString() },
+      { callId, version, variant, caseId, policy: c.scenario.policy, callDate: c.scenario.callDate, turns, createdAt: deps.now?.() ?? new Date().toISOString() },
       { extractor, derive: deriveCaseState as unknown as DeriveFn, retries: 1, onTurn: (t) => t.failed && console.log(`    turn ${t.turnId} FAILED`) },
     );
     await ledger.settle(res.id, r.usd);
@@ -79,7 +102,7 @@ async function runOne(paths: PipelinePaths, callId: string, version: PipelineVer
     const out = extractCachePath(paths.dataRoot, callId, version, variant);
     mkdirSync(dirname(out), { recursive: true });
     writeFileSync(out, stableJson(file));
-    return { usd: r.usd, turns: turns.length, failed: r.failedTurnIds.length };
+    return { usd: r.usd, turns: turns.length, failed: r.failedTurnIds.length, out };
   } catch (e) {
     await ledger.release(res.id).catch(() => undefined);
     throw e;
@@ -127,7 +150,7 @@ async function main(): Promise<void> {
       break;
     }
     try {
-      const r = await runOne(paths, t.c.entry.callId, t.version, t.variant, t.c);
+      const r = await extractCall(paths, t.c, t.version, t.variant);
       spent += r.usd;
       console.log(`extracted ${t.c.entry.callId} ${t.version}.${t.variant}: ${r.turns} turns, ${r.failed} failed, $${r.usd.toFixed(4)}`);
     } catch (e) {
