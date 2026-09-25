@@ -33,6 +33,7 @@ import type { ConsoleStore } from "../store/store";
 import type { ConsoleActions } from "./actions";
 import type { SessionApi } from "./api";
 import { createEvidencePlayer } from "./evidence";
+import { provisionalQa } from "./provisional-qa";
 
 export { EXPRESS_LEAD_MS };
 
@@ -170,6 +171,9 @@ export class CallSession implements ConsoleActions {
   private sttReady: (() => void) | null = null;
   private playEv: ((ev: Evidence) => Promise<unknown>) | null = null;
   private mic: MicSource | null = null;
+  /** The case state the AI inherited, per pass (captured once the drain is over), for the provisional QA. */
+  private passSnapshot: { pass: number; state: CaseState } | null = null;
+  private provisionalFor = -1;
   /** The signed visitor token for cookie-less browsers (CreateCaseResponse.visitorToken). */
   visitorToken: string | undefined;
 
@@ -439,11 +443,27 @@ export class CallSession implements ConsoleActions {
     return this.store.getState().human.find((l) => l.turnId === id)?.turn ?? null;
   }
 
-  /** The takeover view changed: after /end the verification job id arrives → poll #20 once (WP8). */
+  /** The takeover view changed: snapshot at compile, provisional QA at the end, then poll #20 once (WP8). */
   private onTakeoverView(): void {
     const h = this.handle;
-    if (!h || this.polling) return;
+    if (!h) return;
     const v = h.ctl.view();
+    const st = this.store.getState();
+    if (["compiling", "connecting", "greeting", "active"].includes(v.phase) && this.passSnapshot?.pass !== v.passes && st.caseState) {
+      this.passSnapshot = { pass: v.passes, state: st.caseState };
+    }
+    if (v.phase === "done" && this.provisionalFor !== v.passes && !st.qa.verified) {
+      // DESIGN S3: provisional numbers right away, from the agent's own captions; WP8's verified result replaces them.
+      this.provisionalFor = v.passes;
+      const snap = this.passSnapshot?.pass === v.passes ? this.passSnapshot.state : null;
+      try {
+        const qa = provisionalQa(st, snap);
+        if (qa) this.store.dispatch({ t: this.now(), type: "qa", qa });
+      } catch (e) {
+        this.log("warn", "provisional QA failed", { error: e instanceof Error ? e.message : String(e) });
+      }
+    }
+    if (this.polling) return;
     const id = v.pass?.takeoverId ?? null;
     const token = h.token();
     if (v.verificationJobId && id && token) {
