@@ -2,8 +2,11 @@
  * WP14b relay test fixtures: a stub gallery (the WP14a mini blueprint as "Dental deposit" with two Try-an-edit presets,
  * and a flagship stand-in until WP14a·2 ships data/relays/baton-add-driver.json), request builders and env secrets.
  */
+import type { SQL } from "drizzle-orm";
+
 import type { RelayPresetDef } from "@/core/contracts/ext/wp14b-relays";
 import type { Blueprint } from "@/core/contracts/v2";
+import type { Db } from "@/server/db/client";
 import type { GalleryEntry } from "@/server/relays/seed";
 import { miniBlueprint } from "../../core/relay/fixtures/mini-blueprint";
 
@@ -72,4 +75,10 @@ export function withSecrets(): () => void {
       else process.env[k] = v;
     }
   };
+}
+
+/** The first column of the first row of a `select count(*)::int as n ...`-style query. */
+export async function scalar(db: Db, q: SQL): Promise<number> {
+  const row = (await db.execute(q)).rows[0] as Record<string, unknown> | undefined;
+  return Number(row ? Object.values(row)[0] : NaN);
 }

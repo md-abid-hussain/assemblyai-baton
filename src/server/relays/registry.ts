@@ -160,9 +160,11 @@ export class PgRelayRegistry implements RelayRegistry {
   }
 
   private extrasCols() {
+    // `"relays"."id"` spelled out: drizzle drops the table prefix of `${relays.id}` in single-table selects
+    const outer = sql.raw(`"relays"."id"`);
     return {
-      versionCount: sql<number>`(select count(*)::int from ${relayVersions} rv where rv.relay_id = ${relays.id} and rv.preset is null)`.mapWith(Number),
-      lastRunAt: sql<Date | string | null>`(select max(c.created_at) from ${cases} c join ${relayVersions} rv2 on rv2.id = c.relay_version_id where rv2.relay_id = ${relays.id})`,
+      versionCount: sql<number>`(select count(*)::int from ${relayVersions} rv where rv.relay_id = ${outer} and rv.preset is null)`.mapWith(Number),
+      lastRunAt: sql<Date | string | null>`(select max(c.created_at) from ${cases} c join ${relayVersions} rv2 on rv2.id = c.relay_version_id where rv2.relay_id = ${outer})`,
     };
   }
 
