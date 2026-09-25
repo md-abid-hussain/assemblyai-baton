@@ -262,10 +262,12 @@ describe("WP7·1: /call over the real WP4 / WP5 / WP5b controllers", () => {
     // ---- the greeting becomes audible → GREETING → ACTIVE
     const ws = w.sockets[0]!;
     ws.server({ type: "reply.started", reply_id: "r1" });
+    upd.session.greeting.split(" ").forEach((word, i) => ws.server({ type: "transcript.agent.delta", reply_id: "r1", delta: word, start_ms: 20 + i * 250 }));
     for (let i = 0; i < 3; i++) ws.server({ type: "reply.audio", reply_id: "r1", data: pcmChunkB64(8000) });
     ws.server({ type: "transcript.agent", reply_id: "r1", text: upd.session.greeting });
     ws.server({ type: "reply.done", reply_id: "r1", status: "completed" });
     await until(() => store.getState().takeover.phase === "active");
+    await until(() => store.getState().ai.some((l) => l.lane === "ai"));
     // WP5 emits one phase per dispatch: a quiet click goes idle → draining directly; the store starts the pass there
     const tk = store.getState().takeover;
     expect(tk.steps.map((x) => x.phase)).toEqual(expect.arrayContaining(["draining", "compiling", "greeting", "active"]));
@@ -287,6 +289,8 @@ describe("WP7·1: /call over the real WP4 / WP5 / WP5b controllers", () => {
     expect(ws.types()).toContain("session.end");
     expect(log).toEqual(expect.arrayContaining(["end tko_1 abandoned tt_secret_1", "verification tko_1 tt_secret_1"]));
     expect(store.getState().qa.verified?.pendingConfirmed).toBe(1);
+    // WP7·2: the provisional numbers were computed on the page at `done`, from the agent's own captions (WP1 computeQa)
+    expect(store.getState().qa.provisional).toMatchObject({ provisional: true, reAsked: 0, payment: "unpaid" });
     // the page never released the run itself: WP5 owns it once the takeover exists
     expect(log.some((l) => l.startsWith("page.release"))).toBe(false);
     session.dispose("unmount");

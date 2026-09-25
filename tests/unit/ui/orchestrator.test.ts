@@ -8,9 +8,11 @@ import type { RunPlan } from "@/core/contracts/run";
 import type { CallManifestEntry } from "@/core/contracts/scenario";
 import type { CallPlayback, CallTick, CaseSync } from "@/core/contracts/services";
 import type { TurnInput } from "@/core/contracts/turns";
+import { fixtureLog } from "@/client/fixtures";
 import { emptyCaseState, S01_POLICY } from "@/client/fixtures/builder";
 import type { SessionApi } from "@/client/session/api";
 import { CallSession, type LifecycleLike, type SessionContext, type SessionControllers, type SttManagerLike } from "@/client/session/orchestrator";
+import { softNotice } from "@/client/store/selectors";
 import { createConsoleStore } from "@/client/store/store";
 
 const CALL: CallManifestEntry = {
@@ -105,6 +107,11 @@ class FakeTakeover implements TakeoverControllerExt {
   }
   dispose() {
     this.log.push("takeover.dispose");
+  }
+  /** A view change without the end of a pass (e.g. a notice). */
+  set(v: Partial<TakeoverClientView>) {
+    this.v = { ...this.v, ...v };
+    for (const cb of [...this.cbs]) cb();
   }
   /** WP5: /end answered → the verification job id appears on the view. */
   ended(takeoverId: string) {
@@ -379,6 +386,45 @@ describe("CallSession orchestrator (real-controller seams)", () => {
     expect(log.filter((l) => l.startsWith("verification"))).toEqual(["verification tko_1 tt_1"]);
     expect(store.getState().qa.status).toBe("verified");
     expect(store.getState().qa.verified?.pendingConfirmed).toBe(1);
+  });
+
+  it("the pass ends → provisional QA from the page's own captions at once (WP1 computeQa); a 404 from #20 keeps it", async () => {
+    const store = createConsoleStore();
+    const { api } = fakeApi({}, { verification: "404" });
+    const f = fakeControllers();
+    const s = new CallSession({ callId: "s01-take2", call: CALL, api, store, controllers: f.controllers, now: () => 5, verifyPollMs: 1 });
+    await s.prepare();
+    s.start("express");
+    await flush();
+    // the AI half as the page saw it (s01-full up to the takeover's `done`, without the fixture's own QA events)
+    for (const e of fixtureLog("s01-full") ?? []) {
+      if (e.type === "qa") continue;
+      store.apply(e);
+      if (e.type === "takeover.phase" && e.phase === "done") break;
+    }
+    expect(store.getState().qa.provisional).toBeNull();
+    f.takeover.ended("tko_1");
+    await flush();
+    const qa = store.getState().qa;
+    expect(qa.provisional).toMatchObject({ provisional: true, reAsked: 0, payment: "verified_webhook" });
+    expect(qa.provisional!.disclosures.map((d) => d.kind)).toEqual(["premium_change", "esign_consent"]);
+    expect(qa).toMatchObject({ status: "failed", reason: "there is no recording to verify", verified: null });
+  });
+
+  it("WP5 info notices become the top bar's soft line; error notices stay errors", async () => {
+    const store = createConsoleStore();
+    const { api } = fakeApi();
+    const f = fakeControllers();
+    const s = new CallSession({ callId: "s01-take2", call: CALL, api, store, controllers: f.controllers, now: () => 5 });
+    await s.prepare();
+    s.start("express");
+    await flush();
+    const msg = "Live AI is unavailable, so the recorded AI session plays (labelled).";
+    f.takeover.set({ notice: { level: "info", code: null, message: msg } });
+    expect(store.getState().notice).toBe(msg);
+    expect(softNotice(store.getState())).toBe(msg);
+    f.takeover.set({ notice: { level: "error", code: "E_VA_CONFIG", message: "The live AI could not start: x" } });
+    expect(store.getState().notice).toBe(msg);
   });
 
   it("a 404 from #20 (no VA recording) keeps the provisional numbers with a plain reason", async () => {

@@ -308,7 +308,8 @@ export function planNotice(s: UiState): string | null {
 
 /** Non-fatal error notice (e.g. "1 turn not analysed"). */
 export function softNotice(s: UiState): string | null {
-  if (!s.error || s.phase === "error") return null;
+  if (s.phase === "error") return null;
+  if (!s.error) return s.notice;
   if (s.error.code.startsWith("E_OPENAI")) return "1 turn not analysed (the language model was slow); the verifier may fill it.";
   return s.error.message;
 }

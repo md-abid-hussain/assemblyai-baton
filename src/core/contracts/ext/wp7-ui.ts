@@ -122,6 +122,8 @@ export type UiAction =
   | { t: number; type: "ui.call-ended" }
   | { t: number; type: "ui.audio-locked"; locked: boolean }
   | { t: number; type: "ui.error-cleared" }
+  /** A plain-words, non-fatal notice from a controller (WP5 `view().notice` at level "info"); null clears it. */
+  | { t: number; type: "ui.notice"; message: string | null }
   | { t: number; type: "ui.reset" };
 export type UiActionType = UiAction["type"];
 
@@ -193,6 +195,8 @@ export interface Wp7UiState {
   disclosuresGiven: DisclosureKind[];
   callEnded: boolean;
   audioLocked: boolean;
+  /** The latest informational notice (top-bar soft line), or null. */
+  notice: string | null;
 }
 
 declare module "../services" {

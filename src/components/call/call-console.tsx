@@ -71,9 +71,21 @@ function MobileConsole() {
   const phase = useBaton((s) => s.flowPhase);
   const passVisible = phase === "shadowing" || phase === "handed-back";
   const recorded = useBaton(isRecordedAi);
+  const paid = useBaton((s) => s.phone.state === "paid");
+  const done = phase === "completed" || phase === "handed-back";
   useEffect(() => {
     if (smsCount > 0) setTab("phone"); // DESIGN §7.6: the Phone tab opens by itself on phone.sms
   }, [smsCount]);
+  useEffect(() => {
+    // Paid: back to the call after a beat, so the AI's closing lines are in view (the Phone tab stays one tap away).
+    if (!paid) return;
+    const id = setTimeout(() => setTab((t) => (t === "phone" ? "call" : t)), 3000);
+    return () => clearTimeout(id);
+  }, [paid]);
+  useEffect(() => {
+    // The QA card lives in the Call tab: the end of the pass always brings it into view.
+    if (done) setTab("call");
+  }, [done]);
   useEffect(() => {
     // The whole phone in view (under the sticky tabs) whenever the Phone tab opens.
     if (tab !== "phone") return;

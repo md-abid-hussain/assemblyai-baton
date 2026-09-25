@@ -449,6 +449,10 @@ export class CallSession implements ConsoleActions {
     if (!h) return;
     const v = h.ctl.view();
     const st = this.store.getState();
+    // WP5's info notices (e.g. "live AI unavailable, the recorded session plays") as the top bar's soft line; its
+    // error notices already arrive as `error` events.
+    const info = v.notice?.level === "info" ? v.notice.message : null;
+    if (info && info !== st.notice) this.store.act({ t: this.now(), type: "ui.notice", message: info });
     if (["compiling", "connecting", "greeting", "active"].includes(v.phase) && this.passSnapshot?.pass !== v.passes && st.caseState) {
       this.passSnapshot = { pass: v.passes, state: st.caseState };
     }

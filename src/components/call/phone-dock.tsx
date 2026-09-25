@@ -156,9 +156,14 @@ export function FloatingPhone() {
   const [open, setOpen] = useState(true);
   const yourTurn = state === "sms-received";
   const terminal = state === "paid" || state === "failed" || state === "expired";
+  const done = useBaton((s) => s.flowPhase === "completed" || s.flowPhase === "handed-back");
   useEffect(() => {
     if (yourTurn) setOpen(true);
   }, [yourTurn]);
+  useEffect(() => {
+    // The pass is over and the QA card opens: the phone steps aside at once.
+    if (done) setOpen(false);
+  }, [done]);
   useEffect(() => {
     // Once the payment is settled the overlay steps aside (it stays one tap away as a pill).
     if (!terminal) return;

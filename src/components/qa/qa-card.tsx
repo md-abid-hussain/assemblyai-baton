@@ -137,7 +137,7 @@ export function QaCardBody() {
       <div className="flex flex-wrap items-center gap-2">
         {qa.verified ? (
           <span className="inline-flex items-center gap-1.5 rounded-full bg-(--verified-bg) px-3 py-1 text-sm font-bold text-(--verified-fg)">
-            <ShieldCheckIcon className="size-4" aria-hidden="true" /> ✓ Verified from recording
+            <ShieldCheckIcon className="size-4" aria-hidden="true" /> Verified from recording
           </span>
         ) : qa.status === "failed" ? (
           <span className="inline-flex items-center gap-1.5 rounded-full bg-(--pending-bg) px-3 py-1 text-sm font-bold text-(--pending-fg)">

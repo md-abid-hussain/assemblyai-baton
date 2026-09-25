@@ -72,6 +72,7 @@ export function initialUiState(): UiState {
     disclosuresGiven: [],
     callEnded: false,
     audioLocked: false,
+    notice: null,
   };
 }
 
@@ -485,6 +486,8 @@ export function reduceUi(s: UiState, a: UiAction): UiState {
       return { ...s, t, audioLocked: a.locked };
     case "ui.error-cleared":
       return { ...s, t, error: null };
+    case "ui.notice":
+      return { ...s, t, notice: a.message };
     case "ui.reset":
       return { ...initialUiState(), context: s.context };
     default: {
