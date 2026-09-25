@@ -7,12 +7,12 @@
  * Allowed differences (listed, not silent): `promptVersion` = `relay:<hash8>`; `compiledBy` and the takeover
  * `snapshot` are unchanged.
  */
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import type { CaseState, FieldState, PolicyRecord, Readiness, Stage } from "@/core/contracts";
-import { BlueprintSchema } from "@/core/contracts/v2";
+import { BlueprintSchema, safeTest } from "@/core/contracts/v2";
 import { emptyCaseState } from "@/core/case/state";
 import { sha256Hex } from "@/core/case/sha256";
 import { buildFirstUpdate } from "@/core/compiler/first-update";
@@ -87,6 +87,16 @@ describe("Baton blueprint", () => {
   it("carries the recorded handoff line and accepts both wordings", () => {
     expect(bp.handoff.repLine).toBe("OK if my assistant finishes the paperwork? I'll be one tap away if you need me.");
     expect(bp.handoff.repLinePatterns.length).toBeGreaterThanOrEqual(2);
+    const detects = (line: string) => bp.handoff.repLinePatterns.some((p) => safeTest(p, line));
+    expect(detects(bp.handoff.repLine)).toBe(true);
+    // The older wording (PLATFORM §1.3), in case a take was recorded with it.
+    expect(detects("OK if my assistant finishes the paperwork? I'll stay on the line.")).toBe(true);
+    // Every scripted handoff line in the scenario corpus (s02 and s06 use variants).
+    const lines = readdirSync(join(ROOT, "data", "scenarios")).filter((f) => /^s\d+\.json$/.test(f)).map((f) =>
+      [f, (JSON.parse(readFileSync(join(ROOT, "data", "scenarios", f), "utf8")) as { handoff?: { line?: string } }).handoff?.line] as const);
+    expect(lines.length).toBeGreaterThanOrEqual(20);
+    for (const [f, line] of lines) expect(line && detects(line), `${f}: ${line}`).toBe(true);
+    expect(detects("Could you spell the last name for me?")).toBe(false);
   });
 });
 
