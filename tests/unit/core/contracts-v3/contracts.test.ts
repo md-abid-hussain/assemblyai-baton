@@ -22,8 +22,14 @@ describe("SAAS §14 errors.ts", () => {
     expect(V3_ERROR_STATUS).toEqual({
       E_AUTH_REQUIRED: 401, E_ACCOUNT_REQUIRED: 403, E_FORBIDDEN: 403, E_SCOPE: 403, E_CSRF: 403,
       E_USE_APP_API: 403, E_NOT_FOUND: 404, E_CONFLICT: 409, E_VALIDATION: 400, E_UNPROCESSABLE: 422,
-      E_PLAN_LIMIT: 402, E_RATE_LIMITED: 429, E_BILLING_UNAVAILABLE: 503,
+      E_PLAN_LIMIT: 402, E_RATE_LIMITED: 429, E_BUSY: 503, E_BILLING_UNAVAILABLE: 503,
     });
+  });
+
+  // §14's code block predates the v3.1 review; §6.4/§10.4/§17-I3 added the shed code. C3 syncs the map.
+  it("carries E_BUSY for the global compile bucket's 503 shed (§6.4, §10.4)", () => {
+    expect(V3_ERROR_STATUS.E_BUSY).toBe(503);
+    expect(isV3ErrorCode("E_BUSY")).toBe(true);
   });
 
   it("a plan limit is 402 and a foreign id is 404, never 403 (no existence leak)", () => {

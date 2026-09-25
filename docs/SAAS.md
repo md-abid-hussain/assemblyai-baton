@@ -1416,7 +1416,8 @@ export interface AuditEntry { orgId: string | null; actor: { type: "user" | "gue
 // errors.ts
 export const V3_ERROR_STATUS = { E_AUTH_REQUIRED: 401, E_ACCOUNT_REQUIRED: 403, E_FORBIDDEN: 403, E_SCOPE: 403,
   E_CSRF: 403, E_USE_APP_API: 403, E_NOT_FOUND: 404, E_CONFLICT: 409, E_VALIDATION: 400, E_UNPROCESSABLE: 422,
-  E_PLAN_LIMIT: 402, E_RATE_LIMITED: 429, E_BILLING_UNAVAILABLE: 503 } as const;
+  E_PLAN_LIMIT: 402, E_RATE_LIMITED: 429, E_BUSY: 503, E_BILLING_UNAVAILABLE: 503 } as const;
+//                                        ^ v3.1 (§17 I3): the global compile bucket's shed code (§6.4, §10.4).
 export type V3ErrorCode = keyof typeof V3_ERROR_STATUS;
 
 // public-api.ts (zod + .meta({id}) for zod-openapi; §6.2). WP19 freezes the names at C3; WP22 fills the fields additively.

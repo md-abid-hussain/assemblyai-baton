@@ -84,6 +84,28 @@ const IDENTITY_LAYER = [
 const BETTER_AUTH_IMPORT =
   /(?:\bfrom\s*|\bimport\s*\(?\s*|\brequire\s*\(\s*)["'](?:better-auth|@better-auth\/[^"']*|@polar-sh\/better-auth)(?:\/[^"']*)?["']/;
 
+/** Every import/require specifier in a file, with its line number. */
+function specifiers(file: string): { spec: string; line: number }[] {
+  const re = /(?:\bfrom\s*|\bimport\s*\(?\s*|\brequire\s*\(\s*)["']([^"']+)["']/g;
+  const out: { spec: string; line: number }[] = [];
+  stripComments(readFileSync(join(ROOT, file), "utf8"))
+    .split("\n")
+    .forEach((text, i) => {
+      for (const m of text.matchAll(re)) out.push({ spec: m[1]!, line: i + 1 });
+    });
+  return out;
+}
+
+/**
+ * Where a **relative** specifier lands, as a repo-relative posix path. A bare specifier returns null (those are
+ * judged by the deny-regexes above). This is what catches `../../server/db` — an alias- and `node:`-free escape
+ * that the prefix regex alone cannot see, and relative cross-imports (`../case`) are already idiomatic in v3.
+ */
+function relativeTarget(file: string, spec: string): string | null {
+  if (!spec.startsWith(".")) return null;
+  return toPosix(relative(ROOT, resolve(join(ROOT, file), "..", spec)));
+}
+
 function hits(files: string[], re: RegExp): string[] {
   const out: string[] = [];
   for (const file of files) {
@@ -135,6 +157,31 @@ describe("contracts v3 stays pure", () => {
     expect(files.length).toBeGreaterThan(0);
     const re = /(?:\bfrom\s*|\bimport\s*\(?\s*|\brequire\s*\(\s*)["'](?:node:|@\/(?:server|client|app|components)|server-only|client-only)/;
     expect(hits(files, re).join("\n")).toBe("");
+  });
+
+  it("no relative import escapes src/core/** either", () => {
+    const files = listFiles("src/core/contracts/v3");
+    expect(files.length).toBeGreaterThan(0);
+    const escapes: string[] = [];
+    for (const file of files) {
+      for (const { spec, line } of specifiers(file)) {
+        const target = relativeTarget(file, spec);
+        if (target !== null && !target.startsWith("src/core/")) escapes.push(`${file}:${line} ${spec} -> ${target}`);
+      }
+    }
+    expect(escapes.join("\n")).toBe("");
+  });
+
+  it("that check actually catches an escape (the sibling imports pass, a reach into src/server does not)", () => {
+    const f = "src/core/contracts/v3/events.ts";
+    expect(relativeTarget(f, "../case")).toBe("src/core/contracts/case");
+    expect(relativeTarget(f, "./identity")).toBe("src/core/contracts/v3/identity");
+    expect(relativeTarget(f, "../../../server/db")).toBe("src/server/db");
+    expect(relativeTarget(f, "../../../../scripts/x")).toBe("scripts/x");
+    expect(relativeTarget(f, "zod")).toBeNull();
+    for (const bad of ["../../../server/db", "../../../../scripts/x"]) {
+      expect([bad, relativeTarget(f, bad)!.startsWith("src/core/")]).toEqual([bad, false]);
+    }
   });
 
   it("the v1 and v2 barrels do not re-export v3, so the frozen names cannot collide", () => {

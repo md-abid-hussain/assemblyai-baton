@@ -93,7 +93,16 @@ export const SaveDraftV1 = z
   .object({ blueprint: z.unknown(), expectedRev: z.number().int().nonnegative() })
   .meta({ id: "SaveDraftV1" });
 
-/** `POST /blueprints/validate` (§6.2): a source **or** a blueprint, ≤ 256 KiB. No DB writes. */
+/**
+ * `POST /blueprints/validate` (§6.2): a source **or** a blueprint, ≤ 256 KiB. No DB writes.
+ *
+ * **WP22 obligation — the 256 KiB cap is only half-expressible here.** The `source` branch carries it
+ * (`SourceBodyV1.text.max(MAX_SOURCE_BYTES)`), but the `blueprint` branch is `unknown`: there is no cheap zod
+ * `.max()` for an arbitrary JSON value, and a schema-level check would in any case run *after* the body is
+ * parsed. §10.4 requires the bound *before* parsing — the same reason the global compile bucket (`E_BUSY`)
+ * sits in front of this route. So WP22 enforces `Content-Length`/stream length ≤ `MAX_SOURCE_BYTES` at the
+ * route/transport layer for **both** branches, answering `E_VALIDATION`; this schema is the second line only.
+ */
 export const ValidateRequestV1 = z
   .union([z.object({ source: SourceBodyV1 }), z.object({ blueprint: z.unknown() })])
   .meta({ id: "ValidateRequestV1" });

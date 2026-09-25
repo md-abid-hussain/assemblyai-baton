@@ -57,6 +57,12 @@ describe("the §6.3 envelope", () => {
     expect(res.headers.get("retry-after")).toBe("13");
   });
 
+  it("sheds with 503 E_BUSY + Retry-After: 1, the shape WP22's compile bucket throws (§6.4, §10.4)", () => {
+    const res = saasErrorResponse(new SaasError("E_BUSY", "Busy; retry shortly.", { retryAfterSec: 1 }));
+    expect(res.status).toBe(503);
+    expect(res.headers.get("retry-after")).toBe("1");
+  });
+
   it("echoes zod issue paths and codec diagnostics, never values", () => {
     const body = saasErrorBody(
       new SaasError("E_VALIDATION", "Invalid request.", {
