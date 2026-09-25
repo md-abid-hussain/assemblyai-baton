@@ -1,6 +1,6 @@
 "use client";
 /** Top bar (title, call date, mode badge, plain-words notice, HUD), narrator strip, provenance banner, fallback / error banners. */
-import { AlertOctagonIcon, CircleAlertIcon, FlaskConicalIcon, HistoryIcon, InfoIcon, PlayIcon, RadioIcon, RotateCcwIcon } from "lucide-react";
+import { AlertOctagonIcon, CircleAlertIcon, FlaskConicalIcon, HistoryIcon, HomeIcon, InfoIcon, PlayIcon, RadioIcon, RotateCcwIcon } from "lucide-react";
 
 import { useBaton, shallowEqual } from "@/client/store/hooks";
 import { formatCallDate, formatMmSs, modeBadge, narrator, phaseCopy, planNotice, provenance, softNotice } from "@/client/store/selectors";
@@ -36,6 +36,7 @@ export function ModeBadge() {
 
 export function TopBar() {
   const ctx = useBaton((s) => s.context);
+  const phase = useBaton((s) => s.phase);
   const notice = useBaton(planNotice);
   const env = useConsoleEnv();
   return (
@@ -46,7 +47,7 @@ export function TopBar() {
       </a>
       <div className="min-w-0 flex-1 basis-60">
         <h1 className="bt-display truncate text-[15px] leading-tight font-semibold" title={ctx?.title}>
-          {ctx?.title ?? "Loading call…"}
+          {ctx?.title ?? (phase === "error" ? "Call unavailable" : "Loading call…")}
         </h1>
         <div className="flex items-center gap-2 text-xs text-(--bt-muted)">
           {ctx ? <span>Call date: {formatCallDate(ctx.callDate)}</span> : null}
@@ -83,7 +84,8 @@ const TONE: Record<ReturnType<typeof narrator>["tone"], string> = {
   human: "text-(--rep-fg)",
   protocol: "text-(--ai-fg)",
   ai: "text-(--ai-fg)",
-  action: "text-(--conflict-fg)",
+  // A call to action, not an error: the AI accent (the phone's "Your turn" pill), underlined.
+  action: "text-(--ai-fg) underline decoration-(--ai)/45 decoration-2 underline-offset-4",
   done: "text-(--verified-fg)",
   warn: "text-(--pending-fg)",
   error: "text-(--conflict-fg)",
@@ -116,7 +118,9 @@ export function Banners() {
   const copy = useBaton(phaseCopy, shallowEqual);
   const soft = useBaton(softNotice);
   const hasBundle = useBaton((s) => !!s.context?.hasRecordedAiBundle);
+  const unknownCall = useBaton((s) => s.error?.code === "E_NOT_FOUND" && !s.context);
   const actions = useActions();
+  const env = useConsoleEnv();
   return (
     <>
       {phase === "error" ? (
@@ -125,9 +129,15 @@ export function Banners() {
           <span className="min-w-0 flex-1">
             <strong>{copy.title}.</strong> {copy.body}
           </span>
-          <button type="button" onClick={() => actions.retry()} className="inline-flex h-8 items-center gap-1 rounded-md bg-(--conflict-fg) px-3 text-xs font-semibold text-(--bt-accent-ink)">
-            <RotateCcwIcon className="size-3.5" aria-hidden="true" /> Try again
-          </button>
+          {unknownCall ? (
+            <a href={env.links.home} className="inline-flex h-8 items-center gap-1 rounded-md bg-(--conflict-fg) px-3 text-xs font-semibold text-(--bt-accent-ink)">
+              <HomeIcon className="size-3.5" aria-hidden="true" /> All calls
+            </a>
+          ) : (
+            <button type="button" onClick={() => actions.retry()} className="inline-flex h-8 items-center gap-1 rounded-md bg-(--conflict-fg) px-3 text-xs font-semibold text-(--bt-accent-ink)">
+              <RotateCcwIcon className="size-3.5" aria-hidden="true" /> Try again
+            </button>
+          )}
           {hasBundle ? (
             <button type="button" onClick={() => actions.watchReplay()} className="inline-flex h-8 items-center gap-1 rounded-md border border-(--conflict)/50 bg-(--bt-panel) px-3 text-xs font-semibold">
               <HistoryIcon className="size-3.5" aria-hidden="true" /> Watch replay

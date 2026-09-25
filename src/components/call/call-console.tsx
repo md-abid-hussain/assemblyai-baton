@@ -29,13 +29,16 @@ import { TranscriptLanes } from "./transcript-lanes";
 
 export function ControlColumn({ showDockedPhone }: { showDockedPhone: boolean }) {
   const phase = useBaton((s) => s.flowPhase);
+  const loadFailed = useBaton((s) => s.phase === "error" && !s.context);
   const ended = useBaton((s) => s.callEnded);
   const recordedPlan = useBaton((s) => s.plan?.aiHalf === "recorded" && s.takeover.phase === "idle");
   const hasSms = useBaton((s) => s.phone.sms.length > 0);
   return (
     <div className="space-y-4">
       {phase === "preflight" ? (
-        <p className="text-sm text-(--bt-muted)">Choose Express or the full call to start. The Pass button appears here.</p>
+        <p className="text-sm text-(--bt-muted)">
+          {loadFailed ? "The call did not load, so there is nothing to start yet." : "Choose Express or the full call to start. The Pass button appears here."}
+        </p>
       ) : phase === "queued" ? (
         <QueuedCard />
       ) : phase === "connecting" ? (

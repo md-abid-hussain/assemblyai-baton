@@ -8,6 +8,8 @@
  * window (§5.13 step 6.2) still anchors on its `get_disclosure` result. Critical tokens are read back from WP1's
  * deterministic disclosure templates; when a text does not match them the check falls back to similarity alone.
  */
+import "client-only";
+
 import type { CaseState, DisclosureKind, PolicyRecord } from "@/core/contracts/case";
 import { DISCLOSURE_KINDS } from "@/core/contracts/case";
 import type { QaResult } from "@/core/contracts/events";

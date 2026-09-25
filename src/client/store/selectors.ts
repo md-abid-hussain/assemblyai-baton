@@ -166,8 +166,11 @@ export function phaseCopy(s: UiState): PhaseCopy {
       title: "Labelled fallback",
       body: lastFallback?.label ?? "A recorded run is replayed; it is labelled as such everywhere.",
     },
-    error: {
-      title: "Something went wrong",
+    error: s.error?.code === "E_NOT_FOUND" && !s.context ? {
+      title: "This call isn't available",
+      body: "It may have been renamed or removed. Pick another call from the home page.",
+    } : {
+      title: s.context ? "Something went wrong" : "The call could not load",
       body: s.error?.message ?? (s.takeover.phase === "failed" ? "The live AI could not start after one retry." : "Please try again."),
     },
   };
@@ -223,7 +226,8 @@ export function narrator(s: UiState): { text: string; tone: "neutral" | "human" 
     case "fallback":
       return { text: `Labelled fallback: ${phaseCopy(s).body}`, tone: "warn" };
     case "error":
-      return { text: `Something went wrong: ${phaseCopy(s).body}`, tone: "error" };
+      // The banner right below carries the details and the way out; the strip only names the state.
+      return { text: phaseCopy(s).title, tone: "error" };
   }
 }
 
