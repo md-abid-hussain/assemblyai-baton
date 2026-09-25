@@ -11,6 +11,9 @@
  */
 import type { Channel, PolicyRecord } from "../contracts/case";
 import type { CallManifestEntry } from "../contracts/scenario";
+import type { IntentSpec } from "../contracts/v2/relay";
+import { accountFor } from "../relay/account";
+import { kernelOrLegacy } from "../relay/spec-link";
 import { LIMITS, sanitizeParams, type BeginMessage, type StreamingParams } from "./streaming";
 
 /** The only model the product streams with (10b ST-1). */
@@ -119,14 +122,21 @@ export interface BuildSttParamsOptions {
 /**
  * The exact Streaming params of one channel of a recorded call (DESIGN §5.1.5). Sanitized: prompt ≤ 1750 chars,
  * keyterms ≤ 100 × ≤ 50 chars, agent_context keeps its last 1750 chars (fatal 3006 otherwise, 10b C15).
+ *
+ * WP14a·3: with `spec` = a compiled relay's spec, the keyterms and prompt come from `compiled.listening(account)`
+ * (PLATFORM §4.3), and a relay whose `listening.languageCodes` include "hi" gets the Hinglish params on both
+ * channels. The turn tuning still follows the audio (8 kHz → TUNING_8K). `LEGACY_BATON_SPEC` keeps this code.
  */
 export function buildSttParams(
   call: Pick<CallManifestEntry, "format" | "language" | "scenarioId">,
   policy: PolicyRecord,
   channel: Channel,
   opts: BuildSttParamsOptions = {},
+  spec?: IntentSpec,
 ): StreamingParams {
-  const hinglish = opts.hinglish ?? hinglishChannel(call, channel);
+  const k = kernelOrLegacy(spec, "buildSttParams");
+  const listening = k ? k.listening(accountFor(policy)) : null;
+  const hinglish = opts.hinglish ?? (hinglishChannel(call, channel) || (listening?.languageCodes.includes("hi") ?? false));
   const tuning = call.format.sampleRate === 8000 ? (opts.tuning8k === undefined ? TUNING_8K : opts.tuning8k) : null;
   const p: StreamingParams = {
     speech_model: STT_SPEECH_MODEL,
@@ -134,8 +144,8 @@ export function buildSttParams(
     sample_rate: call.format.sampleRate,
     mode: STT_MODE,
     inactivity_timeout: STT_INACTIVITY_TIMEOUT_S,
-    keyterms_prompt: keytermsFromPolicy(policy),
-    prompt: STT_PROMPT,
+    keyterms_prompt: listening ? [...listening.keyterms] : keytermsFromPolicy(policy),
+    prompt: listening ? listening.prompt : STT_PROMPT,
     ...(hinglish ? { language_codes: [...HINGLISH_PARAMS.language_codes], language_detection: true } : {}),
     ...(tuning ? { min_turn_silence: tuning.min_turn_silence, max_turn_silence: tuning.max_turn_silence } : {}),
     ...(opts.agentContext ? { agent_context: opts.agentContext } : {}),

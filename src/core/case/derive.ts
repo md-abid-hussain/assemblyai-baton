@@ -2,14 +2,19 @@
  * case/derive.ts - `deriveCaseState` (DESIGN §5.4.2–§5.4.3): the whole CaseState recomputed from the append-only
  * fact events, every time. Pure and deterministic (exported for the sweep, §6.5). Also `deriveV1`, the naive v1
  * rule ("any stated value = VERIFIED", §6.4).
+ *
+ * WP14a·3: optional trailing `spec?: IntentSpec` (TASKS-v2 §2 rule 9). With a spec the fields, rules and readiness are
+ * the spec's; `intent` stays "add_driver" until the P§4.7 widening. The §5.4.1 age rule runs only for a spec that has
+ * both `driver_dob` and `driver_age` (Baton and its clones).
  */
 import type {
   CasePayment, CaseState, ConflictCard, DisclosureKind, FieldId, FieldState, PolicyRecord, Stage,
 } from "../contracts/case";
 import type { VerifierResult } from "../contracts/extract";
-import { displayValue } from "../intents/add-driver";
+import type { IntentSpec } from "../contracts/v2/relay";
 import { FIELD_IDS } from "../intents/add-driver.fields";
 import { ageOn, dayNumber } from "./dates";
+import { fieldIdsOf, fieldOps, type FieldOps } from "./field-ops";
 import { emptyFieldState, readinessOf } from "./state";
 import { deriveField, verifierViewOf, type DerivableEvent, type VerifierOpinion } from "./status-rules";
 
@@ -55,9 +60,10 @@ function groupByField(events: readonly DerivableEvent[]): Map<FieldId, Derivable
  * a merely stated-once consistent age is upgraded). If both exist and disagree, both become PENDING (`conflict`)
  * unless one of them was confirmed by the AI.
  */
-function applyAgeRule(fields: Record<FieldId, FieldState>, policy: PolicyRecord, callDate: string, cards: ConflictCard[]): void {
+function applyAgeRule(fields: Record<FieldId, FieldState>, ops: FieldOps, callDate: string, cards: ConflictCard[]): void {
   const dob = fields.driver_dob;
   const age = fields.driver_age;
+  if (!dob || !age) return;
   if (dob.value === null || dayNumber(dob.value) === null || dayNumber(callDate) === null) return;
   const computed = String(ageOn(dob.value, callDate));
   if (age.value !== null && age.value !== computed) {
@@ -83,7 +89,7 @@ function applyAgeRule(fields: Record<FieldId, FieldState>, policy: PolicyRecord,
       status: "VERIFIED",
       reason: dob.reason,
       value: computed,
-      display: displayValue("driver_age", computed, policy),
+      display: ops.display("driver_age", computed),
       source: age.value === null ? dob.source : age.source,
       evidence: age.value === null ? dob.evidence : age.evidence,
       updatedAtMs: Math.max(age.updatedAtMs, dob.updatedAtMs),
@@ -92,21 +98,21 @@ function applyAgeRule(fields: Record<FieldId, FieldState>, policy: PolicyRecord,
 }
 
 /** `deriveCaseState(policy, events, ctx)`: recompute the full state from the events (§5.4). */
-export function deriveCaseState(policy: PolicyRecord, events: readonly DerivableEvent[], ctx: DeriveCtx): CaseState {
+export function deriveCaseState(policy: PolicyRecord, events: readonly DerivableEvent[], ctx: DeriveCtx, spec?: IntentSpec): CaseState {
   const sorted = sortEvents(events);
   const callDate = policy.callDate;
   const lateCut = ctx.rules?.lateCut ?? true;
   const verifier: Map<FieldId, VerifierOpinion> =
-    ctx.rules?.verifierOverlay === false ? new Map() : verifierViewOf(sorted, ctx.verifier, { policy, callDate });
+    ctx.rules?.verifierOverlay === false ? new Map() : verifierViewOf(sorted, ctx.verifier, { policy, callDate }, spec);
   const byField = groupByField(sorted);
   const cards: ConflictCard[] = [];
   const fields = {} as Record<FieldId, FieldState>;
-  for (const f of FIELD_IDS) {
-    const { state, card } = deriveField(f, byField.get(f) ?? [], { policy, callDate, tArmMs: ctx.tArmMs ?? null, lateCut, verifier });
+  for (const f of fieldIdsOf(spec, FIELD_IDS)) {
+    const { state, card } = deriveField(f, byField.get(f) ?? [], { policy, callDate, tArmMs: ctx.tArmMs ?? null, lateCut, verifier }, spec);
     fields[f] = state;
     if (card) cards.push(card);
   }
-  applyAgeRule(fields, policy, callDate, cards);
+  applyAgeRule(fields, fieldOps({ policy, callDate }, spec), callDate, cards);
   const clock = sorted.length ? Math.max(...sorted.map((e) => e.turnEndMs)) : 0;
   return {
     caseId: ctx.caseId,
@@ -114,7 +120,7 @@ export function deriveCaseState(policy: PolicyRecord, events: readonly Derivable
     version: ctx.version ?? 0,
     callClockMs: ctx.callClockMs ?? clock,
     fields,
-    readiness: readinessOf(fields),
+    readiness: readinessOf(fields, spec),
     conflicts: cards,
     stage: ctx.stage ?? null,
     disclosuresGiven: ctx.disclosuresGiven ?? [],
@@ -127,18 +133,20 @@ export function deriveCaseState(policy: PolicyRecord, events: readonly Derivable
  * `deriveV1` (§6.4 v1, naive): the latest non-null value of each field is VERIFIED, whoever said it, with no
  * acknowledgement, conflict, late/cut or verifier logic. Reason `stated_once` (it was stated; v1 asserts it anyway).
  */
-export function deriveV1(policy: PolicyRecord, events: readonly DerivableEvent[], ctx: Pick<DeriveCtx, "caseId" | "version" | "callClockMs">): CaseState {
+export function deriveV1(policy: PolicyRecord, events: readonly DerivableEvent[], ctx: Pick<DeriveCtx, "caseId" | "version" | "callClockMs">, spec?: IntentSpec): CaseState {
   const sorted = sortEvents(events);
+  const ops = fieldOps({ policy, callDate: policy.callDate }, spec);
   const fields = {} as Record<FieldId, FieldState>;
-  for (const f of FIELD_IDS) fields[f] = emptyFieldState(f);
+  for (const f of fieldIdsOf(spec, FIELD_IDS)) fields[f] = emptyFieldState(f);
   for (const e of sorted) {
     if (e.kind === "question" || e.kind === "verifier" || e.valueNorm === null) continue;
+    if (!fields[e.field]) continue;   // a field this intent does not have
     fields[e.field] = {
       ...fields[e.field],
       status: "VERIFIED",
       reason: "stated_once",
       value: e.valueNorm,
-      display: displayValue(e.field, e.valueNorm, policy, e.valueRaw),
+      display: ops.display(e.field, e.valueNorm, e.valueRaw),
       source: e.party,
       evidence: e.evidence ? [e.evidence, ...fields[e.field].evidence].slice(0, 3) : fields[e.field].evidence,
       updatedAtMs: e.turnEndMs,
@@ -147,6 +155,6 @@ export function deriveV1(policy: PolicyRecord, events: readonly DerivableEvent[]
   const clock = sorted.length ? Math.max(...sorted.map((e) => e.turnEndMs)) : 0;
   return {
     caseId: ctx.caseId, intent: "add_driver", version: ctx.version ?? 0, callClockMs: ctx.callClockMs ?? clock, fields,
-    readiness: readinessOf(fields), conflicts: [], stage: null, disclosuresGiven: [], payment: null, confirmationNumber: null,
+    readiness: readinessOf(fields, spec), conflicts: [], stage: null, disclosuresGiven: [], payment: null, confirmationNumber: null,
   };
 }

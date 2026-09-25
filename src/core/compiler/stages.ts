@@ -2,13 +2,18 @@
  * compiler/stages.ts - stage progression (§5.8), the next step and its input mode (§5.9.1), the dynamic session
  * cap (§5.9.5) and the pure timing helpers of the hold protocol (§5.8) and the wrap-up (§5.9.5).
  * WP1 early deliverable; WP5/WP5b/WP6 import these.
+ *
+ * WP14a·3: `nextStepOf`, `inputModeFor`, `staticInputMode`, `openRequiredFields` and `vaSessionCapMs` take an optional
+ * trailing `spec?: IntentSpec` (TASKS-v2 §2 rule 9); without it they are the Baton rules, unchanged.
  */
 import type { CaseState, FieldId, Stage } from "../contracts/case";
 import type { TakeoverPhase } from "../contracts/events";
 import type { InputModeFor, PhoneState, VaSessionCapMs } from "../contracts/services";
 import { TAKEOVER_TIMING, type InputModePlan, type NextStep } from "../contracts/takeover";
+import type { IntentSpec } from "../contracts/v2/relay";
 import { REQUIRED_SET, SERVER_RESOLVABLE_SET } from "../intents/add-driver.fields";
 import { GREETING_PRIORITY } from "../intents/add-driver";
+import { missingEntityFor, nextStepFor, openRequiredFor } from "../relay/spec-link";
 
 export const STAGE_ORDER: readonly Stage[] = ["confirm", "disclose", "pay", "close"];
 
@@ -38,7 +43,8 @@ export function nextStage(
  * The greeting's (and the agent's) next step (§5.6 sentence 4): the first PENDING field in priority order →
  * `confirm`; else the first required MISSING field (never the server-resolvable premium) → `ask`; else `none`.
  */
-export function nextStepOf(snapshot: Pick<CaseState, "fields">): NextStep {
+export function nextStepOf(snapshot: Pick<CaseState, "fields">, spec?: IntentSpec): NextStep {
+  if (spec) return nextStepFor(spec, snapshot) as NextStep;
   for (const f of GREETING_PRIORITY) if (snapshot.fields[f]?.status === "PENDING") return { kind: "confirm", field: f };
   for (const f of GREETING_PRIORITY) {
     if (REQUIRED_SET.has(f) && !SERVER_RESOLVABLE_SET.has(f) && (snapshot.fields[f]?.status ?? "MISSING") === "MISSING") {
@@ -61,7 +67,8 @@ export const ENTITY_FIELDS: ReadonlySet<FieldId> = new Set<FieldId>([
  * - yes/no confirmations and "ready?" → `min_latency` (yes_no);
  * - disclosure and consent answers → `min_latency` (disclosure).
  */
-export const inputModeFor: InputModeFor = (next) => {
+export const inputModeFor = (next: Parameters<InputModeFor>[0], spec?: IntentSpec): InputModePlan => {
+  if (spec) return spec.inputModeFor(next);
   switch (next.kind) {
     case "ask":
       return next.field === "license_number" ? { mode: "max_accuracy", reason: "id_capture" } : { mode: "balanced", reason: "asks_entity" };
@@ -78,8 +85,8 @@ export const inputModeFor: InputModeFor = (next) => {
  * Fallback if T-D1-4 shows `transcription_mode` is immutable mid-session (§5.9.1): `balanced` whenever the
  * snapshot has any MISSING required entity field, else `min_latency`.
  */
-export function staticInputMode(snapshot: Pick<CaseState, "fields">): InputModePlan {
-  const missingEntity = [...ENTITY_FIELDS].some(
+export function staticInputMode(snapshot: Pick<CaseState, "fields">, spec?: IntentSpec): InputModePlan {
+  const missingEntity = spec ? missingEntityFor(spec, snapshot) : [...ENTITY_FIELDS].some(
     (f) => REQUIRED_SET.has(f) && (snapshot.fields[f]?.status ?? "MISSING") === "MISSING",
   );
   return missingEntity ? { mode: "balanced", reason: "asks_entity" } : { mode: "min_latency", reason: "yes_no" };
@@ -96,7 +103,8 @@ export interface VaCapEnv {
 export const DEFAULT_VA_CAP_ENV: VaCapEnv = { baseMs: 150_000, perFieldMs: 15_000, maxMs: 420_000 };
 
 /** Required fields that are not VERIFIED at the snapshot, excluding the server-resolvable premium (never asked). */
-export function openRequiredFields(snapshot: Pick<CaseState, "fields">): FieldId[] {
+export function openRequiredFields(snapshot: Pick<CaseState, "fields">, spec?: IntentSpec): FieldId[] {
+  if (spec) return openRequiredFor(spec, snapshot) as FieldId[];
   return [...REQUIRED_SET].filter((f) => !SERVER_RESOLVABLE_SET.has(f) && snapshot.fields[f]?.status !== "VERIFIED");
 }
 
@@ -104,8 +112,12 @@ export function openRequiredFields(snapshot: Pick<CaseState, "fields">): FieldId
  * `vaSessionCapMs = min(MAX, BASE + PER_FIELD × open)` (§5.9.5), where `open` = PENDING + MISSING required fields
  * at the snapshot (the premium excluded: the AI never works on it). 150 s + 15 s per open field, at most 420 s.
  */
-export const vaSessionCapMs: VaSessionCapMs = (snapshot, env) =>
-  Math.min(env.maxMs, env.baseMs + env.perFieldMs * openRequiredFields(snapshot).length);
+export const vaSessionCapMs = (snapshot: Parameters<VaSessionCapMs>[0], env: Parameters<VaSessionCapMs>[1], spec?: IntentSpec): number =>
+  Math.min(env.maxMs, env.baseMs + env.perFieldMs * openRequiredFields(snapshot, spec).length);
+
+// The contract types still describe the (spec-less) calls.
+const _contracts: [InputModeFor, VaSessionCapMs] = [inputModeFor, vaSessionCapMs];
+void _contracts;
 
 /** The effective cap: the dynamic cap plus the time spent in `paying` (the wrap-up clock pauses while holding). */
 export const effectiveCapMs = (capMs: number, payingMs: number): number => capMs + Math.max(0, payingMs);

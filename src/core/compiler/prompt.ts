@@ -5,8 +5,11 @@
  * (= sha256(template + stage instructions).slice(0, 8)).
  */
 import type { CaseState, FieldId, PolicyRecord, Stage } from "../contracts/case";
+import type { IntentSpec } from "../contracts/v2/relay";
 import { sha256Hex } from "../case/sha256";
 import { ADVICE_DOMAIN_SET, FIELD_IDS, REQUIRED_SET } from "../intents/add-driver.fields";
+import { accountFor } from "../relay/account";
+import { kernelOrLegacy } from "../relay/spec-link";
 import { spokenDateLong } from "./spoken";
 import type { PayToolMode } from "./tool-schemas";
 
@@ -74,8 +77,13 @@ const MONEY_FIELDS_IN_PROMPT: ReadonlySet<FieldId> = new Set<FieldId>(["premium_
  * `caseStateJson` (§5.7): compact JSON, ≤ 1800 chars. The 10 required fields plus any non-MISSING optional
  * field; advice-domain fields go under `decided_by_rep` (read-only context). Money fields appear only when the REP
  * quoted them (VERIFIED from the rep), never otherwise, and never as MISSING.
+ *
+ * WP14a·3: with `spec` = a compiled relay's spec (`compileRelay(bp).spec`), the kernel's case JSON of that relay
+ * (`promptVisibility`, `caseJson.{header,tables,maxChars}`); `LEGACY_BATON_SPEC` keeps this code. Parity: equal for Baton.
  */
-export function caseStateJson(state: Pick<CaseState, "fields">, policy: PolicyRecord): string {
+export function caseStateJson(state: Pick<CaseState, "fields">, policy: PolicyRecord, spec?: IntentSpec): string {
+  const k = kernelOrLegacy(spec, "caseStateJson");
+  if (k) return k.caseJson(state, accountFor(policy));
   const vehicles = Object.fromEntries(policy.vehicles.map((v) => [v.id, v.label]));
   const fields: Record<string, { status: string; value?: string }> = {};
   const optional: string[] = [];

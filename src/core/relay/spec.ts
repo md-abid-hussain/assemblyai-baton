@@ -9,17 +9,17 @@
  * `capture.priority`: 1..99 orders the next steps (ascending; ties keep field order); 0 = never a next step (the AI
  * does not raise the field on its own, e.g. Baton's premium, discounts and license number).
  */
-import type { CaseState, FieldState } from "../contracts/case";
 import type { InputModePlan } from "../contracts/takeover";
 import type { AccountRecord, Blueprint, BlueprintField } from "../contracts/v2/blueprint";
 import { compileSafeUnion, safeTest } from "../contracts/v2/regex";
-import type { IntentSpec, PhraseScope, RelayNextStep } from "../contracts/v2/relay";
+import type { IntentSpec, PhraseScope } from "../contracts/v2/relay";
 import { dayNumber, diffDays, ymd } from "../case/dates";
 import { speechLower } from "../intents/add-driver";
 import { ALL_VALUE, formatValue } from "./formatters";
 import { blueprintHash } from "./migrate";
 import { normalizeRaw } from "./normalizers";
-import { fieldState, lookupTableOf, makeScope, renderIn, TemplateCache, type Fields } from "./scope";
+import { lookupTableOf, makeScope, renderIn, TemplateCache, type Fields } from "./scope";
+import { openRequiredFor } from "./spec-link";
 
 /** An `IntentSpec` plus the blueprint it came from (kernel-internal; `CompiledRelay.spec` exposes the spec). */
 export interface BlueprintSpec extends IntentSpec {
@@ -199,43 +199,12 @@ export function buildIntentSpec(bp: Blueprint, opts: { hash?: string } = {}): Bl
 }
 
 // ============================================================================================ spec-driven helpers
-// (Kernel versions of compiler/stages.ts; WP14a·3 threads the optional `spec` through the legacy functions.)
+// The pure rules live in the leaf ./spec-link.ts so the legacy functions share them (WP14a·3 spec injection).
 
-/** The next step (§5.6 sentence 4): the first PENDING field in priority order → confirm; else the first required
- *  MISSING field that is not server-resolvable → ask; else none. */
-export function nextStepFor(spec: IntentSpec, snapshot: Fields): RelayNextStep {
-  for (const f of spec.priority) if (fieldState(snapshot, f)?.status === "PENDING") return { kind: "confirm", field: f };
-  for (const f of spec.priority) {
-    if (spec.required.has(f) && !spec.serverResolvable.has(f) && (fieldState(snapshot, f)?.status ?? "MISSING") === "MISSING") {
-      return { kind: "ask", field: f };
-    }
-  }
-  return { kind: "none", field: null };
-}
-
-/** Required fields not VERIFIED at the snapshot, excluding server-resolvable ones (never asked). */
-export function openRequiredFor(spec: IntentSpec, snapshot: Fields): string[] {
-  return [...spec.required].filter((f) => !spec.serverResolvable.has(f) && fieldState(snapshot, f)?.status !== "VERIFIED");
-}
+export { nextStepFor, openRequiredFor, readinessFor } from "./spec-link";
 
 /** `min(max, base + perField × open)` in ms, from `playbook.sessionCap` (seconds) unless an env override is given. */
 export function sessionCapMsFor(spec: IntentSpec, bp: Blueprint, snapshot: Fields, env?: { baseMs: number; perFieldMs: number; maxMs: number }): number {
   const cap = env ?? { baseMs: bp.playbook.sessionCap.baseSec * 1000, perFieldMs: bp.playbook.sessionCap.perFieldSec * 1000, maxMs: bp.playbook.sessionCap.maxSec * 1000 };
   return Math.min(cap.maxMs, cap.baseMs + cap.perFieldMs * openRequiredFor(spec, snapshot).length);
 }
-
-/** Readiness over a spec's required fields (the kernel's `Readiness`, as case/state.ts `readinessOf`). */
-export function readinessFor(spec: IntentSpec, snapshot: Fields): CaseState["readiness"] {
-  let verified = 0, pending = 0, missing = 0;
-  let ready = true;
-  for (const f of spec.required) {
-    const st: FieldState | undefined = fieldState(snapshot, f);
-    const status = st?.status ?? "MISSING";
-    if (status === "VERIFIED") verified++;
-    else if (status === "PENDING") pending++;
-    else missing++;
-    if (status !== "VERIFIED" && !spec.serverResolvable.has(f)) ready = false;   // as case/state.ts readinessOf
-  }
-  return { verified, pending, missing, requiredTotal: spec.required.size, ready };
-}
-

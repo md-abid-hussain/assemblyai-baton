@@ -2,10 +2,15 @@
  * qa/index.ts - `computeQa(input): QaResult` (DESIGN §5.13): the deterministic re-ask counter and the
  * disclosure-verbatim check over the agent channel of the AI half. WP8 runs it on the async multichannel transcript
  * (ch2 = agent) and, provisionally, on `transcript.agent` finals (no timings).
+ *
+ * WP14a·3: `computeQa(input, spec?)` (TASKS-v2 §2 rule 9): the spec's QA lexicon and spoken forms; with a compiled
+ * relay's spec also `qa.verbatimThreshold` and `qa.reaskTargets` (PLATFORM §4.3). Without a spec: unchanged.
  */
 import type { CaseState, DisclosureKind, FieldId, PolicyRecord } from "../contracts/case";
 import type { QaResult } from "../contracts/events";
 import type { ToolName } from "../contracts/tools";
+import type { IntentSpec } from "../contracts/v2/relay";
+import { specKernelOf } from "../relay/spec-link";
 import { normTokens, splitSentences } from "./norm";
 import { classifySentence } from "./reask";
 import { verbatimCheck } from "./verbatim";
@@ -72,7 +77,9 @@ export function sentencesOf(utts: readonly QaUtterance[]): Sent[] {
 }
 
 /** `computeQa(input)` (§5.13 algorithm, steps 1–7). */
-export function computeQa(input: QaInput): QaResult {
+export function computeQa(input: QaInput, spec?: IntentSpec): QaResult {
+  const kernel = specKernelOf(spec);
+  const targets = kernel && kernel.reaskTargets.length ? new Set<string>(kernel.reaskTargets) : null;
   const utts = input.prependGreeting && input.greeting ? [{ text: input.greeting, startMs: 0 }, ...input.ch2] : input.ch2;
   const sents = sentencesOf(utts);
 
@@ -86,7 +93,8 @@ export function computeQa(input: QaInput): QaResult {
       .map(({ i }) => i);
     const stream: { tok: string; sent: number }[] = idx.flatMap((i) => sents[i]!.tokens.map((tok) => ({ tok, sent: i })));
     const r = verbatimCheck(d.text, stream.map((x) => x.tok), d.criticalTokens);
-    disclosures.push({ kind: d.kind, similarity: Math.round(r.similarity * 1000) / 1000, ok: r.ok, missingCritical: r.missingCritical });
+    const ok = kernel ? r.similarity >= kernel.verbatimThreshold && r.missingCritical.length === 0 : r.ok;
+    disclosures.push({ kind: d.kind, similarity: Math.round(r.similarity * 1000) / 1000, ok, missingCritical: r.missingCritical });
     const inWin = new Map<number, number>();
     for (let k = r.window[0]; k < r.window[1]; k++) inWin.set(stream[k]!.sent, (inWin.get(stream[k]!.sent) ?? 0) + 1);
     for (const [i, n] of inWin) if (n * 2 >= sents[i]!.tokens.length) excluded.add(i);
@@ -97,7 +105,8 @@ export function computeQa(input: QaInput): QaResult {
   let adviceFlags = 0;
   sents.forEach((s, i) => {
     if (excluded.has(i)) return;
-    const c = classifySentence(s.sentence, input.snapshot, input.policy);
+    const c0 = classifySentence(s.sentence, input.snapshot, input.policy, spec);
+    const c = targets ? { ...c0, fields: c0.fields.filter((f) => targets.has(f.field)) } : c0;
     if (c.advice) { adviceFlags++; details.push({ sentence: s.sentence, atMs: s.atMs, field: null, classification: "advice" }); }
     if (!c.isRequest) return;
     if (!c.fields.length) { if (!c.advice) details.push({ sentence: s.sentence, atMs: s.atMs, field: null, classification: "other" }); return; }

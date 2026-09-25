@@ -4,13 +4,17 @@
  * Applied per field over the case's events sorted by `(turnEndMs, seq)`. VERIFIED needs a cross-party
  * confirmation (ack, read-back, both stated), a policy record or an accepted AI tool update; the verifier (sol)
  * can only downgrade or fill a MISSING field as PENDING, never upgrade.
+ *
+ * WP14a·3: every export takes an optional trailing `spec?: IntentSpec` (TASKS-v2 §2 rule 9). Without it the Baton
+ * functions run unchanged; with it, normalize/display/compare/rep-only/range come from the spec (case/field-ops.ts).
  */
 import type {
   ConflictCard, Evidence, FactEvent, FieldId, FieldState, Party, PolicyRecord, StatusReason,
 } from "../contracts/case";
 import type { VerifierResult } from "../contracts/extract";
-import { compatible, displayValue, effectiveDateInRange, mergeValues, normalizeField } from "../intents/add-driver";
-import { REP_ONLY_SET } from "../intents/add-driver.fields";
+import type { IntentSpec } from "../contracts/v2/relay";
+import { compatible } from "../intents/add-driver";
+import { fieldOps } from "./field-ops";
 import { emptyFieldState } from "./state";
 
 /** A fact event as derivation needs it: `seq` is optional (cached/sweep events have none; array order breaks ties). */
@@ -62,12 +66,14 @@ export function verifierViewOf(
   events: readonly DerivableEvent[],
   result: VerifierResult | null | undefined,
   ctx: { policy: PolicyRecord; callDate: string },
+  spec?: IntentSpec,
 ): Map<FieldId, VerifierOpinion> {
   const view = new Map<FieldId, VerifierOpinion>();
   if (result) {
+    const ops = fieldOps(ctx, spec);
     for (const f of result.fields) {
       if (f.support === "absent") continue;
-      const n = f.value === null ? null : (normalizeField(f.field, f.value, ctx)?.norm ?? null);
+      const n = f.value === null ? null : (ops.normalize(f.field, f.value)?.norm ?? null);
       view.set(f.field, { valueNorm: n, support: f.support, evidence: null, turnEndMs: result.uptoRecvMs });
     }
     return view;
@@ -83,9 +89,9 @@ export function verifierViewOf(
 }
 
 /** §5.4.3: sol reports a non-absent support with a value not compatible with `v`. */
-export function verifierDisagrees(field: FieldId, v: string, view: VerifierView): boolean {
+export function verifierDisagrees(field: FieldId, v: string, view: VerifierView, spec?: IntentSpec): boolean {
   const o = view.get(field);
-  return !!o && o.valueNorm !== null && !compatible(field, v, o.valueNorm);
+  return !!o && o.valueNorm !== null && !(spec ? spec.compatible(field, v, o.valueNorm) : compatible(field, v, o.valueNorm));
 }
 
 function reasonOf(e: DerivableEvent): StatusReason {
@@ -115,7 +121,8 @@ const evidenceOf = (evs: readonly DerivableEvent[]): Evidence[] => {
  * `deriveField(field, evs, ctx)` (§5.4.2). `evs` = this field's events in `(turnEndMs, seq)` order; `question`
  * events are ignored; `verifier` events are read only through `ctx.verifier`.
  */
-export function deriveField(field: FieldId, evs: readonly DerivableEvent[], ctx: FieldDeriveCtx): FieldDerivation {
+export function deriveField(field: FieldId, evs: readonly DerivableEvent[], ctx: FieldDeriveCtx, spec?: IntentSpec): FieldDerivation {
+  const ops = fieldOps(ctx, spec);
   let cur: { value: string; party: Party; supports: DerivableEvent[] } | null = null;
   let confirmedBy: DerivableEvent | null = null;
   let conflict: DerivableEvent[] = [];
@@ -134,7 +141,7 @@ export function deriveField(field: FieldId, evs: readonly DerivableEvent[], ctx:
         confirmedBy = e;
         break;
       case "tool_update": // an accepted update_case_field / confirm_effective_date in the AI half (§5.8)
-        if (cur && confirmedBy && !compatible(field, cur.value, e.valueNorm)) corrected = { old: cur, by: e };
+        if (cur && confirmedBy && !ops.compatible(field, cur.value, e.valueNorm)) corrected = { old: cur, by: e };
         cur = { value: e.valueNorm!, party: "ai", supports: [e] };
         confirmedBy = e; aiConfirmed = true; conflict = []; denied = false;
         break;
@@ -142,7 +149,7 @@ export function deriveField(field: FieldId, evs: readonly DerivableEvent[], ctx:
       case "readback":
       case "corrected": {
         const v = e.valueNorm!;
-        if (!cur || !compatible(field, cur.value, v)) {
+        if (!cur || !ops.compatible(field, cur.value, v)) {
           if (cur && e.kind !== "corrected" && e.party !== cur.party && !confirmedBy) conflict = [...cur.supports, e];
           if (e.kind === "corrected" || !cur || confirmedBy === null || e.party === cur.party) {
             cur = { value: v, party: e.party, supports: [e] }; confirmedBy = null; denied = false;
@@ -153,13 +160,13 @@ export function deriveField(field: FieldId, evs: readonly DerivableEvent[], ctx:
           }
         } else {
           cur.supports.push(e);
-          cur.value = mergeValues(field, cur.value, v);
+          cur.value = ops.merge(field, cur.value, v);
           if (e.party !== cur.party && !confirmedBy) confirmedBy = e; // read_back / both_stated
         }
         break;
       }
       case "ack":
-        if (cur && e.party !== cur.party && (e.valueNorm === null || compatible(field, cur.value, e.valueNorm))
+        if (cur && e.party !== cur.party && (e.valueNorm === null || ops.compatible(field, cur.value, e.valueNorm))
             && (e.acknowledgesTurnId === null || cur.supports.some((s) => s.turnId === e.acknowledgesTurnId))) {
           confirmedBy ??= e;
         }
@@ -180,7 +187,7 @@ export function deriveField(field: FieldId, evs: readonly DerivableEvent[], ctx:
       return {
         state: {
           ...base, status: "PENDING", reason: "verifier_only", value: o.valueNorm,
-          display: displayValue(field, o.valueNorm, ctx.policy), source: "verifier",
+          display: ops.display(field, o.valueNorm), source: "verifier",
           evidence: o.evidence ? [o.evidence] : [], updatedAtMs: Math.max(updatedAtMs, o.turnEndMs),
         },
         card: null,
@@ -193,7 +200,7 @@ export function deriveField(field: FieldId, evs: readonly DerivableEvent[], ctx:
   const involved = confirmedBy ? [confirmedBy, ...c.supports] : [...c.supports];
   if (involved.some((x) => isLate(x, ctx.tArmMs))) flags.add("late_turn");
   if (involved.some((x) => x.cut)) flags.add("cut_turn");
-  const disagrees = verifierDisagrees(field, c.value, ctx.verifier);
+  const disagrees = verifierDisagrees(field, c.value, ctx.verifier, spec);
   if (disagrees) flags.add("verifier_disagrees");
   if (corrected) {
     flags.add("customer_corrected_verified");
@@ -211,7 +218,7 @@ export function deriveField(field: FieldId, evs: readonly DerivableEvent[], ctx:
   let status: FieldState["status"] = "PENDING";
   let reason: StatusReason;
   let conflictState: FieldState["conflict"] = null;
-  if (REP_ONLY_SET.has(field) && !c.supports.some((s) => s.party === "rep" || s.party === "ai")) reason = "rep_only_violation";
+  if (ops.repOnly(field) && !c.supports.some((s) => s.party === "rep" || s.party === "ai")) reason = "rep_only_violation";
   else if (conflict.length && !aiConfirmed) {
     reason = "conflict";
     const values = [...new Set(conflict.map((e) => e.valueNorm!))];
@@ -227,7 +234,7 @@ export function deriveField(field: FieldId, evs: readonly DerivableEvent[], ctx:
   else if (disagrees && !aiConfirmed) reason = "verifier_disagrees";
   else { status = "VERIFIED"; reason = reasonOf(confirmedBy); }
 
-  if (field === "effective_date" && !effectiveDateInRange(c.value, ctx.callDate)) {
+  if (!ops.inRange(field, c.value)) {
     flags.add("out_of_range");
     status = "PENDING";
     reason = "out_of_range";
@@ -240,7 +247,7 @@ export function deriveField(field: FieldId, evs: readonly DerivableEvent[], ctx:
       status,
       reason,
       value: c.value,
-      display: displayValue(field, c.value, ctx.policy, rawOf),
+      display: ops.display(field, c.value, rawOf),
       source: c.party,
       evidence: evidenceOf([...(confirmedBy ? [confirmedBy] : []), ...c.supports, ...conflict]),
       conflict: conflictState,

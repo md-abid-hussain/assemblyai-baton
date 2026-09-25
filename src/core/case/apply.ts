@@ -2,11 +2,15 @@
  * case/apply.ts - deterministic post-processing of one extractor patch (DESIGN §5.3 "Post-processing"):
  * drop foreign/empty events, set party from the turn's channel, normalize, align evidence to word timings, copy
  * late/cut. `seq` is assigned by the repository inside the F1 transaction (G0: extractor output has no seq).
+ *
+ * WP14a·3: `applyExtraction` and `verifierDisagreementEvents` take an optional trailing `spec?: IntentSpec` (TASKS-v2
+ * §2 rule 9): normalize/compare through the spec, and events naming a field the spec does not have are dropped.
  */
 import type { CaseState, Evidence, FactEvent, FieldId, NewFactEvent, PolicyRecord } from "../contracts/case";
 import type { RawPatch, VerifierResult } from "../contracts/extract";
 import type { TurnInput } from "../contracts/turns";
-import { compatible, normalizeField } from "../intents/add-driver";
+import type { IntentSpec } from "../contracts/v2/relay";
+import { fieldOps } from "./field-ops";
 import { lcsLength } from "./text";
 
 export type EvidenceTurn = Pick<TurnInput, "channel" | "turnId" | "text" | "startMs" | "endMs" | "words" | "source">;
@@ -108,16 +112,19 @@ export function alignEvidence(quote: string, turn: EvidenceTurn): Evidence {
  * `applyExtraction(raw, turns, ctx)` (§5.3 post-processing). `turns` are the NEW turns of the call; events whose
  * `turn_id` is not one of them are dropped, as are value-less events other than ack/denied/question.
  */
-export function applyExtraction(raw: RawPatch, turns: readonly TurnInput[], ctx: ApplyCtx): NewFactEvent[] {
+export function applyExtraction(raw: RawPatch, turns: readonly TurnInput[], ctx: ApplyCtx, spec?: IntentSpec): NewFactEvent[] {
   const byId = new Map(turns.map((t) => [t.turnId, t]));
   const callDate = ctx.callDate ?? ctx.policy.callDate;
+  const ops = fieldOps({ policy: ctx.policy, callDate }, spec);
+  const known = spec ? new Set<string>(spec.fieldIds) : null;
   const out: NewFactEvent[] = [];
   raw.events.forEach((e, index) => {
     const turn = byId.get(e.turn_id);
     if (!turn) return; // step 1
+    if (known && !known.has(e.field)) return; // a field this intent does not have (spec runs only)
     if (e.kind !== "question" && e.kind !== "ack" && e.kind !== "denied" && (e.value === null || !e.value.trim())) return; // step 2
     const value = e.kind === "question" ? null : e.value;
-    const norm = value === null ? null : (normalizeField(e.field, value, { policy: ctx.policy, callDate })?.norm ?? null); // step 4
+    const norm = value === null ? null : (ops.normalize(e.field, value)?.norm ?? null); // step 4
     const ev: Omit<FactEvent, "seq"> = {
       id: ctx.newId ? ctx.newId(turn.turnId, index) : `${ctx.caseId}:${turn.turnId}:${index}`,
       caseId: ctx.caseId,
@@ -155,16 +162,20 @@ export function verifierDisagreementEvents(
   state: Pick<CaseState, "fields">,
   turns: readonly TurnInput[],
   ctx: ApplyCtx,
+  spec?: IntentSpec,
 ): NewFactEvent[] {
   const callDate = ctx.callDate ?? ctx.policy.callDate;
+  const ops = fieldOps({ policy: ctx.policy, callDate }, spec);
+  const known = spec ? new Set<string>(spec.fieldIds) : null;
   const byId = new Map(turns.map((t) => [t.turnId, t]));
   const out: NewFactEvent[] = [];
   result.fields.forEach((f, index) => {
     if (f.support === "absent" || f.value === null) return;
-    const norm = normalizeField(f.field, f.value, { policy: ctx.policy, callDate })?.norm ?? null;
+    if (known && !known.has(f.field)) return;
+    const norm = ops.normalize(f.field, f.value)?.norm ?? null;
     if (norm === null) return;
     const cur = state.fields[f.field];
-    if (cur && cur.value !== null && compatible(f.field, cur.value, norm)) return;
+    if (cur && cur.value !== null && ops.compatible(f.field, cur.value, norm)) return;
     const cited = f.turnIds.map((id) => byId.get(id)).find((t): t is TurnInput => !!t);
     out.push({
       id: ctx.newId ? ctx.newId(`verifier@${result.uptoRecvMs}`, index) : `${ctx.caseId}:verifier@${result.uptoRecvMs}:${f.field}`,

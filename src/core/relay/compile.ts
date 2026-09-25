@@ -29,6 +29,7 @@ import {
   fieldState, knownValue, lookupTableOf, makeScope, renderIn, renderTracked, type Fields, type ScopeSlots,
 } from "./scope";
 import { buildIntentSpec, nextStepFor, readinessFor, sessionCapMsFor, type BlueprintSpec } from "./spec";
+import { linkSpecKernel } from "./spec-link";
 
 export interface CompileRelayOptions {
   /** The relay version id (null for an unsaved draft or the Studio preview). */
@@ -504,6 +505,12 @@ export function compileRelay(bp: Blueprint, opts: CompileRelayOptions = {}): Ker
     validateFirstUpdate(buildFirstUpdate(compiled), { keytermsEnabled, toolNames: allToolNames() });
     return compiled;
   };
+
+  // `compiled.spec` carries the blueprint-level outputs the legacy functions need (spec injection, relay/spec-link.ts).
+  linkSpecKernel(spec, {
+    blueprint: bp, caseJson, disclosure, listening,
+    verbatimThreshold: bp.qa.verbatimThreshold, reaskTargets: bp.qa.reaskTargets,
+  });
 
   return {
     versionId: opts.versionId ?? null,
