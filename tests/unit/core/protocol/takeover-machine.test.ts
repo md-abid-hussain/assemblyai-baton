@@ -621,6 +621,13 @@ describe("ACTIVE ⇄ PAYING → CLOSING → DONE", () => {
     expect(m.effects("post_end").at(-1)).toMatchObject({ outcome: "handed_back", reason: "cap" });
   });
 
+  it("the iOS background end (the VA controller ends after 10 s hidden) → outcome abandoned", () => {
+    const m = new M().toActive();
+    m.send({ type: "va_ended", now: (m.now += 30_000), attempt: 0, reason: "ios_background", sessionSeconds: 40 });
+    expect(m.phase).toBe("done");
+    expect(m.effects("post_end").at(-1)).toMatchObject({ outcome: "abandoned", reason: "ended:ios_background" });
+  });
+
   it("a failure after the greeting is not retried: the session ends and the pass is FAILED", () => {
     const m = new M().toActive();
     m.send({ type: "va_error", now: (m.now += 20_000), attempt: 0, code: "E_VA_SILENT", retryable: true, message: "silent twice" });

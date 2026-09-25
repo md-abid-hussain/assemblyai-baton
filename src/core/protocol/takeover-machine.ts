@@ -971,9 +971,12 @@ function onVaEnded(c: Ctx, now: number, attempt: 0 | 1, reason: string, sessionS
   if (!p || p.va.attempt !== attempt || p.va.status === "ended" || p.va.status === "dead") return;
   if (s.phase === "closing") return finishPass(c, now, sessionSeconds);
   if (s.phase === "active" || s.phase === "paying") {
-    // The VA controller ended the session itself: the dynamic cap or the absolute ceiling (§5.9.5).
+    // The VA controller ended the session itself: the dynamic cap or the absolute ceiling (§5.9.5) hands the rest to
+    // the rep; the page going to the background (iOS, §5.9.5) is the visitor leaving; anything else is a failure.
     const cap = /cap|ceiling/i.test(reason);
-    p.closing = { outcome: cap ? "handed_back" : "failed", reason: cap ? "cap" : `ended:${reason}`, finalPhase: cap ? "done" : "failed", startedAt: now, step: "ending" };
+    const left = /ios_background|pagehide/i.test(reason);
+    const outcome: TakeoverOutcome = cap ? "handed_back" : left ? "abandoned" : "failed";
+    p.closing = { outcome, reason: cap ? "cap" : `ended:${reason}`, finalPhase: outcome === "failed" ? "failed" : "done", startedAt: now, step: "ending" };
     s.phase = "closing";
     return finishPass(c, now, sessionSeconds);
   }
