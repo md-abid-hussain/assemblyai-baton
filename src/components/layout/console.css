@@ -1,0 +1,273 @@
+/*
+ * Call console tokens (DESIGN §1.4 design system): a calm "operations console", light and dark (.dark).
+ * Status colors: verified green, pending amber, missing slate, conflict red; parties: rep blue, customer teal, AI violet.
+ * Every *-fg on its *-bg is ≥ 4.5:1. Every status chip also carries an icon and a word, never color alone.
+ */
+:root {
+  --bt-display: "Bahnschrift", "DIN Alternate", "DIN Next LT Pro", "Barlow Semi Condensed", "Roboto Condensed", "Arial Narrow", system-ui, sans-serif;
+  --bt-mono: "Cascadia Mono", "SF Mono", ui-monospace, Menlo, Consolas, "Liberation Mono", monospace;
+
+  --bt-bg: oklch(0.975 0.004 250);
+  --bt-grid: oklch(0.91 0.008 250 / 0.55);
+  --bt-panel: oklch(1 0 0);
+  --bt-panel-2: oklch(0.985 0.003 250);
+  --bt-ink: oklch(0.23 0.02 262);
+  --bt-muted: oklch(0.47 0.018 262);
+  --bt-faint: oklch(0.53 0.014 262); /* ≥ 4.5:1 on every light panel and tint (WCAG AA small text) */
+  --bt-line: oklch(0.905 0.008 262);
+  --bt-line-strong: oklch(0.84 0.012 262);
+  --bt-shadow: 0 1px 0 oklch(0.2 0.02 262 / 0.04), 0 8px 24px -12px oklch(0.2 0.02 262 / 0.18);
+
+  --rep: oklch(0.56 0.17 256);
+  --rep-fg: oklch(0.45 0.16 258);
+  --rep-bg: oklch(0.955 0.025 256);
+  --customer: oklch(0.62 0.11 188);
+  --customer-fg: oklch(0.44 0.085 192);
+  --customer-bg: oklch(0.955 0.028 188);
+  --ai: oklch(0.55 0.21 295);
+  --ai-fg: oklch(0.47 0.2 295);
+  --ai-bg: oklch(0.955 0.03 295);
+
+  --verified: oklch(0.62 0.15 152);
+  --verified-fg: oklch(0.43 0.11 152);
+  --verified-bg: oklch(0.955 0.045 152);
+  --pending: oklch(0.79 0.155 78);
+  --pending-fg: oklch(0.48 0.11 62);
+  --pending-bg: oklch(0.965 0.05 88);
+  --missing: oklch(0.7 0.018 262);
+  --missing-fg: oklch(0.46 0.02 262);
+  --missing-bg: oklch(0.955 0.005 262);
+  --conflict: oklch(0.6 0.2 27);
+  --conflict-fg: oklch(0.49 0.18 27);
+  --conflict-bg: oklch(0.96 0.028 27);
+
+  --bt-live: oklch(0.62 0.17 150);
+  --bt-cached: oklch(0.5 0.12 65);
+  --bt-cached-bg: oklch(0.96 0.055 85);
+  /* Text on a filled accent (--ai, --rep, --conflict-fg, the Pass gradient): ≥ 4.5:1 in both themes. */
+  --bt-accent-ink: oklch(1 0 0);
+}
+
+.dark {
+  --bt-bg: oklch(0.165 0.01 262);
+  --bt-grid: oklch(0.28 0.012 262 / 0.5);
+  --bt-panel: oklch(0.205 0.012 262);
+  --bt-panel-2: oklch(0.225 0.012 262);
+  --bt-ink: oklch(0.95 0.006 262);
+  --bt-muted: oklch(0.74 0.015 262);
+  --bt-faint: oklch(0.66 0.014 262); /* ≥ 4.5:1 on every dark panel and tint */
+  --bt-line: oklch(0.3 0.014 262);
+  --bt-line-strong: oklch(0.38 0.016 262);
+  --bt-shadow: 0 1px 0 oklch(0 0 0 / 0.3), 0 10px 30px -14px oklch(0 0 0 / 0.7);
+
+  --rep: oklch(0.68 0.15 256);
+  --rep-fg: oklch(0.8 0.1 256);
+  --rep-bg: oklch(0.29 0.06 258);
+  --customer: oklch(0.72 0.11 188);
+  --customer-fg: oklch(0.83 0.08 188);
+  --customer-bg: oklch(0.29 0.045 192);
+  --ai: oklch(0.7 0.17 295);
+  --ai-fg: oklch(0.82 0.11 295);
+  --ai-bg: oklch(0.29 0.07 295);
+
+  --verified: oklch(0.72 0.15 152);
+  --verified-fg: oklch(0.83 0.12 152);
+  --verified-bg: oklch(0.29 0.05 152);
+  --pending: oklch(0.82 0.15 80);
+  --pending-fg: oklch(0.86 0.12 85);
+  --pending-bg: oklch(0.31 0.05 75);
+  --missing: oklch(0.6 0.02 262);
+  --missing-fg: oklch(0.78 0.015 262);
+  --missing-bg: oklch(0.27 0.012 262);
+  --conflict: oklch(0.7 0.18 25);
+  --conflict-fg: oklch(0.83 0.1 25);
+  --conflict-bg: oklch(0.3 0.07 25);
+
+  --bt-live: oklch(0.74 0.16 150);
+  --bt-cached: oklch(0.86 0.12 85);
+  --bt-cached-bg: oklch(0.31 0.05 75);
+  --bt-accent-ink: oklch(0.17 0.01 262);
+}
+
+.bt-console {
+  /* Components embedded in the console (WP6's MockPhone) use the shadcn tokens: a muted text that stays ≥ 4.5:1 on
+     the phone's muted bubbles. */
+  --muted-foreground: oklch(0.5 0 0);
+  --success: oklch(0.52 0.14 149);
+  background-color: var(--bt-bg);
+  background-image:
+    linear-gradient(var(--bt-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--bt-grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  background-position: -1px -1px;
+  color: var(--bt-ink);
+}
+
+.bt-display {
+  font-family: var(--bt-display);
+  font-stretch: 92%;
+  letter-spacing: 0.005em;
+}
+.bt-mono {
+  font-family: var(--bt-mono);
+  font-variant-numeric: tabular-nums;
+}
+.bt-num {
+  font-variant-numeric: tabular-nums;
+}
+.bt-eyebrow {
+  font-family: var(--bt-display);
+  font-size: 0.6875rem;
+  line-height: 1rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--bt-muted);
+  font-weight: 600;
+}
+
+.bt-panel {
+  background: var(--bt-panel);
+  border: 1px solid var(--bt-line);
+  border-radius: 12px;
+  box-shadow: var(--bt-shadow);
+}
+
+/* Scroll areas inside the fixed-height desktop grid. */
+.bt-scroll {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--bt-line-strong) transparent;
+}
+
+/* Live dot (LIVE STT, listening). */
+@keyframes bt-pulse {
+  0% { box-shadow: 0 0 0 0 color-mix(in oklch, currentColor 55%, transparent); }
+  70% { box-shadow: 0 0 0 7px color-mix(in oklch, currentColor 0%, transparent); }
+  100% { box-shadow: 0 0 0 0 color-mix(in oklch, currentColor 0%, transparent); }
+}
+.bt-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: currentColor;
+}
+.bt-dot-pulse {
+  animation: bt-pulse 1.8s ease-out infinite;
+}
+
+/* Caption words reveal on the reply's own schedule (animation-delay = word atMs). */
+@keyframes bt-word-in {
+  from { opacity: 0; filter: blur(2px); transform: translateY(2px); }
+  to { opacity: 1; filter: blur(0); transform: none; }
+}
+.bt-word {
+  opacity: 0;
+  animation: bt-word-in 220ms ease-out forwards;
+}
+
+/* Thinking bubble. */
+@keyframes bt-bounce {
+  0%, 80%, 100% { transform: translateY(0); opacity: 0.45; }
+  40% { transform: translateY(-3px); opacity: 1; }
+}
+.bt-think span {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  margin: 0 1.5px;
+  border-radius: 999px;
+  background: currentColor;
+  animation: bt-bounce 1.2s infinite ease-in-out;
+}
+.bt-think span:nth-child(2) { animation-delay: 0.15s; }
+.bt-think span:nth-child(3) { animation-delay: 0.3s; }
+
+/* The Pass button: a baton track that fills while the protocol runs. */
+@keyframes bt-sheen {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+.bt-pass {
+  background-image: linear-gradient(100deg, var(--rep) 0%, color-mix(in oklch, var(--rep) 55%, var(--ai)) 55%, var(--ai) 100%);
+  color: var(--bt-accent-ink);
+  box-shadow: 0 10px 24px -12px color-mix(in oklch, var(--ai) 70%, transparent), inset 0 1px 0 oklch(1 0 0 / 0.25);
+}
+.bt-pass:not(:disabled):hover {
+  filter: brightness(1.06) saturate(1.05);
+}
+.bt-pass-sheen {
+  background-image: linear-gradient(100deg, transparent 30%, oklch(1 0 0 / 0.28) 50%, transparent 70%);
+  background-size: 200% 100%;
+  animation: bt-sheen 3.2s linear infinite;
+}
+.bt-pass:disabled {
+  background-image: none;
+  background-color: var(--bt-panel-2);
+  color: var(--bt-muted);
+  box-shadow: none;
+  border: 1px dashed var(--bt-line-strong);
+}
+
+/* The floating phone rises in when the SMS arrives. */
+@keyframes bt-rise {
+  from { transform: translateY(24px) scale(0.98); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+.bt-rise {
+  animation: bt-rise 360ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+@keyframes bt-ring {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in oklch, var(--ai) 50%, transparent), var(--bt-shadow); }
+  50% { box-shadow: 0 0 0 8px color-mix(in oklch, var(--ai) 0%, transparent), var(--bt-shadow); }
+}
+.bt-attention {
+  animation: bt-ring 1.6s ease-in-out infinite;
+}
+
+.dark .bt-console {
+  --muted-foreground: oklch(0.74 0 0);
+}
+
+/* WP6's MockPhone (300 × 580 px) floating over a laptop viewport: scaled with its layout box, so the whole phone and
+   its "Your turn" pill stay above the fold at 1366×768 and 1024×768. Full size on tall screens and in the Phone tab. */
+.bt-phone-float {
+  zoom: 1;
+}
+@media (max-height: 900px) {
+  .bt-phone-float { zoom: 0.9; }
+}
+@media (max-height: 700px) {
+  .bt-phone-float { zoom: 0.78; }
+}
+
+/* WP6's near-black bezel disappears into the dark console: a hairline keeps the phone's silhouette. */
+.dark .bt-phone-float,
+.dark .bt-phone-docked > * {
+  outline: 1px solid oklch(1 0 0 / 0.18);
+  outline-offset: 0;
+}
+
+/* Recorded / greyed shadow lanes. */
+.bt-greyed {
+  filter: grayscale(0.9);
+  opacity: 0.8;
+}
+
+/* Diagonal hatch for the AI-half segment of the timeline and the recorded badge. */
+.bt-hatch {
+  background-image: repeating-linear-gradient(135deg, color-mix(in oklch, var(--ai) 22%, transparent) 0 6px, transparent 6px 12px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bt-dot-pulse, .bt-pass-sheen, .bt-attention, .bt-think span { animation: none; }
+  .bt-word { animation-duration: 1ms; }
+  .bt-rise { animation: none; }
+}
+
+/* next dev's floating indicator would cover the timeline in screenshots (dev only; nothing to hide in production). */
+.bt-console ~ nextjs-portal,
+body:has(.bt-console) nextjs-portal {
+  display: none;
+}
