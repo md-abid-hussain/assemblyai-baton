@@ -183,10 +183,11 @@ export const PITCH_NUMBERS = [
   },
   {
     id: "N-scan",
-    label: "Vendors whose public docs we checked for the handoff direction",
+    label: "Vendors checked for the handoff direction",
     value: "22",
     tag: "sourced",
-    provenance: "19 voice-agent and contact-center vendors plus 3 PCI payment-handoff vendors (list in docs/pitch/numbers.md §5)",
+    provenance:
+      "19 voice-agent and contact-center vendors plus 3 PCI payment-handoff vendors; 9 through secondary pages only (list in docs/pitch/numbers.md §5)",
     source: "docs/pitch/numbers.md",
     asOf: "2026-09-24",
   },

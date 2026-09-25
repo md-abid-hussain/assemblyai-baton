@@ -107,8 +107,8 @@ export const LANDING: LandingContent = {
       { label: "human → AI, mid-call", example: "not found in our market scan", ours: true },
     ],
     footnote:
-      "From the public docs of 22 voice-agent, contact-center and payment vendors, read in September 2026. A desk " +
-      "scan, not an exhaustive search.",
+      "We checked 22 voice-agent, contact-center and payment vendors in September 2026, from their docs and product " +
+      "pages (some only through secondary pages). A desk scan, not an exhaustive search.",
   },
 
   numbersRow: {
