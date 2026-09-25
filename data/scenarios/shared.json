@@ -21,7 +21,7 @@
     "MISSING": "Required but not established before the hand-off (see missing_reason)."
   },
   "rep_recorded_line_notice_example": "Thanks for calling Harborview Insurance, this is Daniel. This call is recorded for quality and training. How can I help?",
-  "handoff_line_default": "OK if my assistant finishes the paperwork? I'll stay on the line.",
+  "handoff_line_default": "OK if my assistant finishes the paperwork? I'll be one tap away if you need me.",
   "twilio_recording_notice": "This practice call is being recorded for the Baton hackathon project. Connecting you to your role-play partner now.",
   "tail_change_summary_template_sample": "SAMPLE, fictional, not legal advice: Before I finalize: adding {driver_full_name} changes your premium to {premium_new_monthly_usd} a month, prorated for the rest of your policy term, starting {effective_date}. The change becomes part of your policy on that date. I'll text a secure link to the number on file so you can review and e-sign the change and pay {amount_due_today_usd} today. Is it OK to send that text?"
 }

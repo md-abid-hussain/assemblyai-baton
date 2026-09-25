@@ -12,14 +12,15 @@ zerops:
         - npm run build            # next build → .next/standalone; esbuild migrate/cron → dist/; assemble → bundle/
       deployFiles:
         - bundle                   # lands at /var/www/bundle
+      # Only node_modules is cached. A restored `.next/cache` left `.next/` unwritable for the build user on the second
+      # build (EACCES on /build/source/.next/trace); Turbopack compiles this app in ~17 s, so it is not worth caching.
       cache:
         - node_modules
-        - .next/cache
     deploy:
       readinessCheck:
         httpGet: { port: 3000, path: /api/health }
-        failureTimeout: 120
-        retryPeriod: 5
+        failureTimeout: 120s     # Go durations: a bare int is rejected; retryPeriod must be within [10s, 1h]
+        retryPeriod: 10s
     run:
       base: nodejs@22
       ports:
@@ -28,14 +29,21 @@ zerops:
       envVariables:
         NODE_ENV: production
         PORT: "3000"
-        HOSTNAME: 0.0.0.0
         DATABASE_URL: ${db_connectionString}
         ENABLE_INPROC_WORKER: "1"
         LIMITS_ROLE: authority
         BATON_DEPLOY_ID: zp-prod
+        APP_URL: ${zeropsSubdomain}   # system var of the app service: https://app-<id>-3000.prg1.zerops.app
+        POLAR_SERVER: sandbox
+        # Secrets (ASSEMBLYAI_API_KEY, OPENAI_API_KEY, POLAR_ACCESS_TOKEN, CASE_TOKEN_SECRET, VISITOR_SECRET, ADMIN_KEY,
+        # CRON_SECRET, AAI_WEBHOOK_SECRET, AGENT_TOOL_SECRET, LIMITS_AUTHORITY_KEY) are service *secret* variables set
+        # at import time / in the GUI, never here. Note: envVariables here win over secret variables of the same name.
       initCommands:
+        - echo "[boot] public URL (APP_URL from zeropsSubdomain) = $APP_URL"   # zcli prints no URL; read it from `zcli service log`
         - node bundle/migrate.mjs  # idempotent drizzle migrator (advisory-locked); runs on every container start
-      start: node bundle/server.js # standalone server.js chdir()s to its own dir
+      # HOSTNAME is a reserved Zerops system variable (the container hostname), so it cannot be set in envVariables.
+      # Next's standalone server binds to $HOSTNAME, so override it for the node process only (env execs node).
+      start: env HOSTNAME=0.0.0.0 node bundle/server.js # standalone server.js chdir()s to its own dir
       healthCheck:
         httpGet: { port: 3000, path: /api/health }
       crontab:

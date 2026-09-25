@@ -82,7 +82,7 @@
   ],
   "handoff": {
     "at_beat": 12,
-    "line": "The system's still working out the new rate. OK if my assistant finishes up once it's ready? I'll stay on the line.",
+    "line": "The system's still working out the new rate. OK if my assistant finishes up once it's ready? I'll be one tap away if you need me.",
     "customer_response": "accepts",
     "customer_says": "Sure, no rush.",
     "after": "end_call",

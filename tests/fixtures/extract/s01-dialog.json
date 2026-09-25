@@ -1,0 +1,117 @@
+{
+  "description": "WP3 extractor fixture: the s01 golden call (Priya adds Maya to the 2021 Civic) as per-channel finals. Turns 0-11 are the 12-turn live fixture (TASKS WP3 acceptance 1); the 10 events marked scored:true are its labels. All 20 turns drive the unit tests' fake extractor (its output = `events`). Written by WP3 from data/scenarios/s01.json talk_track; fictional data.",
+  "scenarioId": "s01",
+  "callDate": "2026-09-25",
+  "liveTurns": 12,
+  "turns": [
+    { "turnId": "rep-0", "channel": "rep", "startMs": 400, "endMs": 5200,
+      "text": "Harborview Insurance, this is Daniel. This call is recorded for quality and training. How can I help you today?",
+      "events": [] },
+    { "turnId": "customer-0", "channel": "customer", "startMs": 5600, "endMs": 10100,
+      "text": "Hi Daniel, I'd like to add my daughter to our car insurance. She just got her license.",
+      "events": [
+        { "field": "driver_relation", "kind": "stated", "value": "child", "quote": "my daughter", "acknowledges_turn_id": null, "scored": true }
+      ] },
+    { "turnId": "rep-1", "channel": "rep", "startMs": 10600, "endMs": 14900,
+      "text": "Congratulations to her! What's her full name and date of birth?",
+      "events": [
+        { "field": "driver_full_name", "kind": "question", "value": null, "quote": "What's her full name", "acknowledges_turn_id": null },
+        { "field": "driver_dob", "kind": "question", "value": null, "quote": "date of birth", "acknowledges_turn_id": null }
+      ] },
+    { "turnId": "customer-1", "channel": "customer", "startMs": 15300, "endMs": 22800,
+      "text": "Maya Raman, that's M-A-Y-A. Her birthday is March 14th, 2009, so she's seventeen.",
+      "events": [
+        { "field": "driver_full_name", "kind": "stated", "value": "Maya Raman", "quote": "Maya Raman", "acknowledges_turn_id": null, "scored": true },
+        { "field": "driver_dob", "kind": "stated", "value": "2009-03-14", "quote": "March 14th, 2009", "acknowledges_turn_id": null, "scored": true },
+        { "field": "driver_age", "kind": "stated", "value": "17", "quote": "she's seventeen", "acknowledges_turn_id": null }
+      ] },
+    { "turnId": "rep-2", "channel": "rep", "startMs": 23300, "endMs": 30400,
+      "text": "Maya Raman, born March 14th, 2009. Which state issued her license, and what kind of license is it?",
+      "events": [
+        { "field": "driver_full_name", "kind": "readback", "value": "Maya Raman", "quote": "Maya Raman", "acknowledges_turn_id": null },
+        { "field": "driver_dob", "kind": "readback", "value": "2009-03-14", "quote": "born March 14th, 2009", "acknowledges_turn_id": null, "scored": true },
+        { "field": "license_state", "kind": "question", "value": null, "quote": "Which state issued her license", "acknowledges_turn_id": null }
+      ] },
+    { "turnId": "customer-2", "channel": "customer", "startMs": 30900, "endMs": 37600,
+      "text": "Ohio. It's a probationary license, she passed last Tuesday. And no tickets, nothing.",
+      "events": [
+        { "field": "license_state", "kind": "stated", "value": "OH", "quote": "Ohio", "acknowledges_turn_id": null, "scored": true },
+        { "field": "license_status", "kind": "stated", "value": "provisional", "quote": "probationary license", "acknowledges_turn_id": null, "scored": true },
+        { "field": "incidents_3y", "kind": "stated", "value": "none", "quote": "no tickets, nothing", "acknowledges_turn_id": null }
+      ] },
+    { "turnId": "rep-3", "channel": "rep", "startMs": 38100, "endMs": 44700,
+      "text": "Got it, Ohio, probationary, no incidents. Which car will she drive most, the Civic or the Highlander?",
+      "events": [
+        { "field": "license_state", "kind": "readback", "value": "OH", "quote": "Ohio", "acknowledges_turn_id": null },
+        { "field": "license_status", "kind": "readback", "value": "provisional", "quote": "probationary", "acknowledges_turn_id": null },
+        { "field": "incidents_3y", "kind": "readback", "value": "none", "quote": "no incidents", "acknowledges_turn_id": null }
+      ] },
+    { "turnId": "customer-3", "channel": "customer", "startMs": 45200, "endMs": 52300,
+      "text": "The Civic. She'll drive it every day to school. It's parked at home, 44107.",
+      "events": [
+        { "field": "vehicle_assignment", "kind": "stated", "value": "veh1", "quote": "The Civic", "acknowledges_turn_id": null, "scored": true },
+        { "field": "operator_type", "kind": "stated", "value": "primary", "quote": "every day to school", "acknowledges_turn_id": null },
+        { "field": "garaging_zip", "kind": "stated", "value": "44107", "quote": "44107", "acknowledges_turn_id": null, "scored": true }
+      ] },
+    { "turnId": "rep-4", "channel": "rep", "startMs": 52800, "endMs": 60100,
+      "text": "Perfect, so Maya is the primary driver on the Civic, kept overnight at 44107. When should we add her?",
+      "events": [
+        { "field": "vehicle_assignment", "kind": "readback", "value": "veh1", "quote": "the Civic", "acknowledges_turn_id": null },
+        { "field": "operator_type", "kind": "readback", "value": "primary", "quote": "primary driver", "acknowledges_turn_id": null },
+        { "field": "garaging_zip", "kind": "readback", "value": "44107", "quote": "44107", "acknowledges_turn_id": null },
+        { "field": "effective_date", "kind": "question", "value": null, "quote": "When should we add her?", "acknowledges_turn_id": null }
+      ] },
+    { "turnId": "customer-4", "channel": "customer", "startMs": 60600, "endMs": 64200,
+      "text": "Next Friday, October 2nd. That's when she starts driving to school.",
+      "events": [
+        { "field": "effective_date", "kind": "stated", "value": "2026-10-02", "quote": "Next Friday, October 2nd", "acknowledges_turn_id": null, "scored": true }
+      ] },
+    { "turnId": "rep-5", "channel": "rep", "startMs": 64700, "endMs": 73900,
+      "text": "Friday, October 2nd. With the good student discount, your new premium is $142 a month, that's up $46.",
+      "events": [
+        { "field": "effective_date", "kind": "readback", "value": "2026-10-02", "quote": "Friday, October 2nd", "acknowledges_turn_id": null },
+        { "field": "premium_new_monthly_usd", "kind": "stated", "value": "142.00", "quote": "$142 a month", "acknowledges_turn_id": null, "scored": true },
+        { "field": "premium_change_monthly_usd", "kind": "stated", "value": "46.00", "quote": "up $46", "acknowledges_turn_id": null }
+      ] },
+    { "turnId": "customer-5", "channel": "customer", "startMs": 74400, "endMs": 78800,
+      "text": "Oof, that's a bit much, but yes, that's fine. Go ahead.",
+      "events": [
+        { "field": "premium_new_monthly_usd", "kind": "ack", "value": "142.00", "quote": "yes, that's fine", "acknowledges_turn_id": "rep-5" },
+        { "field": "effective_date", "kind": "ack", "value": "2026-10-02", "quote": "yes, that's fine", "acknowledges_turn_id": "rep-5" }
+      ] },
+    { "turnId": "rep-6", "channel": "rep", "startMs": 79300, "endMs": 86000,
+      "text": "Does Maya get B's or better? The good student discount needs a report card within thirty days.",
+      "events": [
+        { "field": "good_student_discount", "kind": "question", "value": null, "quote": "Does Maya get B's or better?", "acknowledges_turn_id": null }
+      ] },
+    { "turnId": "customer-6", "channel": "customer", "startMs": 86500, "endMs": 90400,
+      "text": "She has a 3.6 GPA, I can send the report card.",
+      "events": [
+        { "field": "good_student_discount", "kind": "stated", "value": "eligible", "quote": "She has a 3.6 GPA", "acknowledges_turn_id": null }
+      ] },
+    { "turnId": "rep-7", "channel": "rep", "startMs": 90900, "endMs": 98800,
+      "text": "Great, she qualifies. Would you like to raise the liability limits for a teen driver? It's about eleven dollars more a month.",
+      "events": [
+        { "field": "good_student_discount", "kind": "ack", "value": "eligible", "quote": "she qualifies", "acknowledges_turn_id": "customer-6" }
+      ] },
+    { "turnId": "customer-7", "channel": "customer", "startMs": 99300, "endMs": 103100,
+      "text": "Let's keep the limits as they are for now.",
+      "events": [
+        { "field": "coverage_change", "kind": "stated", "value": "keep current limits", "quote": "keep the limits as they are", "acknowledges_turn_id": null }
+      ] },
+    { "turnId": "rep-8", "channel": "rep", "startMs": 103600, "endMs": 107300,
+      "text": "No problem, we'll keep your current limits.",
+      "events": [
+        { "field": "coverage_change", "kind": "readback", "value": "keep current limits", "quote": "keep your current limits", "acknowledges_turn_id": null }
+      ] },
+    { "turnId": "customer-8", "channel": "customer", "startMs": 107800, "endMs": 109400,
+      "text": "Thank you.",
+      "events": [] },
+    { "turnId": "rep-9", "channel": "rep", "startMs": 109900, "endMs": 115600,
+      "text": "OK if my assistant finishes the paperwork? I'll stay on the line.",
+      "events": [] },
+    { "turnId": "customer-9", "channel": "customer", "startMs": 116100, "endMs": 117900,
+      "text": "Sure, go ahead.",
+      "events": [] }
+  ]
+}

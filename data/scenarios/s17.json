@@ -94,7 +94,7 @@
   ],
   "handoff": {
     "at_beat": 15,
-    "line": "OK if my assistant finishes the paperwork? I'll stay on the line.",
+    "line": "OK if my assistant finishes the paperwork? I'll be one tap away if you need me.",
     "customer_response": "declines",
     "customer_says": "No no, you just finish it. I'm cooking, I don't want to explain everything again to a machine.",
     "after": "rep_finishes_tail",

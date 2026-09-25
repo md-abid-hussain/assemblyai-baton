@@ -1,20 +1,24 @@
-# Zerops: excluded from deployFiles (gitignore syntax). We deploy only ./bundle, but keep this as a safety net
-# mirroring .gitignore plus local-only material (DESIGN §8.1, research/16 §pitfalls 4).
+# Zerops .deployignore (gitignore syntax). zcli applies it twice: to the source it uploads for the build, and to the
+# deployFiles artefact (./bundle). Directory patterns MUST be anchored with a leading "/": an unanchored
+# `node_modules/` also matched bundle/node_modules and bundle/.next/node_modules, so the first deploy shipped a
+# 0.6 MiB artefact and server.js died with "Cannot find module 'next'" (docs/notes/deploy.md).
+# Secrets stay unanchored on purpose: no .env may ship at any depth.
 .env
 .env.*
 !.env.example
-node_modules/
-.next/cache/
-coverage/
 *.log
-spikes/
-tools/
-research/
-data/calls/
-tests/
-docs/
-.github/
-.vercel/
-.turbo/
-bundle/**/.env
-bundle/**/.env.*
+/node_modules/
+/.next/
+/dist/
+/bundle/**/.env
+/coverage/
+/spikes/
+/tools/
+/research/
+/data/calls/
+/tests/
+/docs/
+/.github/
+/.vercel/
+/.turbo/
+/.wt/

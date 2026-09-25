@@ -1,0 +1,100 @@
+{
+  "calls": [
+    {
+      "scenarioId": "fixture",
+      "language": "en",
+      "durationMs": 69130,
+      "publishAudio": true,
+      "inEval": false,
+      "featured": false,
+      "picker": "hidden",
+      "decisionPointMs": 46270,
+      "handoff": {
+        "lineStartMs": 46270,
+        "lineEndMs": 48870,
+        "acceptStartMs": 49120,
+        "acceptEndMs": 53790,
+        "declined": false
+      },
+      "recordedAiBundle": null,
+      "customerTailPack": null,
+      "callId": "fixture-dialog-16k",
+      "title": "Fixture: claim call (TTS, 16 kHz PCM16)",
+      "source": "golden16k",
+      "format": {
+        "encoding": "pcm_s16le",
+        "sampleRate": 16000
+      },
+      "assets": {
+        "rep": "/fixtures/dialog/rep.pcm16",
+        "customer": "/fixtures/dialog/customer.pcm16",
+        "peaks": "/fixtures/dialog/peaks.16k.json"
+      }
+    },
+    {
+      "scenarioId": "fixture",
+      "language": "en",
+      "durationMs": 69130,
+      "publishAudio": true,
+      "inEval": false,
+      "featured": false,
+      "picker": "hidden",
+      "decisionPointMs": 46270,
+      "handoff": {
+        "lineStartMs": 46270,
+        "lineEndMs": 48870,
+        "acceptStartMs": 49120,
+        "acceptEndMs": 53790,
+        "declined": false
+      },
+      "recordedAiBundle": null,
+      "customerTailPack": null,
+      "callId": "fixture-dialog-8k",
+      "title": "Fixture: claim call (TTS, 8 kHz µ-law derivative)",
+      "source": "twilio8k",
+      "format": {
+        "encoding": "pcm_mulaw",
+        "sampleRate": 8000
+      },
+      "assets": {
+        "rep": "/fixtures/dialog/rep.ulaw",
+        "customer": "/fixtures/dialog/customer.ulaw",
+        "peaks": "/fixtures/dialog/peaks.8k.json"
+      }
+    }
+  ],
+  "policy": {
+    "policyNumber": "HP7740391",
+    "carrier": "Harbor Point",
+    "agencyName": "Harbor Point Claims",
+    "repFirstName": "Daniel",
+    "policyholder": {
+      "firstName": "Priya",
+      "lastName": "Shah"
+    },
+    "phoneOnFileLast4": "0137",
+    "address": {
+      "street": "88 Birchwood Lane",
+      "city": "Springfield",
+      "state": "IL",
+      "zip": "62704"
+    },
+    "existingDrivers": [
+      {
+        "name": "Priya Shah",
+        "relation": "named_insured"
+      }
+    ],
+    "vehicles": [
+      {
+        "id": "veh1",
+        "year": 2020,
+        "make": "Toyota",
+        "model": "Camry",
+        "label": "2020 Toyota Camry"
+      }
+    ],
+    "currentMonthlyPremiumUsd": 120,
+    "callDate": "2026-09-18"
+  }
+}
