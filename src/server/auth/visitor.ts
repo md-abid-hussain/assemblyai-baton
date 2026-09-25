@@ -3,6 +3,7 @@ import "server-only";
 import { nanoid } from "nanoid";
 
 import { BatonError } from "../../core/contracts/errors";
+import { clientHop, type IpKeyMode } from "./client-ip";
 import { hmacB64url, safeEqual } from "./crypto";
 
 /**
@@ -14,7 +15,9 @@ import { hmacB64url, safeEqual } from "./crypto";
  * - Cookies blocked: `/api/cases` returns `visitorToken` (same signed format) and the client sends it back as
  *   `x-baton-visitor`. A valid header WINS over the cookie, because the proxy mints a fresh cookie on every request
  *   of a cookie-less browser. Never a 401 just because cookies are off.
- * - `ipKey = hmac(VISITOR_SECRET, dayUTC + ":" + firstHop(x-forwarded-for))`. The raw IP is never stored.
+ * - `ipKey = hmac(VISITOR_SECRET, "ip:" + dayUTC + ":" + clientHop(headers))`: the balancer-set `X-Real-IP` (else the
+ *   rightmost `X-Forwarded-For` hop) grouped by /24 or /48; `IPKEY_MODE=off` disables per-ipKey buckets. See
+ *   `./client-ip.ts` (PLATFORM v2.1 §10.2). The raw IP is never stored.
  *
  * Framework-free (plain `Request`/`Headers`) so the route handlers and the proxy share it and tests need no Next.
  */
@@ -78,18 +81,22 @@ export function readCookie(header: string | null | undefined, name: string): str
   return null;
 }
 
-/** The first hop of x-forwarded-for (else x-real-ip, else "unknown"). */
+/**
+ * @deprecated v2.0 name. It returned the client-controlled LEFTMOST `X-Forwarded-For` entry; it now returns the
+ * trustworthy hop's /24 or /48 group (`clientHop`).
+ */
 export function firstHop(headers: Headers): string {
-  const xff = headers.get("x-forwarded-for");
-  const first = xff?.split(",")[0]?.trim();
-  if (first) return first;
-  return headers.get("x-real-ip")?.trim() || "unknown";
+  return clientHop(headers);
 }
 
-/** `ipKey = hmac(VISITOR_SECRET, dayUTC + ":" + firstHop)`, truncated to 22 chars (132 bits). */
-export function ipKeyOf(req: { headers: Headers }, opts: { now?: number; secret?: string } = {}): string {
+/** `ipKey = hmac(VISITOR_SECRET, "ip:" + dayUTC + ":" + clientHop)`, truncated to 22 chars (132 bits). */
+export function ipKeyOf(
+  req: { headers: Headers },
+  opts: { now?: number; secret?: string; mode?: IpKeyMode } = {},
+): string {
   const day = new Date(opts.now ?? Date.now()).toISOString().slice(0, 10);
-  return hmacB64url(visitorSecret(opts.secret), `ip:${day}:${firstHop(req.headers)}`).slice(0, 22);
+  const hop = clientHop(req.headers, opts.mode ? { mode: opts.mode } : {});
+  return hmacB64url(visitorSecret(opts.secret), `ip:${day}:${hop}`).slice(0, 22);
 }
 
 /**
