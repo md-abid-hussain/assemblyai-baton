@@ -4,7 +4,7 @@
 import type { CaseState, CaseStatus } from "../../../../src/core/contracts/case";
 import type { CompiledTakeover, DrainReport } from "../../../../src/core/contracts/takeover";
 import type { RunPlan } from "../../../../src/core/contracts/run";
-import { TakeoverServiceImpl, type TakeoverServiceDeps } from "../../../../src/server/takeovers/service";
+import { TakeoverServiceImpl, type RelayCompileFn, type TakeoverServiceDeps } from "../../../../src/server/takeovers/service";
 import type { CompiledPatch, EndPatch, EventsPatch, TakeoverCase, TakeoverRecord, TakeoverStore } from "../../../../src/server/takeovers/store";
 import { caseState, compiled as compiledFixture, policy, runPlan } from "../../contracts/fixtures";
 
@@ -15,7 +15,10 @@ export class FakeStore implements TakeoverStore {
   failLead = false;
 
   addCase(o: Partial<TakeoverCase> & { id: string }): TakeoverCase {
-    const c: TakeoverCase = { status: "shadowing", visitorId: "vis_1", runPlan: { ...runPlan, caseId: o.id }, policy, callId: "call_s01", scenarioId: "s01", ...o };
+    const c: TakeoverCase = {
+      status: "shadowing", visitorId: "vis_1", runPlan: { ...runPlan, caseId: o.id }, policy, callId: "call_s01", scenarioId: "s01",
+      relayVersionId: null, simCallId: null, ...o,
+    };
     this.cases.set(c.id, c);
     return c;
   }
@@ -96,7 +99,9 @@ export interface Harness {
   deps: TakeoverServiceDeps;
 }
 
-export function harness(o: { verificationJobId?: string | null; validate?: (m: unknown) => void; compile?: (s: CaseState) => CompiledTakeover } = {}): Harness {
+export function harness(
+  o: { verificationJobId?: string | null; validate?: (m: unknown) => void; compile?: (s: CaseState) => CompiledTakeover; relayCompile?: RelayCompileFn } = {},
+): Harness {
   const store = new FakeStore();
   const clock = { t: Date.parse("2026-09-25T10:00:00Z") };
   const calls: Harness["calls"] = { freeze: [], compile: [], validate: [], tokens: [], heartbeat: [], release: [], verify: [] };
@@ -115,6 +120,7 @@ export function harness(o: { verificationJobId?: string | null; validate?: (m: u
       calls.compile.push({ snapshot, opts });
       return o.compile ? o.compile(snapshot) : { ...compiledFixture(), snapshot };
     },
+    ...(o.relayCompile ? { relayCompile: o.relayCompile } : {}),
     buildFirstUpdate: (c) => ({ type: "session.update", session: { system_prompt: c.systemPrompt, greeting: c.greeting } }),
     validateFirstUpdate: (m) => {
       calls.validate.push(m);

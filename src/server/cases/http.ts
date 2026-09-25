@@ -6,6 +6,7 @@ import { apiError, BatonError, ERROR_HTTP_STATUS } from "../../core/contracts/er
 import type { RateLimiter } from "../../core/contracts/services";
 import { EnvError } from "../env";
 import { log } from "../log";
+import { RelayError, relayErrorResponse } from "../relays/http";
 
 /**
  * Route plumbing for WP3's handlers (#3, #4, #8): the same conventions as WP2's `src/server/auth/http.ts`
@@ -67,6 +68,8 @@ export function route<C>(name: string, fn: (req: Request, ctx: C) => Promise<Res
       return await fn(req, ctx);
     } catch (e) {
       if (e instanceof BatonError) return errorOf(e);
+      // v2 codes (relay runs on #3: E_LINT, E_MODERATION_FLAGGED), as `ApiErrorV2` bodies.
+      if (e instanceof RelayError) return relayErrorResponse(e);
       if (e instanceof EnvError) {
         httpLog.error("route misconfigured", { route: name, err: e });
         return json(apiError("E_INTERNAL", "The server is missing configuration."), { status: 503 });

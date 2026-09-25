@@ -26,6 +26,10 @@ export interface TakeoverCase {
   policy: PolicyRecord;
   callId: string | null;
   scenarioId: string;
+  /** v2 (WP14b): the relay version this case runs, null for a plain Baton case. Picks the compiler (PLATFORM §4.7). */
+  relayVersionId: string | null;
+  /** v2 (WP14b): set only when the case plays a simulated call, which decides how the account is recovered. */
+  simCallId: string | null;
 }
 
 export interface TakeoverRecord {
@@ -140,6 +144,8 @@ export class DrizzleTakeoverStore implements TakeoverStore {
         policy: cases.policy,
         callId: cases.callId,
         scenarioId: cases.scenarioId,
+        relayVersionId: cases.relayVersionId,
+        simCallId: cases.simCallId,
       })
       .from(cases)
       .where(eq(cases.id, caseId));

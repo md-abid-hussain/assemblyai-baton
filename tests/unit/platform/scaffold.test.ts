@@ -13,10 +13,11 @@ const ROOT = resolve(fileURLToPath(new URL("../../..", import.meta.url)));
 
 describe("initial migration (DESIGN §4.2)", () => {
   const sql = readFileSync(join(ROOT, "drizzle", "0000_init.sql"), "utf8");
-  const journal = JSON.parse(readFileSync(join(ROOT, "drizzle", "meta", "_journal.json"), "utf8")) as { entries: unknown[] };
+  const journal = JSON.parse(readFileSync(join(ROOT, "drizzle", "meta", "_journal.json"), "utf8")) as { entries: { tag: string }[] };
 
   it("is ONE migration that creates every table", () => {
-    expect(journal.entries).toHaveLength(1);
+    // WP14b: 0001_relays (PLATFORM §2.4) is the one additive migration after the initial one.
+    expect(journal.entries.map((e) => e.tag)).toEqual(["0000_init", "0001_relays"]);
     for (const t of ALL_TABLES) expect(sql).toContain(`CREATE TABLE "${t}"`);
     expect((sql.match(/CREATE TABLE/g) ?? []).length).toBe(ALL_TABLES.length);
   });

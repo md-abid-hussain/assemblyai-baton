@@ -147,6 +147,8 @@ export class PgCaseRepository implements CaseRepository {
 
   async create(input: {
     mode: CaseMode; callId: string | null; scenarioId: string; visitorId: string; ipKey: string; prefillUntilMs?: number;
+    /** 0001: the relay version this run executes (WP14b·2), and the sim it plays (`sim_calls.id`), if any. */
+    relayVersionId?: string | null; simCallId?: string | null;
   }): Promise<{ caseId: string; state: CaseState; policy: PolicyRecord }> {
     const policy = await this.d.policyOf(input.scenarioId);
     if (!policy) throw new BatonError("E_NOT_FOUND", `Unknown scenario ${input.scenarioId}.`);
@@ -155,6 +157,7 @@ export class PgCaseRepository implements CaseRepository {
     await this.d.db.insert(cases).values({
       id: caseId, mode: input.mode, callId: input.callId, scenarioId: input.scenarioId, policy: policy as unknown as Record<string, unknown>,
       state: state as unknown as Record<string, unknown>, version: 0, status: "shadowing", visitorId: input.visitorId, ipKey: input.ipKey,
+      relayVersionId: input.relayVersionId ?? null, simCallId: input.simCallId ?? null,
     });
     if (input.prefillUntilMs !== undefined && input.prefillUntilMs > 0 && input.callId && this.d.prefillPlan) {
       const plan = await this.d.prefillPlan({ caseId, callId: input.callId, untilMs: input.prefillUntilMs });
