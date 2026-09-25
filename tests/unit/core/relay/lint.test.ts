@@ -12,7 +12,7 @@ const FAIL_CASES: [string, string, (bp: Blueprint) => void][] = [
   // L1
   ["L1 stage id reused by a disclosure", "L1", (bp) => { bp.playbook.stages[1]!.id = "deposit_terms"; }],
   ["L1 stage id reused by a connector", "L1", (bp) => { bp.playbook.stages[0]!.id = "deposit_link"; }],
-  ["L1 tool name clashes with a built-in", "L1", (bp) => { const c = bp.connectors[2]!; if (c.type === "http_action") c.toolName = "get_disclosure"; }],
+  ["L1 tool name clashes with a built-in", "L1", (bp) => { const c = bp.connectors[2]!; if (c.type === "http_action") { c.toolName = "get_disclosure"; c.headers = []; } }],
   ["L1 duplicate enum value", "L1", (bp) => { bp.fields[3]!.enumValues![1]!.value = "new_patient"; }],
   // L2
   ["L2 normalizer does not fit the type", "L2", (bp) => { bp.fields[0]!.normalizer = "us_zip5"; }],
@@ -66,9 +66,24 @@ const FAIL_CASES: [string, string, (bp: Blueprint) => void][] = [
   ["X3 lookahead in an enum synonym", "X3", (bp) => { bp.fields[3]!.enumValues![0]!.synonyms = ["(?=new)new"]; }],
   ["X3 backreference in a rep-line pattern", "X3", (bp) => { bp.handoff.repLinePatterns = ["(hand) you\\1"]; }],
   ["X3 unsafe tool pattern", "X3", (bp) => { const c = bp.connectors[2]!; if (c.type === "http_action") c.params.properties.ref_code!.pattern = "(a|ab)*c"; }],
+  // B1
+  ["B1 real brand as a sample's business name", "B1", (bp) => { bp.context.samples[0]!.org.name = "Aspen Dental"; }],
+  ["B1 real brand in the greeting opening", "B1", (bp) => {
+    bp.playbook.greeting.opening = "Hi {customer.firstName}, I'm Delta Dental's AI assistant, not a person, and this call is recorded.";
+  }],
+  ["B1 real brand in a disclosure", "B1", (bp) => { bp.playbook.disclosures[0]!.text = "Wells Fargo holds a deposit of {v.deposit|spoken_money}. Is that OK?"; }],
+  ["B1 brand split across a section", "B1", (bp) => { bp.playbook.disclosures[0]!.text = "Wells{?opt.tax_suffix}{/?} Fargo holds it. Is that OK?"; }],
+  ["B1 real brand in persona.extraRules", "B1", (bp) => { bp.playbook.persona.extraRules = ["Say you work for Chase."]; }],
+  ["B1 real brand in meta.title", "B1", (bp) => { bp.meta.title = "Verizon plan change"; }],
+  ["B1 real brand in an SMS template", "B1", (bp) => { const c = bp.connectors[1]!; if (c.type === "confirmation") c.smsTemplate = "PayPal: you're booked, {customer.firstName}."; }],
+  // K2
+  ["K2 used http_action header secret unset", "K2", (bp) => { bp.playbook.stages[0]!.tools.push("log_crm_note"); }],
+  ["K2 completion webhook without a signing secret", "K2", (bp) => {
+    bp.connectors.push({ type: "completion_webhook", id: "done_hook", label: "Done hook", url: "https://example.com/hook", hmacSecret: null, include: ["case"] });
+  }],
 ];
 
-describe("lint skeleton (L1, L2, L3, G1, C1, S1, X3)", () => {
+describe("lint rules: one fail fixture each, the mini fixture passes", () => {
   it("the mini fixture lints clean", () => {
     expect(lintBlueprint(miniBlueprint())).toEqual([]);
   });
@@ -102,6 +117,92 @@ describe("lint skeleton (L1, L2, L3, G1, C1, S1, X3)", () => {
     const bp = miniBlueprint();
     bp.playbook.greeting.opening = "{?f.ghost.verified}{f.ghost}{/?}";
     expect(() => lintBlueprint(bp)).not.toThrow();
+  });
+});
+
+describe("B1, K1, K2 details", () => {
+  const SECRET = { $secret: "sec_0123456789abcdef" };
+  const withSecrets = () => {
+    const bp = miniBlueprint();
+    bp.playbook.stages[0]!.tools.push("log_crm_note");
+    const c = bp.connectors[2]!;
+    if (c.type === "http_action") { c.headers = [{ name: "Authorization", value: SECRET }]; c.hmacSecret = { $secret: "sec_fedcba9876543210" }; }
+    bp.connectors.push({ type: "completion_webhook", id: "done_hook", label: "Done hook", url: "https://example.com/hook", hmacSecret: SECRET, include: ["case", "qa"] });
+    return bp;
+  };
+
+  it("B1 ignores field phrases, stage goals and sample data (a port-in may name the carrier being left)", () => {
+    const bp = miniBlueprint();
+    bp.fields[0]!.phrases.ask = "the name on your Verizon account";
+    bp.playbook.stages[0]!.goal = "Confirm the booking details with {subject}; they moved from Aspen Dental.";
+    bp.context.facts.push({ key: "previous_dentist", label: "Previous dentist" });
+    bp.context.samples[0]!.facts.previous_dentist = "Aspen Dental";
+    expect(codes(bp)).toEqual([]);
+  });
+
+  it("B1 names the brand and its list, once per text", () => {
+    const bp = miniBlueprint();
+    bp.playbook.persona.extraRules = ["Never mention Chase or Chase Bank or Chase."];
+    const got = issues(bp, "B1");
+    expect(got).toHaveLength(2);
+    expect(got[0]!.message).toContain("top-50 US bank");
+    expect(got[0]!.path).toEqual(["playbook", "persona", "extraRules", 0]);
+  });
+
+  it("B1 checks an unparsable template on its literal text", () => {
+    const bp = miniBlueprint();
+    bp.playbook.greeting.optOut = "Say Sam anytime {oops. GEICO";
+    expect(new Set(codes(bp))).toEqual(new Set(["L3", "B1"]));
+  });
+
+  it("K1: no secret refs in a gallery relay or a pinned publication; private relays may hold them", () => {
+    const bp = withSecrets();
+    expect(lintBlueprint(bp)).toEqual([]);
+    expect(lintBlueprint(bp, { visibility: "private" })).toEqual([]);
+    const gallery = lintBlueprint(bp, { visibility: "gallery" });
+    expect(gallery.map((i) => i.code)).toEqual(["K1", "K1", "K1"]);
+    expect(gallery.map((i) => i.path)).toEqual([
+      ["connectors", 2, "headers", 0, "value"], ["connectors", 2, "hmacSecret"], ["connectors", 3, "hmacSecret"],
+    ]);
+    expect(lintBlueprint(bp, { pinnedPublication: true }).map((i) => i.code)).toEqual(["K1", "K1", "K1"]);
+    expect(gallery[0]!.message).toContain("gallery");
+  });
+
+  it("K1 counts refs in unused connectors too (they would ship with the gallery JSON)", () => {
+    const bp = miniBlueprint();
+    const c = bp.connectors[2]!;
+    if (c.type === "http_action") c.headers = [{ name: "Authorization", value: SECRET }];
+    expect(lintBlueprint(bp, { visibility: "gallery" }).map((i) => i.code)).toEqual(["K1"]);
+  });
+
+  it("K2: a ref to a missing or expired secret fails when the server passes the workspace's secret ids", () => {
+    const bp = withSecrets();
+    expect(lintBlueprint(bp, { secretIds: ["sec_0123456789abcdef", "sec_fedcba9876543210"] })).toEqual([]);
+    const got = lintBlueprint(bp, { secretIds: new Set(["sec_0123456789abcdef"]) });
+    expect(got.map((i) => [i.code, i.path])).toEqual([["K2", ["connectors", 2, "hmacSecret"]]]);
+    expect(got[0]!.message).toContain("missing or expired");
+    expect(lintBlueprint(bp, { secretIds: [] }).map((i) => i.code)).toEqual(["K2", "K2", "K2"]);
+  });
+
+  it("K2: an unused connector's null secret and an http_action without HMAC are fine", () => {
+    const bp = miniBlueprint();   // crm_note has a null Authorization header but no stage lists log_crm_note
+    expect(codes(bp)).toEqual([]);
+    bp.playbook.stages[0]!.tools.push("log_crm_note");
+    const c = bp.connectors[2]!;
+    if (c.type === "http_action") c.headers = [];
+    expect(codes(bp)).toEqual([]);
+  });
+
+  it("K2 message asks for a signing secret on a cloned completion webhook", () => {
+    const bp = withSecrets();
+    const hook = bp.connectors[3]!;
+    if (hook.type === "completion_webhook") hook.hmacSecret = null;
+    expect(issues(bp, "K2")[0]!.message).toContain("Set a signing secret");
+  });
+
+  it("lintBlueprintJson passes the options through", () => {
+    const json = JSON.parse(JSON.stringify(withSecrets())) as unknown;
+    expect(lintBlueprintJson(json, { visibility: "gallery" }).issues.map((i) => i.code)).toEqual(["K1", "K1", "K1"]);
   });
 });
 

@@ -3,16 +3,16 @@
  * in the browser on every change (debounced) and the server re-runs it on save, run and publish.
  * Errors block a run or publish; warnings don't.
  *
- * SKELETON (WP14a·1, C2; formatters wired in WP14a·2): L1, L2, L3, G1, C1, S1, X3 are implemented. The rest (C2, S2, S3, F1, F2, X1, X2, G2, W3,
- * B1, K1, K2, W2) land in WP14a·3; `LINT_RULES_PENDING` lists them so callers can tell a clean skeleton result from a
- * full one. `lintBlueprintJson(json)` also maps `BlueprintSchema` parse failures to issues (`SCHEMA`, or `X3` for an
- * unsafe regex, naming the offending group).
+ * Implemented: L1, L2, L3, G1, C1, S1, X3 (WP14a·1), B1, K1, K2 (WP14a·3). `LINT_RULES_PENDING` lists the rules still
+ * to land, so callers can tell a partial result from a full one. `lintBlueprintJson(json)` also maps `BlueprintSchema`
+ * parse failures to issues (`SCHEMA`, or `X3` for an unsafe regex, naming the offending group). K1 and K2 need
+ * context from outside the blueprint (visibility, pinned publications, the workspace's secret ids): pass `LintOptions`.
  *
  * Every blueprint regex is checked through contracts/v2/regex.ts and matched only through `safeTest()`.
  */
 import type { ZodError } from "zod";
 import {
-  BlueprintSchema, FORMATTERS, type AccountRecord, type Blueprint, type BlueprintField, type ValueRef,
+  BlueprintSchema, FORMATTERS, type AccountRecord, type Blueprint, type BlueprintField, type SecretRef, type ValueRef,
 } from "../contracts/v2/blueprint";
 import { checkSafeRegexSource, checkSafeToolPattern, safeTest } from "../contracts/v2/regex";
 import { REQUIRED_STAGE_TOOLS, STAGE_KIND_ORDER, type LintIssue } from "../contracts/v2/relay";
@@ -21,9 +21,10 @@ import {
   type PathKind, type PathRef, type RenderScope, type TemplateCond, type TemplateNode,
 } from "./template";
 import { formatValue } from "./formatters";
+import { BRAND_LIST_LABEL, findDenylistedBrands, type BrandSite } from "./brand-denylist";
 
-export const LINT_RULES_IMPLEMENTED = ["SCHEMA", "L1", "L2", "L3", "G1", "C1", "S1", "X3"] as const;
-export const LINT_RULES_PENDING = ["C2", "S2", "S3", "F1", "F2", "X1", "X2", "G2", "W3", "B1", "K1", "K2", "W2"] as const;
+export const LINT_RULES_IMPLEMENTED = ["SCHEMA", "L1", "L2", "L3", "G1", "C1", "S1", "X3", "B1", "K1", "K2"] as const;
+export const LINT_RULES_PENDING = ["C2", "S2", "S3", "F1", "F2", "X1", "X2", "G2", "W3", "W2"] as const;
 
 type Path = (string | number)[];
 const err = (code: string, path: Path, message: string): LintIssue => ({ code, severity: "error", path, message });
@@ -488,10 +489,178 @@ function lintX3(bp: Blueprint): LintIssue[] {
   return out;
 }
 
+// ============================================================================================ B1 brand denylist
+
+export interface BrandTextUse { path: Path; text: string; site: BrandSite; template: boolean }
+
+/**
+ * The author-written texts B1 checks (PLATFORM §3.4): each sample's `org.name` (a business name) and, as prose,
+ * `meta.title`/`tagline`, `persona.tone`/`extraRules`, the subject and greeting templates, the disclosures (title,
+ * text, critical tokens), the prompt template, the handoff lines and the connectors' SMS/document templates: every
+ * text the agent speaks, sends or shows as the business. Field phrases, stage goals and sample data are not checked
+ * (a telecom port-in may name the carrier the customer leaves). The drafting post-fix walks the same list.
+ */
+export function blueprintBrandTexts(bp: Blueprint): BrandTextUse[] {
+  const out: BrandTextUse[] = [];
+  const plain = (path: Path, text: string, site: BrandSite = "prose") => out.push({ path, text, site, template: false });
+  const tpl = (path: Path, text: string | null | undefined) => { if (typeof text === "string") out.push({ path, text, site: "prose", template: true }); };
+  bp.context.samples.forEach((s, i) => plain(["context", "samples", i, "org", "name"], s.org.name, "name"));
+  plain(["meta", "title"], bp.meta.title);
+  plain(["meta", "tagline"], bp.meta.tagline);
+  const pb = bp.playbook;
+  plain(["playbook", "persona", "tone"], pb.persona.tone);
+  pb.persona.extraRules.forEach((r, i) => plain(["playbook", "persona", "extraRules", i], r));
+  tpl(["playbook", "subject"], pb.subject);
+  const g = pb.greeting;
+  tpl(["playbook", "greeting", "opening"], g.opening);
+  tpl(["playbook", "greeting", "summary"], g.summary);
+  g.clauses.forEach((c, i) => tpl(["playbook", "greeting", "clauses", i, "text"], c.text));
+  tpl(["playbook", "greeting", "optOut"], g.optOut);
+  for (const k of ["confirm", "ask", "ready"] as const) tpl(["playbook", "greeting", "next", k], g.next[k]);
+  pb.disclosures.forEach((d, i) => {
+    plain(["playbook", "disclosures", i, "title"], d.title);
+    tpl(["playbook", "disclosures", i, "text"], d.text);
+    d.criticalTokens.forEach((t, j) => tpl(["playbook", "disclosures", i, "criticalTokens", j], t));
+  });
+  tpl(["playbook", "promptTemplate"], pb.promptTemplate);
+  plain(["handoff", "repLine"], bp.handoff.repLine);
+  plain(["handoff", "repReturnLine"], bp.handoff.repReturnLine);
+  bp.connectors.forEach((c, i) => {
+    if (c.type === "payment_link" || c.type === "esign_mock" || c.type === "confirmation") tpl(["connectors", i, "smsTemplate"], c.smsTemplate);
+    if (c.type === "esign_mock") tpl(["connectors", i, "documentTitle"], c.documentTitle);
+    if (c.type === "sms_mock") tpl(["connectors", i, "template"], c.template);
+  });
+  return out;
+}
+
+/**
+ * The literal text runs of a template: a `{var}` ends a run (its value is sample data, not author text); a section
+ * boundary does not ("Wells{?x}{/?} Fargo" is still one run).
+ */
+export function templateTextRuns(nodes: readonly TemplateNode[]): string[] {
+  const runs: string[] = [""];
+  const add = (t: string) => { runs[runs.length - 1] += t; };
+  const walk = (ns: readonly TemplateNode[]) => {
+    for (const n of ns) {
+      if (n.type === "text") add(n.text);
+      else if (n.type === "var") runs.push("");
+      else {
+        add(" ");
+        walk(n.then);
+        add(" ");
+        if (n.else) { walk(n.else); add(" "); }
+      }
+    }
+  };
+  walk(nodes);
+  return runs.filter((r) => r.trim() !== "");
+}
+
+const TEMPLATE_TAG_RE = /\{[^{}]*\}/;
+
+function lintB1(bp: Blueprint, parsed: Map<string, TemplateNode[]>): LintIssue[] {
+  const out: LintIssue[] = [];
+  for (const use of blueprintBrandTexts(bp)) {
+    let runs: string[] = [use.text];
+    if (use.template) {
+      let nodes = parsed.get(JSON.stringify(use.path)) ?? null;
+      if (!nodes) { const r = tryParseTemplate(use.text); nodes = r.ok ? r.nodes : null; }
+      runs = nodes ? templateTextRuns(nodes) : use.text.split(TEMPLATE_TAG_RE);
+    }
+    const seen = new Set<string>();
+    for (const run of runs) {
+      for (const h of findDenylistedBrands(run, use.site)) {
+        if (seen.has(h.brand)) continue;
+        seen.add(h.brand);
+        out.push(err("B1", use.path, `"${h.text}" is a real brand (${BRAND_LIST_LABEL[h.list]}: ${h.brand}); a relay must use a fictional business and never name a real company`));
+      }
+    }
+  }
+  return out;
+}
+
+// ============================================================================================ K1/K2 secrets
+
+/** A secret-ref slot in a connector (K1, K2). `required`: a null ref fails K2 when the connector is used. */
+export interface SecretSlot {
+  path: Path;
+  connector: string;
+  kind: "header" | "hmac";
+  header: string | null;
+  ref: SecretRef | null;
+  used: boolean;
+  required: boolean;
+}
+
+/** Every secret-ref slot in a blueprint's connectors, and whether its connector is used. */
+export function blueprintSecretSlots(bp: Blueprint): SecretSlot[] {
+  const stageTools = new Set(bp.playbook.stages.flatMap((s) => s.tools));
+  const out: SecretSlot[] = [];
+  bp.connectors.forEach((c, i) => {
+    if (c.type === "http_action") {
+      const used = stageTools.has(c.toolName);
+      c.headers.forEach((h, j) => {
+        if (typeof h.value === "string") return;
+        out.push({ path: ["connectors", i, "headers", j, "value"], connector: c.id, kind: "header", header: h.name, ref: h.value, used, required: true });
+      });
+      // An http_action's HMAC signing is optional: null means unsigned.
+      out.push({ path: ["connectors", i, "hmacSecret"], connector: c.id, kind: "hmac", header: null, ref: c.hmacSecret, used, required: false });
+    }
+    // A completion webhook fires at the end of every case (it has no tool name), so it is always used and always signed.
+    if (c.type === "completion_webhook") {
+      out.push({ path: ["connectors", i, "hmacSecret"], connector: c.id, kind: "hmac", header: null, ref: c.hmacSecret, used: true, required: true });
+    }
+  });
+  return out;
+}
+
+/** Context that lives outside the blueprint: the relay row, its publications, its workspace's secrets. */
+export interface LintOptions {
+  /** The relay's visibility. K1: a `gallery` relay carries no secret refs. */
+  visibility?: "private" | "unlisted" | "gallery";
+  /** True when a pinned publication uses this version. K1: no secret refs either. */
+  pinnedPublication?: boolean;
+  /**
+   * The ids of the secrets that exist and have not expired in the relay's workspace (or org). K2 then also fails a
+   * ref to a missing or expired secret. Omitted (the Studio's client-side lint): only null refs fail.
+   */
+  secretIds?: ReadonlySet<string> | readonly string[];
+}
+
+function lintK1(bp: Blueprint, opts: LintOptions): LintIssue[] {
+  const gallery = opts.visibility === "gallery";
+  if (!gallery && !opts.pinnedPublication) return [];
+  const where = gallery ? "a gallery relay" : "a version a pinned publication uses";
+  const who = gallery ? "gallery relays" : "pinned publications";
+  return blueprintSecretSlots(bp).filter((s) => s.ref !== null).map((s) =>
+    err("K1", s.path, `secret refs are not allowed in ${where} (connector "${s.connector}"): secrets expire after 7 days and ${who} must keep working until Oct 21; use plain headers or the unsigned demo echo`));
+}
+
+function lintK2(bp: Blueprint, opts: LintOptions): LintIssue[] {
+  const known = opts.secretIds === undefined ? null : new Set(opts.secretIds);
+  const out: LintIssue[] = [];
+  for (const s of blueprintSecretSlots(bp)) {
+    if (!s.used) continue;
+    const what = s.kind === "header" ? `header "${s.header}" of connector "${s.connector}"` : `connector "${s.connector}"`;
+    if (s.ref === null) {
+      if (!s.required) continue;
+      out.push(err("K2", s.path, s.kind === "hmac"
+        ? `Set a signing secret for ${what}: a completion webhook is always signed (cloning a relay drops its secrets)`
+        : `Set the secret for ${what} (cloning a relay drops its secrets)`));
+    } else if (known && !known.has(s.ref.$secret)) {
+      out.push(err("K2", s.path, `the secret for ${what} is missing or expired (secrets expire after 7 days); set it again`));
+    }
+  }
+  return out;
+}
+
 // ============================================================================================ entry points
 
-/** Lint a parsed blueprint. Rule order: L1, L2, L3, G1, C1, S1, X3 (the WP14a·1 skeleton). Never throws. */
-export function lintBlueprint(bp: Blueprint): LintIssue[] {
+/**
+ * Lint a parsed blueprint. Rule order: L1, L2, L3, G1, C1, S1, X3, B1, K1, K2. Never throws. `opts` carries the
+ * context that is not in the blueprint (K1, K2); the client-side Studio lint may omit it.
+ */
+export function lintBlueprint(bp: Blueprint, opts: LintOptions = {}): LintIssue[] {
   const ix = indexOf(bp);
   const parsed = new Map<string, TemplateNode[]>();
   return [
@@ -502,6 +671,9 @@ export function lintBlueprint(bp: Blueprint): LintIssue[] {
     ...lintC1(bp, parsed),
     ...lintS1(bp, ix),
     ...lintX3(bp),
+    ...lintB1(bp, parsed),
+    ...lintK1(bp, opts),
+    ...lintK2(bp, opts),
   ];
 }
 
@@ -522,9 +694,9 @@ export function schemaIssuesToLint(json: unknown, issues: ZodError["issues"]): L
 }
 
 /** Parse + lint any JSON (the Studio's Advanced tab, saveDraft, imports). */
-export function lintBlueprintJson(json: unknown): { blueprint: Blueprint | null; issues: LintIssue[] } {
+export function lintBlueprintJson(json: unknown, opts: LintOptions = {}): { blueprint: Blueprint | null; issues: LintIssue[] } {
   const r = BlueprintSchema.safeParse(json);
   if (!r.success) return { blueprint: null, issues: schemaIssuesToLint(json, r.error.issues) };
-  return { blueprint: r.data, issues: lintBlueprint(r.data) };
+  return { blueprint: r.data, issues: lintBlueprint(r.data, opts) };
 }
 
