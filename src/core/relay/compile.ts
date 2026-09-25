@@ -246,7 +246,8 @@ export function compileRelay(bp: Blueprint, opts: CompileRelayOptions = {}): Ker
       const scope = makeScope({
         bp, account, snapshot,
         slots: {
-          ...baseSlots(snapshot, account),
+          // `{subject}` states a field too (e.g. the VERIFIED name), so it is rendered tracked here.
+          subject: () => renderTracked(T.get(bp.playbook.subject), makeScope({ bp, account, snapshot }), asserted),
           clause: (id) => {
             const c = clauses.get(id);
             return c && !dropped.includes(id) ? renderTracked(T.get(c.text), scope, asserted) : null;
