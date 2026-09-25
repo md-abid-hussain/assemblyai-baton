@@ -9,7 +9,7 @@ Branch `wp/wp14b` (worktree `.wt/wp14b`), based on `main` = `175a6b7` (C2). `git
 | `747d0be` | `drizzle/0001_relays.sql` + meta, the additive tables in `src/server/db/schema.ts`, the one-line scaffold test update |
 | `429f7e0` | `src/server/relays/**`, `src/app/api/relays/**`, `src/core/contracts/ext/wp14b-relays.ts`, pure tests |
 | `e5b6582` | DB tests: migration, registry, routes, quotas, LRU |
-| (next) | request files, these notes |
+| `0353091`, `3b5b307` | request files (`docs/notes/requests/wp14b-to-{wp12,wp14a,wp15,wp16,wp17,wp18}.md`), these notes |
 
 ### Done
 
