@@ -118,6 +118,11 @@ describe("migrate", () => {
     bp.meta.title = "Other title";
     expect(blueprintHash(bp)).not.toBe(blueprintHash(miniBlueprint()));
   });
+  it("blueprintHash equals WP14b's server hash (the vector pinned in wp14b-to-wp14a.md and its pure.test.ts)", () => {
+    expect(blueprintHash({ n: [1, 2.5, "é"], meta: { title: "x", slug: "y" } })).toBe("7aabb678e04f7850d6878f922d518c0af1c344ad6b54f9599c584d483294139d");
+    // JSON.stringify semantics: undefined keys dropped, undefined array items → null.
+    expect(canonicalJson({ b: undefined, a: [undefined, 1] })).toBe(JSON.stringify({ a: [null, 1] }));
+  });
   it("migrateBlueprint accepts 2.0 and rejects unknown schemas", () => {
     const bp = miniBlueprint();
     expect(migrateBlueprint(bp)).toBe(bp);

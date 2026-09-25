@@ -19,7 +19,7 @@ import { buildFirstUpdate } from "@/core/compiler/first-update";
 import { policyToAccount, type BatonRating } from "@/core/relay/account";
 import { compileRelay } from "@/core/relay/compile";
 import { lintBlueprintJson } from "@/core/relay/lint";
-import { hash8 } from "@/core/relay/migrate";
+import { canonicalJson, hash8 } from "@/core/relay/migrate";
 
 const ROOT = fileURLToPath(new URL("../../../../", import.meta.url));
 const DIR = join(ROOT, "tests", "fixtures", "relay-parity", "baton");
@@ -78,6 +78,8 @@ describe("Baton blueprint", () => {
     const r = lintBlueprintJson(batonJson);
     expect(r.issues).toEqual([]);
     expect(r.blueprint).not.toBeNull();
+    // No unknown keys (zod would strip them and the seeded hash would differ from the file's; wp14b-to-wp14a §2).
+    expect(canonicalJson(bp)).toBe(canonicalJson(batonJson));
   });
   it("the oracle covers the corpus", () => {
     expect(meta.counts).toEqual({ named: named.length, random: random.length });
