@@ -68,15 +68,29 @@ describe("visitor identity", () => {
     expect(requireVisitor(reqWith({})).via).toBe("new");
   });
 
-  it("ipKey: HMAC of day + first hop; the raw IP never appears; changes by day and by IP", () => {
+  it("ipKey: HMAC of day + the balancer hop (/24); the raw IP never appears; changes by day and by network", () => {
     const now = Date.parse("2026-10-01T12:00:00Z");
-    const a = ipKeyOf(reqWith({ "x-forwarded-for": "198.51.100.4, 10.0.0.1" }), { now });
+    // Zerops: the balancer overwrites X-Real-IP and appends the client to X-Forwarded-For.
+    const a = ipKeyOf(reqWith({ "x-forwarded-for": "10.9.9.9, 198.51.100.4", "x-real-ip": "198.51.100.4" }), { now });
     expect(a).toHaveLength(22);
     expect(a).not.toContain("198");
-    expect(ipKeyOf(reqWith({ "x-forwarded-for": "198.51.100.4" }), { now })).toBe(a);
-    expect(ipKeyOf(reqWith({ "x-forwarded-for": "198.51.100.5" }), { now })).not.toBe(a);
-    expect(ipKeyOf(reqWith({ "x-forwarded-for": "198.51.100.4" }), { now: now + 86_400_000 })).not.toBe(a);
     expect(ipKeyOf(reqWith({ "x-real-ip": "198.51.100.4" }), { now })).toBe(a);
+    expect(ipKeyOf(reqWith({ "x-forwarded-for": "198.51.100.4" }), { now })).toBe(a);
+    expect(ipKeyOf(reqWith({ "x-real-ip": "198.51.100.77" }), { now })).toBe(a); // same /24
+    expect(ipKeyOf(reqWith({ "x-real-ip": "198.51.101.4" }), { now })).not.toBe(a);
+    expect(ipKeyOf(reqWith({ "x-real-ip": "198.51.100.4" }), { now: now + 86_400_000 })).not.toBe(a);
+  });
+
+  it("ipKey: a spoofed leftmost X-Forwarded-For entry no longer buys a fresh bucket (P-0)", () => {
+    const now = Date.parse("2026-10-01T12:00:00Z");
+    const real = ipKeyOf(reqWith({ "x-forwarded-for": "198.51.100.4", "x-real-ip": "198.51.100.4" }), { now });
+    for (const spoof of ["203.0.113.7", "192.0.2.1, 203.0.113.9", "garbage"]) {
+      const h = { "x-forwarded-for": `${spoof}, 198.51.100.4`, "x-real-ip": "198.51.100.4" };
+      expect(ipKeyOf(reqWith(h), { now })).toBe(real);
+      expect(ipKeyOf(reqWith(h), { now, mode: "xff-right" })).toBe(real);
+    }
+    const off1 = ipKeyOf(reqWith({ "x-real-ip": "198.51.100.4" }), { now, mode: "off" });
+    expect(ipKeyOf(reqWith({ "x-real-ip": "198.51.100.4" }), { now, mode: "off" })).not.toBe(off1);
   });
 
   it("the proxy sets bvid on the first request and injects it into that request; a valid cookie passes through", () => {

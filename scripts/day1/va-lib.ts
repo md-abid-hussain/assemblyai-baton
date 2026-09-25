@@ -17,7 +17,9 @@ import {
   RealtimeAudioFeeder, type ClientEvent, type ReplyInfo, type ServerEvent, type SessionReadyEvent, type ToolCallEvent,
   type VoiceAgentSession,
 } from "../../src/core/aai/voice-agent";
-import { OpenRefusedError, VA_USD_PER_SEC, openVoiceAgentNode, type VoiceAgentHandle } from "../lib/aai-open";
+import {
+  OpenRefusedError, VA_USD_PER_SEC, openVoiceAgentNode, type VoiceAgentAuth, type VoiceAgentHandle,
+} from "../lib/aai-open";
 import { loadEnv } from "../lib/load-env";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -113,6 +115,8 @@ export async function openVaQueued(o: {
   maxWaitMs?: number;
   /** Extra raw-event hook (tests assert the order of client events on the wire). */
   onEvent?: (dir: "in" | "out", ev: ServerEvent | ClientEvent, atMs: number) => void;
+  /** Socket auth (default: the API-key header). `{kind:"token"}` mints a temp token first (T-D1-3 part B). */
+  auth?: VoiceAgentAuth;
 }): Promise<OpenedVa> {
   const log = makeLog(o.name);
   const t0 = nowMs();
@@ -124,6 +128,7 @@ export async function openVaQueued(o: {
         capMs: o.capMs,
         label: `wp5b_${o.name}`,
         source: "script",
+        ...(o.auth ? { auth: o.auth } : {}),
         connect: {
           onEvent: (d, ev, at) => {
             log.onEvent(d, ev, at);
