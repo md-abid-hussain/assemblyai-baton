@@ -20,3 +20,10 @@ Details and evidence: `docs/notes/deploy.md`.
    after:
    - WP2's `/api/internal/limits/*` routes are deployed;
    - `RemoteLimitsAuthority` is registered for scripts.
+
+---
+
+## Integrator status (G1, 2026-09-25)
+
+- §1 merged; §2 **not redeployed** (no deploys at G1); §3 the 10 app secrets still need the user (Zerops GUI).
+Details: `docs/notes/g1.md` ("Integrator requests: disposition").

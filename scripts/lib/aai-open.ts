@@ -14,7 +14,7 @@
 import type { LimitsAuthority, OpenSource } from "../../src/core/contracts/services";
 import { StreamingSession, type ConnectOptions, type StreamingParams, type TerminationMessage } from "../../src/core/aai/streaming";
 import type { VoiceAgentSession } from "../../src/core/aai/voice-agent";
-import { connectNode, nodeWebSocketFactory } from "../../src/server/aai/va-node";
+import { connectNode, nodeWebSocketFactory, VoiceAgentRest } from "../../src/server/aai/va-node";
 import { getLimitsAuthority } from "./limits";
 import { loadEnv } from "./load-env";
 
@@ -268,8 +268,34 @@ export interface OpenVoiceAgentOptions extends Omit<AcquireOptions, "maxWaitMs" 
   takeoverId?: string;
   attempt?: 0 | 1;
   label?: string;
-  /** Passed to connectNode (event hooks etc.). Auth is always the API key header. */
+  /** Passed to connectNode (event hooks etc.). Auth is set by `auth`. */
   connect?: Omit<Parameters<typeof connectNode>[0], "token" | "apiKey" | "maxDurationMs">;
+  /**
+   * How the socket authenticates (G1, for T-D1-3 part B):
+   * - `header` (default): the API key in the Authorization header;
+   * - `token`: mint a temp token (`GET /v1/token`, `expiresInSeconds`) and connect with `?token=` (the browser flow),
+   *   optionally waiting `connectDelayMs` between the mint and the connect. `restBase` points the mint at a fake
+   *   server in tests. Slot, ledger, heartbeat, report and release are the same in both modes.
+   */
+  auth?: VoiceAgentAuth;
+}
+
+export type VoiceAgentAuth =
+  | { kind: "header" }
+  | { kind: "token"; expiresInSeconds: number; connectDelayMs?: number; restBase?: string };
+
+/** VA temp tokens accept `max_session_duration_seconds` in 60..10800 (not enforced by the server; sent anyway). */
+function maxSessionSeconds(capMs: number): number {
+  return Math.min(10_800, Math.max(60, Math.ceil(capMs / 1000)));
+}
+
+async function connectVoiceAgent(o: OpenVoiceAgentOptions, key: string, capMs: number): Promise<VoiceAgentSession> {
+  const auth = o.auth ?? { kind: "header" };
+  if (auth.kind === "header") return connectNode({ ...(o.connect ?? {}), apiKey: key, maxDurationMs: capMs });
+  const rest = new VoiceAgentRest(key, auth.restBase ? { base: auth.restBase } : {});
+  const { token } = await rest.mintToken({ expiresInSeconds: auth.expiresInSeconds, maxSessionDurationSeconds: maxSessionSeconds(capMs) });
+  if (auth.connectDelayMs && auth.connectDelayMs > 0) await sleep(auth.connectDelayMs);
+  return connectNode({ ...(o.connect ?? {}), token, maxDurationMs: capMs });
 }
 
 export interface VoiceAgentHandle {
@@ -312,7 +338,7 @@ export async function openVoiceAgentNode(o: OpenVoiceAgentOptions = {}): Promise
   let session: VoiceAgentSession;
   const openedAt = Date.now();
   try {
-    session = await connectNode({ ...(o.connect ?? {}), apiKey: key, maxDurationMs: capMs });
+    session = await connectVoiceAgent(o, key, capMs);
   } catch (e) {
     await authority.ledger.release(ledgerId).catch(() => undefined);
     await authority.release(liveSessionId, "connect_failed").catch(() => undefined);

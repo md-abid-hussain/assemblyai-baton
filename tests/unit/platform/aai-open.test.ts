@@ -3,6 +3,7 @@
  * always close, all through an injected LocalOpenGuard over a temp directory.
  */
 import { mkdtempSync, rmSync } from "node:fs";
+import { createServer, type IncomingHttpHeaders, type Server } from "node:http";
 import type { AddressInfo } from "node:net";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -15,9 +16,14 @@ import { LocalOpenGuard } from "../../../scripts/lib/local-open-guard";
 
 let stt: WebSocketServer;
 let va: WebSocketServer;
+let rest: Server;
 let sttUrl = "";
 let vaUrl = "";
+let restBase = "";
 let dir = "";
+/** What the fake VA socket and the fake token endpoint saw (G1 token-auth open). */
+const vaUpgrades: { url: string; headers: IncomingHttpHeaders }[] = [];
+const mints: { url: string; auth: string | undefined }[] = [];
 
 beforeAll(async () => {
   process.env.ASSEMBLYAI_API_KEY = "test-key-not-real-0000000000"; // shell value wins over any .env
@@ -35,7 +41,8 @@ beforeAll(async () => {
     });
   });
   va = new WebSocketServer({ host: "127.0.0.1", port: 0 });
-  va.on("connection", (ws) => {
+  va.on("connection", (ws, req) => {
+    vaUpgrades.push({ url: req.url ?? "", headers: req.headers });
     ws.on("message", (raw) => {
       const msg = JSON.parse(String(raw)) as { type?: string };
       if (msg.type === "session.end") {
@@ -44,13 +51,24 @@ beforeAll(async () => {
       }
     });
   });
-  await Promise.all([new Promise((r) => stt.once("listening", r)), new Promise((r) => va.once("listening", r))]);
+  rest = createServer((req, res) => {
+    mints.push({ url: req.url ?? "", auth: req.headers.authorization });
+    res.writeHead(200, { "content-type": "application/json" });
+    res.end(JSON.stringify({ token: "fake-temp-token", expires_in_seconds: 5 }));
+  });
+  rest.listen(0, "127.0.0.1");
+  await Promise.all([
+    new Promise((r) => stt.once("listening", r)),
+    new Promise((r) => va.once("listening", r)),
+    new Promise((r) => rest.once("listening", r)),
+  ]);
   sttUrl = `ws://127.0.0.1:${(stt.address() as AddressInfo).port}/v3/ws`;
   vaUrl = `ws://127.0.0.1:${(va.address() as AddressInfo).port}/v1/ws`;
+  restBase = `http://127.0.0.1:${(rest.address() as AddressInfo).port}/v1`;
 });
 
 afterAll(async () => {
-  await Promise.all([new Promise((r) => stt.close(r)), new Promise((r) => va.close(r))]);
+  await Promise.all([new Promise((r) => stt.close(r)), new Promise((r) => va.close(r)), new Promise((r) => rest.close(r))]);
   rmSync(dir, { recursive: true, force: true });
 });
 
@@ -111,5 +129,39 @@ describe("aai-open (through the limits authority)", () => {
     // The slot is free again.
     const again = await openVoiceAgentNode({ authority: guard, capMs: 30_000, connect: { url: vaUrl } });
     await again.close();
+  });
+
+  it("openVoiceAgentNode defaults to the API-key header (no token in the URL)", async () => {
+    const guard = new LocalOpenGuard({ dir: join(dir, "e"), sttOpensPerMin: 4, vaMax: 1, dailyCapUsd: 5 });
+    vaUpgrades.length = 0;
+    await (await openVoiceAgentNode({ authority: guard, capMs: 30_000, connect: { url: vaUrl } })).close();
+    expect(vaUpgrades).toHaveLength(1);
+    expect(vaUpgrades[0]?.headers.authorization).toBe(process.env.ASSEMBLYAI_API_KEY);
+    expect(vaUpgrades[0]?.url).not.toContain("token=");
+  });
+
+  it("auth:token mints a temp token and connects with ?token= and no Authorization header (T-D1-3 part B)", async () => {
+    const guard = new LocalOpenGuard({ dir: join(dir, "f"), sttOpensPerMin: 4, vaMax: 1, dailyCapUsd: 5 });
+    vaUpgrades.length = 0;
+    mints.length = 0;
+    const h = await openVoiceAgentNode({
+      authority: guard,
+      capMs: 30_000,
+      connect: { url: vaUrl },
+      auth: { kind: "token", expiresInSeconds: 5, connectDelayMs: 10, restBase },
+    });
+    await h.close();
+    expect(mints).toHaveLength(1);
+    expect(mints[0]?.url).toMatch(/^\/v1\/token\?/);
+    expect(new URLSearchParams(mints[0]?.url.split("?")[1]).get("expires_in_seconds")).toBe("5");
+    expect(new URLSearchParams(mints[0]?.url.split("?")[1]).get("max_session_duration_seconds")).toBe("60");
+    expect(mints[0]?.auth).toBe(process.env.ASSEMBLYAI_API_KEY); // the mint uses the key; the socket does not
+    expect(vaUpgrades).toHaveLength(1);
+    expect(vaUpgrades[0]?.url).toContain("token=fake-temp-token");
+    expect(vaUpgrades[0]?.headers.authorization).toBeUndefined();
+    const s = await guard.snapshot();
+    expect(s.reports.map((r) => `${r.kind}:${r.event}`)).toEqual(["va:opened", "va:closed"]);
+    expect(s.ledger[0]).toMatchObject({ provider: "aai_va", status: "settled" });
+    expect(s.va).toHaveLength(0);
   });
 });

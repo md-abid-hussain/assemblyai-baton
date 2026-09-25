@@ -1,5 +1,6 @@
 import "server-only";
 
+import { buildSttParams } from "../../core/aai/stt-params";
 import type { StreamingParamsDto } from "../../core/contracts/api";
 import type { Channel, PolicyRecord } from "../../core/contracts/case";
 import type { CallManifestEntry } from "../../core/contracts/scenario";
@@ -8,9 +9,9 @@ import type { CallManifestEntry } from "../../core/contracts/scenario";
  * Streaming params handed to the browser by route #5 (DESIGN §5.1.5).
  *
  * WP4 owns the real builder, `buildSttParams(call, policy, channel)` in src/core/aai/stt-params.ts (per-channel
- * Hinglish, TUNING_8K after T-D1-6, the URL snapshot test). Until it lands on main this module serves the golden
- * defaults of §5.1.5 verbatim. [WIRE-STT-PARAMS] G1 (integrator): replace the body of `sttParamsFor` with
- * `return buildSttParams(call, policy, channel)` (and drop the fallback) once WP4 is merged.
+ * Hinglish, TUNING_8K after T-D1-6, the URL snapshot test). [WIRE-STT-PARAMS] wired at G1: `sttParamsFor` uses it
+ * whenever the call and the policy are known. The golden-defaults fallback below stays only for a request with no
+ * manifest entry (the call lookup, [WIRE-CALLS], arrives with WP9's manifest) or no policy.
  */
 
 export const STT_PROMPT =
@@ -54,5 +55,7 @@ export function fallbackSttParams(call: CallManifestEntry | null, policy: Policy
 }
 
 export function sttParamsFor(call: CallManifestEntry | null, policy: PolicyRecord | null, channel: Channel): StreamingParamsDto {
-  return fallbackSttParams(call, policy, channel);
+  if (!call || !policy) return fallbackSttParams(call, policy, channel);
+  // Spread: `StreamingParams` is an interface (no implicit index signature); the DTO is a passthrough object.
+  return { ...buildSttParams(call, policy, channel) };
 }

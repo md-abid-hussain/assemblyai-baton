@@ -286,9 +286,9 @@ export function stopInprocWorker(): void {
 }
 
 /**
- * Register the job steps this process can run. Purge is WP2's. [WIRE-WP8-STEPS] G1 (integrator): once WP8's modules
- * exist, add `await import("./verify-takeover")` and `await import("./va-audit")` here (each registers its step /
- * audit hook on import), so the ticker can run them before any route has loaded them.
+ * Register the job steps this process can run. Purge is WP2's. [WIRE-WP8-STEPS] wired at G1: WP8's modules register
+ * the `verify_takeover` step and the F6 audit hook on import (through `ensureWp8Wired()`), so the ticker can run
+ * them before any route has loaded them.
  */
 export async function installBuiltinSteps(runner: DbJobRunner = getJobRunner()): Promise<void> {
   const { registerPurgeJob } = await import("./purge");
@@ -297,4 +297,7 @@ export async function installBuiltinSteps(runner: DbJobRunner = getJobRunner()):
   setFallbackVerificationEnqueue((takeoverId, vaSessionId) =>
     runner.enqueueOnce("verify_takeover", takeoverId, { state: { vaSessionId, from: "sweeper" } }),
   );
+  await import("./verify-takeover");
+  await import("./va-audit");
+  await (await import("../qa/wiring")).wp8HooksReady();
 }

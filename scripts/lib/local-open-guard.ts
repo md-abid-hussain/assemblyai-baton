@@ -56,7 +56,8 @@ function numEnv(name: string, def: number): number {
 }
 
 export function defaultGuardDir(): string {
-  return resolve(process.env.LOCAL_GUARD_DIR || join(homedir(), ".baton", "limits"));
+  // turbopackIgnore: src/server/limits imports this module; a dynamic path would make Next trace the whole project.
+  return resolve(/*turbopackIgnore: true*/ process.env.LOCAL_GUARD_DIR || join(homedir(), ".baton", "limits"));
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -162,7 +163,7 @@ export class LocalOpenGuard implements LimitsAuthority {
   readonly ledger: SpendLedger;
 
   constructor(opts: LocalGuardOptions = {}) {
-    this.dir = resolve(opts.dir ?? defaultGuardDir());
+    this.dir = resolve(/*turbopackIgnore: true*/ opts.dir ?? defaultGuardDir());
     this.statePath = join(this.dir, "state.json");
     this.lockPath = join(this.dir, "state.lock");
     this.sttOpensPerMin = opts.sttOpensPerMin ?? Math.min(numEnv("STT_OPENS_PER_MIN", 4), 5);

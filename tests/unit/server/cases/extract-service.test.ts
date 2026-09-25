@@ -2,7 +2,7 @@
  * F1 extraction on real Postgres (TASKS WP3 acceptance 2 and 5, DESIGN §4.5 F1, §5.3 batching, §5.5.4 rule 2).
  */
 import { sql } from "drizzle-orm";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
 import type { CaseState } from "@/core/contracts/case";
 import type { DrainReport } from "@/core/contracts/takeover";
@@ -67,9 +67,14 @@ describe.skipIf(!HAS_DB)("ExtractService (F1) on Postgres", () => {
 
   it("batches only a backlog: >2 queued → up to 3 per luna call, else one turn per call", async () => {
     expect([0, 1, 2, 3, 4, 7].map((n) => batchSizeFor(n, 3))).toEqual([1, 1, 1, 3, 3, 3]);
-    const h = harness(t, { latencyMs: () => 120 });
+    const h = harness(t, { latencyMs: (ids) => (ids.includes("rep-0") ? 1000 : 120) });
     const caseId = await newCase(h, { callId: null });
-    await Promise.all(dialog.turns.slice(0, 7).map((f) => h.service.handle(turnOf(caseId, f))));
+    const turns = dialog.turns.slice(0, 7).map((f) => turnOf(caseId, f));
+    // G1: under the full parallel suite, DB timing decided which of 7 simultaneous calls ran first (flaky). Start rep-0
+    // alone, wait until its luna call is in flight (held 1 s), then send the other 6 so they queue up behind it.
+    const first = h.service.handle(turns[0]!);
+    await vi.waitFor(() => expect(h.extractor.calls).toBe(1));
+    await Promise.all([first, ...turns.slice(1).map((x) => h.service.handle(x))]);
     // 1 starts alone; 6 queue up → 3, then 3 → 3
     expect(h.extractor.batchSizes).toEqual([1, 3, 3]);
     expect(h.extractor.inputs[1]!.newTurns.map((x) => x.turnId)).toEqual(["customer-0", "rep-1", "customer-1"]);
