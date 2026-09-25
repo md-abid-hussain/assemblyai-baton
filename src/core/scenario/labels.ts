@@ -201,11 +201,13 @@ export function matchQuote(u: LabelUtterance, quote: string): QuoteMatch {
   }
   // Fuzzy: best window of the quote's length by token hits.
   const n = Math.min(q.length, w.length);
-  let best = { hits: 0, s: 0 };
+  let best = { hits: 0, score: 0, s: 0 };
   for (let s = 0; s + n <= w.length; s++) {
     let hits = 0;
     for (let k = 0; k < n; k++) if (qj.includes(w[s + k]!.tok.replace(/'/g, ""))) hits++;
-    if (hits > best.hits) best = { hits, s };
+    // Ties: prefer the window that starts on the quote's first word.
+    const score = hits + (w[s]!.tok.replace(/'/g, "") === qj[0] ? 0.5 : 0);
+    if (score > best.score) best = { hits, score, s };
   }
   if (best.hits / q.length >= 0.6) return { startMs: w[best.s]!.startMs, endMs: w[best.s + n - 1]!.endMs, quality: "fuzzy" };
   return whole;

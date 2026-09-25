@@ -122,9 +122,9 @@ export interface VerifyReplayInput {
   model: string;
 }
 
-/** The run start times, given each run's measured duration (pure; exported for the test). */
+/** The next run's start: the first cadence tick after the previous run has finished (runs never overlap). */
 export function nextVerifyStart(prevStartMs: number, prevMs: number, cadenceMs = VERIFY_CADENCE_MS): number {
-  return Math.max(prevStartMs + cadenceMs, prevStartMs + prevMs);
+  return Math.ceil(Math.max(prevStartMs + cadenceMs, prevStartMs + prevMs) / cadenceMs) * cadenceMs;
 }
 
 export async function replayVerifier(

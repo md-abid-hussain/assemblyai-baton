@@ -49,7 +49,7 @@ export interface PathOptions {
   repoRoot?: string | undefined;
 }
 
-export function resolvePaths(o: PathOptions = {}, env: NodeJS.ProcessEnv = process.env): PipelinePaths {
+export function resolvePaths(o: PathOptions = {}, env: Readonly<Record<string, string | undefined>> = process.env): PipelinePaths {
   const repoRoot = resolve(o.repoRoot ?? REPO_ROOT);
   const pick = (flag: string | undefined, envKey: string, dflt: string): string => resolve(flag ?? env[envKey] ?? dflt);
   return {
