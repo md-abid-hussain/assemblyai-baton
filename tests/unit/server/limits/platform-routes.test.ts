@@ -12,6 +12,7 @@ import { POST as cronPost } from "@/app/api/internal/cron/route";
 import { POST as runsPost } from "@/app/api/runs/route";
 import { GET as statusGet } from "@/app/api/status/route";
 import { cases, healthChecks, jobs, rateEvents } from "@/server/db/schema";
+import { setLogSink } from "@/server/log";
 import { createTestDb, HAS_DB, type TestDb } from "./helpers/test-db";
 import { call, caseAuthHeaders, insertCase, setupRouteEnv, TEST_SECRETS, truncateAll, type RouteEnv } from "./helpers/routes";
 
@@ -53,7 +54,27 @@ describe.skipIf(!HAS_DB)("status, cron, admin routes (+ acceptance 6 through a r
     for (let i = 0; i < 60; i++) await call(statusGet, { method: "GET", headers: { "x-forwarded-for": "192.0.2.99" } });
     const r = await call(statusGet, { method: "GET", headers: { "x-forwarded-for": "192.0.2.99" } });
     expect(r.status).toBe(429);
-    expect((await call(statusGet, { method: "GET", headers: { "x-forwarded-for": "192.0.2.100" } })).status).toBe(200);
+    expect((await call(statusGet, { method: "GET", headers: { "x-forwarded-for": "198.51.100.100" } })).status).toBe(200); // another /24
+  });
+
+  it("P-0: rotating a spoofed leftmost X-Forwarded-For entry does not escape the status bucket; the probe logs classes only", async () => {
+    // What Zerops delivers: the client chain + the appended client hop, X-Real-IP overwritten with the client.
+    const spoofed = (i: number) => ({ "x-forwarded-for": `203.0.113.${i}, 8.8.4.4`, "x-real-ip": "8.8.4.4" });
+    for (let i = 0; i < 60; i++) await call(statusGet, { method: "GET", headers: spoofed(i) });
+    expect((await call(statusGet, { method: "GET", headers: spoofed(99) })).status).toBe(429);
+    const lines: string[] = [];
+    const restore = setLogSink((_l, line) => lines.push(line));
+    try {
+      await call(statusGet, { method: "GET", headers: { ...spoofed(7), "x-ipkey-probe": "1" } });
+    } finally {
+      restore();
+    }
+    const probe = lines.find((l) => l.includes("ipkey_probe"));
+    expect(probe).toBeTruthy();
+    expect(probe).toContain('"realIp":"public"');
+    expect(probe).toContain('"xffLeft":"testnet"');
+    expect(probe).not.toContain("8.8.4.4");
+    expect(probe).not.toContain("203.0.113");
   });
 
   it("admin flags: key required; a balance below the reserve flips replay_only (aai_balance); mode live clears", async () => {

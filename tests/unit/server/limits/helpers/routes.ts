@@ -139,7 +139,9 @@ export async function insertTakeover(
 export function visitorHeaders(visitorId: string, o: { ip?: string; cookieless?: boolean } = {}): Record<string, string> {
   const signed = signVisitorId(visitorId, TEST_SECRETS.VISITOR_SECRET);
   return {
-    "x-forwarded-for": `${o.ip ?? "203.0.113.7"}, 10.0.0.1`,
+    // What the Zerops balancer delivers: a client-supplied XFF chain + the appended client hop, and X-Real-IP overwritten.
+    "x-forwarded-for": `10.0.0.1, ${o.ip ?? "203.0.113.7"}`,
+    "x-real-ip": o.ip ?? "203.0.113.7",
     ...(o.cookieless ? { "x-baton-visitor": signed } : { cookie: `other=1; bvid=${encodeURIComponent(signed)}` }),
   };
 }
