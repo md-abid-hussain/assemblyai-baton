@@ -21,7 +21,7 @@ import { enforceCreateQuota, enforceSaveQuota } from "./quotas";
  *   DELETE /api/relays/:id             → 204
  *   PUT    /api/relays/:id/draft       → {rev, lint} | 409 {conflict, rev}; 422 E_LINT when the JSON fails the schema
  *   POST   /api/relays/:id/versions    → {versionId, version, hash, created}; content-addressed; `relay:save`
- *   GET    /api/relays/:id/compiled    → CompiledRelayView (?version=<rv_…>|draft); 503 until the compiler is wired
+ *   GET    /api/relays/:id/compiled    → CompiledRelayView (?version=<rv_…>|draft); 503 until the kernel is bound
  */
 
 type IdCtx = RouteCtx<{ id: string }>;
@@ -118,6 +118,5 @@ export const getCompiled = relayRoute("relays.compiled", async (req: Request, ct
     blueprint = v.blueprint;
     lint = d.registry.kernel.parse(v.blueprint).issues;
   }
-  if (!d.compileView) throw new BatonError("E_MAINTENANCE", "The server compiler is not available yet; the Studio's local preview still works.");
-  return json(await d.compileView({ relayId: detail.id, versionId, blueprint, lint }));
+  return json(await d.compileView({ relayId: detail.id, versionId, blueprint, lint, flagship: detail.flagship }));
 });

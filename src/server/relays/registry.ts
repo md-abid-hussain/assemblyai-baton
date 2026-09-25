@@ -551,6 +551,14 @@ export class PgRelayRegistry implements RelayRegistry {
     return row.current;
   }
 
+  /** May workspace `ws` see (and so play a sim of) this version's relay? (owner, gallery, unlisted; live relays only) */
+  async canSeeVersion(ws: string, versionId: string): Promise<boolean> {
+    if (!versionId.startsWith(ID_PREFIXES.version)) return false;
+    const [v] = await this.db.select({ relayId: relayVersions.relayId }).from(relayVersions).where(eq(relayVersions.id, versionId));
+    const row = v ? await this.findRow(v.relayId) : null;
+    return !!row && this.accessOf(row, ws) !== "none";
+  }
+
   async remove(id: string, ws: string): Promise<void> {
     const row = await this.ownRow(id, ws);
     const now = new Date(this.now());

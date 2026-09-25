@@ -16,8 +16,8 @@ import type { RunVersion } from "../relays/registry";
  * - `forVersion(null)`: the legacy Baton path, i.e. the flagship gallery file `data/relays/baton-add-driver.json`
  *   compiled with `flagship: true, versionId: null`. Parity (PLATFORM §4.6) makes it equal to the legacy compiler, and
  *   the legacy case engine still drives Baton runs (P3); this relay only supplies the v2 response fields.
- * - The compiler is WP14a's `compileRelay`, injected (`compiler.ts`). Until it is on main, every compile answers
- *   503 E_MAINTENANCE and Baton keeps its v1 behaviour.
+ * - The compiler is WP14a's `compileRelay`, read lazily from the kernel binding (`kernel-binding.ts`). Until it is
+ *   on main, every compile answers 503 E_MAINTENANCE (not cached) and Baton keeps its v1 behaviour.
  */
 export interface EngineVersionSource {
   runVersion(versionId: string): Promise<RunVersion | null>;
@@ -25,7 +25,8 @@ export interface EngineVersionSource {
 
 export interface CachedRelayEngineFactoryDeps {
   versions: EngineVersionSource;
-  compiler: RelayCompiler | null;
+  /** Read at each miss, so binding the kernel later (tests, the WP14a swap) needs no rebuild. */
+  compiler: () => RelayCompiler | null;
   /** The flagship blueprint for `forVersion(null)`, parsed, with its content hash; null when the file is missing. */
   legacyBlueprint: () => Promise<{ blueprint: Blueprint; hash: string } | null>;
   capacity?: number;
@@ -44,7 +45,7 @@ export class CachedRelayEngineFactory implements RelayEngineFactory {
 
   /** True when a kernel compiler is wired (else every `forVersion` is a 503). */
   get available(): boolean {
-    return this.d.compiler !== null;
+    return this.d.compiler() !== null;
   }
 
   forVersion(versionId: string | null): Promise<CompiledRelay> {
@@ -77,7 +78,7 @@ export class CachedRelayEngineFactory implements RelayEngineFactory {
   }
 
   private async build(versionId: string | null): Promise<CompiledRelay> {
-    const compile = this.d.compiler;
+    const compile = this.d.compiler();
     if (!compile) throw new BatonError("E_MAINTENANCE", "The relay engine is not available yet.");
     if (versionId === null) {
       const legacy = await this.d.legacyBlueprint();
