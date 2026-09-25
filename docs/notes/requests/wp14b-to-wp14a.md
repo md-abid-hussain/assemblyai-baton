@@ -40,3 +40,25 @@ would not match the other, and the recorded-bundle replay check (P§10.4) compar
 `POST /api/relays {kind:"blank"}` builds `src/server/relays/blank.ts` (one `person_name` field, confirm and close
 stages, the `AI assistant` / `not a person` / `recorded` opening). It passes `BlueprintSchema` for every industry.
 WP14b·2 will also run it through your full lint. If a rule you add makes it fail, send a request file.
+
+## 5. WP14b·2: the kernel binding (one constant, `src/server/engine/kernel-binding.ts`)
+
+The server consumes your kernel through `KernelBinding` (`src/core/contracts/ext/wp14b-engine.ts`):
+
+```ts
+interface KernelBinding {
+  kernelVersion: string;
+  compile(bp: Blueprint, opts: { versionId: string | null; relayId: string | null; hash: string; flagship: boolean }): CompiledRelay;
+  policyToAccount(policy: PolicyRecord): AccountRecord;                                   // P§4.2
+  cannedSnapshot(compiled: CompiledRelay, account: AccountRecord, state: CannedState): CaseState;
+}
+```
+
+- `compile` = `compileRelay(bp, opts)`. The engine LRU caches per version, so it never passes `simulated`; the run
+  sets `ui.relay.simulated` itself. Please keep `CompileRelayOptions` accepting these four keys.
+- `policyToAccount` = your `src/core/relay/account.ts` as it is.
+- **Request: export the lint G2 canned snapshot builder** (all_verified / one_pending / one_missing / nothing), with a
+  full `CaseState` result, from `src/core/relay/**`. The server's compiled view (`GET /api/relays/:id/compiled`)
+  renders the greetings for every sample × canned state from it, and the prompts, tools and first update for
+  `one_pending`, so the Studio's browser compile and the server agree. Until it exists, the binding stays null (the
+  compiled route answers 503 and relay runs 503; Baton is unaffected).

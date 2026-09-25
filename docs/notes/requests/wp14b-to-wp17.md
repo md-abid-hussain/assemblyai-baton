@@ -39,3 +39,12 @@ exists too. Need a column? Send a request: it would go in a new additive migrati
 `PgRelayRegistry.create(ws, { kind: "blueprint", blueprint, origin: "draft" })` (via `getRelaysDeps().registry`)
 parses, lints and stores it, and returns `RelayDetail` (`id` = `rl_…`). It is never blocked by the global cap. The
 per-visitor quotas are applied by the route, not the registry, so apply your `draft` bucket before calling it.
+
+## 4. WP14b·2: the `CallCatalog` consumes your `SimCallStore.resolveCall`
+
+`src/server/engine/catalog.ts` reads a structural subset of `SimCallResolution` (`SimCallResolutionLite` in
+`src/core/contracts/ext/wp14b-engine.ts`: `entry`, `simulated`, `relayVersionId`, `relay {slug, title,
+blueprintHash}`, `sampleIndex`, `gallery`), so your store is assignable as it is. Please keep those keys. The binding
+(`sims: () => getSimCallStore()` in `buildRelaysDeps`) is one line after your branch merges; until then the catalog
+answers recorded calls only. A run's account is the RUN version's `samples[sampleIndex]`, so a preset that edits sample
+data (e.g. "Deposit $75") plays the base sim with its own numbers. `cases.sim_call_id` is set to the sim id.
