@@ -24,7 +24,7 @@ import { DockedPhone, FloatingPhone } from "./phone-dock";
 import {
   AudioLockedOverlay, CallEndedCard, ConnectingCard, HandBackCard, PausedOverlay, PreflightCard, QaSheet, QueuedCard, RecordedAiNote,
 } from "./state-cards";
-import { Banners, NarratorStrip, TopBar } from "./top-bar";
+import { Banners, NarratorStrip, ProvenanceBanner, TopBar } from "./top-bar";
 import { TranscriptLanes } from "./transcript-lanes";
 
 export function ControlColumn({ showDockedPhone }: { showDockedPhone: boolean }) {
@@ -141,6 +141,7 @@ export function CallConsole() {
       <div className={cn("bt-console flex min-h-dvh flex-col", !isMobile && "h-dvh")}>
         <TopBar />
         <NarratorStrip />
+        <ProvenanceBanner />
         <Banners />
         {isMobile ? (
           <MobileConsole />

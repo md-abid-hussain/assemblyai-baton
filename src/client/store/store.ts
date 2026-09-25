@@ -21,13 +21,24 @@ export interface ConsoleStore extends BatonStore, EventSink {
   reset(s?: UiState): void;
   /** The BatonEvents dispatched so far (bounded ring; newest last). */
   events(): readonly BatonEvent[];
+  /**
+   * The phone's events only (`phone.sms`, `phone.state`, `payment`, `va.tool` results of `hand_back_to_rep`): the
+   * MockPhone's `events` prop. A separate, never-trimmed list with a new identity per phone event, so the phone's
+   * "seen" index never slides with the bounded ring above (a 5-minute call easily exceeds it).
+   */
+  phoneEvents(): BatonEvent[];
 }
+
+/** The events WP6's MockPhone reads (docs/notes/requests/wp6-to-wp7.md). */
+export const isPhoneEvent = (ev: BatonEvent): boolean =>
+  ev.type === "phone.sms" || ev.type === "phone.state" || ev.type === "payment" || (ev.type === "va.tool" && ev.name === "hand_back_to_rep" && ev.phase === "result");
 
 const MAX_EVENTS = 5000;
 
 export function createConsoleStore(initial: UiState = initialUiState()): ConsoleStore {
   let state = initial;
   let log: BatonEvent[] = [];
+  let phoneLog: BatonEvent[] = [];
   const listeners = new Set<() => void>();
   const notify = () => {
     for (const l of [...listeners]) l();
@@ -46,6 +57,7 @@ export function createConsoleStore(initial: UiState = initialUiState()): Console
     dispatch(ev) {
       log.push(ev);
       if (log.length > MAX_EVENTS) log = log.slice(log.length - MAX_EVENTS);
+      if (isPhoneEvent(ev)) phoneLog = [...phoneLog, ev];
       set(reduceEntry(state, ev));
     },
     emit(ev) {
@@ -60,10 +72,12 @@ export function createConsoleStore(initial: UiState = initialUiState()): Console
     },
     reset(s = initialUiState()) {
       log = [];
+      phoneLog = [];
       state = s;
       notify();
     },
     events: () => log,
+    phoneEvents: () => phoneLog,
   };
   return store;
 }

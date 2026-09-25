@@ -278,6 +278,7 @@ function SuggestionChip({ s, disabled }: { s: Suggestion; disabled: boolean }) {
 
 export function ReplyControls() {
   const actions = useActions();
+  const inputs = useConsoleEnv().inputs ?? { autopilot: true, typed: true, mic: true };
   const suggestions = useBaton((s) => s.suggestions);
   const autopilot = useBaton((s) => s.autopilot);
   const recorded = useBaton(isRecordedAi);
@@ -302,21 +303,28 @@ export function ReplyControls() {
         <Eyebrow as="h3">Your replies as {customer}</Eyebrow>
         {readOnly ? <span className="rounded border border-(--bt-cached)/50 bg-(--bt-cached-bg) px-1.5 text-[10px] font-semibold text-(--bt-cached) uppercase">recorded</span> : null}
       </div>
-      <label className="flex items-center justify-between gap-3 rounded-lg border border-(--bt-line) px-3 py-2">
-        <span className="text-sm">
-          <span className="font-semibold">Autopilot</span>
-          <span className="block text-[11px] text-(--bt-muted)">Answers for {customer} 0.6 s after each question</span>
-        </span>
-        <SwitchPrimitive.Root
-          checked={autopilot}
-          disabled={readOnly}
-          onCheckedChange={(v) => actions.setAutopilot(v)}
-          aria-label="Autopilot customer"
-          className="relative h-6 w-11 shrink-0 rounded-full bg-(--bt-line-strong) transition-colors focus-visible:ring-2 focus-visible:ring-(--ai) focus-visible:outline-none disabled:opacity-60 data-[state=checked]:bg-(--ai)"
-        >
-          <SwitchPrimitive.Thumb className="block size-5 translate-x-0.5 rounded-full bg-white shadow transition-transform data-[state=checked]:translate-x-[22px]" />
-        </SwitchPrimitive.Root>
-      </label>
+      {inputs.autopilot ? (
+        <label className="flex items-center justify-between gap-3 rounded-lg border border-(--bt-line) px-3 py-2">
+          <span className="text-sm">
+            <span className="font-semibold">Autopilot</span>
+            <span className="block text-[11px] text-(--bt-muted)">Answers for {customer} 0.6 s after each question</span>
+          </span>
+          <SwitchPrimitive.Root
+            checked={autopilot}
+            disabled={readOnly}
+            onCheckedChange={(v) => actions.setAutopilot(v)}
+            aria-label="Autopilot customer"
+            className="relative h-6 w-11 shrink-0 rounded-full bg-(--bt-line-strong) transition-colors focus-visible:ring-2 focus-visible:ring-(--ai) focus-visible:outline-none disabled:opacity-60 data-[state=checked]:bg-(--ai)"
+          >
+            <SwitchPrimitive.Thumb className="block size-5 translate-x-0.5 rounded-full bg-white shadow transition-transform data-[state=checked]:translate-x-[22px]" />
+          </SwitchPrimitive.Root>
+        </label>
+      ) : (
+        <p className="rounded-lg border border-(--bt-line) px-3 py-2 text-sm">
+          <span className="font-semibold">Answer as {customer} with your mic.</span>{" "}
+          <span className="text-[12px] text-(--bt-muted)">Or stay quiet: the phone&apos;s autopilot still simulates the payment.</span>
+        </p>
+      )}
       {suggestions.length ? (
         <div className="flex flex-wrap gap-1.5" aria-label="Suggested replies" role="group">
           {suggestions.slice(0, 4).map((s) => (
@@ -324,36 +332,42 @@ export function ReplyControls() {
           ))}
         </div>
       ) : null}
-      <form onSubmit={submit} className="flex gap-1.5">
-        <label htmlFor="typed-reply" className="sr-only">
-          Type a reply as {customer}
-        </label>
-        <input
-          ref={input}
-          id="typed-reply"
-          value={text}
-          maxLength={200}
-          disabled={readOnly || !live}
-          onChange={(e) => setText(e.target.value)}
-          placeholder={`Type anything as ${customer}…`}
-          className="h-9 min-w-0 flex-1 rounded-md border border-(--bt-line-strong) bg-(--bt-panel) px-3 text-sm placeholder:text-(--bt-faint) focus-visible:ring-2 focus-visible:ring-(--ai) focus-visible:outline-none disabled:opacity-60"
-        />
-        <button type="submit" disabled={readOnly || !live || !text.trim()} className="inline-flex h-9 items-center gap-1 rounded-md bg-(--bt-ink) px-3 text-sm font-semibold text-(--bt-panel) disabled:opacity-40" aria-label="Send reply">
-          <SendIcon className="size-4" aria-hidden="true" />
-        </button>
-      </form>
-      <p className="-mt-1 text-[11px] text-(--bt-muted)">Your reply will be spoken by a synthetic voice.</p>
+      {inputs.typed ? (
+        <>
+          <form onSubmit={submit} className="flex gap-1.5">
+            <label htmlFor="typed-reply" className="sr-only">
+              Type a reply as {customer}
+            </label>
+            <input
+              ref={input}
+              id="typed-reply"
+              value={text}
+              maxLength={200}
+              disabled={readOnly || !live}
+              onChange={(e) => setText(e.target.value)}
+              placeholder={`Type anything as ${customer}…`}
+              className="h-9 min-w-0 flex-1 rounded-md border border-(--bt-line-strong) bg-(--bt-panel) px-3 text-sm placeholder:text-(--bt-faint) focus-visible:ring-2 focus-visible:ring-(--ai) focus-visible:outline-none disabled:opacity-60"
+            />
+            <button type="submit" disabled={readOnly || !live || !text.trim()} className="inline-flex h-9 items-center gap-1 rounded-md bg-(--bt-ink) px-3 text-sm font-semibold text-(--bt-panel) disabled:opacity-40" aria-label="Send reply">
+              <SendIcon className="size-4" aria-hidden="true" />
+            </button>
+          </form>
+          <p className="-mt-1 text-[11px] text-(--bt-muted)">Your reply will be spoken by a synthetic voice.</p>
+        </>
+      ) : null}
       <div className="flex flex-wrap gap-1.5">
-        <button
-          type="button"
-          disabled={readOnly || !live}
-          aria-pressed={mic}
-          onClick={async () => setMic(await actions.toggleMic(!mic))}
-          className="inline-flex h-8 items-center gap-1.5 rounded-md border border-(--bt-line-strong) px-2.5 text-xs font-medium hover:bg-(--bt-panel-2) disabled:opacity-50"
-        >
-          {mic ? <MicIcon className="size-3.5" aria-hidden="true" /> : <MicOffIcon className="size-3.5" aria-hidden="true" />}
-          {mic ? "Mic on" : "Use my mic"}
-        </button>
+        {inputs.mic ? (
+          <button
+            type="button"
+            disabled={readOnly || !live}
+            aria-pressed={mic}
+            onClick={async () => setMic(await actions.toggleMic(!mic))}
+            className="inline-flex h-8 items-center gap-1.5 rounded-md border border-(--bt-line-strong) px-2.5 text-xs font-medium hover:bg-(--bt-panel-2) disabled:opacity-50"
+          >
+            {mic ? <MicIcon className="size-3.5" aria-hidden="true" /> : <MicOffIcon className="size-3.5" aria-hidden="true" />}
+            {mic ? "Mic on" : "Use my mic"}
+          </button>
+        ) : null}
         <button type="button" disabled={readOnly || !live} onClick={() => actions.askForDaniel()} className="inline-flex h-8 items-center gap-1.5 rounded-md border border-(--bt-line-strong) px-2.5 text-xs font-medium hover:bg-(--bt-panel-2) disabled:opacity-50">
           <UserRoundIcon className="size-3.5" aria-hidden="true" /> Ask for {rep}
         </button>

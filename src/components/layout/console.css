@@ -219,6 +219,18 @@
   animation: bt-ring 1.6s ease-in-out infinite;
 }
 
+/* WP6's MockPhone (300 × 580 px) floating over a laptop viewport: scaled with its layout box, so the whole phone and
+   its "Your turn" pill stay above the fold at 1366×768 and 1024×768. Full size on tall screens and in the Phone tab. */
+.bt-phone-float {
+  zoom: 1;
+}
+@media (max-height: 900px) {
+  .bt-phone-float { zoom: 0.9; }
+}
+@media (max-height: 700px) {
+  .bt-phone-float { zoom: 0.78; }
+}
+
 /* Recorded / greyed shadow lanes. */
 .bt-greyed {
   filter: grayscale(0.9);

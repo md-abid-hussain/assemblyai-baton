@@ -6,7 +6,7 @@ import "client-only";
 
 import type { Evidence, FieldId } from "@/core/contracts/case";
 import type { TranscriptLine } from "@/core/contracts/ext/wp7-ui";
-import type { Suggestion } from "@/core/contracts/services";
+import type { PhoneState, Suggestion } from "@/core/contracts/services";
 
 export interface ConsoleActions {
   /** MUST run the audio unlock synchronously inside the click handler (AudioEngine.unlockSync, DESIGN §7.6). */
@@ -26,6 +26,8 @@ export interface ConsoleActions {
   askForDaniel(): void;
   endCall(): void;
   unlockAudio(): void;
+  /** MockPhone `onState` (WP6): the store's phone state plus, in a live run, the VA's progress-aware hold. */
+  setPhoneState(s: PhoneState): void;
 }
 
 const noop = () => {};
@@ -48,4 +50,5 @@ export const NOOP_ACTIONS: ConsoleActions = {
   askForDaniel: noop,
   endCall: noop,
   unlockAudio: noop,
+  setPhoneState: noop,
 };

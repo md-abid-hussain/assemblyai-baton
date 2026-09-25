@@ -249,6 +249,57 @@ export function modeBadge(s: UiState): { label: string; tone: "live" | "cached" 
 }
 
 /** The queue/budget notice in plain words (top bar), or null. */
+/**
+ * The run's provenance (PLATFORM §7.6's four segments; the G2 console shows it as one banner line, WP7·3 turns it into
+ * the provenance strip). `customer` is who answers the AI after the pass on this page: WP11's synthetic autopilot, the
+ * judge's mic, or the recorded session's customer.
+ */
+export interface ProvenanceSegment {
+  key: "human" | "transcription" | "ai" | "customer";
+  label: string;
+  value: string;
+  tooltip: string;
+}
+
+export function provenance(s: Pick<UiState, "context" | "plan" | "mode">, o: { customerInput: "synthetic" | "mic" }): ProvenanceSegment[] {
+  const phoneLine = s.context?.source === "twilio8k";
+  const cachedDate = s.context?.cachedTranscribedAt ? ` (${formatCallDate(s.context.cachedTranscribedAt)})` : "";
+  const cached = s.mode === "cached_replay" || s.plan?.sttHalf === "cached";
+  const recordedAi = isRecordedAi(s);
+  return [
+    {
+      key: "human",
+      label: "Human half",
+      value: phoneLine ? "recorded role-play, real phone line" : "recorded role-play",
+      tooltip: "A role-play call recorded by consented volunteers" + (phoneLine ? " over a real phone line (8 kHz, one channel per speaker)." : "."),
+    },
+    {
+      key: "transcription",
+      label: "Transcription",
+      value: cached ? `cached${cachedDate}` : "live AssemblyAI",
+      tooltip: cached
+        ? "AssemblyAI transcripts made live on an earlier day, replayed now (labelled)."
+        : "Two live AssemblyAI Universal-3.5 Pro streaming sessions, one per speaker.",
+    },
+    {
+      key: "ai",
+      label: "AI half",
+      value: recordedAi ? "recorded session" : "live Voice Agent",
+      tooltip: recordedAi ? "A labelled recording of a real AssemblyAI Voice Agent session on this call." : "A live AssemblyAI Voice Agent session starts at the pass.",
+    },
+    {
+      key: "customer",
+      label: "Customer in the AI half",
+      value: recordedAi ? "recorded" : o.customerInput === "mic" ? "you (mic)" : "synthetic",
+      tooltip: recordedAi
+        ? "The customer's side of the recorded session."
+        : o.customerInput === "mic"
+          ? "You answer the AI as the customer, with your mic."
+          : "A synthetic stand-in voice answers for the customer (Autopilot).",
+    },
+  ];
+}
+
 export function planNotice(s: UiState): string | null {
   if (s.plan?.reason) return s.plan.reason;
   if (s.mode === "cached_replay" && s.modeReason) return s.modeReason;

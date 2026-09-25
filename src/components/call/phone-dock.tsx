@@ -2,11 +2,13 @@
 /**
  * The MockPhone container (DESIGN §1.4 S2 right column, S6): docked in the right column on ≥1600 px, and floating
  * bottom-right from `phone.sms` onwards on anything narrower, so it is never below the fold on a 1366×768 laptop.
- * WP6's MockPhone is mounted through `ConsoleEnv.renderPhone`; until then a read-only preview renders the same
- * events (phone.sms, phone.state, payment).
+ * WP6's MockPhone (`src/components/phone/MockPhone.tsx`) is mounted through `ConsoleEnv.renderPhone` (live runs and
+ * the /dev/ui `phone=wp6` harness): it brings its own frame, gets the phone's events from `store.phoneEvents()`, and
+ * its `onState` goes to `actions.setPhoneState` (store + the VA's progress-aware hold). Without `renderPhone` (fixture
+ * logs, recorded runs) a read-only preview renders the same events (phone.sms, phone.state, payment).
  */
 import { BatteryFullIcon, CheckCircle2Icon, ChevronDownIcon, CreditCardIcon, FileSignatureIcon, Loader2Icon, MessageSquareIcon, SignalIcon, SmartphoneIcon } from "lucide-react";
-import { useEffect, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useState, useSyncExternalStore, type ReactNode } from "react";
 
 import { useBaton, useConsoleStore } from "@/client/store/hooks";
 import { formatUsd, names } from "@/client/store/selectors";
@@ -108,37 +110,38 @@ function PhoneFrame({ children, className }: { children: ReactNode; className?: 
   );
 }
 
-function PhoneBody({ variant }: { variant: "docked" | "floating" }) {
+/** WP6's MockPhone through `ConsoleEnv.renderPhone`, or null when the page has none (the preview renders instead). */
+function useMountedPhone(variant: "docked" | "floating"): ReactNode | null {
   const env = useConsoleEnv();
   const store = useConsoleStore();
-  const t = useBaton((s) => s.t);
+  const events = useSyncExternalStore(store.subscribe, store.phoneEvents, store.phoneEvents);
   const autopilot = useBaton((s) => s.autopilot);
-  const readOnly = useBaton((s) => s.mode === "recorded_ai" || s.plan?.aiHalf === "recorded") || !!env.fixture;
-  void t;
-  if (env.renderPhone) {
-    return (
-      <>
-        {env.renderPhone({
-          events: [...store.events()],
-          paymentId: env.paymentId ?? null,
-          takeoverToken: env.takeoverToken ?? "",
-          variant,
-          readOnly,
-          autopilot,
-          onState: (st: PhoneState) => store.dispatch({ t: env.clockNow(), type: "phone.state", state: st }),
-        })}
-      </>
-    );
-  }
-  return <PhonePreview />;
+  const readOnly = useBaton((s) => s.mode === "recorded_ai" || s.plan?.aiHalf === "recorded");
+  const { actions } = env;
+  const onState = useCallback((st: PhoneState) => actions.setPhoneState(st), [actions]);
+  if (!env.renderPhone) return null;
+  const auth = env.phoneAuth?.() ?? { paymentId: null, takeoverToken: "" };
+  return env.renderPhone({
+    events,
+    paymentId: auth.paymentId,
+    takeoverToken: auth.takeoverToken,
+    variant,
+    readOnly,
+    autopilot,
+    onState,
+    // The console positions the floating phone itself (with the "Your turn" pill and the minimise button).
+    className: variant === "floating" ? "static shadow-2xl" : "shadow-lg",
+  });
 }
 
 /** Docked variant (right column ≥1600 px, the mobile Phone tab). */
 export function DockedPhone({ className }: { className?: string }) {
+  const mounted = useMountedPhone("docked");
+  if (mounted) return <div className="flex justify-center">{mounted}</div>;
   return (
     <div className={cn("mx-auto h-[520px] w-[280px]", className)}>
       <PhoneFrame>
-        <PhoneBody variant="docked" />
+        <PhonePreview />
       </PhoneFrame>
     </div>
   );
@@ -146,6 +149,7 @@ export function DockedPhone({ className }: { className?: string }) {
 
 /** Floating overlay (bottom-right) from phone.sms onwards on screens narrower than 1600 px. */
 export function FloatingPhone() {
+  const mounted = useMountedPhone("floating");
   const hasSms = useBaton((s) => s.phone.sms.length > 0);
   const state = useBaton((s) => s.phone.state);
   const customer = useBaton((s) => names(s).customer);
@@ -173,20 +177,31 @@ export function FloatingPhone() {
       </button>
     );
   }
+  const header = (
+    <div className="mb-1.5 flex w-full items-center justify-between gap-2">
+      {yourTurn ? (
+        <span className="bt-attention rounded-full bg-(--ai) px-3 py-1 text-xs font-bold text-white">Your turn: tap the text</span>
+      ) : (
+        <span className="rounded-full bg-(--bt-panel) px-3 py-1 text-xs font-semibold shadow">{customer}&apos;s phone</span>
+      )}
+      <button type="button" onClick={() => setOpen(false)} className="inline-flex size-7 items-center justify-center rounded-full bg-(--bt-panel) shadow" aria-label="Minimise the phone">
+        <ChevronDownIcon className="size-4" aria-hidden="true" />
+      </button>
+    </div>
+  );
+  if (mounted) {
+    return (
+      <aside aria-label={`${customer}'s phone`} className="bt-rise fixed right-4 bottom-4 z-40 flex flex-col items-end">
+        {header}
+        <div className={cn("bt-phone-float rounded-[2.2rem]", yourTurn && "bt-attention")}>{mounted}</div>
+      </aside>
+    );
+  }
   return (
     <aside aria-label={`${customer}'s phone`} className="bt-rise fixed right-4 bottom-4 z-40 flex h-[min(500px,calc(100dvh-18rem))] min-h-[360px] w-[260px] flex-col">
-      <div className="mb-1.5 flex items-center justify-between gap-2">
-        {yourTurn ? (
-          <span className="bt-attention rounded-full bg-(--ai) px-3 py-1 text-xs font-bold text-white">Your turn: tap the text</span>
-        ) : (
-          <span className="rounded-full bg-(--bt-panel) px-3 py-1 text-xs font-semibold shadow">{customer}&apos;s phone</span>
-        )}
-        <button type="button" onClick={() => setOpen(false)} className="inline-flex size-7 items-center justify-center rounded-full bg-(--bt-panel) shadow" aria-label="Minimise the phone">
-          <ChevronDownIcon className="size-4" aria-hidden="true" />
-        </button>
-      </div>
+      {header}
       <PhoneFrame className={cn("min-h-0 flex-1", yourTurn && "bt-attention")}>
-        <PhoneBody variant="floating" />
+        <PhonePreview />
       </PhoneFrame>
     </aside>
   );

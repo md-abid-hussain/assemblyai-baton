@@ -11,9 +11,13 @@ import type { MockPhoneProps } from "@/core/contracts/services";
 export interface ConsoleEnv {
   actions: ConsoleActions;
   /** WP6's MockPhone (DESIGN S6). When absent the console shows its read-only phone preview. */
-  renderPhone?: (p: MockPhoneProps) => ReactNode;
-  takeoverToken?: string;
-  paymentId?: string | null;
+  renderPhone?: (p: MockPhoneProps & { className?: string }) => ReactNode;
+  /** The MockPhone's pay link and takeover token, read at render time (they change per pass). */
+  phoneAuth?: () => { paymentId: string | null; takeoverToken: string };
+  /** `/call/[id]?express=1` (the landing CTA): Express starts by itself after a 3 s countdown. */
+  autoStart?: "express" | null;
+  /** Which customer inputs the AI half has on this page (WP11 brings autopilot, chips and typed replies). */
+  inputs?: { autopilot: boolean; typed: boolean; mic: boolean };
   /** "FIXTURE" badge: the page is driven by a dev event log, not a live run. */
   fixture: string | null;
   links: { explorer: string; evals: string; about: string; home: string };

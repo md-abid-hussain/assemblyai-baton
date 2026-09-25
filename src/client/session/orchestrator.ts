@@ -24,7 +24,7 @@ import type { TranscriptLine, UiCallContext } from "@/core/contracts/ext/wp7-ui"
 import type { RunPlan } from "@/core/contracts/run";
 import { PeaksSchema, type CallManifestEntry, type Peaks } from "@/core/contracts/scenario";
 import type {
-  AudioEngine, CallPlayback, CaseSync, CustomerInput, EventSink, PageLifecycle, SttChannelManager, Suggestion,
+  AudioEngine, CallPlayback, CaseSync, CustomerInput, EventSink, MicSource, PageLifecycle, PhoneState, SttChannelManager, Suggestion,
 } from "@/core/contracts/services";
 import type { TurnInput } from "@/core/contracts/turns";
 
@@ -96,6 +96,19 @@ export interface TakeoverHandle {
   askForRep(): void;
   /** WP4's provider session ids → the HUD (WP5b). */
   setSessionIds?(ids: { rep?: string; customer?: string; va?: string }): void;
+  /** The current pass's pay link (route #14 `ui.paymentId`) for the MockPhone; null before the pay tool ran. */
+  paymentId?(): string | null;
+  /** MockPhone `onState` → `VoiceAgentController.setPayingState` (the progress-aware hold, DESIGN §5.8). */
+  setPhoneState?(s: PhoneState): void;
+  /** The judge's mic as the customer in the AI half (DESIGN §1.3 P1 step 5), when WP11's CustomerInput is absent. */
+  setMicSource?(src: MicSource | null): void;
+}
+
+/** What the page's MockPhone needs besides the events (WP6 `MockPhoneProps`). */
+export interface PhoneAuth {
+  paymentId: string | null;
+  takeoverToken: string;
+  visitorToken: string | null;
 }
 
 export interface SessionControllers {
@@ -156,6 +169,7 @@ export class CallSession implements ConsoleActions {
   private polling = false;
   private sttReady: (() => void) | null = null;
   private playEv: ((ev: Evidence) => Promise<unknown>) | null = null;
+  private mic: MicSource | null = null;
   /** The signed visitor token for cookie-less browsers (CreateCaseResponse.visitorToken). */
   visitorToken: string | undefined;
 
@@ -555,11 +569,47 @@ export class CallSession implements ConsoleActions {
   }
 
   async toggleMic(on: boolean): Promise<boolean> {
-    if (!on || !this.customer) return false;
-    this.setAutopilot(false);
-    const ok = await this.customer.enableMic();
-    if (!ok) this.fail("E_MIC_DENIED", "The microphone is blocked: autopilot, the reply chips and typing still work.");
-    return ok;
+    if (this.customer) {
+      if (!on) return false;
+      this.setAutopilot(false);
+      const ok = await this.customer.enableMic();
+      if (!ok) this.fail("E_MIC_DENIED", "The microphone is blocked: autopilot, the reply chips and typing still work.");
+      return ok;
+    }
+    // No WP11 customer input on the page: the judge's own mic answers the AI (WP4 openMic → WP5b setMicSource).
+    if (!on) {
+      const m = this.mic;
+      this.mic = null;
+      this.handle?.setMicSource?.(null);
+      await m?.stop().catch(() => undefined);
+      return false;
+    }
+    if (this.mic) return true;
+    if (!this.engine || !this.handle?.setMicSource) return false;
+    try {
+      const m = await this.engine.openMic(24_000);
+      if (this.disposed) {
+        await m.stop().catch(() => undefined);
+        return false;
+      }
+      this.mic = m;
+      this.handle.setMicSource(m);
+      return true;
+    } catch {
+      this.fail("E_MIC_DENIED", "The microphone is blocked. Allow it in the browser's site settings, or let the AI finish without you.");
+      return false;
+    }
+  }
+
+  /** The MockPhone's `paymentId` and tokens (read at render time; the takeover token changes per pass). */
+  phoneAuth(): PhoneAuth {
+    return { paymentId: this.handle?.paymentId?.() ?? null, takeoverToken: this.handle?.token() ?? "", visitorToken: this.visitorToken ?? null };
+  }
+
+  /** MockPhone `onState`: the store's phone state (narrator, floating pill) and the VA's progress-aware hold. */
+  setPhoneState(s: PhoneState): void {
+    this.store.dispatch({ t: this.now(), type: "phone.state", state: s });
+    this.handle?.setPhoneState?.(s);
   }
 
   askForDaniel(): void {
@@ -587,6 +637,8 @@ export class CallSession implements ConsoleActions {
     const armed = !!this.handle?.ctl.armInfo().armed || this.store.getState().takeover.armedT !== null;
     if (!this.handle || (reason === "unmount" && !armed)) void this.releaseHold(true);
     this.human?.stt.dispose?.();
+    void this.mic?.stop().catch(() => undefined);
+    this.mic = null;
     for (const u of this.unsubs.splice(0)) u();
     // On pagehide the controller's own pagehide listener may not have run yet (ours was registered first); disposing
     // it now would remove that listener mid-dispatch and skip its session.end / keepalive /end. The page is going away.

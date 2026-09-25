@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { FixtureConsole } from "@/components/call/fixture-console";
 
 /**
- * /dev/ui?fixture=<name>&at=<ms|end|phase[:end][+ms]>&speed=<n>&play=1&chrome=0
+ * /dev/ui?fixture=<name>&at=<ms|end|phase[:end][+ms]>&speed=<n>&play=1&chrome=0&express=1&phone=wp6
  * The call console driven by BatonEvent fixture logs (src/client/fixtures), for building, screenshots and demos.
  */
 export const metadata: Metadata = { title: "Console fixtures (dev)", robots: { index: false, follow: false } };
@@ -21,6 +21,8 @@ export default async function DevUiPage({ searchParams }: { searchParams: Promis
       autoplay={one(sp.play) === "1"}
       chrome={one(sp.chrome) !== "0"}
       basePath="/dev/ui"
+      express={one(sp.express) === "1"}
+      phone={one(sp.phone) === "wp6" ? "wp6" : "preview"}
     />
   );
 }

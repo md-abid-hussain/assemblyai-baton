@@ -14,6 +14,7 @@ import "client-only";
 
 import type { CaseState, Stage } from "@/core/contracts/case";
 import type { PayToolMode, VaStageSource } from "@/core/contracts/ext/wp5b-va";
+import type { MicSource, PhoneState } from "@/core/contracts/services";
 import { compilePrompt, compileTakeover, toolsForStage, validateFirstUpdate } from "@/core/compiler";
 
 import { getAudioEngine } from "../audio/engine";
@@ -26,13 +27,13 @@ import { LiveSttChannelManager, type SttConnect } from "../stt/channel-manager";
 import { createTakeoverController, HttpTakeoverApi, type TakeoverApi, type VaSession } from "../takeover";
 import { createVoiceAgentController, type VaControllerConfig, type VoiceAgentControllerImpl } from "../va/controller";
 import type { HumanHalf, SessionContext, SessionControllers, TakeoverHandle } from "./orchestrator";
-import { createHttpToolPorts, type ToolPortsFactory } from "./tool-ports";
+import { createWp6ToolPorts, withPaymentTap, type ToolPortsFactory } from "./tool-ports";
 
 export const CLIENT_PAY_TOOL_MODE: PayToolMode = "push";
 export const CLIENT_VA_KEYTERMS = true;
 
 export interface BrowserWiringOptions {
-  /** Routes #14/#15 for the VA controller. Default: the contract-exact HTTP ports; G2: WP6's `createCallTool`/`createPaymentsClient`. */
+  /** Routes #14/#15 for the VA controller. Default: WP6's `createCallTool` / `createPaymentsClient`. */
   toolPorts?: ToolPortsFactory;
   /** WP4: a Begin mismatch is fatal in dev/CI, a warning in production. */
   strictBegin?: boolean;
@@ -117,7 +118,8 @@ export function wireTakeover(c: TakeoverWiringContext, o: BrowserWiringOptions &
     arm: async (req, token) => {
       const r = await base.arm(req, token);
       armedToken = r.takeoverToken;
-      current = null; // a new pass: the previous pass's VA ids no longer apply
+      current = null; // a new pass: the previous pass's VA ids and payment no longer apply
+      paymentId = null;
       return r;
     },
     compile: (id, drain, token) => base.compile(id, drain, token),
@@ -134,9 +136,16 @@ export function wireTakeover(c: TakeoverWiringContext, o: BrowserWiringOptions &
   const hud = createLatencyHud({ onMetric: hudMetricReporter({ sink: c.sink, postEvents, eventTime: c.now }) });
   const policy = c.create.policy;
   const deployId = c.deployId ?? "client";
-  const ports = (o.toolPorts ?? createHttpToolPorts)({ takeoverToken: () => token() ?? "", visitorToken: () => visitorToken() });
+  // The pay link's paymentId (route #14 `ui.paymentId`) for the MockPhone; reset on every new pass.
+  let paymentId: string | null = null;
+  const ports = withPaymentTap((o.toolPorts ?? createWp6ToolPorts)({ takeoverToken: () => token() ?? "", visitorToken: () => visitorToken() }), (id) => {
+    paymentId = id;
+  });
   const stageSource = stageSourceFor({ caseState: c.caseState, policy, deployId });
   let va: VoiceAgentControllerImpl | null = null;
+  // The MockPhone's state and the judge's mic outlive a VA attempt: a new attempt gets them too.
+  let phone: PhoneState | null = null;
+  let mic: MicSource | null = null;
 
   const ctl = createTakeoverController({
     ids: { caseId: c.create.caseId, runId: c.plan.runId, caseToken: c.create.caseToken },
@@ -166,6 +175,8 @@ export function wireTakeover(c: TakeoverWiringContext, o: BrowserWiringOptions &
         eventTime: c.now,
         config: { payToolMode: CLIENT_PAY_TOOL_MODE, vaKeyterms: CLIENT_VA_KEYTERMS, ...o.vaConfig },
       });
+      if (phone) va.setPayingState(phone);
+      if (mic) va.setMicSource(mic);
       return va;
     },
     localCompile: () =>
@@ -188,5 +199,14 @@ export function wireTakeover(c: TakeoverWiringContext, o: BrowserWiringOptions &
     token,
     askForRep: () => (va as VoiceAgentControllerImpl | null)?.say(askForRepInstructions(policy.repFirstName)),
     setSessionIds: (ids) => hud.setSessionIds(ids),
+    paymentId: () => paymentId,
+    setPhoneState: (s) => {
+      phone = s;
+      (va as VoiceAgentControllerImpl | null)?.setPayingState(s);
+    },
+    setMicSource: (src) => {
+      mic = src;
+      (va as VoiceAgentControllerImpl | null)?.setMicSource(src);
+    },
   };
 }

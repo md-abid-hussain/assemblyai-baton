@@ -13,11 +13,50 @@ import { useActions, useConsoleEnv, useNow } from "../common/console-context";
 import { QaCardBody, QaTitle } from "../qa/qa-card";
 
 const AI_HALF_MIN = 2.5;
+/** `/call/[id]?express=1` (the landing CTA, PLATFORM §12.1): Express starts after this countdown. */
+export const EXPRESS_COUNTDOWN_S = 3;
+
+/**
+ * Counts down from `seconds` while `active`, then calls `onDone` once. Returns the seconds left (null when inactive).
+ * `onDone` runs from a timer, not a click: the landing CTA's click created and resumed the AudioContext (DESIGN
+ * autoplay rule); a deep link without that click gets the "Tap to enable sound" overlay from the orchestrator.
+ */
+export function useCountdown(active: boolean, seconds: number, onDone: () => void): number | null {
+  const [left, setLeft] = useState<number | null>(null);
+  const done = useRef(onDone);
+  done.current = onDone;
+  useEffect(() => {
+    if (!active) {
+      setLeft(null);
+      return;
+    }
+    const t0 = Date.now();
+    setLeft(seconds);
+    const id = setInterval(() => {
+      const l = seconds - Math.floor((Date.now() - t0) / 1000);
+      if (l > 0) {
+        setLeft(l);
+        return;
+      }
+      clearInterval(id);
+      setLeft(0);
+      done.current();
+    }, 100);
+    return () => clearInterval(id);
+  }, [active, seconds]);
+  return left;
+}
 
 export function PreflightCard() {
   const actions = useActions();
+  const env = useConsoleEnv();
   const ctx = useBaton((s) => s.context);
   const plan = useBaton((s) => s.plan);
+  const phase = useBaton((s) => s.phase);
+  const [cancelled, setCancelled] = useState(false);
+  const canExpress = !!ctx && ctx.decisionPointMs !== null;
+  const counting = env.autoStart === "express" && canExpress && !!plan && phase === "preflight" && !cancelled;
+  const left = useCountdown(counting, EXPRESS_COUNTDOWN_S, () => actions.start("express"));
   const [ios, setIos] = useState(false);
   useEffect(() => {
     setIos(/iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1));
@@ -34,6 +73,22 @@ export function PreflightCard() {
   const expressStart = ctx.decisionPointMs !== null ? Math.max(0, ctx.decisionPointMs - 25_000) : null;
   const expressMin = expressStart !== null ? Math.round((ctx.durationMs - expressStart) / 60_000 + AI_HALF_MIN) : null;
   const fullMin = Math.round(ctx.durationMs / 60_000 + AI_HALF_MIN);
+  if (counting && left !== null) {
+    return (
+      <ExpressCountdownCard
+        left={left}
+        minutes={expressMin}
+        title={`${ctx.policy.policyholder.firstName} calls to add a driver. ${rep} diagnoses, then passes the baton to an AI.`}
+        onNow={() => actions.start("express")}
+        onFull={() => {
+          setCancelled(true);
+          actions.start("full");
+        }}
+        onCancel={() => setCancelled(true)}
+        ios={ios}
+      />
+    );
+  }
   return (
     <section aria-labelledby="pre-h" className="bt-panel bt-rise w-full max-w-xl overflow-hidden">
       <div className="h-1.5 bg-gradient-to-r from-(--rep) via-(--customer) to-(--ai)" aria-hidden="true" />
@@ -76,6 +131,53 @@ export function PreflightCard() {
           <Volume2Icon className="size-3.5" aria-hidden="true" />
           {expressMin !== null ? `Express fast-forwards to 25 s before the decision point with cached transcription (labelled). ` : ""}Sound on: the recording plays out loud.
           {ios ? " No sound? Turn off silent mode." : ""}
+        </p>
+      </div>
+    </section>
+  );
+}
+
+function ExpressCountdownCard(p: { left: number; minutes: number | null; title: string; onNow(): void; onFull(): void; onCancel(): void; ios: boolean }) {
+  const pct = Math.max(0, Math.min(1, p.left / EXPRESS_COUNTDOWN_S));
+  return (
+    <section aria-labelledby="pre-h" className="bt-panel bt-rise w-full max-w-xl overflow-hidden">
+      <div className="h-1.5 bg-gradient-to-r from-(--rep) via-(--customer) to-(--ai)" aria-hidden="true" />
+      <div className="p-6">
+        <Eyebrow as="p">Watch the handoff · no mic needed</Eyebrow>
+        <h2 id="pre-h" className="bt-display mt-1 text-2xl leading-tight font-bold">
+          {p.title}
+        </h2>
+        <div className="mt-5 flex items-center gap-4">
+          <div className="relative size-16 shrink-0" aria-hidden="true">
+            <svg viewBox="0 0 36 36" className="size-16 -rotate-90">
+              <circle cx="18" cy="18" r="16" fill="none" stroke="var(--bt-line)" strokeWidth="3" />
+              <circle cx="18" cy="18" r="16" fill="none" stroke="var(--ai)" strokeWidth="3" strokeLinecap="round" strokeDasharray={`${(pct * 100.5).toFixed(1)} 100.5`} className="transition-[stroke-dasharray] duration-200" />
+            </svg>
+            <span className="bt-display bt-num absolute inset-0 flex items-center justify-center text-2xl font-bold">{p.left}</span>
+          </div>
+          <p className="min-w-0 text-sm leading-relaxed" role="status" aria-live="polite">
+            <strong>Express starts in {p.left} s</strong>
+            {p.minutes !== null ? ` · about ${p.minutes} min` : ""}. It fast-forwards to 25 s before the handoff with cached transcription (labelled), then streams live.
+          </p>
+        </div>
+        <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2">
+          <button
+            type="button"
+            onClick={p.onNow}
+            className="bt-pass bt-display inline-flex h-12 items-center justify-center gap-2 rounded-xl px-5 text-base font-bold focus-visible:ring-4 focus-visible:ring-(--ai)/40 focus-visible:outline-none"
+          >
+            <ZapIcon className="size-5" aria-hidden="true" /> Start now
+          </button>
+          <button type="button" onClick={p.onFull} className="text-sm font-semibold text-(--rep-fg) underline underline-offset-2 focus-visible:ring-2 focus-visible:ring-(--ai) focus-visible:outline-none">
+            Full call instead
+          </button>
+          <button type="button" onClick={p.onCancel} className="ml-auto text-xs text-(--bt-muted) underline underline-offset-2 focus-visible:ring-2 focus-visible:ring-(--ai) focus-visible:outline-none">
+            Wait, let me choose
+          </button>
+        </div>
+        <p className="mt-3 flex items-center gap-1.5 text-xs text-(--bt-muted)">
+          <Volume2Icon className="size-3.5" aria-hidden="true" />
+          Sound on: the recording plays out loud.{p.ios ? " No sound? Turn off silent mode." : ""}
         </p>
       </div>
     </section>

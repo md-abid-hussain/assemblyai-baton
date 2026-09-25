@@ -3,22 +3,26 @@
  * FixtureConsole: the call console driven by a BatonEvent fixture log (dev only; /dev/ui?fixture=… and
  * /call/<id>?fixture=…). Buttons map onto the fixture timeline; a small dev bar (hidden with chrome=0) plays, pauses,
  * changes speed, scrubs and jumps between S2 states. Query: fixture, at (ms | end | <phase>[:end][+ms]), speed,
- * play=1, chrome=0.
+ * play=1, chrome=0, express=1 (the landing CTA's 3 s countdown), phone=wp6 (WP6's real MockPhone over a no-network
+ * fixture payments client instead of the read-only preview).
  */
 import { FastForwardIcon, PauseIcon, PlayIcon, RotateCcwIcon } from "lucide-react";
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { toast } from "sonner";
 
 import { DEFAULT_FIXTURE, FIXTURES, fixtureLog } from "@/client/fixtures";
+import { createFixturePaymentsClient, FIXTURE_PAYMENT_ID, FIXTURE_TAKEOVER_TOKEN } from "@/client/fixtures/phone-client";
 import { FixturePlayer, phaseSpans, resolveAt } from "@/client/fixtures/player";
 import type { ConsoleActions } from "@/client/session/actions";
 import { clipWindowFor } from "@/client/session/evidence";
 import { ConsoleStoreProvider } from "@/client/store/hooks";
 import { formatCallClock, formatMmSs } from "@/client/store/selectors";
 import { createConsoleStore } from "@/client/store/store";
+import type { MockPhoneProps } from "@/core/contracts/services";
 import { cn } from "@/lib/utils";
 
-import { ConsoleEnvProvider } from "../common/console-context";
+import { MockPhone } from "../phone/MockPhone";
+import { ConsoleEnvProvider, type ConsoleEnv } from "../common/console-context";
 import { CallConsole } from "./call-console";
 
 export interface FixtureConsoleProps {
@@ -28,6 +32,10 @@ export interface FixtureConsoleProps {
   autoplay: boolean;
   chrome: boolean;
   basePath: string;
+  /** Start Express by itself after the 3 s countdown (`/call/[id]?express=1`). */
+  express?: boolean;
+  /** "wp6": mount WP6's MockPhone over a fixture payments client; default: the read-only preview. */
+  phone?: "preview" | "wp6";
 }
 
 export function FixtureConsole(p: FixtureConsoleProps) {
@@ -85,12 +93,32 @@ export function FixtureConsole(p: FixtureConsoleProps) {
       askForDaniel: () => note("asking the AI to hand back to the rep"),
       endCall: () => note("ending the AI session"),
       unlockAudio: () => store.act({ t: player.clock(), type: "ui.audio-locked", locked: false }),
+      setPhoneState: (st) => {
+        if (store.getState().phone.state !== st) store.dispatch({ t: player.clock(), type: "phone.state", state: st });
+      },
     };
   }, [player, store, log]);
 
-  const env = useMemo(
-    () => ({ actions, fixture: name, clockNow: () => player.clock(), links: { explorer: "/explorer/s01", evals: "/evals", about: "/about#qa", home: "/" } }),
-    [actions, name, player],
+  const wp6Phone = p.phone === "wp6";
+  const phoneClient = useMemo(
+    () => (wp6Phone ? createFixturePaymentsClient({ caseState: () => store.getState().caseState, policy: () => store.getState().context?.policy ?? null }) : null),
+    [wp6Phone, store],
+  );
+  const env = useMemo<Partial<ConsoleEnv>>(
+    () => ({
+      actions,
+      fixture: name,
+      clockNow: () => player.clock(),
+      links: { explorer: "/explorer/s01", evals: "/evals", about: "/about#qa", home: "/" },
+      autoStart: p.express ? "express" : null,
+      ...(phoneClient
+        ? {
+            renderPhone: (props: MockPhoneProps & { className?: string }) => <MockPhone {...props} readOnly={false} client={phoneClient} />,
+            phoneAuth: () => ({ paymentId: store.getState().phone.sms.length ? FIXTURE_PAYMENT_ID : null, takeoverToken: FIXTURE_TAKEOVER_TOKEN }),
+          }
+        : {}),
+    }),
+    [actions, name, player, p.express, phoneClient, store],
   );
 
   return (

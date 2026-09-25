@@ -1,9 +1,9 @@
 "use client";
-/** Top bar (title, call date, mode badge, plain-words notice, HUD), narrator strip, fallback / error banners. */
+/** Top bar (title, call date, mode badge, plain-words notice, HUD), narrator strip, provenance banner, fallback / error banners. */
 import { AlertOctagonIcon, CircleAlertIcon, FlaskConicalIcon, HistoryIcon, InfoIcon, PlayIcon, RadioIcon, RotateCcwIcon } from "lucide-react";
 
 import { useBaton, shallowEqual } from "@/client/store/hooks";
-import { formatCallDate, formatMmSs, modeBadge, narrator, phaseCopy, planNotice, softNotice } from "@/client/store/selectors";
+import { formatCallDate, formatMmSs, modeBadge, narrator, phaseCopy, planNotice, provenance, softNotice } from "@/client/store/selectors";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
@@ -154,3 +154,35 @@ export function Banners() {
     </>
   );
 }
+
+/**
+ * The run's provenance as one line (TASKS-v2 WP7 "the provenance text as a banner"; WP7·3's provenance strip replaces
+ * it). Each segment has a one-line tooltip.
+ */
+export function ProvenanceBanner({ className }: { className?: string }) {
+  const env = useConsoleEnv();
+  const customerInput = env.inputs && !env.inputs.autopilot ? "mic" : "synthetic";
+  const segs = useBaton((s) => provenance(s, { customerInput }), shallowEqualSegments);
+  const ready = useBaton((s) => !!s.context);
+  if (!ready) return null;
+  return (
+    <div role="note" aria-label="Where this run comes from" className={cn("flex flex-wrap items-center gap-x-3 gap-y-0.5 border-b border-(--bt-line) bg-(--bt-panel) px-4 py-1 text-[11.5px] leading-snug", className)}>
+      {segs.map((g) => (
+        <Tooltip key={g.key}>
+          <TooltipTrigger asChild>
+            <span tabIndex={0} className="inline-flex items-baseline gap-1 rounded focus-visible:ring-2 focus-visible:ring-(--ai) focus-visible:outline-none">
+              <span className="text-(--bt-muted)">{g.label}:</span>
+              <span className="font-semibold text-(--bt-ink)">{g.value}</span>
+            </span>
+          </TooltipTrigger>
+          <TooltipContent side="bottom" className="max-w-72">
+            {g.tooltip}
+          </TooltipContent>
+        </Tooltip>
+      ))}
+    </div>
+  );
+}
+
+const shallowEqualSegments = (a: ReturnType<typeof provenance>, b: ReturnType<typeof provenance>): boolean =>
+  a.length === b.length && a.every((x, i) => x.value === b[i]?.value && x.tooltip === b[i]?.tooltip);
