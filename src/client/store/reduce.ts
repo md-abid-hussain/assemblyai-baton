@@ -326,25 +326,32 @@ export function reduceEvent(s: UiState, ev: BatonEvent): UiState {
   }
 }
 
+/** Phases that are not inside a pass (a phase event after one of these starts a new pass). */
+const OUTSIDE_PASS: ReadonlySet<string> = new Set(["idle", "done", "failed", "fallback"]);
+
 function reduceTakeoverPhase(s: UiState, ev: BatonEventOf<"takeover.phase">): UiState {
   const prev = s.takeover;
   const step = { phase: ev.phase, t: ev.t, atMs: ev.atMs, detail: ev.detail ?? null };
-  if (ev.phase === "armed") {
+  // WP5's controller emits one phase per dispatch (a quiet click goes idle → draining at once, skipping "armed") and
+  // stamps `atMs` on the AudioContext clock; the call-clock arm time is `detail.tArmMs`. Fixture logs stamp call ms.
+  const startsPass = ev.phase === "armed" || (OUTSIDE_PASS.has(prev.phase) && !OUTSIDE_PASS.has(ev.phase));
+  if (startsPass) {
     const restart = prev.phase === "done" || prev.phase === "failed" || prev.phase === "fallback";
     const source = ev.detail?.source === "auto_handoff" ? "auto_handoff" : "manual";
+    const armCallMs = typeof ev.detail?.tArmMs === "number" ? ev.detail.tArmMs : ev.atMs;
     return {
       ...s,
       takeover: {
-        phase: "armed",
+        phase: ev.phase,
         steps: [step],
-        tArmMs: ev.atMs,
+        tArmMs: armCallMs,
         armedT: ev.t,
         connectedT: null,
         source,
         midUtterance: truthy(ev.detail?.midUtterance),
         count: prev.count + 1,
       },
-      clock: { ...s.clock, callMs: Math.max(s.clock.callMs, ev.atMs) },
+      clock: { ...s.clock, callMs: Math.max(s.clock.callMs, armCallMs) },
       ...(restart
         ? {
             handBack: null,
