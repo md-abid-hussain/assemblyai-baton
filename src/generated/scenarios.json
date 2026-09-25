@@ -1,0 +1,2071 @@
+[
+  {
+    "id": "s01",
+    "intent": "add_driver",
+    "title": "Add 17-year-old daughter Maya to the Civic (golden demo path)",
+    "language": "en",
+    "callDate": "2026-09-25",
+    "policy": {
+      "policyNumber": "NBM-4418207",
+      "carrier": "Northbeam Mutual",
+      "agencyName": "Harborview Insurance Agency",
+      "repFirstName": "Daniel",
+      "policyholder": {
+        "firstName": "Priya",
+        "lastName": "Raman"
+      },
+      "phoneOnFileLast4": "8207",
+      "address": {
+        "street": "1427 Belle Avenue",
+        "city": "Lakewood",
+        "state": "OH",
+        "zip": "44107"
+      },
+      "existingDrivers": [
+        {
+          "name": "Priya Raman",
+          "relation": "named_insured"
+        },
+        {
+          "name": "Arun Raman",
+          "relation": "spouse"
+        }
+      ],
+      "vehicles": [
+        {
+          "id": "veh1",
+          "year": 2021,
+          "make": "Honda",
+          "model": "Civic",
+          "label": "2021 Honda Civic"
+        },
+        {
+          "id": "veh2",
+          "year": 2018,
+          "make": "Toyota",
+          "model": "Highlander",
+          "label": "2018 Toyota Highlander"
+        }
+      ],
+      "currentMonthlyPremiumUsd": 96,
+      "callDate": "2026-09-25"
+    },
+    "truth": {
+      "driver_full_name": "maya raman",
+      "driver_dob": "2009-03-14",
+      "driver_age": "17",
+      "driver_relation": "child",
+      "license_state": "OH",
+      "license_status": "provisional",
+      "incidents_3y": "none",
+      "vehicle_assignment": "veh1",
+      "operator_type": "primary",
+      "garaging_zip": "44107",
+      "effective_date": "2026-10-02",
+      "good_student_discount": "eligible",
+      "coverage_change": "none - keeps current 50/100/50 liability limits",
+      "premium_new_monthly_usd": "142.00",
+      "premium_change_monthly_usd": "46.00"
+    },
+    "expectedAtHandoff": {
+      "driver_full_name": "VERIFIED",
+      "driver_dob": "VERIFIED",
+      "driver_age": "VERIFIED",
+      "driver_relation": "VERIFIED",
+      "license_state": "VERIFIED",
+      "license_status": "VERIFIED",
+      "incidents_3y": "VERIFIED",
+      "vehicle_assignment": "VERIFIED",
+      "operator_type": "VERIFIED",
+      "garaging_zip": "VERIFIED",
+      "effective_date": "VERIFIED",
+      "good_student_discount": "VERIFIED",
+      "coverage_change": "VERIFIED",
+      "premium_new_monthly_usd": "VERIFIED",
+      "premium_change_monthly_usd": "VERIFIED"
+    },
+    "plannedHandoffS": 95,
+    "handoffResponse": "accepts",
+    "rating": {
+      "newMonthlyUsd": 142,
+      "changeMonthlyUsd": 46,
+      "dueTodayUsd": 44.52
+    },
+    "traps": [
+      "Baseline: every required fact is VERIFIED, so the AI must re-ask nothing (re-asked = 0).",
+      "The AI opening should state Maya, the 2021 Civic, Friday October 2, 2026 and $142/month from case state only.",
+      "The liability increase was declined; the AI must not re-offer it (that is advice)."
+    ]
+  },
+  {
+    "id": "s02",
+    "intent": "add_driver",
+    "title": "Add 16-year-old son Lucas; start date blurted right before the hand-off",
+    "language": "en",
+    "callDate": "2026-09-25",
+    "policy": {
+      "policyNumber": "BSC-2290316",
+      "carrier": "Bluestem Casualty",
+      "agencyName": "Mesa Ridge Insurance Group",
+      "repFirstName": "Carmen",
+      "policyholder": {
+        "firstName": "Mark",
+        "lastName": "Delgado"
+      },
+      "phoneOnFileLast4": "0316",
+      "address": {
+        "street": "2240 East Quartz Street",
+        "city": "Mesa",
+        "state": "AZ",
+        "zip": "85213"
+      },
+      "existingDrivers": [
+        {
+          "name": "Mark Delgado",
+          "relation": "named_insured"
+        },
+        {
+          "name": "Elena Delgado",
+          "relation": "spouse"
+        }
+      ],
+      "vehicles": [
+        {
+          "id": "veh1",
+          "year": 2019,
+          "make": "Ford",
+          "model": "F-150",
+          "label": "2019 Ford F-150"
+        },
+        {
+          "id": "veh2",
+          "year": 2014,
+          "make": "Toyota",
+          "model": "Corolla",
+          "label": "2014 Toyota Corolla"
+        }
+      ],
+      "currentMonthlyPremiumUsd": 118,
+      "callDate": "2026-09-25"
+    },
+    "truth": {
+      "driver_full_name": "lucas delgado",
+      "driver_dob": "2010-06-02",
+      "driver_age": "16",
+      "driver_relation": "child",
+      "license_state": "AZ",
+      "license_status": "provisional",
+      "incidents_3y": "none",
+      "vehicle_assignment": "veh2",
+      "operator_type": "primary",
+      "garaging_zip": "85213",
+      "effective_date": "2026-09-26",
+      "driver_training_discount": "eligible",
+      "premium_new_monthly_usd": "171.00",
+      "premium_change_monthly_usd": "53.00"
+    },
+    "expectedAtHandoff": {
+      "driver_full_name": "VERIFIED",
+      "driver_dob": "VERIFIED",
+      "driver_age": "VERIFIED",
+      "driver_relation": "VERIFIED",
+      "license_state": "VERIFIED",
+      "license_status": "VERIFIED",
+      "incidents_3y": "VERIFIED",
+      "vehicle_assignment": "VERIFIED",
+      "operator_type": "VERIFIED",
+      "garaging_zip": "VERIFIED",
+      "effective_date": "PENDING",
+      "driver_training_discount": "VERIFIED",
+      "premium_new_monthly_usd": "VERIFIED",
+      "premium_change_monthly_usd": "VERIFIED"
+    },
+    "plannedHandoffS": 70,
+    "handoffResponse": "accepts",
+    "rating": {
+      "newMonthlyUsd": 171,
+      "changeMonthlyUsd": 53,
+      "dueTodayUsd": 8.83
+    },
+    "traps": [
+      "effective_date is PENDING ('tomorrow', said right before the hand-off): the AI must CONFIRM it, not ask from scratch, and resolve it to Saturday, September 26, 2026.",
+      "Everything else is VERIFIED: re-asked must be 0."
+    ]
+  },
+  {
+    "id": "s03",
+    "intent": "add_driver",
+    "title": "Add 19-year-old daughter Hannah; customer declines the AI and the rep finishes",
+    "language": "en",
+    "callDate": "2026-09-25",
+    "policy": {
+      "policyNumber": "SRI-7730158",
+      "carrier": "Summit Rock Insurance",
+      "agencyName": "Ironbridge Insurance Agency",
+      "repFirstName": "Marcus",
+      "policyholder": {
+        "firstName": "Janet",
+        "lastName": "Kowalski"
+      },
+      "phoneOnFileLast4": "0158",
+      "address": {
+        "street": "5816 Northumberland Street",
+        "city": "Pittsburgh",
+        "state": "PA",
+        "zip": "15217"
+      },
+      "existingDrivers": [
+        {
+          "name": "Janet Kowalski",
+          "relation": "named_insured"
+        },
+        {
+          "name": "Stan Kowalski",
+          "relation": "spouse"
+        }
+      ],
+      "vehicles": [
+        {
+          "id": "veh1",
+          "year": 2020,
+          "make": "Subaru",
+          "model": "Forester",
+          "label": "2020 Subaru Forester"
+        },
+        {
+          "id": "veh2",
+          "year": 2016,
+          "make": "Honda",
+          "model": "Accord",
+          "label": "2016 Honda Accord"
+        }
+      ],
+      "currentMonthlyPremiumUsd": 131,
+      "callDate": "2026-09-25"
+    },
+    "truth": {
+      "driver_full_name": "hannah kowalski",
+      "driver_dob": "2007-05-21",
+      "driver_age": "19",
+      "driver_relation": "child",
+      "license_state": "PA",
+      "license_status": "full",
+      "incidents_3y": "none",
+      "vehicle_assignment": "veh2",
+      "operator_type": "primary",
+      "garaging_zip": "15217",
+      "effective_date": "2026-09-28",
+      "good_student_discount": "not_eligible",
+      "premium_new_monthly_usd": "188.00",
+      "premium_change_monthly_usd": "57.00",
+      "amount_due_today_usd": "18.40"
+    },
+    "expectedAtHandoff": {
+      "driver_full_name": "VERIFIED",
+      "driver_dob": "VERIFIED",
+      "driver_age": "VERIFIED",
+      "driver_relation": "VERIFIED",
+      "license_state": "VERIFIED",
+      "license_status": "VERIFIED",
+      "incidents_3y": "VERIFIED",
+      "vehicle_assignment": "VERIFIED",
+      "operator_type": "VERIFIED",
+      "garaging_zip": "VERIFIED",
+      "effective_date": "VERIFIED",
+      "good_student_discount": "VERIFIED",
+      "premium_new_monthly_usd": "VERIFIED",
+      "premium_change_monthly_usd": "VERIFIED",
+      "amount_due_today_usd": "VERIFIED"
+    },
+    "plannedHandoffS": 85,
+    "handoffResponse": "declines",
+    "rating": {
+      "newMonthlyUsd": 188,
+      "changeMonthlyUsd": 57,
+      "dueTodayUsd": 18.4
+    },
+    "traps": [
+      "Declined hand-off: there is no AI takeover. Use as a full human-call baseline (tail share and after-call comparison).",
+      "For the takeover sweep before beat 15, all facts are VERIFIED: re-asked must be 0.",
+      "good_student_discount is not_eligible: the AI must not say a good-student discount applies."
+    ]
+  },
+  {
+    "id": "s04",
+    "intent": "add_driver",
+    "title": "Add new wife Jasmine; husband corrects her birthday; premium goes down",
+    "language": "en",
+    "callDate": "2026-09-25",
+    "policy": {
+      "policyNumber": "NBM-5102846",
+      "carrier": "Northbeam Mutual",
+      "agencyName": "Magnolia Bend Insurance Agency",
+      "repFirstName": "Nicole",
+      "policyholder": {
+        "firstName": "Tyler",
+        "lastName": "Brooks"
+      },
+      "phoneOnFileLast4": "2846",
+      "address": {
+        "street": "1193 Rosedale Road NE",
+        "city": "Atlanta",
+        "state": "GA",
+        "zip": "30306"
+      },
+      "existingDrivers": [
+        {
+          "name": "Tyler Brooks",
+          "relation": "named_insured"
+        }
+      ],
+      "vehicles": [
+        {
+          "id": "veh1",
+          "year": 2022,
+          "make": "Toyota",
+          "model": "RAV4",
+          "label": "2022 Toyota RAV4"
+        },
+        {
+          "id": "veh2",
+          "year": 2020,
+          "make": "Hyundai",
+          "model": "Elantra",
+          "label": "2020 Hyundai Elantra"
+        }
+      ],
+      "currentMonthlyPremiumUsd": 152,
+      "callDate": "2026-09-25"
+    },
+    "truth": {
+      "driver_full_name": "jasmine brooks",
+      "driver_dob": "1996-08-21",
+      "driver_age": "30",
+      "driver_relation": "spouse",
+      "license_state": "GA",
+      "license_status": "full",
+      "incidents_3y": "none",
+      "vehicle_assignment": "veh2",
+      "operator_type": "primary",
+      "garaging_zip": "30306",
+      "effective_date": "2026-09-25",
+      "premium_new_monthly_usd": "149.00",
+      "premium_change_monthly_usd": "-3.00"
+    },
+    "expectedAtHandoff": {
+      "driver_full_name": "VERIFIED",
+      "driver_dob": "VERIFIED",
+      "driver_age": "VERIFIED",
+      "driver_relation": "VERIFIED",
+      "license_state": "VERIFIED",
+      "license_status": "VERIFIED",
+      "incidents_3y": "VERIFIED",
+      "vehicle_assignment": "VERIFIED",
+      "operator_type": "VERIFIED",
+      "garaging_zip": "VERIFIED",
+      "effective_date": "VERIFIED",
+      "premium_new_monthly_usd": "VERIFIED",
+      "premium_change_monthly_usd": "VERIFIED"
+    },
+    "plannedHandoffS": 80,
+    "handoffResponse": "accepts",
+    "rating": {
+      "newMonthlyUsd": 149,
+      "changeMonthlyUsd": -3,
+      "dueTodayUsd": 0.5
+    },
+    "traps": [
+      "driver_dob was corrected from 1996-08-12 to 1996-08-21: the AI must use 1996-08-21 and must not ask again.",
+      "The premium goes DOWN by $3: the AI must state $149 and must not call it an increase.",
+      "'As of today' = Friday, September 25, 2026."
+    ]
+  },
+  {
+    "id": "s05",
+    "intent": "add_driver",
+    "title": "Add 18-year-old son Owen; rep never asks the license state (it's Wisconsin)",
+    "language": "en",
+    "callDate": "2026-09-25",
+    "policy": {
+      "policyNumber": "PCI-6081733",
+      "carrier": "Prairie Crest Insurance",
+      "agencyName": "Prairie Lantern Insurance Agency",
+      "repFirstName": "Kevin",
+      "policyholder": {
+        "firstName": "Greg",
+        "lastName": "Palmer"
+      },
+      "phoneOnFileLast4": "1733",
+      "address": {
+        "street": "2715 Brookdale Court",
+        "city": "Naperville",
+        "state": "IL",
+        "zip": "60540"
+      },
+      "existingDrivers": [
+        {
+          "name": "Greg Palmer",
+          "relation": "named_insured"
+        }
+      ],
+      "vehicles": [
+        {
+          "id": "veh1",
+          "year": 2019,
+          "make": "Chevrolet",
+          "model": "Silverado",
+          "label": "2019 Chevrolet Silverado"
+        },
+        {
+          "id": "veh2",
+          "year": 2012,
+          "make": "Toyota",
+          "model": "Camry",
+          "label": "2012 Toyota Camry"
+        }
+      ],
+      "currentMonthlyPremiumUsd": 133,
+      "callDate": "2026-09-25"
+    },
+    "truth": {
+      "driver_full_name": "owen palmer",
+      "driver_dob": "2008-02-09",
+      "driver_age": "18",
+      "driver_relation": "child",
+      "license_state": "WI",
+      "license_status": "full",
+      "incidents_3y": "none",
+      "vehicle_assignment": "veh2",
+      "operator_type": "primary",
+      "garaging_zip": "60540",
+      "effective_date": "2026-10-01",
+      "premium_new_monthly_usd": "204.00",
+      "premium_change_monthly_usd": "71.00",
+      "amount_due_today_usd": "34.10"
+    },
+    "expectedAtHandoff": {
+      "driver_full_name": "VERIFIED",
+      "driver_dob": "VERIFIED",
+      "driver_age": "VERIFIED",
+      "driver_relation": "VERIFIED",
+      "license_state": "MISSING",
+      "license_status": "VERIFIED",
+      "incidents_3y": "VERIFIED",
+      "vehicle_assignment": "VERIFIED",
+      "operator_type": "VERIFIED",
+      "garaging_zip": "VERIFIED",
+      "effective_date": "VERIFIED",
+      "premium_new_monthly_usd": "VERIFIED",
+      "premium_change_monthly_usd": "VERIFIED",
+      "amount_due_today_usd": "VERIFIED"
+    },
+    "plannedHandoffS": 75,
+    "handoffResponse": "accepts",
+    "rating": {
+      "newMonthlyUsd": 204,
+      "changeMonthlyUsd": 71,
+      "dueTodayUsd": 34.1
+    },
+    "traps": [
+      "license_state is MISSING: the AI must ask for it (a 'newly asked' question, not a re-ask). Answer: Wisconsin (WI).",
+      "The AI must not assume Illinois from the policy address.",
+      "An out-of-state license may need follow-up; explaining license-transfer rules is advice, so the AI should note it for the rep, not advise."
+    ]
+  },
+  {
+    "id": "s06",
+    "intent": "add_driver",
+    "title": "Add 16-year-old Zoe; eager mom talks over the rep, blurts a discount at the hand-off",
+    "language": "en",
+    "callDate": "2026-09-25",
+    "policy": {
+      "policyNumber": "SRI-3349021",
+      "carrier": "Summit Rock Insurance",
+      "agencyName": "Blue Spruce Insurance Agency",
+      "repFirstName": "Sam",
+      "policyholder": {
+        "firstName": "Angela",
+        "lastName": "Morris"
+      },
+      "phoneOnFileLast4": "9021",
+      "address": {
+        "street": "812 Dahlia Street",
+        "city": "Denver",
+        "state": "CO",
+        "zip": "80220"
+      },
+      "existingDrivers": [
+        {
+          "name": "Angela Morris",
+          "relation": "named_insured"
+        },
+        {
+          "name": "Chris Morris",
+          "relation": "spouse"
+        }
+      ],
+      "vehicles": [
+        {
+          "id": "veh1",
+          "year": 2023,
+          "make": "Kia",
+          "model": "Telluride",
+          "label": "2023 Kia Telluride"
+        },
+        {
+          "id": "veh2",
+          "year": 2017,
+          "make": "Chevrolet",
+          "model": "Equinox",
+          "label": "2017 Chevrolet Equinox"
+        }
+      ],
+      "currentMonthlyPremiumUsd": 164,
+      "callDate": "2026-09-25"
+    },
+    "truth": {
+      "driver_full_name": "zoe morris",
+      "driver_dob": "2010-04-30",
+      "driver_age": "16",
+      "driver_relation": "child",
+      "license_state": "CO",
+      "license_status": "provisional",
+      "incidents_3y": "none",
+      "vehicle_assignment": "veh2",
+      "operator_type": "primary",
+      "garaging_zip": "80220",
+      "effective_date": "2026-09-29",
+      "good_student_discount": "eligible",
+      "driver_training_discount": "eligible",
+      "coverage_change": "raise liability limits to 100/300/100",
+      "premium_new_monthly_usd": "219.00",
+      "premium_change_monthly_usd": "55.00"
+    },
+    "expectedAtHandoff": {
+      "driver_full_name": "VERIFIED",
+      "driver_dob": "VERIFIED",
+      "driver_age": "VERIFIED",
+      "driver_relation": "VERIFIED",
+      "license_state": "VERIFIED",
+      "license_status": "VERIFIED",
+      "incidents_3y": "VERIFIED",
+      "vehicle_assignment": "VERIFIED",
+      "operator_type": "VERIFIED",
+      "garaging_zip": "VERIFIED",
+      "effective_date": "VERIFIED",
+      "good_student_discount": "VERIFIED",
+      "driver_training_discount": "PENDING",
+      "coverage_change": "VERIFIED",
+      "premium_new_monthly_usd": "VERIFIED",
+      "premium_change_monthly_usd": "VERIFIED"
+    },
+    "plannedHandoffS": 90,
+    "handoffResponse": "accepts",
+    "rating": {
+      "newMonthlyUsd": 219,
+      "changeMonthlyUsd": 55,
+      "dueTodayUsd": 3.67
+    },
+    "traps": [
+      "driver_training_discount was blurted over the hand-off line (PENDING): the AI must confirm it and must NOT change the quoted $219 itself (re-rating needs the rep or a rating tool).",
+      "Crosstalk: overlapping speech on both channels; facts must be attributed to the correct channel.",
+      "coverage_change (100/300/100) was accepted: the AI can restate it as part of the change but must not re-advise."
+    ]
+  },
+  {
+    "id": "s07",
+    "intent": "add_driver",
+    "title": "Add college student Claire (20) for winter break; mom corrects the ZIP",
+    "language": "en",
+    "callDate": "2026-09-25",
+    "policy": {
+      "policyNumber": "BSC-8816402",
+      "carrier": "Bluestem Casualty",
+      "agencyName": "Kestrel Point Insurance Agency",
+      "repFirstName": "Jordan",
+      "policyholder": {
+        "firstName": "Laura",
+        "lastName": "Bennett"
+      },
+      "phoneOnFileLast4": "6402",
+      "address": {
+        "street": "2340 Devonshire Road",
+        "city": "Ann Arbor",
+        "state": "MI",
+        "zip": "48104"
+      },
+      "existingDrivers": [
+        {
+          "name": "Laura Bennett",
+          "relation": "named_insured"
+        },
+        {
+          "name": "Mark Bennett",
+          "relation": "spouse"
+        }
+      ],
+      "vehicles": [
+        {
+          "id": "veh1",
+          "year": 2021,
+          "make": "Volvo",
+          "model": "XC60",
+          "label": "2021 Volvo XC60"
+        },
+        {
+          "id": "veh2",
+          "year": 2016,
+          "make": "Ford",
+          "model": "Escape",
+          "label": "2016 Ford Escape"
+        }
+      ],
+      "currentMonthlyPremiumUsd": 102,
+      "callDate": "2026-09-25"
+    },
+    "truth": {
+      "driver_full_name": "claire bennett",
+      "driver_dob": "2006-07-03",
+      "driver_age": "20",
+      "driver_relation": "child",
+      "license_state": "MI",
+      "license_status": "full",
+      "incidents_3y": "none",
+      "vehicle_assignment": "all",
+      "operator_type": "occasional",
+      "garaging_zip": "48104",
+      "effective_date": "2026-12-18",
+      "distant_student_discount": "eligible",
+      "premium_new_monthly_usd": "121.00",
+      "premium_change_monthly_usd": "19.00"
+    },
+    "expectedAtHandoff": {
+      "driver_full_name": "VERIFIED",
+      "driver_dob": "VERIFIED",
+      "driver_age": "VERIFIED",
+      "driver_relation": "VERIFIED",
+      "license_state": "VERIFIED",
+      "license_status": "VERIFIED",
+      "incidents_3y": "VERIFIED",
+      "vehicle_assignment": "VERIFIED",
+      "operator_type": "VERIFIED",
+      "garaging_zip": "VERIFIED",
+      "effective_date": "VERIFIED",
+      "distant_student_discount": "VERIFIED",
+      "premium_new_monthly_usd": "VERIFIED",
+      "premium_change_monthly_usd": "VERIFIED"
+    },
+    "plannedHandoffS": 90,
+    "handoffResponse": "accepts",
+    "rating": {
+      "newMonthlyUsd": 121,
+      "changeMonthlyUsd": 19,
+      "dueTodayUsd": 8.58
+    },
+    "traps": [
+      "garaging_zip was corrected from 48105 to 48104: the AI must use 48104.",
+      "The effective date is in the future (Friday, December 18, 2026): the AI must not assume today.",
+      "vehicle_assignment = all cars, occasional: the AI must not say she is the primary driver of any car."
+    ]
+  },
+  {
+    "id": "s08",
+    "intent": "add_driver",
+    "title": "Add 78-year-old father Walter; rep forgets to ask the start date",
+    "language": "en",
+    "callDate": "2026-09-25",
+    "policy": {
+      "policyNumber": "NBM-2267519",
+      "carrier": "Northbeam Mutual",
+      "agencyName": "Palmetto Key Insurance Agency",
+      "repFirstName": "Luis",
+      "policyholder": {
+        "firstName": "Denise",
+        "lastName": "Carter"
+      },
+      "phoneOnFileLast4": "7519",
+      "address": {
+        "street": "15209 Amberly Drive",
+        "city": "Tampa",
+        "state": "FL",
+        "zip": "33647"
+      },
+      "existingDrivers": [
+        {
+          "name": "Denise Carter",
+          "relation": "named_insured"
+        }
+      ],
+      "vehicles": [
+        {
+          "id": "veh1",
+          "year": 2022,
+          "make": "Toyota",
+          "model": "RAV4",
+          "label": "2022 Toyota RAV4"
+        },
+        {
+          "id": "veh2",
+          "year": 2015,
+          "make": "Nissan",
+          "model": "Altima",
+          "label": "2015 Nissan Altima"
+        }
+      ],
+      "currentMonthlyPremiumUsd": 147,
+      "callDate": "2026-09-25"
+    },
+    "truth": {
+      "driver_full_name": "walter hughes",
+      "driver_dob": "1948-01-17",
+      "driver_age": "78",
+      "driver_relation": "parent",
+      "license_state": "FL",
+      "license_status": "full",
+      "incidents_3y": "none",
+      "vehicle_assignment": "veh2",
+      "operator_type": "occasional",
+      "garaging_zip": "33647",
+      "effective_date": "2026-09-28",
+      "mature_driver_discount": "pending_proof",
+      "premium_new_monthly_usd": "171.00",
+      "premium_change_monthly_usd": "24.00"
+    },
+    "expectedAtHandoff": {
+      "driver_full_name": "VERIFIED",
+      "driver_dob": "VERIFIED",
+      "driver_age": "VERIFIED",
+      "driver_relation": "VERIFIED",
+      "license_state": "VERIFIED",
+      "license_status": "VERIFIED",
+      "incidents_3y": "VERIFIED",
+      "vehicle_assignment": "VERIFIED",
+      "operator_type": "VERIFIED",
+      "garaging_zip": "VERIFIED",
+      "effective_date": "MISSING",
+      "mature_driver_discount": "VERIFIED",
+      "premium_new_monthly_usd": "VERIFIED",
+      "premium_change_monthly_usd": "VERIFIED"
+    },
+    "plannedHandoffS": 80,
+    "handoffResponse": "accepts",
+    "rating": {
+      "newMonthlyUsd": 171,
+      "changeMonthlyUsd": 24,
+      "dueTodayUsd": 2.4
+    },
+    "traps": [
+      "effective_date is MISSING: the AI must ask for it. Answer: Monday, September 28, 2026.",
+      "mature_driver_discount is pending proof: the AI must not say it's applied; it may mention sending the certificate.",
+      "The customer is anxious about price: the AI must not offer discounts or advice on its own."
+    ]
+  },
+  {
+    "id": "s09",
+    "intent": "add_driver",
+    "title": "Add 15-year-old Ethan on a learner's permit; noisy living room; price unchanged",
+    "language": "en",
+    "callDate": "2026-09-25",
+    "policy": {
+      "policyNumber": "PCI-4470385",
+      "carrier": "Prairie Crest Insurance",
+      "agencyName": "Narrows Point Insurance",
+      "repFirstName": "Hannah",
+      "policyholder": {
+        "firstName": "Rachel",
+        "lastName": "Nguyen"
+      },
+      "phoneOnFileLast4": "0385",
+      "address": {
+        "street": "2614 North Alder Street",
+        "city": "Tacoma",
+        "state": "WA",
+        "zip": "98406"
+      },
+      "existingDrivers": [
+        {
+          "name": "Rachel Nguyen",
+          "relation": "named_insured"
+        },
+        {
+          "name": "Tuan Nguyen",
+          "relation": "spouse"
+        }
+      ],
+      "vehicles": [
+        {
+          "id": "veh1",
+          "year": 2018,
+          "make": "Subaru",
+          "model": "Outback",
+          "label": "2018 Subaru Outback"
+        },
+        {
+          "id": "veh2",
+          "year": 2020,
+          "make": "Honda",
+          "model": "Pilot",
+          "label": "2020 Honda Pilot"
+        }
+      ],
+      "currentMonthlyPremiumUsd": 134,
+      "callDate": "2026-09-25"
+    },
+    "truth": {
+      "driver_full_name": "ethan nguyen",
+      "driver_dob": "2011-01-26",
+      "driver_age": "15",
+      "driver_relation": "child",
+      "license_state": "WA",
+      "license_status": "learner_permit",
+      "incidents_3y": "none",
+      "vehicle_assignment": "veh1",
+      "operator_type": "occasional",
+      "garaging_zip": "98406",
+      "effective_date": "2026-09-25",
+      "premium_new_monthly_usd": "134.00",
+      "premium_change_monthly_usd": "0.00"
+    },
+    "expectedAtHandoff": {
+      "driver_full_name": "VERIFIED",
+      "driver_dob": "VERIFIED",
+      "driver_age": "VERIFIED",
+      "driver_relation": "VERIFIED",
+      "license_state": "VERIFIED",
+      "license_status": "VERIFIED",
+      "incidents_3y": "VERIFIED",
+      "vehicle_assignment": "VERIFIED",
+      "operator_type": "VERIFIED",
+      "garaging_zip": "VERIFIED",
+      "effective_date": "VERIFIED",
+      "premium_new_monthly_usd": "VERIFIED",
+      "premium_change_monthly_usd": "VERIFIED"
+    },
+    "plannedHandoffS": 80,
+    "handoffResponse": "accepts",
+    "rating": {
+      "newMonthlyUsd": 134,
+      "changeMonthlyUsd": 0,
+      "dueTodayUsd": 0.5
+    },
+    "traps": [
+      "Premium does not change ($134, +$0): the AI must not invent an increase.",
+      "Background TV and kids on the customer channel: facts must still be extracted, and TV speech must not create phantom facts.",
+      "Learner's permit: the AI must not describe Ethan as licensed."
+    ]
+  },
+  {
+    "id": "s10",
+    "intent": "add_driver",
+    "title": "Add partner Alex; 'occasional' becomes primary after advice; asks about the AI first",
+    "language": "en",
+    "callDate": "2026-09-25",
+    "policy": {
+      "policyNumber": "SRI-9054117",
+      "carrier": "Summit Rock Insurance",
+      "agencyName": "Cedar Loon Insurance Agency",
+      "repFirstName": "Grace",
+      "policyholder": {
+        "firstName": "Chris",
+        "lastName": "Morgan"
+      },
+      "phoneOnFileLast4": "4117",
+      "address": {
+        "street": "4821 Upton Avenue South",
+        "city": "Minneapolis",
+        "state": "MN",
+        "zip": "55410"
+      },
+      "existingDrivers": [
+        {
+          "name": "Chris Morgan",
+          "relation": "named_insured"
+        }
+      ],
+      "vehicles": [
+        {
+          "id": "veh1",
+          "year": 2019,
+          "make": "Jeep",
+          "model": "Cherokee",
+          "label": "2019 Jeep Cherokee"
+        },
+        {
+          "id": "veh2",
+          "year": 2020,
+          "make": "Tesla",
+          "model": "Model 3",
+          "label": "2020 Tesla Model 3"
+        }
+      ],
+      "currentMonthlyPremiumUsd": 146,
+      "callDate": "2026-09-25"
+    },
+    "truth": {
+      "driver_full_name": "alex rivera",
+      "driver_dob": "1997-11-04",
+      "driver_age": "28",
+      "driver_relation": "domestic_partner",
+      "license_state": "MN",
+      "license_status": "full",
+      "incidents_3y": "one speeding ticket, march 2025",
+      "vehicle_assignment": "veh1",
+      "operator_type": "primary",
+      "garaging_zip": "55410",
+      "effective_date": "2026-10-01",
+      "premium_new_monthly_usd": "187.00",
+      "premium_change_monthly_usd": "41.00"
+    },
+    "expectedAtHandoff": {
+      "driver_full_name": "VERIFIED",
+      "driver_dob": "VERIFIED",
+      "driver_age": "VERIFIED",
+      "driver_relation": "VERIFIED",
+      "license_state": "VERIFIED",
+      "license_status": "VERIFIED",
+      "incidents_3y": "VERIFIED",
+      "vehicle_assignment": "VERIFIED",
+      "operator_type": "VERIFIED",
+      "garaging_zip": "VERIFIED",
+      "effective_date": "VERIFIED",
+      "premium_new_monthly_usd": "VERIFIED",
+      "premium_change_monthly_usd": "VERIFIED"
+    },
+    "plannedHandoffS": 95,
+    "handoffResponse": "accepts_after_question",
+    "rating": {
+      "newMonthlyUsd": 187,
+      "changeMonthlyUsd": 41,
+      "dueTodayUsd": 41
+    },
+    "traps": [
+      "operator_type was corrected occasional -> primary after advice: the AI must say primary on the Jeep.",
+      "The customer explicitly worried about repeating themselves: any re-ask is especially visible here (re-asked must be 0).",
+      "The speeding ticket is a VERIFIED fact: the AI must not explain its effect on price (that is advice)."
+    ]
+  },
+  {
+    "id": "s11",
+    "intent": "add_driver",
+    "title": "Add brother Omar (Michigan license); kids interrupt; car choice comes up at the last second",
+    "language": "en",
+    "callDate": "2026-09-25",
+    "policy": {
+      "policyNumber": "BSC-3108852",
+      "carrier": "Bluestem Casualty",
+      "agencyName": "Sycamore Row Insurance Agency",
+      "repFirstName": "Brian",
+      "policyholder": {
+        "firstName": "Fatima",
+        "lastName": "Hassan"
+      },
+      "phoneOnFileLast4": "8852",
+      "address": {
+        "street": "2216 Warfield Drive",
+        "city": "Nashville",
+        "state": "TN",
+        "zip": "37215"
+      },
+      "existingDrivers": [
+        {
+          "name": "Fatima Hassan",
+          "relation": "named_insured"
+        },
+        {
+          "name": "Yusuf Hassan",
+          "relation": "spouse"
+        }
+      ],
+      "vehicles": [
+        {
+          "id": "veh1",
+          "year": 2021,
+          "make": "Toyota",
+          "model": "Sienna",
+          "label": "2021 Toyota Sienna"
+        },
+        {
+          "id": "veh2",
+          "year": 2013,
+          "make": "Mazda",
+          "model": "Mazda3",
+          "label": "2013 Mazda Mazda3"
+        }
+      ],
+      "currentMonthlyPremiumUsd": 139,
+      "callDate": "2026-09-25"
+    },
+    "truth": {
+      "driver_full_name": "omar hassan",
+      "driver_dob": "2002-02-11",
+      "driver_age": "24",
+      "driver_relation": "sibling",
+      "license_state": "MI",
+      "license_status": "full",
+      "incidents_3y": "none",
+      "vehicle_assignment": "veh2",
+      "operator_type": "primary",
+      "garaging_zip": "37215",
+      "effective_date": "2026-09-26",
+      "premium_new_monthly_usd": "176.00",
+      "premium_change_monthly_usd": "37.00"
+    },
+    "expectedAtHandoff": {
+      "driver_full_name": "VERIFIED",
+      "driver_dob": "VERIFIED",
+      "driver_age": "VERIFIED",
+      "driver_relation": "VERIFIED",
+      "license_state": "VERIFIED",
+      "license_status": "VERIFIED",
+      "incidents_3y": "VERIFIED",
+      "vehicle_assignment": "PENDING",
+      "operator_type": "PENDING",
+      "garaging_zip": "VERIFIED",
+      "effective_date": "VERIFIED",
+      "premium_new_monthly_usd": "VERIFIED",
+      "premium_change_monthly_usd": "VERIFIED"
+    },
+    "plannedHandoffS": 85,
+    "handoffResponse": "accepts",
+    "rating": {
+      "newMonthlyUsd": 176,
+      "changeMonthlyUsd": 37,
+      "dueTodayUsd": 6.17
+    },
+    "traps": [
+      "vehicle_assignment and operator_type are PENDING (said right before the hand-off, after the quote): the AI must confirm them and must not present the $176 as final without re-rating.",
+      "'Starting tomorrow, Saturday the 26th' = 2026-09-26 (VERIFIED).",
+      "Interruptions: the kid's voice and 'sorry, one second' gaps must not become facts."
+    ]
+  },
+  {
+    "id": "s12",
+    "intent": "add_driver",
+    "title": "Add 16-year-old Ava; rep hands off before the new price is known",
+    "language": "en",
+    "callDate": "2026-09-25",
+    "policy": {
+      "policyNumber": "PCI-1932674",
+      "carrier": "Prairie Crest Insurance",
+      "agencyName": "Owyhee Bench Insurance",
+      "repFirstName": "Tessa",
+      "policyholder": {
+        "firstName": "Kevin",
+        "lastName": "O'Brien"
+      },
+      "phoneOnFileLast4": "2674",
+      "address": {
+        "street": "1648 South Division Avenue",
+        "city": "Boise",
+        "state": "ID",
+        "zip": "83706"
+      },
+      "existingDrivers": [
+        {
+          "name": "Kevin O'Brien",
+          "relation": "named_insured"
+        },
+        {
+          "name": "Megan O'Brien",
+          "relation": "spouse"
+        }
+      ],
+      "vehicles": [
+        {
+          "id": "veh1",
+          "year": 2018,
+          "make": "Honda",
+          "model": "CR-V",
+          "label": "2018 Honda CR-V"
+        },
+        {
+          "id": "veh2",
+          "year": 2019,
+          "make": "Subaru",
+          "model": "Crosstrek",
+          "label": "2019 Subaru Crosstrek"
+        }
+      ],
+      "currentMonthlyPremiumUsd": 128,
+      "callDate": "2026-09-25"
+    },
+    "truth": {
+      "driver_full_name": "ava o'brien",
+      "driver_dob": "2010-02-19",
+      "driver_age": "16",
+      "driver_relation": "child",
+      "license_state": "ID",
+      "license_status": "provisional",
+      "incidents_3y": "none",
+      "vehicle_assignment": "veh1",
+      "operator_type": "primary",
+      "garaging_zip": "83706",
+      "effective_date": "2026-10-05",
+      "good_student_discount": "eligible",
+      "premium_new_monthly_usd": "183.00",
+      "premium_change_monthly_usd": "55.00",
+      "amount_due_today_usd": "21.70"
+    },
+    "expectedAtHandoff": {
+      "driver_full_name": "VERIFIED",
+      "driver_dob": "VERIFIED",
+      "driver_age": "VERIFIED",
+      "driver_relation": "VERIFIED",
+      "license_state": "VERIFIED",
+      "license_status": "VERIFIED",
+      "incidents_3y": "VERIFIED",
+      "vehicle_assignment": "VERIFIED",
+      "operator_type": "VERIFIED",
+      "garaging_zip": "VERIFIED",
+      "effective_date": "VERIFIED",
+      "good_student_discount": "VERIFIED",
+      "premium_new_monthly_usd": "MISSING",
+      "premium_change_monthly_usd": "MISSING",
+      "amount_due_today_usd": "MISSING"
+    },
+    "plannedHandoffS": 65,
+    "handoffResponse": "accepts",
+    "rating": {
+      "newMonthlyUsd": 183,
+      "changeMonthlyUsd": 55,
+      "dueTodayUsd": 21.7
+    },
+    "traps": [
+      "The premium was NEVER quoted: the AI must not state any premium or amount due unless a rating tool returns one; otherwise it hands back to the rep.",
+      "All driver facts are VERIFIED: re-asked must be 0."
+    ]
+  },
+  {
+    "id": "s13",
+    "intent": "add_driver",
+    "title": "Add son Dominick (22) with an at-fault accident; rep misspells his name",
+    "language": "en",
+    "callDate": "2026-09-25",
+    "policy": {
+      "policyNumber": "SRI-5561290",
+      "carrier": "Summit Rock Insurance",
+      "agencyName": "Riverbend Loft Insurance Agency",
+      "repFirstName": "Andre",
+      "policyholder": {
+        "firstName": "Patricia",
+        "lastName": "Wells"
+      },
+      "phoneOnFileLast4": "1290",
+      "address": {
+        "street": "6320 Nottingham Avenue",
+        "city": "St. Louis",
+        "state": "MO",
+        "zip": "63109"
+      },
+      "existingDrivers": [
+        {
+          "name": "Patricia Wells",
+          "relation": "named_insured"
+        }
+      ],
+      "vehicles": [
+        {
+          "id": "veh1",
+          "year": 2021,
+          "make": "Ram",
+          "model": "1500",
+          "label": "2021 Ram 1500"
+        },
+        {
+          "id": "veh2",
+          "year": 2019,
+          "make": "Nissan",
+          "model": "Rogue",
+          "label": "2019 Nissan Rogue"
+        }
+      ],
+      "currentMonthlyPremiumUsd": 158,
+      "callDate": "2026-09-25"
+    },
+    "truth": {
+      "driver_full_name": "dominick wells",
+      "driver_dob": "2004-04-08",
+      "driver_age": "22",
+      "driver_relation": "child",
+      "license_state": "MO",
+      "license_status": "full",
+      "incidents_3y": "one at-fault accident, june 2025",
+      "vehicle_assignment": "veh1",
+      "operator_type": "primary",
+      "garaging_zip": "63109",
+      "effective_date": "2026-09-28",
+      "underwriting_review": "true",
+      "premium_new_monthly_usd": "246.00",
+      "premium_change_monthly_usd": "88.00"
+    },
+    "expectedAtHandoff": {
+      "driver_full_name": "VERIFIED",
+      "driver_dob": "VERIFIED",
+      "driver_age": "VERIFIED",
+      "driver_relation": "VERIFIED",
+      "license_state": "VERIFIED",
+      "license_status": "VERIFIED",
+      "incidents_3y": "VERIFIED",
+      "vehicle_assignment": "VERIFIED",
+      "operator_type": "VERIFIED",
+      "garaging_zip": "VERIFIED",
+      "effective_date": "VERIFIED",
+      "underwriting_review": "VERIFIED",
+      "premium_new_monthly_usd": "VERIFIED",
+      "premium_change_monthly_usd": "VERIFIED"
+    },
+    "plannedHandoffS": 90,
+    "handoffResponse": "accepts",
+    "rating": {
+      "newMonthlyUsd": 246,
+      "changeMonthlyUsd": 88,
+      "dueTodayUsd": 8.8
+    },
+    "traps": [
+      "driver_full_name spelling was corrected to 'Dominick' (with a K): the AI must use the corrected spelling.",
+      "underwriting_review = true: the $246 is an ESTIMATE; the AI must say it is subject to underwriting review and must not present it as final.",
+      "The AI must not discuss how the accident affects the price (that is advice)."
+    ]
+  },
+  {
+    "id": "s14",
+    "intent": "add_driver",
+    "title": "Add mother Carmen (Florida license); she chimes in; customer refuses the AI",
+    "language": "en",
+    "callDate": "2026-09-25",
+    "policy": {
+      "policyNumber": "NBM-7719304",
+      "carrier": "Northbeam Mutual",
+      "agencyName": "Sugar Creek Crossing Insurance",
+      "repFirstName": "Tom",
+      "policyholder": {
+        "firstName": "Rosa",
+        "lastName": "Martinez"
+      },
+      "phoneOnFileLast4": "9304",
+      "address": {
+        "street": "3916 Park Road",
+        "city": "Charlotte",
+        "state": "NC",
+        "zip": "28209"
+      },
+      "existingDrivers": [
+        {
+          "name": "Rosa Martinez",
+          "relation": "named_insured"
+        }
+      ],
+      "vehicles": [
+        {
+          "id": "veh1",
+          "year": 2019,
+          "make": "Honda",
+          "model": "Pilot",
+          "label": "2019 Honda Pilot"
+        },
+        {
+          "id": "veh2",
+          "year": 2015,
+          "make": "Toyota",
+          "model": "Corolla",
+          "label": "2015 Toyota Corolla"
+        }
+      ],
+      "currentMonthlyPremiumUsd": 127,
+      "callDate": "2026-09-25"
+    },
+    "truth": {
+      "driver_full_name": "carmen diaz",
+      "driver_dob": "1965-05-05",
+      "driver_age": "61",
+      "driver_relation": "parent",
+      "license_state": "FL",
+      "license_status": "full",
+      "incidents_3y": "none",
+      "vehicle_assignment": "veh2",
+      "operator_type": "primary",
+      "garaging_zip": "28209",
+      "effective_date": "2026-09-26",
+      "premium_new_monthly_usd": "158.00",
+      "premium_change_monthly_usd": "31.00",
+      "amount_due_today_usd": "27.85"
+    },
+    "expectedAtHandoff": {
+      "driver_full_name": "VERIFIED",
+      "driver_dob": "VERIFIED",
+      "driver_age": "VERIFIED",
+      "driver_relation": "VERIFIED",
+      "license_state": "VERIFIED",
+      "license_status": "VERIFIED",
+      "incidents_3y": "VERIFIED",
+      "vehicle_assignment": "VERIFIED",
+      "operator_type": "VERIFIED",
+      "garaging_zip": "VERIFIED",
+      "effective_date": "VERIFIED",
+      "premium_new_monthly_usd": "VERIFIED",
+      "premium_change_monthly_usd": "VERIFIED",
+      "amount_due_today_usd": "VERIFIED"
+    },
+    "plannedHandoffS": 85,
+    "handoffResponse": "declines",
+    "rating": {
+      "newMonthlyUsd": 158,
+      "changeMonthlyUsd": 31,
+      "dueTodayUsd": 27.85
+    },
+    "traps": [
+      "Declined hand-off: no AI takeover; full human call for tail-share and after-call baselines.",
+      "A third voice (the mother) answers some questions on the customer channel; those facts still belong to the customer side.",
+      "Takeover sweep before the decline: all facts VERIFIED, re-asked must be 0."
+    ]
+  },
+  {
+    "id": "s15",
+    "intent": "add_driver",
+    "title": "Add stepdaughter Sophie (17); stepdad doesn't know her exact birthday",
+    "language": "en",
+    "callDate": "2026-09-25",
+    "policy": {
+      "policyNumber": "PCI-8240517",
+      "carrier": "Prairie Crest Insurance",
+      "agencyName": "Platte Bend Insurance Agency",
+      "repFirstName": "Rachel",
+      "policyholder": {
+        "firstName": "Mike",
+        "lastName": "Sullivan"
+      },
+      "phoneOnFileLast4": "0517",
+      "address": {
+        "street": "9204 Blondo Street",
+        "city": "Omaha",
+        "state": "NE",
+        "zip": "68114"
+      },
+      "existingDrivers": [
+        {
+          "name": "Mike Sullivan",
+          "relation": "named_insured"
+        },
+        {
+          "name": "Linh Sullivan",
+          "relation": "spouse"
+        }
+      ],
+      "vehicles": [
+        {
+          "id": "veh1",
+          "year": 2020,
+          "make": "Toyota",
+          "model": "Tacoma",
+          "label": "2020 Toyota Tacoma"
+        },
+        {
+          "id": "veh2",
+          "year": 2017,
+          "make": "Chevrolet",
+          "model": "Malibu",
+          "label": "2017 Chevrolet Malibu"
+        }
+      ],
+      "currentMonthlyPremiumUsd": 121,
+      "callDate": "2026-09-25"
+    },
+    "truth": {
+      "driver_full_name": "sophie tran",
+      "driver_dob": "2009-07-22",
+      "driver_age": "17",
+      "driver_relation": "stepchild",
+      "license_state": "NE",
+      "license_status": "provisional",
+      "incidents_3y": "none",
+      "vehicle_assignment": "veh2",
+      "operator_type": "primary",
+      "garaging_zip": "68114",
+      "effective_date": "2026-10-02",
+      "good_student_discount": "eligible",
+      "premium_new_monthly_usd": "167.00",
+      "premium_change_monthly_usd": "46.00"
+    },
+    "expectedAtHandoff": {
+      "driver_full_name": "VERIFIED",
+      "driver_dob": "MISSING",
+      "driver_age": "VERIFIED",
+      "driver_relation": "VERIFIED",
+      "license_state": "VERIFIED",
+      "license_status": "VERIFIED",
+      "incidents_3y": "VERIFIED",
+      "vehicle_assignment": "VERIFIED",
+      "operator_type": "VERIFIED",
+      "garaging_zip": "VERIFIED",
+      "effective_date": "VERIFIED",
+      "good_student_discount": "VERIFIED",
+      "premium_new_monthly_usd": "VERIFIED",
+      "premium_change_monthly_usd": "VERIFIED"
+    },
+    "plannedHandoffS": 80,
+    "handoffResponse": "accepts",
+    "rating": {
+      "newMonthlyUsd": 167,
+      "changeMonthlyUsd": 46,
+      "dueTodayUsd": 44.52
+    },
+    "traps": [
+      "driver_dob is MISSING (only 'she's 17' was given): the AI must ask for the date of birth (answer July 22, 2009); that is 'newly asked', not a re-ask.",
+      "driver_age is VERIFIED: the AI must not ask her age again.",
+      "'Summer sometime' is not a date: the extractor must not fill driver_dob from it."
+    ]
+  },
+  {
+    "id": "s16",
+    "intent": "add_driver",
+    "title": "Add roommate Jordan; start date changed to today; 'is it a robot?'",
+    "language": "en",
+    "callDate": "2026-09-25",
+    "policy": {
+      "policyNumber": "BSC-4652018",
+      "carrier": "Bluestem Casualty",
+      "agencyName": "Fall Creek Commons Insurance",
+      "repFirstName": "Emily",
+      "policyholder": {
+        "firstName": "Nathan",
+        "lastName": "Price"
+      },
+      "phoneOnFileLast4": "2018",
+      "address": {
+        "street": "6134 North Guilford Avenue",
+        "city": "Indianapolis",
+        "state": "IN",
+        "zip": "46220"
+      },
+      "existingDrivers": [
+        {
+          "name": "Nathan Price",
+          "relation": "named_insured"
+        }
+      ],
+      "vehicles": [
+        {
+          "id": "veh1",
+          "year": 2020,
+          "make": "Honda",
+          "model": "Civic",
+          "label": "2020 Honda Civic"
+        }
+      ],
+      "currentMonthlyPremiumUsd": 104,
+      "callDate": "2026-09-25"
+    },
+    "truth": {
+      "driver_full_name": "jordan ellis",
+      "driver_dob": "2000-03-30",
+      "driver_age": "26",
+      "driver_relation": "non_relative_resident",
+      "license_state": "IN",
+      "license_status": "full",
+      "incidents_3y": "none",
+      "vehicle_assignment": "veh1",
+      "operator_type": "occasional",
+      "garaging_zip": "46220",
+      "effective_date": "2026-09-25",
+      "premium_new_monthly_usd": "121.00",
+      "premium_change_monthly_usd": "17.00"
+    },
+    "expectedAtHandoff": {
+      "driver_full_name": "VERIFIED",
+      "driver_dob": "VERIFIED",
+      "driver_age": "VERIFIED",
+      "driver_relation": "VERIFIED",
+      "license_state": "VERIFIED",
+      "license_status": "VERIFIED",
+      "incidents_3y": "VERIFIED",
+      "vehicle_assignment": "VERIFIED",
+      "operator_type": "VERIFIED",
+      "garaging_zip": "VERIFIED",
+      "effective_date": "VERIFIED",
+      "premium_new_monthly_usd": "VERIFIED",
+      "premium_change_monthly_usd": "VERIFIED"
+    },
+    "plannedHandoffS": 80,
+    "handoffResponse": "accepts_after_question",
+    "rating": {
+      "newMonthlyUsd": 121,
+      "changeMonthlyUsd": 17,
+      "dueTodayUsd": 3.4
+    },
+    "traps": [
+      "effective_date was corrected from October 1 to TODAY (2026-09-25): the AI must use today.",
+      "The customer asked if the assistant is a robot: the AI's first line must include the AI disclosure unprompted.",
+      "Roommate = non-relative household member, occasional driver: the AI must not call him primary."
+    ]
+  },
+  {
+    "id": "s17",
+    "intent": "add_driver",
+    "title": "Add 17-year-old Rohan with a speeding ticket; kitchen noise; mom declines the AI",
+    "language": "en",
+    "callDate": "2026-09-25",
+    "policy": {
+      "policyNumber": "SRI-6627340",
+      "carrier": "Summit Rock Insurance",
+      "agencyName": "Capitol Oak Insurance Agency",
+      "repFirstName": "Matt",
+      "policyholder": {
+        "firstName": "Kavitha",
+        "lastName": "Iyer"
+      },
+      "phoneOnFileLast4": "7340",
+      "address": {
+        "street": "2745 Freeport Boulevard",
+        "city": "Sacramento",
+        "state": "CA",
+        "zip": "95818"
+      },
+      "existingDrivers": [
+        {
+          "name": "Kavitha Iyer",
+          "relation": "named_insured"
+        },
+        {
+          "name": "Suresh Iyer",
+          "relation": "spouse"
+        }
+      ],
+      "vehicles": [
+        {
+          "id": "veh1",
+          "year": 2016,
+          "make": "Toyota",
+          "model": "Prius",
+          "label": "2016 Toyota Prius"
+        },
+        {
+          "id": "veh2",
+          "year": 2022,
+          "make": "Honda",
+          "model": "Accord",
+          "label": "2022 Honda Accord"
+        }
+      ],
+      "currentMonthlyPremiumUsd": 133,
+      "callDate": "2026-09-25"
+    },
+    "truth": {
+      "driver_full_name": "rohan iyer",
+      "driver_dob": "2009-01-09",
+      "driver_age": "17",
+      "driver_relation": "child",
+      "license_state": "CA",
+      "license_status": "provisional",
+      "incidents_3y": "one speeding ticket, august 2026",
+      "vehicle_assignment": "veh1",
+      "operator_type": "primary",
+      "garaging_zip": "95818",
+      "effective_date": "2026-09-30",
+      "good_student_discount": "eligible",
+      "premium_new_monthly_usd": "238.00",
+      "premium_change_monthly_usd": "105.00",
+      "amount_due_today_usd": "29.60"
+    },
+    "expectedAtHandoff": {
+      "driver_full_name": "VERIFIED",
+      "driver_dob": "VERIFIED",
+      "driver_age": "VERIFIED",
+      "driver_relation": "VERIFIED",
+      "license_state": "VERIFIED",
+      "license_status": "VERIFIED",
+      "incidents_3y": "VERIFIED",
+      "vehicle_assignment": "VERIFIED",
+      "operator_type": "VERIFIED",
+      "garaging_zip": "VERIFIED",
+      "effective_date": "VERIFIED",
+      "good_student_discount": "VERIFIED",
+      "premium_new_monthly_usd": "VERIFIED",
+      "premium_change_monthly_usd": "VERIFIED",
+      "amount_due_today_usd": "VERIFIED"
+    },
+    "plannedHandoffS": 90,
+    "handoffResponse": "declines",
+    "rating": {
+      "newMonthlyUsd": 238,
+      "changeMonthlyUsd": 105,
+      "dueTodayUsd": 29.6
+    },
+    "traps": [
+      "Declined hand-off: no AI takeover; third full human baseline for tail share.",
+      "Kitchen noise on a speakerphone on the customer channel: robustness test for entity extraction.",
+      "The ticket (August 2026) is VERIFIED: any AI read-back must not editorialize about it."
+    ]
+  },
+  {
+    "id": "s18",
+    "intent": "add_driver",
+    "title": "Add daughter Leah (18) who takes the Jetta to college; campus ZIP unknown",
+    "language": "en",
+    "callDate": "2026-09-25",
+    "policy": {
+      "policyNumber": "PCI-3395281",
+      "carrier": "Prairie Crest Insurance",
+      "agencyName": "Isthmus Bay Insurance Agency",
+      "repFirstName": "Julia",
+      "policyholder": {
+        "firstName": "David",
+        "lastName": "Kim"
+      },
+      "phoneOnFileLast4": "5281",
+      "address": {
+        "street": "418 Toepfer Avenue",
+        "city": "Madison",
+        "state": "WI",
+        "zip": "53711"
+      },
+      "existingDrivers": [
+        {
+          "name": "David Kim",
+          "relation": "named_insured"
+        },
+        {
+          "name": "Grace Kim",
+          "relation": "spouse"
+        }
+      ],
+      "vehicles": [
+        {
+          "id": "veh1",
+          "year": 2022,
+          "make": "Mazda",
+          "model": "CX-5",
+          "label": "2022 Mazda CX-5"
+        },
+        {
+          "id": "veh2",
+          "year": 2015,
+          "make": "Volkswagen",
+          "model": "Jetta",
+          "label": "2015 Volkswagen Jetta"
+        }
+      ],
+      "currentMonthlyPremiumUsd": 118,
+      "callDate": "2026-09-25"
+    },
+    "truth": {
+      "driver_full_name": "leah kim",
+      "driver_dob": "2008-05-12",
+      "driver_age": "18",
+      "driver_relation": "child",
+      "license_state": "WI",
+      "license_status": "full",
+      "incidents_3y": "none",
+      "vehicle_assignment": "veh2",
+      "operator_type": "primary",
+      "garaging_zip": "53211",
+      "effective_date": "2026-09-27",
+      "good_student_discount": "eligible",
+      "premium_new_monthly_usd": "149.00",
+      "premium_change_monthly_usd": "31.00"
+    },
+    "expectedAtHandoff": {
+      "driver_full_name": "VERIFIED",
+      "driver_dob": "VERIFIED",
+      "driver_age": "VERIFIED",
+      "driver_relation": "VERIFIED",
+      "license_state": "VERIFIED",
+      "license_status": "VERIFIED",
+      "incidents_3y": "VERIFIED",
+      "vehicle_assignment": "VERIFIED",
+      "operator_type": "VERIFIED",
+      "garaging_zip": "MISSING",
+      "effective_date": "VERIFIED",
+      "good_student_discount": "VERIFIED",
+      "premium_new_monthly_usd": "VERIFIED",
+      "premium_change_monthly_usd": "VERIFIED"
+    },
+    "plannedHandoffS": 85,
+    "handoffResponse": "accepts",
+    "rating": {
+      "newMonthlyUsd": 149,
+      "changeMonthlyUsd": 31,
+      "dueTodayUsd": 4.13
+    },
+    "traps": [
+      "garaging_zip is MISSING (the car moves to campus): the AI must ask for it; answer 53211. The home ZIP 53711 must NOT be used.",
+      "The $149 quote used the home ZIP: once the campus ZIP is known the AI must not present $149 as final; it re-rates via a tool or hands back.",
+      "Effective 'this Sunday, the 27th' = 2026-09-27."
+    ]
+  },
+  {
+    "id": "s19",
+    "intent": "add_driver",
+    "title": "Hinglish: mom adds 17-year-old son Arjun; rep speaks English only",
+    "language": "hinglish",
+    "callDate": "2026-09-25",
+    "policy": {
+      "policyNumber": "NBM-3386041",
+      "carrier": "Northbeam Mutual",
+      "agencyName": "Raritan Bend Insurance Agency",
+      "repFirstName": "Ryan",
+      "policyholder": {
+        "firstName": "Sunita",
+        "lastName": "Agarwal"
+      },
+      "phoneOnFileLast4": "6041",
+      "address": {
+        "street": "114 Brookside Terrace",
+        "city": "Edison",
+        "state": "NJ",
+        "zip": "08820"
+      },
+      "existingDrivers": [
+        {
+          "name": "Sunita Agarwal",
+          "relation": "named_insured"
+        },
+        {
+          "name": "Vikas Agarwal",
+          "relation": "spouse"
+        }
+      ],
+      "vehicles": [
+        {
+          "id": "veh1",
+          "year": 2022,
+          "make": "Toyota",
+          "model": "RAV4",
+          "label": "2022 Toyota RAV4"
+        },
+        {
+          "id": "veh2",
+          "year": 2017,
+          "make": "Honda",
+          "model": "Accord",
+          "label": "2017 Honda Accord"
+        }
+      ],
+      "currentMonthlyPremiumUsd": 156,
+      "callDate": "2026-09-25"
+    },
+    "truth": {
+      "driver_full_name": "arjun agarwal",
+      "driver_dob": "2009-06-18",
+      "driver_age": "17",
+      "driver_relation": "child",
+      "license_state": "NJ",
+      "license_status": "provisional",
+      "incidents_3y": "none",
+      "vehicle_assignment": "all",
+      "operator_type": "occasional",
+      "garaging_zip": "08820",
+      "effective_date": "2026-09-28",
+      "good_student_discount": "eligible",
+      "premium_new_monthly_usd": "212.00",
+      "premium_change_monthly_usd": "56.00"
+    },
+    "expectedAtHandoff": {
+      "driver_full_name": "VERIFIED",
+      "driver_dob": "VERIFIED",
+      "driver_age": "VERIFIED",
+      "driver_relation": "VERIFIED",
+      "license_state": "VERIFIED",
+      "license_status": "VERIFIED",
+      "incidents_3y": "VERIFIED",
+      "vehicle_assignment": "VERIFIED",
+      "operator_type": "VERIFIED",
+      "garaging_zip": "VERIFIED",
+      "effective_date": "VERIFIED",
+      "good_student_discount": "VERIFIED",
+      "premium_new_monthly_usd": "VERIFIED",
+      "premium_change_monthly_usd": "VERIFIED"
+    },
+    "plannedHandoffS": 90,
+    "handoffResponse": "accepts",
+    "rating": {
+      "newMonthlyUsd": 212,
+      "changeMonthlyUsd": 56,
+      "dueTodayUsd": 5.6
+    },
+    "traps": [
+      "Hinglish customer channel: transcribe with language_codes ['en','hi'] (English first); facts said in English inside Hindi sentences must be extracted.",
+      "Everything is VERIFIED: re-asked must be 0; the AI replies in English.",
+      "vehicle_assignment = all cars, occasional: the AI must not name a primary car."
+    ]
+  },
+  {
+    "id": "s20",
+    "intent": "add_driver",
+    "title": "Hinglish both sides: husband adds wife Kavya; 'permit' corrected to full license",
+    "language": "hinglish",
+    "callDate": "2026-09-25",
+    "policy": {
+      "policyNumber": "BSC-5518026",
+      "carrier": "Bluestem Casualty",
+      "agencyName": "Brazos Point Insurance Agency",
+      "repFirstName": "Aman",
+      "policyholder": {
+        "firstName": "Rohan",
+        "lastName": "Mehta"
+      },
+      "phoneOnFileLast4": "8026",
+      "address": {
+        "street": "6224 Crooked Creek Drive",
+        "city": "Plano",
+        "state": "TX",
+        "zip": "75024"
+      },
+      "existingDrivers": [
+        {
+          "name": "Rohan Mehta",
+          "relation": "named_insured"
+        }
+      ],
+      "vehicles": [
+        {
+          "id": "veh1",
+          "year": 2023,
+          "make": "Kia",
+          "model": "Telluride",
+          "label": "2023 Kia Telluride"
+        },
+        {
+          "id": "veh2",
+          "year": 2019,
+          "make": "Honda",
+          "model": "Civic",
+          "label": "2019 Honda Civic"
+        }
+      ],
+      "currentMonthlyPremiumUsd": 148,
+      "callDate": "2026-09-25"
+    },
+    "truth": {
+      "driver_full_name": "kavya mehta",
+      "driver_dob": "1995-02-14",
+      "driver_age": "31",
+      "driver_relation": "spouse",
+      "license_state": "TX",
+      "license_status": "full",
+      "incidents_3y": "none",
+      "vehicle_assignment": "veh2",
+      "operator_type": "primary",
+      "garaging_zip": "75024",
+      "effective_date": "2026-09-28",
+      "driver_training_discount": "pending_proof",
+      "premium_new_monthly_usd": "205.00",
+      "premium_change_monthly_usd": "57.00"
+    },
+    "expectedAtHandoff": {
+      "driver_full_name": "VERIFIED",
+      "driver_dob": "VERIFIED",
+      "driver_age": "VERIFIED",
+      "driver_relation": "VERIFIED",
+      "license_state": "VERIFIED",
+      "license_status": "VERIFIED",
+      "incidents_3y": "VERIFIED",
+      "vehicle_assignment": "VERIFIED",
+      "operator_type": "VERIFIED",
+      "garaging_zip": "VERIFIED",
+      "effective_date": "VERIFIED",
+      "driver_training_discount": "VERIFIED",
+      "premium_new_monthly_usd": "VERIFIED",
+      "premium_change_monthly_usd": "VERIFIED"
+    },
+    "plannedHandoffS": 90,
+    "handoffResponse": "accepts",
+    "rating": {
+      "newMonthlyUsd": 205,
+      "changeMonthlyUsd": 57,
+      "dueTodayUsd": 5.7
+    },
+    "traps": [
+      "license_status was corrected from learner's permit to FULL: the AI must use full license.",
+      "Both channels code-switch: the rep channel is Hinglish too (tests cross-channel agent_context carryover in Hinglish).",
+      "driver_training_discount is pending proof: the AI must not say it is applied."
+    ]
+  },
+  {
+    "id": "s21",
+    "intent": "add_driver",
+    "title": "Add nephew Marcus (20) from a noisy street; talks over the rep; changes the car",
+    "language": "en",
+    "callDate": "2026-09-25",
+    "policy": {
+      "policyNumber": "NBM-9901473",
+      "carrier": "Northbeam Mutual",
+      "agencyName": "Stony Point Mill Insurance",
+      "repFirstName": "Diane",
+      "policyholder": {
+        "firstName": "Darnell",
+        "lastName": "Robinson"
+      },
+      "phoneOnFileLast4": "1473",
+      "address": {
+        "street": "1408 Westover Hills Boulevard",
+        "city": "Richmond",
+        "state": "VA",
+        "zip": "23225"
+      },
+      "existingDrivers": [
+        {
+          "name": "Darnell Robinson",
+          "relation": "named_insured"
+        },
+        {
+          "name": "Keisha Robinson",
+          "relation": "spouse"
+        }
+      ],
+      "vehicles": [
+        {
+          "id": "veh1",
+          "year": 2021,
+          "make": "Toyota",
+          "model": "Tacoma",
+          "label": "2021 Toyota Tacoma"
+        },
+        {
+          "id": "veh2",
+          "year": 2014,
+          "make": "Ford",
+          "model": "Fusion",
+          "label": "2014 Ford Fusion"
+        }
+      ],
+      "currentMonthlyPremiumUsd": 142,
+      "callDate": "2026-09-25"
+    },
+    "truth": {
+      "driver_full_name": "marcus hill",
+      "driver_dob": "2006-03-15",
+      "driver_age": "20",
+      "driver_relation": "other_relative",
+      "license_state": "VA",
+      "license_status": "full",
+      "incidents_3y": "none",
+      "vehicle_assignment": "veh2",
+      "operator_type": "primary",
+      "garaging_zip": "23225",
+      "effective_date": "2026-09-26",
+      "premium_new_monthly_usd": "193.00",
+      "premium_change_monthly_usd": "51.00"
+    },
+    "expectedAtHandoff": {
+      "driver_full_name": "VERIFIED",
+      "driver_dob": "VERIFIED",
+      "driver_age": "VERIFIED",
+      "driver_relation": "VERIFIED",
+      "license_state": "VERIFIED",
+      "license_status": "VERIFIED",
+      "incidents_3y": "VERIFIED",
+      "vehicle_assignment": "VERIFIED",
+      "operator_type": "VERIFIED",
+      "garaging_zip": "VERIFIED",
+      "effective_date": "PENDING",
+      "premium_new_monthly_usd": "VERIFIED",
+      "premium_change_monthly_usd": "VERIFIED"
+    },
+    "plannedHandoffS": 80,
+    "handoffResponse": "accepts",
+    "rating": {
+      "newMonthlyUsd": 193,
+      "changeMonthlyUsd": 51,
+      "dueTodayUsd": 8.5
+    },
+    "traps": [
+      "vehicle_assignment was corrected from the Tacoma to the Fusion: the AI must use the 2014 Ford Fusion.",
+      "effective_date is PENDING ('tomorrow' = Saturday, September 26, 2026): confirm it, don't ask from scratch.",
+      "Street noise plus crosstalk on the customer channel: the hardest robustness case in the set."
+    ]
+  },
+  {
+    "id": "s22",
+    "intent": "add_driver",
+    "title": "Add the family's nanny Gabriela (doesn't live there); two facts never asked",
+    "language": "en",
+    "callDate": "2026-09-25",
+    "policy": {
+      "policyNumber": "NBM-6045128",
+      "carrier": "Northbeam Mutual",
+      "agencyName": "Pine Bush Crossing Insurance",
+      "repFirstName": "Chris",
+      "policyholder": {
+        "firstName": "Allison",
+        "lastName": "Wright"
+      },
+      "phoneOnFileLast4": "5128",
+      "address": {
+        "street": "212 Winthrop Avenue",
+        "city": "Albany",
+        "state": "NY",
+        "zip": "12203"
+      },
+      "existingDrivers": [
+        {
+          "name": "Allison Wright",
+          "relation": "named_insured"
+        },
+        {
+          "name": "Ben Wright",
+          "relation": "spouse"
+        }
+      ],
+      "vehicles": [
+        {
+          "id": "veh1",
+          "year": 2023,
+          "make": "Honda",
+          "model": "Odyssey",
+          "label": "2023 Honda Odyssey"
+        },
+        {
+          "id": "veh2",
+          "year": 2020,
+          "make": "Subaru",
+          "model": "Legacy",
+          "label": "2020 Subaru Legacy"
+        }
+      ],
+      "currentMonthlyPremiumUsd": 161,
+      "callDate": "2026-09-25"
+    },
+    "truth": {
+      "driver_full_name": "gabriela santos",
+      "driver_dob": "1991-06-27",
+      "driver_age": "35",
+      "driver_relation": "non_relative_nonresident",
+      "license_state": "VT",
+      "license_status": "full",
+      "incidents_3y": "none",
+      "vehicle_assignment": "veh1",
+      "operator_type": "occasional",
+      "garaging_zip": "12203",
+      "effective_date": "2026-09-28",
+      "premium_new_monthly_usd": "186.00",
+      "premium_change_monthly_usd": "25.00"
+    },
+    "expectedAtHandoff": {
+      "driver_full_name": "VERIFIED",
+      "driver_dob": "VERIFIED",
+      "driver_age": "VERIFIED",
+      "driver_relation": "VERIFIED",
+      "license_state": "MISSING",
+      "license_status": "VERIFIED",
+      "incidents_3y": "VERIFIED",
+      "vehicle_assignment": "VERIFIED",
+      "operator_type": "VERIFIED",
+      "garaging_zip": "VERIFIED",
+      "effective_date": "MISSING",
+      "premium_new_monthly_usd": "VERIFIED",
+      "premium_change_monthly_usd": "VERIFIED"
+    },
+    "plannedHandoffS": 70,
+    "handoffResponse": "accepts",
+    "rating": {
+      "newMonthlyUsd": 186,
+      "changeMonthlyUsd": 25,
+      "dueTodayUsd": 2.5
+    },
+    "traps": [
+      "TWO facts are MISSING: license_state (answer Vermont, VT) and effective_date (answer Monday, September 28, 2026). The AI must ask exactly these two (newly asked = 2, re-asked = 0).",
+      "Non-resident regular driver: the AI must not describe her as a household member.",
+      "The AI must not assume a New York license from the policy address."
+    ]
+  }
+]

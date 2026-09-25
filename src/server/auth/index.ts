@@ -10,5 +10,6 @@ export {
   type CaseAuth, type CaseScope, type CaseTokenClaims,
 } from "./case-token";
 export { requireAdmin, requireCron, requireLimitsKey } from "./keys";
+export { clientHop, ipKeyMode, ipPrefix, type IpKeyMode } from "./client-ip";
 export { batonErrorResponse, errorResponse, handler, json, paramsOf, readJson, type RouteCtx } from "./http";
 export { safeEqual } from "./crypto";
