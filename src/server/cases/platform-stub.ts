@@ -7,6 +7,7 @@ import { SignJWT, jwtVerify } from "jose";
 import { BatonError } from "../../core/contracts/errors";
 import type { RateLimiter } from "../../core/contracts/services";
 import { newId } from "../../lib/ids";
+import { ipKeyOf } from "../auth/visitor";
 import type { CasesPlatform, CasesVisitor } from "./platform";
 
 /**
@@ -46,9 +47,13 @@ function cookie(header: string | null, name: string): string | null {
   return null;
 }
 
+/**
+ * ipKey: WP12's `ipKeyOf` (PLATFORM v2.1 §10.2, P-0), the same material and hmac as every other route. The v2.0 code
+ * here keyed on the client-controlled LEFTMOST `X-Forwarded-For` entry; WP12·0 moves `ipKeyOf` to the balancer-set hop
+ * grouped by /24 or /48 (`src/server/auth/client-ip.ts`), and this stand-in follows it automatically.
+ */
 function visitorOf(req: { headers: Headers }): CasesVisitor {
-  const hop = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || req.headers.get("x-real-ip")?.trim() || "unknown";
-  const ipKey = hmac(secretOf("VISITOR_SECRET"), `ip:${new Date().toISOString().slice(0, 10)}:${hop}`).slice(0, 22);
+  const ipKey = ipKeyOf(req);
   const id = verifyVisitor(req.headers.get(VISITOR_HEADER)) ?? verifyVisitor(cookie(req.headers.get("cookie"), VISITOR_COOKIE));
   return { visitorId: id ?? newId(), ipKey };
 }

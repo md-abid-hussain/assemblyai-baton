@@ -4,8 +4,9 @@ import { and, asc, desc, eq, isNotNull, isNull, ne, sql } from "drizzle-orm";
 import { customAlphabet, nanoid } from "nanoid";
 
 import { BatonError } from "../../core/contracts/errors";
+import type { ModerationPurpose, RunModeration } from "../../core/contracts/ext/wp14b-engine";
 import {
-  RELAY_GLOBAL_CAPS, VersionModerationSchema, VersionPresetSchema, type RelayGlobalCaps,
+  RELAY_GLOBAL_CAPS, VersionModerationSchema, VersionPresetSchema, type RelayGlobalCaps, type VersionPreset,
 } from "../../core/contracts/ext/wp14b-relays";
 import {
   GALLERY_WORKSPACE, ID_PREFIXES, INDUSTRIES, type Blueprint, type LintIssue, type PublicationView, type RelayDetail,
@@ -16,8 +17,8 @@ import { cases, relayPublications, relays, relayVersions } from "../db/schema";
 import { log } from "../log";
 import { blankBlueprint } from "./blank";
 import { RelayError } from "./http";
-import { defaultRelayKernel, type RelayKernel } from "./kernel";
-import { moderationText, type Moderator } from "./moderation";
+import { defaultRelayKernel, hasLintErrors, type RelayKernel } from "./kernel";
+import { moderationLines, ModerationUnavailableError, type Moderator } from "./moderation";
 import { seedGallery, type GallerySource, type SeedResult } from "./seed";
 
 /**
@@ -43,6 +44,20 @@ type Industry = (typeof INDUSTRIES)[number];
 type CreateFrom = Parameters<RelayRegistry["create"]>[1];
 type Access = "owner" | "reader" | "none";
 
+/** A version a run executes (`/api/cases` with `relayId`/`relayVersionId`, sims, the engine factory). */
+export interface RunVersion {
+  versionId: string;
+  relayId: string;
+  relaySlug: string;
+  version: number;
+  hash: string;
+  blueprint: Blueprint;
+  flagship: boolean;
+  gallery: boolean;
+  origin: RelayRow["origin"];
+  preset: VersionPreset | null;
+}
+
 /** WP18 plugs its publication view in here (`Publisher`-side lookup); null until then. */
 export interface PublicationLookup {
   forRelay(relayId: string): Promise<PublicationView | null>;
@@ -61,6 +76,8 @@ export interface PgRelayRegistryOptions {
 const regLog = log.child({ component: "relays" });
 const slugSuffix = customAlphabet("0123456789abcdefghijklmnopqrstuvwxyz", 8);
 const TOUCH_EVERY_MS = 60_000;
+/** How long the gallery's moderation lines (the pre-clear set) are cached per process. */
+const GALLERY_TEXT_TTL_MS = 60_000;
 
 const iso = (v: Date | string | null | undefined): string | null => (v == null ? null : new Date(v).toISOString());
 const lintErrorsOf = (lint: unknown): number =>
@@ -88,6 +105,7 @@ export class PgRelayRegistry implements RelayRegistry {
   private readonly moderator: Moderator | null;
   private readonly publications: PublicationLookup | null;
   private readonly gallery: GallerySource | null;
+  private galleryText: { at: number; lines: Promise<Set<string>> } | null = null;
 
   constructor(o: PgRelayRegistryOptions) {
     this.db = o.db;
@@ -375,19 +393,162 @@ export class PgRelayRegistry implements RelayRegistry {
     return { relayId: v.relayId, version: v.version, blueprint: p.blueprint ?? (v.blueprint as unknown as Blueprint), hash: v.hash };
   }
 
+  /** `RelayRegistry.moderate` = the Publish policy: fail closed (503 E_MAINTENANCE) when the endpoint is unavailable. */
   async moderate(versionId: string): Promise<{ flagged: boolean; categories: string[] }> {
+    const r = await this.moderateForRun(versionId, "publish");
+    return { flagged: r.flagged, categories: r.categories };
+  }
+
+  /**
+   * Moderation before a version's first Test run or Publish (PLATFORM §7.4, P14), once per version:
+   * 1. the stored result, if any;
+   * 2. **gallery text**: when every line of the version's author text already appears in a seeded gallery version
+   *    (a clone, a preset, an edit that touched no spoken text), it is our own text: stored as `source: "seed"`, no call;
+   * 3. otherwise the `Moderator` (OpenAI `omni-moderation-latest`), stored;
+   * 4. endpoint unavailable: Publish fails closed (503 E_MAINTENANCE); a Test run of a gallery-derived relay (the gallery
+   *    itself or a clone) fails open, unstored, so the next run asks again; anything else fails closed.
+   */
+  async moderateForRun(versionId: string, purpose: ModerationPurpose): Promise<RunModeration> {
     const [v] = await this.db
-      .select({ blueprint: relayVersions.blueprint, moderation: relayVersions.moderation })
+      .select({ blueprint: relayVersions.blueprint, moderation: relayVersions.moderation, origin: relays.origin, visibility: relays.visibility })
       .from(relayVersions)
+      .innerJoin(relays, eq(relays.id, relayVersions.relayId))
       .where(eq(relayVersions.id, versionId));
     if (!v) throw new BatonError("E_NOT_FOUND", "No such relay version.");
     const cached = VersionModerationSchema.safeParse(v.moderation);
-    if (cached.success) return { flagged: cached.data.flagged, categories: cached.data.categories };
-    if (!this.moderator) throw new BatonError("E_INTERNAL", "Relay moderation is not configured yet.");
-    const r = await this.moderator.check(moderationText(v.blueprint as unknown as Blueprint));
-    const record = { flagged: r.flagged, categories: r.categories, checkedAt: new Date(this.now()).toISOString(), source: "openai" as const };
+    if (cached.success) return { flagged: cached.data.flagged, categories: cached.data.categories, via: "stored" };
+    const parsed = this.kernel.parse(v.blueprint);
+    if (!parsed.blueprint) throw new RelayError("E_LINT", "This relay version no longer parses.", { lint: parsed.issues });
+    const lines = moderationLines(parsed.blueprint);
+    const gallery = await this.galleryLines();
+    if (lines.every((l) => gallery.has(l))) {
+      await this.storeModeration(versionId, { flagged: false, categories: [], source: "seed" });
+      return { flagged: false, categories: [], via: "gallery_text" };
+    }
+    try {
+      if (!this.moderator) throw new ModerationUnavailableError("no moderator is configured");
+      const r = await this.moderator.check(lines.join("\n"), { refId: versionId });
+      await this.storeModeration(versionId, { flagged: r.flagged, categories: r.categories, source: "openai" });
+      return { flagged: r.flagged, categories: r.categories, via: "openai" };
+    } catch (err) {
+      if (!(err instanceof ModerationUnavailableError)) throw err;
+      const galleryDerived = v.visibility === "gallery" || v.origin === "clone" || v.origin === "seed";
+      if (purpose === "test" && galleryDerived) {
+        regLog.warn("moderation unavailable; failing open for a Test run of a gallery-derived relay", { versionId });
+        return { flagged: false, categories: [], via: "fail_open" };
+      }
+      regLog.warn("moderation unavailable; failing closed", { versionId, purpose });
+      throw new BatonError("E_MAINTENANCE", "We could not check this relay's text right now. Try again in a minute.");
+    }
+  }
+
+  private async storeModeration(versionId: string, r: { flagged: boolean; categories: string[]; source: "openai" | "seed" }): Promise<void> {
+    const record = { flagged: r.flagged, categories: r.categories, checkedAt: new Date(this.now()).toISOString(), source: r.source };
     await this.db.update(relayVersions).set({ moderation: record }).where(and(eq(relayVersions.id, versionId), isNull(relayVersions.moderation)));
-    return { flagged: r.flagged, categories: r.categories };
+  }
+
+  /** Every moderation line of every seeded gallery version (incl. presets), cached for a minute. */
+  private galleryLines(): Promise<Set<string>> {
+    const t = this.now();
+    if (this.galleryText && t - this.galleryText.at < GALLERY_TEXT_TTL_MS) return this.galleryText.lines;
+    const lines = (async () => {
+      const rows = await this.db
+        .select({ blueprint: relayVersions.blueprint })
+        .from(relayVersions)
+        .innerJoin(relays, eq(relays.id, relayVersions.relayId))
+        .where(and(eq(relays.visibility, "gallery"), eq(relays.workspaceId, GALLERY_WORKSPACE)));
+      const out = new Set<string>();
+      for (const r of rows) {
+        const p = this.kernel.parse(r.blueprint);
+        if (p.blueprint) for (const l of moderationLines(p.blueprint)) out.add(l);
+      }
+      return out;
+    })();
+    this.galleryText = { at: t, lines };
+    lines.catch(() => {
+      if (this.galleryText?.lines === lines) this.galleryText = null;
+    });
+    return lines;
+  }
+
+  // ------------------------------------------------------------------------------------------ runs (WP14b·2)
+
+  /** A version by id with its relay's identity, whatever the relay's status (runs of archived relays still compile). */
+  async runVersion(versionId: string): Promise<RunVersion | null> {
+    if (!versionId.startsWith(ID_PREFIXES.version)) return null;
+    const [v] = await this.db
+      .select({ v: relayVersions, r: relays })
+      .from(relayVersions)
+      .innerJoin(relays, eq(relays.id, relayVersions.relayId))
+      .where(eq(relayVersions.id, versionId));
+    if (!v) return null;
+    const p = this.kernel.parse(v.v.blueprint);
+    if (!p.blueprint) regLog.error("stored version no longer parses", { versionId, issues: p.issues.length });
+    const preset = VersionPresetSchema.safeParse(v.v.preset);
+    return {
+      versionId: v.v.id, relayId: v.r.id, relaySlug: v.r.slug, version: v.v.version, hash: v.v.blueprintHash,
+      blueprint: p.blueprint ?? (v.v.blueprint as unknown as Blueprint), flagship: v.r.flagship, gallery: v.r.visibility === "gallery",
+      origin: v.r.origin, preset: preset.success ? preset.data : null,
+    };
+  }
+
+  /**
+   * The version a run in workspace `ws` executes (TASKS-v2 §5: `CreateCaseRequest` gains `relayId`/`relayVersionId`):
+   * - `relayVersionId` (e.g. a gallery preset): any version of a relay `ws` can see (owner, gallery, unlisted);
+   * - `relayId` only: the owner's draft is snapshotted (content-addressed, so an unchanged draft reuses its version);
+   *   a reader runs the relay's current version.
+   * 404 when `ws` cannot see it or there is nothing to run; 422 E_LINT when the version has lint errors.
+   */
+  async resolveRun(ws: string, want: { relayId?: string | undefined; relayVersionId?: string | undefined }): Promise<RunVersion> {
+    let versionId: string;
+    if (want.relayVersionId) {
+      const [v] = want.relayVersionId.startsWith(ID_PREFIXES.version)
+        ? await this.db.select({ relayId: relayVersions.relayId }).from(relayVersions).where(eq(relayVersions.id, want.relayVersionId))
+        : [];
+      const row = v ? await this.findRow(v.relayId) : null;
+      if (!row || this.accessOf(row, ws) === "none") throw new BatonError("E_NOT_FOUND", "No such relay version.");
+      if (want.relayId && want.relayId !== row.id && want.relayId !== row.slug) throw new BatonError("E_NOT_FOUND", "No such version of this relay.");
+      versionId = want.relayVersionId;
+    } else if (want.relayId) {
+      const row = await this.findRow(want.relayId);
+      const access = row ? this.accessOf(row, ws) : "none";
+      if (!row || access === "none") throw new BatonError("E_NOT_FOUND", "No such relay.");
+      if (access === "owner") {
+        const lint = this.kernel.parse(row.draft).issues;
+        if (hasLintErrors(lint)) throw new RelayError("E_LINT", "Fix the lint errors before you run this relay.", { lint });
+        versionId = (await this.snapshotVersion(row.id)).versionId;
+      } else {
+        if (!row.currentVersionId) throw new BatonError("E_NOT_FOUND", "This relay has no saved version to run yet.");
+        versionId = row.currentVersionId;
+      }
+    } else {
+      throw new BatonError("E_BAD_REQUEST", "relayId or relayVersionId is required.");
+    }
+    const run = await this.runVersion(versionId);
+    if (!run) throw new BatonError("E_NOT_FOUND", "No such relay version.");
+    const lint = this.kernel.parse(run.blueprint).issues;
+    if (hasLintErrors(lint)) throw new RelayError("E_LINT", "This relay version has lint errors, so it cannot run.", { lint });
+    return run;
+  }
+
+  /**
+   * The gallery version a committed gallery sim was written for (`src/generated/sim-calls.json` carries the relay slug
+   * and blueprint hash, not a version id): the version with that hash, else the relay's current version.
+   */
+  async galleryVersionFor(slug: string, hash: string | null): Promise<string | null> {
+    const [row] = await this.db
+      .select({ id: relays.id, current: relays.currentVersionId })
+      .from(relays)
+      .where(and(eq(relays.slug, slug), eq(relays.visibility, "gallery"), isNull(relays.deletedAt)));
+    if (!row) return null;
+    if (hash) {
+      const [v] = await this.db
+        .select({ id: relayVersions.id })
+        .from(relayVersions)
+        .where(and(eq(relayVersions.relayId, row.id), eq(relayVersions.blueprintHash, hash)));
+      if (v) return v.id;
+    }
+    return row.current;
   }
 
   async remove(id: string, ws: string): Promise<void> {
