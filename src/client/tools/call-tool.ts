@@ -28,10 +28,17 @@ export class ToolCallError extends Error {
 export interface CallToolOptions {
   /** The takeover-scoped case token (re-issued by POST /api/takeovers). */
   token: () => string;
+  /** The signed visitor token (`visitorToken` of POST /api/cases) for cookie-less browsers: sent as `x-baton-visitor`. */
+  visitorToken?: () => string | null;
   fetch?: typeof fetch;
   /** Same-origin by default. */
   base?: string;
   retryDelayMs?: number;
+}
+
+/** The auth headers of every WP6 browser call: the case token, plus the visitor token when the page has one. */
+export function authHeaders(token: string, visitorToken: string | null | undefined): Record<string, string> {
+  return { authorization: `Bearer ${token}`, ...(visitorToken ? { "x-baton-visitor": visitorToken } : {}) };
 }
 
 const RETRYABLE = (s: number) => s === 409 || s === 429 || s >= 500;
@@ -49,7 +56,7 @@ export function createCallTool(o: CallToolOptions): CallTool {
       try {
         res = await f(`${base}/api/tools/${encodeURIComponent(name)}`, {
           method: "POST",
-          headers: { authorization: `Bearer ${o.token()}`, "content-type": "application/json" },
+          headers: { ...authHeaders(o.token(), o.visitorToken?.()), "content-type": "application/json" },
           body,
         });
       } catch (e) {

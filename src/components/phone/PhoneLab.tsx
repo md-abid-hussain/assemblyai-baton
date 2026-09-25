@@ -8,11 +8,11 @@ import { MockPhone } from "./MockPhone";
 
 /**
  * `/pay/lab` (DEV ONLY): mounts the MockPhone against a seeded payment (scripts/polar/lab-seed.ts), feeds it the
- * pay-link SMS, and logs every phone state. Query: `?paymentId=…&autopilot=1&variant=floating`; the takeover token
- * is read from the URL fragment (`#token=…`), so it never reaches a server log.
+ * pay-link SMS, and logs every phone state. Query: `?paymentId=…&autopilot=1&variant=floating`; the takeover token and
+ * the signed visitor token are read from the URL fragment (`#token=…&visitor=…`), so they never reach a server log.
  */
 export function PhoneLab() {
-  const [params, setParams] = React.useState<{ paymentId: string | null; token: string; autopilot: boolean; floating: boolean } | null>(null);
+  const [params, setParams] = React.useState<{ paymentId: string | null; token: string; visitor: string | null; autopilot: boolean; floating: boolean } | null>(null);
   const [events, setEvents] = React.useState<BatonEvent[]>([]);
   const [log, setLog] = React.useState<string[]>([]);
   const t0 = React.useRef(performance.now());
@@ -21,7 +21,7 @@ export function PhoneLab() {
     const q = new URLSearchParams(window.location.search);
     const h = new URLSearchParams(window.location.hash.slice(1));
     const paymentId = q.get("paymentId");
-    setParams({ paymentId, token: h.get("token") ?? "", autopilot: q.get("autopilot") === "1", floating: q.get("variant") === "floating" });
+    setParams({ paymentId, token: h.get("token") ?? "", visitor: h.get("visitor"), autopilot: q.get("autopilot") === "1", floating: q.get("variant") === "floating" });
     if (paymentId) {
       const link = `${window.location.origin}/pay/${paymentId}`;
       setEvents([{ t: 0, type: "phone.sms", text: `Harborview: Review & sign your change to policy NBM-4418207: ${link}`, link }]);
@@ -40,6 +40,7 @@ export function PhoneLab() {
         events={events}
         paymentId={params.paymentId}
         takeoverToken={params.token}
+        visitorToken={params.visitor}
         variant={params.floating ? "floating" : "docked"}
         readOnly={false}
         autopilot={params.autopilot}

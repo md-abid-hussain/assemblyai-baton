@@ -7,8 +7,8 @@
  * Uses DATABASE_URL (refuses anything that is not localhost) and CASE_TOKEN_SECRET from .env; never prints them.
  * Polar mode creates a real SANDBOX checkout (POLAR_SERVER must be sandbox).
  */
-import { SignJWT } from "jose";
-
+import { issueCaseToken } from "../../src/server/auth/case-token";
+import { issueVisitorToken } from "../../src/server/auth/visitor";
 import { closeDb, getDb } from "../../src/server/db/client";
 import * as schema from "../../src/server/db/schema";
 import { resetEnvCache } from "../../src/server/env";
@@ -57,16 +57,12 @@ async function main(): Promise<void> {
     mode: async () => mode,
   });
   const { payment, label } = await svc.create({ caseId, takeoverId, scenarioId: "s01", amountCents: amount, policy: POLICY, origin });
-  const token = await new SignJWT({ vid: "lab-visitor", scp: ["case", "tools"], tko: takeoverId })
-    .setProtectedHeader({ alg: "HS256", typ: "JWT" })
-    .setIssuer("baton")
-    .setSubject(caseId)
-    .setIssuedAt()
-    .setExpirationTime("45m")
-    .sign(new TextEncoder().encode(secret));
+  const token = await issueCaseToken({ caseId, visitorId: "lab-visitor", takeoverId, scopes: ["case", "tools"] });
   console.log(JSON.stringify({ caseId, takeoverId, paymentId: payment.id, provider: payment.provider, status: payment.status, checkoutId: payment.checkoutId, label }));
-  // The token is a short-lived dev credential for this fictional case only; it goes in the URL fragment (never sent to a server).
-  console.log(`${origin}/pay/lab?paymentId=${payment.id}#token=${token}`);
+  // Short-lived dev credentials for this fictional case only; they go in the URL fragment (never sent to a server).
+  // The visitor token makes WP2's requireCase match the case token's `vid` (sent as x-baton-visitor).
+  const visitor = issueVisitorToken("lab-visitor");
+  console.log(`${origin}/pay/lab?paymentId=${payment.id}#token=${token}&visitor=${encodeURIComponent(visitor)}`);
   await closeDb();
 }
 

@@ -3,6 +3,7 @@ import "client-only";
 import type { PhoneState } from "../../core/contracts/services";
 import { PaymentViewExtSchema, type AwaitPaymentOptions, type PaymentResolution, type PaymentViewExt } from "../../core/contracts/ext/wp6-payments";
 import { TAKEOVER_TIMING } from "../../core/contracts/takeover";
+import { authHeaders } from "./call-tool";
 
 /**
  * Browser access to the payment routes (#15–#17 + …/timeout) and `awaitPaymentResolution()`, the hold protocol's
@@ -29,13 +30,13 @@ export interface PaymentsClient {
   timeout(id: string): Promise<{ ok: true; status: string }>;
 }
 
-export function createPaymentsClient(o: { token: () => string; fetch?: typeof fetch; base?: string }): PaymentsClient {
+export function createPaymentsClient(o: { token: () => string; visitorToken?: () => string | null; fetch?: typeof fetch; base?: string }): PaymentsClient {
   const f = o.fetch ?? ((...a: Parameters<typeof fetch>) => fetch(...a));
   const base = o.base ?? "";
   async function call<T>(method: "GET" | "POST", path: string, body?: unknown): Promise<T> {
     const res = await f(`${base}${path}`, {
       method,
-      headers: { authorization: `Bearer ${o.token()}`, ...(body !== undefined ? { "content-type": "application/json" } : {}) },
+      headers: { ...authHeaders(o.token(), o.visitorToken?.()), ...(body !== undefined ? { "content-type": "application/json" } : {}) },
       ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
     });
     if (!res.ok) {

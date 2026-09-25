@@ -2,28 +2,29 @@ import "server-only";
 
 import { jwtVerify } from "jose";
 
+import type { CaseState } from "../../core/contracts/case";
 import { BatonError } from "../../core/contracts/errors";
 import type { CaseRepository, RateLimiter } from "../../core/contracts/services";
 import { getDb } from "../db/client";
 import { env } from "../env";
-import { log } from "../log";
 import { PaymentService, type PaymentsMode } from "../payments/service";
 import { DbPaymentStore } from "../payments/store";
 import { sdkPolarApi } from "../polar/client";
 import { kitRatingSource, type RatingSource } from "../rating";
-import { getToolCore, setToolCore, type ToolCore } from "./core-port";
+import { getToolCore, hasToolCore, setToolCore, type ToolCore } from "./core-port";
+import { wp1ToolCore, wp2PaymentsModeOverride, wp2RateLimiter, wp2RequireTakeover, wp3CaseSink } from "./defaults";
 import { Wp6ToolService } from "./service";
 import { DbToolStore, type ToolStore } from "./store";
 
 /**
- * WP6 composition root: the routes (#14–#18) call `wp6()`. Everything another WP provides is injected with
- * `configureWp6({...})` by the integrator at G1 (see docs/notes/wp6.md "Integrator wiring"):
- * - `cases`: WP3's `CaseRepository` (`load`, `applyEvents`); the tool routes need it (payments do not);
- * - `requireTakeover`: WP2's `requireCase(req, {takeoverId, scope})` (the default below verifies the case JWT of
- *   DESIGN §4.3 itself, without the visitor-cookie match);
- * - `rateLimiter`: WP2's `getRateLimiter()` (default: an in-process fixed-window limiter);
+ * WP6 composition root: the routes (#14–#18) call `wp6()`. Since G1 (WP1, WP2 and WP3 on main) the defaults are the
+ * real implementations (`./defaults.ts`):
+ * - `cases`: WP3's `CaseRepository` (`load`, `applyEvents`, `setCaseExtras`);
+ * - `requireTakeover`: WP2's `requireCase(req, {takeoverId, scope})` (case JWT + visitor-cookie match);
+ * - `rateLimiter`: WP2's `getRateLimiter()` (DB fixed window);
  * - `paymentsModeOverride`: WP2's flags (`app_flags.payments_mode_override`);
- * - `core`: WP1's functions (or `setToolCore`); `rating`: WP9's normalized scenarios.
+ * - `core`: WP1's functions (`wp1ToolCore`); `rating`: the kit table (`kitRatingSource`).
+ * Tests (and, after G2, WP16's `RelayToolService`) replace any of them with `configureWp6({...})` or `setWp6(...)`.
  */
 
 export interface TakeoverAuth {
@@ -33,8 +34,17 @@ export interface TakeoverAuth {
 }
 export type RequireTakeover = (req: Request, want: { takeoverId: string; scope: "tools" | "case" }) => Promise<TakeoverAuth>;
 
+/**
+ * What the tool layer needs from the case repository. `setCaseExtras` mirrors the non-derivable flow parts (stage,
+ * disclosures given, payment, confirmation number) into `cases.state` under the case lock (wp3-to-wp6 item 2), so
+ * route #4 and the console see them; WP6's own tables stay authoritative for the handlers.
+ */
+export type CaseSink = Pick<CaseRepository, "load" | "applyEvents"> & {
+  setCaseExtras?(caseId: string, patch: Partial<Pick<CaseState, "stage" | "disclosuresGiven" | "payment" | "confirmationNumber">>): Promise<unknown>;
+};
+
 export interface Wp6Config {
-  cases?: Pick<CaseRepository, "load" | "applyEvents">;
+  cases?: CaseSink;
   requireTakeover?: RequireTakeover;
   rateLimiter?: RateLimiter;
   paymentsModeOverride?: () => Promise<PaymentsMode | null>;
@@ -67,15 +77,6 @@ export function setWp6(w: Wp6 | null): void {
   built = w;
 }
 
-const notWiredCases: Pick<CaseRepository, "load" | "applyEvents"> = {
-  load: async () => {
-    throw new BatonError("E_INTERNAL", "The tool layer is not wired to the case repository yet (configureWp6({cases})).");
-  },
-  applyEvents: async () => {
-    throw new BatonError("E_INTERNAL", "The tool layer is not wired to the case repository yet (configureWp6({cases})).");
-  },
-};
-
 export function wp6(): Wp6 {
   if (built) return built;
   const e = env();
@@ -90,15 +91,15 @@ export function wp6(): Wp6 {
     polarConfig: polarReady
       ? { productId: e.POLAR_PRODUCT_ID!, demoCustomers: e.POLAR_DEMO_CUSTOMERS ?? {}, embedOrigins: e.EMBED_ORIGINS, appUrl: e.APP_URL ?? null }
       : null,
-    mode: async () => (await cfg.paymentsModeOverride?.().catch(() => null)) ?? e.PAYMENTS_MODE,
+    mode: async () => (await (cfg.paymentsModeOverride ?? wp2PaymentsModeOverride)().catch(() => null)) ?? e.PAYMENTS_MODE,
     stagePayloadFor: (p) => (tools ? tools.stagePayloadFor(p) : Promise.resolve(null)),
     extrasFor: (p, origin) => (tools ? tools.extrasFor(p, origin) : Promise.resolve(null)),
   });
   tools = new Wp6ToolService({
-    cases: cfg.cases ?? notWiredCases,
+    cases: cfg.cases ?? wp3CaseSink(),
     store: toolStore,
     payments,
-    core: getToolCore,
+    core: () => (hasToolCore() ? getToolCore() : wp1ToolCore),
     rating: cfg.rating ?? kitRatingSource,
     config: {
       deployId: e.BATON_DEPLOY_ID,
@@ -111,21 +112,17 @@ export function wp6(): Wp6 {
     payments,
     tools,
     toolStore,
-    requireTakeover: cfg.requireTakeover ?? jwtRequireTakeover,
-    rateLimiter: cfg.rateLimiter ?? memoryRateLimiter,
+    requireTakeover: cfg.requireTakeover ?? wp2RequireTakeover,
+    rateLimiter: cfg.rateLimiter ?? wp2RateLimiter(),
     webhookSecret: e.POLAR_WEBHOOK_SECRET ?? null,
     appUrl: e.APP_URL ?? null,
   };
-  if (!cfg.requireTakeover) authLog.warn("using the fallback case-token check (no visitor match) until WP2's requireCase is wired");
   return built;
 }
 
-const authLog = log.child({ component: "wp6-auth" });
-
 /**
- * Fallback auth until WP2's `requireCase` is wired: verifies the case JWT of DESIGN §4.3 (HS256 with
- * CASE_TOKEN_SECRET; `sub` = caseId, `vid`, `scp` ∋ scope, `tko` = the takeover). It cannot match the visitor
- * cookie (that is WP2's), so the integrator MUST replace it at G1.
+ * The case-JWT check without the visitor-cookie match (DESIGN §4.3: HS256 with CASE_TOKEN_SECRET; `sub` = caseId,
+ * `vid`, `scp` ∋ scope, `tko` = the takeover). Route tests and the dev lab use it; production uses WP2's `requireCase`.
  */
 export const jwtRequireTakeover: RequireTakeover = async (req, want) => {
   const h = req.headers.get("authorization") ?? "";
@@ -146,7 +143,7 @@ export const jwtRequireTakeover: RequireTakeover = async (req, want) => {
   return { caseId: payload.sub, visitorId: payload.vid, takeoverId: typeof payload.tko === "string" ? payload.tko : null };
 };
 
-/** In-process fixed-window limiter (default until WP2's DB limiter is wired; per container, best-effort). */
+/** In-process fixed-window limiter (route tests; production uses WP2's DB limiter). */
 const windows = new Map<string, { start: number; used: number }>();
 export const memoryRateLimiter: RateLimiter = {
   async hit(bucket, key, limit, windowSec, cost = 1) {

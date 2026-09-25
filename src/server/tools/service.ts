@@ -5,17 +5,18 @@ import { BatonError } from "../../core/contracts/errors";
 import type { EsignSummary, StagePayload } from "../../core/contracts/ext/wp6-payments";
 import type { NewFactEvent } from "../../core/contracts/case";
 import type { CaseRepository, ToolContext, ToolOutcome, ToolService } from "../../core/contracts/services";
+import type { CaseSink } from "./wiring";
 import type { TranscriptionMode } from "../../core/contracts/takeover";
 import type { ToolArgs, ToolName } from "../../core/contracts/tools";
 import { REQUIRED_FIELDS } from "../../core/intents/add-driver.fields";
-import { newId as defaultNewId, newRef } from "../../lib/ids";
+import { newRef } from "../../lib/ids";
 import { log as rootLog, type Logger } from "../log";
 import { formatUsd, usdToCents } from "../payments/machine";
 import type { PaymentService } from "../payments/service";
 import type { PaymentRecord } from "../payments/store";
 import type { RatingSource } from "../rating";
 import type { ToolCore } from "./core-port";
-import { flowCtxOf, overlayFlow, type DisclosureRecord, type TakeoverRecord, type ToolStore } from "./store";
+import { flowCtxOf, overlayFlow, type DisclosureRecord, type FlowCtx, type TakeoverRecord, type ToolStore } from "./store";
 
 /**
  * The six Voice Agent tool handlers (DESIGN §5.8), server side. They gate the flow:
@@ -23,7 +24,10 @@ import { flowCtxOf, overlayFlow, type DisclosureRecord, type TakeoverRecord, typ
  *
  * Every handler works on the case state DERIVED by WP1 from the fact events (via WP3's `CaseRepository`), with the
  * non-derivable flow parts (stage, disclosures given, payment, confirmation number) overlaid from our tables.
- * Accepted field updates become `tool_update` fact events (G0: `turnEndMs = cases.t_arm_ms + (now − armed_at)`).
+ * Accepted field updates become `tool_update` fact events (G0: `turnEndMs = cases.t_arm_ms + (now − armed_at)`) with
+ * the deterministic id `${caseId}:tool:${takeoverId}:${callId}` (wp3-to-wp6 item 1), so a retried call is a no-op at
+ * the event level too. After each call the flow parts are mirrored into `cases.state` with WP3's `setCaseExtras`
+ * (wp3-to-wp6 item 2; only when they changed); our tables stay authoritative for the handlers.
  */
 
 export const EFFECTIVE_DATE_TOOL_MAX_DAYS = 30;
@@ -39,13 +43,14 @@ export interface ToolServiceConfig {
 }
 
 export interface ToolServiceDeps {
-  cases: Pick<CaseRepository, "load" | "applyEvents">;
+  cases: CaseSink;
   store: ToolStore;
   payments: PaymentService;
   core: () => ToolCore;
   rating: RatingSource;
   config: ToolServiceConfig;
   now?: () => number;
+  /** Unused since the tool_update ids became deterministic per call (kept for callers that still pass it). */
   newId?: () => string;
   /** "END-" + 5 digits. */
   confirmationNumber?: () => string;
@@ -55,6 +60,8 @@ export interface ToolServiceDeps {
 type Loaded = NonNullable<Awaited<ReturnType<CaseRepository["load"]>>>;
 
 interface Ctx {
+  /** The VA call id of this tool call (route #14 `callId`). */
+  callId: string;
   tko: TakeoverRecord;
   c: Loaded;
   pay: PaymentRecord | null;
@@ -76,13 +83,11 @@ interface HandlerOut {
 
 export class Wp6ToolService implements ToolService {
   private readonly now: () => number;
-  private readonly newId: () => string;
   private readonly log: Logger;
   private readonly confNumber: () => string;
 
   constructor(private readonly deps: ToolServiceDeps) {
     this.now = deps.now ?? Date.now;
-    this.newId = deps.newId ?? defaultNewId;
     this.log = (deps.log ?? rootLog).child({ component: "tools" });
     this.confNumber = deps.confirmationNumber ?? (() => `END-${String(Math.floor(10000 + Math.random() * 90000))}`);
   }
@@ -116,8 +121,10 @@ export class Wp6ToolService implements ToolService {
 
     // Apply accepted field updates, then re-derive (WP3 re-derives if newer events landed).
     let state = x.state;
+    let stored: CaseState = x.c.state;
     if (out.events?.length) {
       const applied = await this.deps.cases.applyEvents(x.tko.caseId, x.c.version, out.events);
+      stored = applied.state;
       state = await this.reload(x, applied.state);
       if (out.ui?.conflict === undefined) {
         const card = conflictFor(state, out.events.map((e) => e.field));
@@ -137,7 +144,26 @@ export class Wp6ToolService implements ToolService {
     }
     if (out.transcriptionMode) outcome.transcriptionMode = out.transcriptionMode;
     else if (out.withInputMode || outcome.stage) outcome.transcriptionMode = x.core.inputModeFor(x.core.nextStepOf(state)).mode;
+    await this.syncExtras(x.tko.caseId, x.tko.id, stored);
     return outcome;
+  }
+
+  /**
+   * Mirror the flow parts (stage, disclosures given, payment, confirmation number) into `cases.state` through WP3's
+   * `setCaseExtras` when they differ from what the case row holds. Best effort: a failure is logged, never thrown
+   * (the handlers read our own tables, and route #4 builds its payment summary from the payments row).
+   */
+  private async syncExtras(caseId: string, takeoverId: string, stored: CaseState): Promise<void> {
+    if (!this.deps.cases.setCaseExtras) return;
+    try {
+      const tko = await this.deps.store.getTakeover(takeoverId);
+      const pay = await this.deps.store.latestPayment(takeoverId);
+      const flow = flowCtxOf(tko, pay);
+      if (sameFlow(flow, stored)) return;
+      await this.deps.cases.setCaseExtras(caseId, flow);
+    } catch (e) {
+      this.log.warn("setCaseExtras failed", { caseId, takeoverId, err: e instanceof Error ? e.message.slice(0, 200) : String(e) });
+    }
   }
 
   /**
@@ -195,6 +221,7 @@ export class Wp6ToolService implements ToolService {
     if (stage !== tko.stage) await this.deps.store.setStage(tko.id, stage);
     const x = { core, policy: c.policy } as Pick<Ctx, "core" | "policy">;
     const sp = this.stagePayload(x, state, stage);
+    await this.syncExtras(tko.caseId, tko.id, c.state);
     return { ...sp, transcriptionMode: "min_latency" };
   }
 
@@ -208,7 +235,7 @@ export class Wp6ToolService implements ToolService {
     if (!c) throw new BatonError("E_NOT_FOUND", "No such case.");
     const pay = await this.deps.store.latestPayment(tko.id);
     const core = this.deps.core();
-    const x: Ctx = { tko, c, pay, state: c.state, policy: c.policy, callDate: c.policy.callDate, core };
+    const x: Ctx = { callId: ctx.callId, tko, c, pay, state: c.state, policy: c.policy, callDate: c.policy.callDate, core };
     x.state = this.overlay(x, c.state);
     return x;
   }
@@ -244,7 +271,7 @@ export class Wp6ToolService implements ToolService {
 
   private toolUpdate(x: Ctx, field: FieldId, valueRaw: string, valueNorm: string): NewFactEvent {
     return {
-      id: this.newId(),
+      id: toolEventId(x.tko.caseId, x.tko.id, x.callId),
       caseId: x.tko.caseId,
       field,
       kind: "tool_update",
@@ -418,6 +445,18 @@ export class Wp6ToolService implements ToolService {
 }
 
 const ACTIVE_CASE_STATUSES: readonly CaseStatus[] = ["shadowing", "armed", "ai_active"];
+
+/** wp3-to-wp6 item 1: one tool call yields at most one fact event, keyed by the call. */
+export const toolEventId = (caseId: string, takeoverId: string, callId: string): string => `${caseId}:tool:${takeoverId}:${callId}`;
+
+function sameFlow(f: FlowCtx, s: Pick<CaseState, "stage" | "disclosuresGiven" | "payment" | "confirmationNumber">): boolean {
+  return (
+    f.stage === (s.stage ?? null) &&
+    f.confirmationNumber === (s.confirmationNumber ?? null) &&
+    JSON.stringify(f.disclosuresGiven) === JSON.stringify(s.disclosuresGiven ?? []) &&
+    JSON.stringify(f.payment) === JSON.stringify(s.payment ?? null)
+  );
+}
 
 function conflictFor(state: CaseState, fields: FieldId[]): ConflictCard | null {
   for (const f of fields) {

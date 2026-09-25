@@ -27,6 +27,8 @@ import { cn } from "@/lib/utils";
 export interface MockPhoneExtraProps {
   /** API base (same origin by default). */
   base?: string;
+  /** The signed visitor token (POST /api/cases `visitorToken`) for cookie-less browsers; sent as `x-baton-visitor`. */
+  visitorToken?: string | null;
   /** Test seam. */
   client?: PaymentsClient;
   theme?: "light" | "dark";
@@ -48,8 +50,12 @@ export function MockPhone(props: MockPhoneProps & MockPhoneExtraProps) {
   const { events, paymentId, takeoverToken, variant, readOnly, autopilot, onState } = props;
   const tokenRef = React.useRef(takeoverToken);
   tokenRef.current = takeoverToken;
+  const visitorRef = React.useRef(props.visitorToken ?? null);
+  visitorRef.current = props.visitorToken ?? null;
   const client = React.useMemo(
-    () => props.client ?? createPaymentsClient({ token: () => tokenRef.current, ...(props.base !== undefined ? { base: props.base } : {}) }),
+    () =>
+      props.client ??
+      createPaymentsClient({ token: () => tokenRef.current, visitorToken: () => visitorRef.current, ...(props.base !== undefined ? { base: props.base } : {}) }),
     [props.client, props.base],
   );
   const [m, dispatch] = React.useReducer(phoneReducer, undefined, initialPhone);
