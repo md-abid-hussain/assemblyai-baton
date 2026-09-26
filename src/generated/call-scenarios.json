@@ -1,1 +1,293 @@
-{}
+{
+  "s01_sim_20260925T110000Z": {
+    "id": "s01",
+    "intent": "add_driver",
+    "title": "Add 17-year-old daughter Maya to the Civic (golden demo path)",
+    "language": "en",
+    "callDate": "2026-09-25",
+    "policy": {
+      "policyNumber": "NBM-4418207",
+      "carrier": "Northbeam Mutual",
+      "agencyName": "Harborview Insurance Agency",
+      "repFirstName": "Daniel",
+      "policyholder": {
+        "firstName": "Priya",
+        "lastName": "Raman"
+      },
+      "phoneOnFileLast4": "8207",
+      "address": {
+        "street": "1427 Belle Avenue",
+        "city": "Lakewood",
+        "state": "OH",
+        "zip": "44107"
+      },
+      "existingDrivers": [
+        {
+          "name": "Priya Raman",
+          "relation": "named_insured"
+        },
+        {
+          "name": "Arun Raman",
+          "relation": "spouse"
+        }
+      ],
+      "vehicles": [
+        {
+          "id": "veh1",
+          "year": 2021,
+          "make": "Honda",
+          "model": "Civic",
+          "label": "2021 Honda Civic"
+        },
+        {
+          "id": "veh2",
+          "year": 2018,
+          "make": "Toyota",
+          "model": "Highlander",
+          "label": "2018 Toyota Highlander"
+        }
+      ],
+      "currentMonthlyPremiumUsd": 96,
+      "callDate": "2026-09-25"
+    },
+    "truth": {
+      "driver_full_name": "maya raman",
+      "driver_dob": "2009-03-14",
+      "driver_age": "17",
+      "driver_relation": "child",
+      "license_state": "OH",
+      "license_status": "provisional",
+      "incidents_3y": "none",
+      "vehicle_assignment": "veh1",
+      "operator_type": "primary",
+      "garaging_zip": "44107",
+      "effective_date": "2026-10-02",
+      "good_student_discount": "eligible",
+      "coverage_change": "none - keeps current 50/100/50 liability limits",
+      "premium_new_monthly_usd": "142.00",
+      "premium_change_monthly_usd": "46.00"
+    },
+    "expectedAtHandoff": {
+      "driver_full_name": "VERIFIED",
+      "driver_dob": "VERIFIED",
+      "driver_age": "VERIFIED",
+      "driver_relation": "VERIFIED",
+      "license_state": "VERIFIED",
+      "license_status": "VERIFIED",
+      "incidents_3y": "VERIFIED",
+      "vehicle_assignment": "VERIFIED",
+      "operator_type": "VERIFIED",
+      "garaging_zip": "VERIFIED",
+      "effective_date": "VERIFIED",
+      "good_student_discount": "VERIFIED",
+      "coverage_change": "VERIFIED",
+      "premium_new_monthly_usd": "VERIFIED",
+      "premium_change_monthly_usd": "VERIFIED"
+    },
+    "plannedHandoffS": 95,
+    "handoffResponse": "accepts",
+    "rating": {
+      "newMonthlyUsd": 142,
+      "changeMonthlyUsd": 46,
+      "dueTodayUsd": 44.52
+    },
+    "traps": [
+      "Baseline: every required fact is VERIFIED, so the AI must re-ask nothing (re-asked = 0).",
+      "The AI opening should state Maya, the 2021 Civic, Friday October 2, 2026 and $142/month from case state only.",
+      "The liability increase was declined; the AI must not re-offer it (that is advice)."
+    ]
+  },
+  "s02_sim_20260925T110000Z": {
+    "id": "s02",
+    "intent": "add_driver",
+    "title": "Add 16-year-old son Lucas; start date blurted right before the hand-off",
+    "language": "en",
+    "callDate": "2026-09-25",
+    "policy": {
+      "policyNumber": "BSC-2290316",
+      "carrier": "Bluestem Casualty",
+      "agencyName": "Mesa Ridge Insurance Group",
+      "repFirstName": "Carmen",
+      "policyholder": {
+        "firstName": "Mark",
+        "lastName": "Delgado"
+      },
+      "phoneOnFileLast4": "0316",
+      "address": {
+        "street": "2240 East Quartz Street",
+        "city": "Mesa",
+        "state": "AZ",
+        "zip": "85213"
+      },
+      "existingDrivers": [
+        {
+          "name": "Mark Delgado",
+          "relation": "named_insured"
+        },
+        {
+          "name": "Elena Delgado",
+          "relation": "spouse"
+        }
+      ],
+      "vehicles": [
+        {
+          "id": "veh1",
+          "year": 2019,
+          "make": "Ford",
+          "model": "F-150",
+          "label": "2019 Ford F-150"
+        },
+        {
+          "id": "veh2",
+          "year": 2014,
+          "make": "Toyota",
+          "model": "Corolla",
+          "label": "2014 Toyota Corolla"
+        }
+      ],
+      "currentMonthlyPremiumUsd": 118,
+      "callDate": "2026-09-25"
+    },
+    "truth": {
+      "driver_full_name": "lucas delgado",
+      "driver_dob": "2010-06-02",
+      "driver_age": "16",
+      "driver_relation": "child",
+      "license_state": "AZ",
+      "license_status": "provisional",
+      "incidents_3y": "none",
+      "vehicle_assignment": "veh2",
+      "operator_type": "primary",
+      "garaging_zip": "85213",
+      "effective_date": "2026-09-26",
+      "driver_training_discount": "eligible",
+      "premium_new_monthly_usd": "171.00",
+      "premium_change_monthly_usd": "53.00"
+    },
+    "expectedAtHandoff": {
+      "driver_full_name": "VERIFIED",
+      "driver_dob": "VERIFIED",
+      "driver_age": "VERIFIED",
+      "driver_relation": "VERIFIED",
+      "license_state": "VERIFIED",
+      "license_status": "VERIFIED",
+      "incidents_3y": "VERIFIED",
+      "vehicle_assignment": "VERIFIED",
+      "operator_type": "VERIFIED",
+      "garaging_zip": "VERIFIED",
+      "effective_date": "PENDING",
+      "driver_training_discount": "VERIFIED",
+      "premium_new_monthly_usd": "VERIFIED",
+      "premium_change_monthly_usd": "VERIFIED"
+    },
+    "plannedHandoffS": 70,
+    "handoffResponse": "accepts",
+    "rating": {
+      "newMonthlyUsd": 171,
+      "changeMonthlyUsd": 53,
+      "dueTodayUsd": 8.83
+    },
+    "traps": [
+      "effective_date is PENDING ('tomorrow', said right before the hand-off): the AI must CONFIRM it, not ask from scratch, and resolve it to Saturday, September 26, 2026.",
+      "Everything else is VERIFIED: re-asked must be 0."
+    ]
+  },
+  "s03_sim_20260925T110000Z": {
+    "id": "s03",
+    "intent": "add_driver",
+    "title": "Add 19-year-old daughter Hannah; customer declines the AI and the rep finishes",
+    "language": "en",
+    "callDate": "2026-09-25",
+    "policy": {
+      "policyNumber": "SRI-7730158",
+      "carrier": "Summit Rock Insurance",
+      "agencyName": "Ironbridge Insurance Agency",
+      "repFirstName": "Marcus",
+      "policyholder": {
+        "firstName": "Janet",
+        "lastName": "Kowalski"
+      },
+      "phoneOnFileLast4": "0158",
+      "address": {
+        "street": "5816 Northumberland Street",
+        "city": "Pittsburgh",
+        "state": "PA",
+        "zip": "15217"
+      },
+      "existingDrivers": [
+        {
+          "name": "Janet Kowalski",
+          "relation": "named_insured"
+        },
+        {
+          "name": "Stan Kowalski",
+          "relation": "spouse"
+        }
+      ],
+      "vehicles": [
+        {
+          "id": "veh1",
+          "year": 2020,
+          "make": "Subaru",
+          "model": "Forester",
+          "label": "2020 Subaru Forester"
+        },
+        {
+          "id": "veh2",
+          "year": 2016,
+          "make": "Honda",
+          "model": "Accord",
+          "label": "2016 Honda Accord"
+        }
+      ],
+      "currentMonthlyPremiumUsd": 131,
+      "callDate": "2026-09-25"
+    },
+    "truth": {
+      "driver_full_name": "hannah kowalski",
+      "driver_dob": "2007-05-21",
+      "driver_age": "19",
+      "driver_relation": "child",
+      "license_state": "PA",
+      "license_status": "full",
+      "incidents_3y": "none",
+      "vehicle_assignment": "veh2",
+      "operator_type": "primary",
+      "garaging_zip": "15217",
+      "effective_date": "2026-09-28",
+      "good_student_discount": "not_eligible",
+      "premium_new_monthly_usd": "188.00",
+      "premium_change_monthly_usd": "57.00",
+      "amount_due_today_usd": "18.40"
+    },
+    "expectedAtHandoff": {
+      "driver_full_name": "VERIFIED",
+      "driver_dob": "VERIFIED",
+      "driver_age": "VERIFIED",
+      "driver_relation": "VERIFIED",
+      "license_state": "VERIFIED",
+      "license_status": "VERIFIED",
+      "incidents_3y": "VERIFIED",
+      "vehicle_assignment": "VERIFIED",
+      "operator_type": "VERIFIED",
+      "garaging_zip": "VERIFIED",
+      "effective_date": "VERIFIED",
+      "good_student_discount": "VERIFIED",
+      "premium_new_monthly_usd": "VERIFIED",
+      "premium_change_monthly_usd": "VERIFIED",
+      "amount_due_today_usd": "VERIFIED"
+    },
+    "plannedHandoffS": 85,
+    "handoffResponse": "declines",
+    "rating": {
+      "newMonthlyUsd": 188,
+      "changeMonthlyUsd": 57,
+      "dueTodayUsd": 18.4
+    },
+    "traps": [
+      "Declined hand-off: there is no AI takeover. Use as a full human-call baseline (tail share and after-call comparison).",
+      "For the takeover sweep before beat 15, all facts are VERIFIED: re-asked must be 0.",
+      "good_student_discount is not_eligible: the AI must not say a good-student discount applies."
+    ]
+  }
+}

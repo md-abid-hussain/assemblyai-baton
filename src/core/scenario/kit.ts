@@ -72,6 +72,24 @@ export const KitScenarioSchema = z
   .loose();
 export type KitScenario = z.infer<typeof KitScenarioSchema>;
 
+/**
+ * NOT a kit field: WP9 writes it on the takes it generates itself (`scenario/sim-take.ts`), so nothing downstream can
+ * mistake a generated call for a recording. A sidecar the recording kit wrote has no `provenance` key at all, which
+ * reads as "recorded".
+ */
+export const SidecarProvenanceSchema = z
+  .object({
+    kind: z.literal("simulated"),
+    /** The provenance strip's detail line (PLATFORM §7.5.3, §7.6). */
+    detail: z.string(),
+    script_model: z.string(),
+    tts_model: z.string(),
+    voices: z.object({ rep: z.string(), customer: z.string() }),
+    generated_at: z.string(),
+  })
+  .loose();
+export type SidecarProvenance = z.infer<typeof SidecarProvenanceSchema>;
+
 /** data/calls/raw/<base>.json (kit `Sidecar`, sidecar_version 1). */
 export const KitSidecarSchema = z
   .object({
@@ -79,6 +97,8 @@ export const KitSidecarSchema = z
     sidecar_version: z.number(),
     base: z.string().min(1),
     state: z.enum(["call_placed", "call_ended_no_recording", "downloaded"]),
+    /** Absent on every recording-kit sidecar; see SidecarProvenanceSchema. */
+    provenance: SidecarProvenanceSchema.optional(),
     scenario: z.object({ id: z.string(), title: z.string(), language: z.string(), file: z.string(), sha256: z.string() }).loose().nullable(),
     take: z.number().int(),
     review: z
@@ -152,6 +172,9 @@ export function parseKit<T>(schema: z.ZodType<T>, data: unknown, label: string):
   const issues = r.error.issues.slice(0, 5).map((i) => `${i.path.join(".") || "(root)"}: ${i.message}`);
   throw new Error(`${label}: not a valid kit file (${issues.join("; ")})`);
 }
+
+/** True for a take WP9 generated (`sim-take.ts`); false for anything the recording kit wrote. */
+export const isSimulatedTake = (sc: Pick<KitSidecar, "provenance">): boolean => sc.provenance?.kind === "simulated";
 
 /** The kit's MONO warning (sidecar.ts splitRecording): Twilio stored a mixed recording. */
 export const isMonoWarning = (w: string): boolean => /recording is MONO/i.test(w);

@@ -29,7 +29,7 @@ import { caseStateJson, compilePrompt, PROMPT_VERSION } from "../../src/core/com
 import { inputModeFor, nextStage, nextStepOf, vaSessionCapMs, DEFAULT_VA_CAP_ENV } from "../../src/core/compiler/stages";
 import { toolsForStage } from "../../src/core/compiler/tool-schemas";
 import { askPhrase, confirmPhrase, displayValue, normalizeField, spokenForms } from "../../src/core/intents/add-driver";
-import { FIELD_IDS, FIELD_KIND } from "../../src/core/intents/add-driver.fields";
+import { FIELD_IDS, fieldKindOf } from "../../src/core/intents/add-driver.fields";
 import {
   compactFields, namedSnapshots, normalizeInputs, policyOf, randomSnapshots, ratingOf, ROOT, SCENARIO_IDS, stateOf, truthOf,
   type NamedSnapshot,
@@ -101,8 +101,8 @@ function phrases() {
   const withName = stateOf(policy, { driver_full_name: { status: "VERIFIED", value: "maya raman" }, vehicle_assignment: { status: "VERIFIED", value: "veh1" } }, "case_phr_a");
   const noName = stateOf(policy, {}, "case_phr_b");
   const valuesOf = (f: FieldId): string[] => {
-    const k = FIELD_KIND[f];
-    if (k.t === "enum") return [...k.values];
+    const k = fieldKindOf(f);
+    if (k?.t === "enum") return [...k.values];
     if (f === "vehicle_assignment") return ["veh1", "veh2", "all"];
     if (f === "incidents_3y") return ["none", "one speeding ticket, March 2025"];
     if (f === "license_number") return ["RM123456"];

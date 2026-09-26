@@ -56,15 +56,15 @@ describe("scenario fixtures reproduce expectedAtHandoff (s01, s02, s05)", () => 
       const seqd = events.map((e, i) => ({ ...e, seq: i + 1 }));
       const st = deriveCaseState(policy, seqd, { caseId: `case_${id}` });
       const expected = expectedAtHandoff(id);
-      const got = Object.fromEntries(Object.keys(expected).map((f) => [f, st.fields[f as FieldId].status]));
+      const got = Object.fromEntries(Object.keys(expected).map((f) => [f, st.fields[f]!.status]));
       expect(got).toEqual(expected);
       // Values agree with the kit truth for every non-MISSING fact.
       const intended = handoffStateOf(id);
       for (const f of Object.keys(expected) as FieldId[]) {
-        if (expected[f] !== "MISSING") expect(st.fields[f].value, f).toBe(intended.fields[f].value);
+        if (expected[f] !== "MISSING") expect(st.fields[f]!.value, f).toBe(intended.fields[f]!.value);
       }
       // Evidence is word-aligned inside the source turn.
-      for (const f of Object.keys(expected) as FieldId[]) for (const e of st.fields[f].evidence) expect(e.endMs).toBeGreaterThan(e.startMs);
+      for (const f of Object.keys(expected) as FieldId[]) for (const e of st.fields[f]!.evidence) expect(e.endMs).toBeGreaterThan(e.startMs);
       // Same greeting as the designer's intended state, and a valid first update in both initial stages.
       expect(compileGreeting(st, policy).text).toBe(compileGreeting(intended, policy).text);
       for (const stage of ["confirm", "disclose"] as const) {
@@ -81,7 +81,7 @@ describe("scenario fixtures reproduce expectedAtHandoff (s01, s02, s05)", () => 
       const policy = policyOf(id);
       const st = deriveCaseState(policy, synthCall(id).events.map((e, i) => ({ ...e, seq: i + 1 })), { caseId: id });
       for (const [f, want] of Object.entries(expectedAtHandoff(id)) as [FieldId, string][]) {
-        if (st.fields[f].status !== want) bad.push(`${id}.${f}: ${st.fields[f].status}/${st.fields[f].reason} ≠ ${want}`);
+        if (st.fields[f]!.status !== want) bad.push(`${id}.${f}: ${st.fields[f]!.status}/${st.fields[f]!.reason} ≠ ${want}`);
       }
     }
     expect(bad).toEqual([]);

@@ -1,0 +1,109 @@
+{
+  "kit": "baton-recording-kit",
+  "sidecar_version": 1,
+  "base": "s03_sim_20260925T110000Z",
+  "created_at": "2026-09-25T11:00:00.000Z",
+  "updated_at": "2026-09-25T11:00:00.000Z",
+  "state": "downloaded",
+  "provenance": {
+    "kind": "simulated",
+    "detail": "Simulated audio: script by gpt-6-luna, voices by gpt-4o-mini-tts. Fictional people.",
+    "script_model": "gpt-6-luna",
+    "tts_model": "gpt-4o-mini-tts-2025-12-15",
+    "voices": {
+      "rep": "cedar",
+      "customer": "marin"
+    },
+    "generated_at": "2026-09-25T11:00:00.000Z",
+    "replaced_by_real_takes": true
+  },
+  "scenario": {
+    "id": "s03",
+    "title": "Add 19-year-old daughter Hannah; customer declines the AI and the rep finishes",
+    "language": "en",
+    "file": "data/scenarios/s03.json",
+    "sha256": "445966e897c6aef0df5e5bfc28908d9c864d2a199a801f1a396e8c6e15728cc3"
+  },
+  "take": 1,
+  "review": {
+    "status": "keep",
+    "notes": [
+      "SIMULATED take: no human was recorded.",
+      "Simulated audio: script by gpt-6-luna, voices by gpt-4o-mini-tts. Fictional people.",
+      "It is a stand-in for the flagship path and is dropped automatically as soon as a real take of this scenario exists."
+    ],
+    "fact_overrides": {},
+    "status_overrides": {}
+  },
+  "channel_map": {
+    "1": "rep",
+    "2": "customer"
+  },
+  "dialed_first": "rep",
+  "participants": {
+    "rep": {
+      "key": "simulated-rep",
+      "display_name": "Marcus Bell",
+      "phone_masked": null,
+      "consent": {
+        "recording": true,
+        "scope": "public"
+      },
+      "voice": "cedar"
+    },
+    "customer": {
+      "key": "simulated-customer",
+      "display_name": "Janet Kowalski",
+      "phone_masked": null,
+      "consent": {
+        "recording": true,
+        "scope": "public"
+      },
+      "voice": "marin"
+    }
+  },
+  "consent": {
+    "all_recording_consent": true,
+    "publishable": true
+  },
+  "twilio": {
+    "call_sid": null,
+    "from_masked": null,
+    "call_status": null,
+    "recording_sid": null,
+    "recording_status": null,
+    "recording_duration_s": 154.5,
+    "recording_channels": 2,
+    "recording_source": "simulated"
+  },
+  "files": {
+    "stereo": "data/sim-takes/raw/s03_sim_20260925T110000Z.wav",
+    "rep": "data/sim-takes/split/s03_sim_20260925T110000Z_rep.wav",
+    "customer": "data/sim-takes/split/s03_sim_20260925T110000Z_customer.wav"
+  },
+  "audio": {
+    "source_sample_rate": 24000,
+    "source_channels": 2,
+    "source_format": "PCM 16-bit",
+    "output_sample_rate": 8000,
+    "duration_s": 154.5,
+    "channels": {
+      "rep": {
+        "rms_dbfs": -25.8,
+        "peak_dbfs": -3,
+        "active_ratio": null,
+        "first_active_s": null,
+        "clipped_ratio": 0
+      },
+      "customer": {
+        "rms_dbfs": -25.7,
+        "peak_dbfs": -3,
+        "active_ratio": null,
+        "first_active_s": null,
+        "clipped_ratio": 0
+      }
+    },
+    "overlap_ratio": 0,
+    "warnings": []
+  }
+}

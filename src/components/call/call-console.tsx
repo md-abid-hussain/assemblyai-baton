@@ -21,10 +21,11 @@ import { useMinWidth } from "../common/console-context";
 import { CallTimeline } from "./call-timeline";
 import { ControlPanelBody, PassButton } from "./control-panel";
 import { DockedPhone, FloatingPhone } from "./phone-dock";
+import { ProvenanceStrip } from "./provenance-strip";
 import {
   AudioLockedOverlay, CallEndedCard, ConnectingCard, HandBackCard, PausedOverlay, PreflightCard, QaSheet, QueuedCard, RecordedAiNote,
 } from "./state-cards";
-import { Banners, NarratorStrip, ProvenanceBanner, TopBar } from "./top-bar";
+import { Banners, NarratorStrip, TopBar } from "./top-bar";
 import { TranscriptLanes } from "./transcript-lanes";
 
 export function ControlColumn({ showDockedPhone }: { showDockedPhone: boolean }) {
@@ -171,7 +172,7 @@ export function CallConsole() {
       <div className={cn("bt-console flex min-h-dvh flex-col", !isMobile && "h-dvh")}>
         <TopBar />
         <NarratorStrip />
-        <ProvenanceBanner />
+        <ProvenanceStrip />
         <Banners />
         {isMobile ? (
           <MobileConsole />

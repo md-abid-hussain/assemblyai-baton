@@ -17,7 +17,7 @@ import { deinterleave, downmixToMono, interleave } from "../../src/core/audio/pc
 import { resampleLinear } from "../../src/core/audio/resample";
 import { decodeWav, encodeWav } from "../../src/core/audio/wav-decode";
 import type { KitSidecar } from "../../src/core/scenario/kit";
-import { mainCheckoutOf, parseFlags, REPO_ROOT, str } from "./lib/kit-io";
+import { assertNotRecordingKitDir, parseFlags, REPO_ROOT, str } from "./lib/kit-io";
 
 export const SYNTHETIC_SOURCE = join(REPO_ROOT, "spikes", "fixtures", "dialog_stereo_16k.wav");
 
@@ -41,8 +41,7 @@ const compactUtc = (iso: string): string => new Date(iso).toISOString().replace(
 
 /** Write one synthetic take (+ refresh manifest.json) into `callsDir`. Returns its sidecar. */
 export function writeSyntheticTake(callsDir: string, o: SyntheticTakeOptions = {}): KitSidecar {
-  const real = resolve(mainCheckoutOf(REPO_ROOT), "data", "calls");
-  if (resolve(callsDir) === real) throw new Error("refusing to write a synthetic take into the real data/calls");
+  assertNotRecordingKitDir(callsDir, "a synthetic take");
   const scenarioId = o.scenarioId ?? "s01";
   const take = o.take ?? 1;
   const at = o.at ?? `2026-09-25T04:${String(30 + take).padStart(2, "0")}:00.000Z`;

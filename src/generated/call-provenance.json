@@ -1,0 +1,35 @@
+{
+  "s01_sim_20260925T110000Z": {
+    "humanHalf": "simulated",
+    "detail": "Simulated audio: script by gpt-6-luna, voices by gpt-4o-mini-tts. Fictional people.",
+    "scriptModel": "gpt-6-luna",
+    "ttsModel": "gpt-4o-mini-tts-2025-12-15",
+    "voices": {
+      "rep": "cedar",
+      "customer": "marin"
+    },
+    "generatedAt": "2026-09-25T11:00:00.000Z"
+  },
+  "s02_sim_20260925T110000Z": {
+    "humanHalf": "simulated",
+    "detail": "Simulated audio: script by gpt-6-luna, voices by gpt-4o-mini-tts. Fictional people.",
+    "scriptModel": "gpt-6-luna",
+    "ttsModel": "gpt-4o-mini-tts-2025-12-15",
+    "voices": {
+      "rep": "cedar",
+      "customer": "marin"
+    },
+    "generatedAt": "2026-09-25T11:00:00.000Z"
+  },
+  "s03_sim_20260925T110000Z": {
+    "humanHalf": "simulated",
+    "detail": "Simulated audio: script by gpt-6-luna, voices by gpt-4o-mini-tts. Fictional people.",
+    "scriptModel": "gpt-6-luna",
+    "ttsModel": "gpt-4o-mini-tts-2025-12-15",
+    "voices": {
+      "rep": "cedar",
+      "customer": "marin"
+    },
+    "generatedAt": "2026-09-25T11:00:00.000Z"
+  }
+}

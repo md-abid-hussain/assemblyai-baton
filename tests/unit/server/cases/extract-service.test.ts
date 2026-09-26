@@ -41,12 +41,12 @@ describe.skipIf(!HAS_DB)("ExtractService (F1) on Postgres", () => {
     expect(r.events.map((e) => e.field)).toEqual(["driver_full_name", "driver_dob", "driver_age"]);
     expect(r.events.map((e) => e.seq)).toEqual([1, 2, 3]);
     expect(r.state.version).toBe(1);
-    expect(r.state.fields.driver_dob.status).toBe("PENDING");
+    expect(r.state.fields.driver_dob?.status).toBe("PENDING");
     const turn = await h.repo.getTurn(caseId, "customer-1");
     expect(turn?.extractStatus).toBe("done");
     // readback by the other party verifies it
     const r2 = await h.service.handle(turnOf(caseId, dialog.turns[4]!));
-    expect(r2.state.fields.driver_dob.status).toBe("VERIFIED");
+    expect(r2.state.fields.driver_dob?.status).toBe("VERIFIED");
     expect(r2.state.version).toBe(2);
   });
 
@@ -194,13 +194,13 @@ describe.skipIf(!HAS_DB)("ExtractService (F1) on Postgres", () => {
     const caseId = await newCase(h, { callId: null });
     for (const f of dialog.turns.slice(0, 7)) await h.service.handle(turnOf(caseId, f)); // up to rep-3 (ends 44700)
     const before = (await h.repo.loadRow(caseId))!.state;
-    expect(before.fields.license_state.status).toBe("VERIFIED"); // customer-2 stated, rep-3 read back
+    expect(before.fields.license_state?.status).toBe("VERIFIED"); // customer-2 stated, rep-3 read back
     const { snap } = await armAndFreeze(t, h, caseId, { tArmMs: 40_000, cutTurnIds: ["rep-3"] });
     const rep3 = await h.repo.getTurn(caseId, "rep-3");
     expect(rep3?.late).toBe(true);
     expect(rep3?.cut).toBe(true);
     expect((await h.repo.getTurn(caseId, "customer-2"))?.late).toBe(false);
-    expect(snap.fields.license_state.status).toBe("PENDING");
-    expect(snap.fields.driver_dob.status).toBe("VERIFIED");
+    expect(snap.fields.license_state?.status).toBe("PENDING");
+    expect(snap.fields.driver_dob?.status).toBe("VERIFIED");
   });
 });

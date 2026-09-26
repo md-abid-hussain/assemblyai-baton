@@ -4,6 +4,9 @@
  * or any private path (.env, participants.json, raw call audio, private research) appears in the files changed
  * in a git range. Never prints secret values, only variable names and file paths.
  *   node scripts/ci/secret-scan.mjs origin/main..HEAD
+ *
+ * Key-shaped strings are allowed only on lines explicitly marked as fake test fixtures with the comment
+ * "secret-scan:allow-fake". Real .env values are always checked, marker or not.
  */
 import fs from "node:fs";
 import { execSync } from "node:child_process";
@@ -17,15 +20,18 @@ const env = envText.split(/\r?\n/)
 const files = execSync(`git diff --name-only --diff-filter=AMR ${range}`, { encoding: "utf8" }).trim().split("\n").filter(Boolean);
 const keyPattern = /(sk-(proj|svcacct|admin)-[A-Za-z0-9_-]{20,})|(AC[0-9a-f]{32})|(polar_(oat|pat)_[A-Za-z0-9]{10,})/;
 const forbidden = /(^|\/)\.env$|participants\.json$|^data\/calls\/(raw|split)\/|^research\/(?!10)/;
+const binary = /\.(wav|mulaw|png|jpg|pdf|mp4|ogg|mp3|webm)$/;
 let hits = 0;
 for (const f of files) {
   if (forbidden.test(f)) { console.log(`FORBIDDEN PATH: ${f}`); hits++; continue; }
   let buf; try { buf = fs.readFileSync(f); } catch { continue; }
   const latin = buf.toString("latin1");
   for (const [k, v] of env) if (latin.includes(v)) { console.log(`LEAK: value of ${k} found in ${f}`); hits++; }
-  if (!/\.(wav|mulaw|png|jpg|pdf|mp4|ogg|mp3|webm)$/.test(f)) {
-    const m = buf.toString("utf8").match(keyPattern);
-    if (m) { console.log(`KEY-SHAPED STRING in ${f} (${m[0].slice(0, 8)}…)`); hits++; }
+  if (binary.test(f)) continue;
+  for (const line of buf.toString("utf8").split(/\r?\n/)) {
+    if (line.includes("secret-scan:allow-fake")) continue;
+    const m = line.match(keyPattern);
+    if (m) { console.log(`KEY-SHAPED STRING in ${f} (${m[0].slice(0, 8)}…)`); hits++; break; }
   }
 }
 console.log(`secret-scan: ${files.length} files in ${range}, ${env.length} secret values checked, hits=${hits}`);

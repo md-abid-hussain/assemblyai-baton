@@ -31,6 +31,7 @@ import type { ErrorCode } from "@/core/contracts/errors";
 import type { CallManifestEntry } from "@/core/contracts/scenario";
 import type { CallTick, CaseSync, EventSink, SttChannelManager } from "@/core/contracts/services";
 import { turnIdOf, type TurnInput } from "@/core/contracts/turns";
+import type { CompiledListening } from "@/core/contracts/v2/relay";
 import type { CachedReplay } from "../replay/cached-replay";
 import type { SttApi } from "./api";
 
@@ -119,6 +120,10 @@ export interface SttMetrics {
 
 const emptyPair = <T>(f: () => T): Record<Channel, T> => ({ rep: f(), customer: f() });
 
+/** `keyterms_prompt` limits (DESIGN §5.1.5): at most 100 unique terms, each at most 50 characters. */
+const STT_KEYTERMS_MAX = 100;
+const STT_KEYTERM_MAX_CHARS = 50;
+
 export class LiveSttChannelManager implements SttChannelManager {
   private readonly o: SttManagerOptions;
   private readonly connectFn: SttConnect;
@@ -128,6 +133,7 @@ export class LiveSttChannelManager implements SttChannelManager {
   private caseId = "";
   private ctxCarry: "none" | "last_rep_turn" = "last_rep_turn";
   private params: Record<Channel, StreamingParams> | null = null;
+  private listening: CompiledListening | null = null;
   private lastRepFinal: string | null = null;
   private lastCallMs = 0;
   private ticket: string | null = null;
@@ -210,8 +216,16 @@ export class LiveSttChannelManager implements SttChannelManager {
   async open(p: {
     caseId: string; caseToken: string; runId: string; call: CallManifestEntry; policy: PolicyRecord; startOffsetMs: number;
     ctxCarry: "none" | "last_rep_turn"; seedAgentContext?: string;
+    /**
+     * The relay's compiled listening (`CreateCaseResponseV2.listening`, PLATFORM §4.1): its scenario prompt and
+     * keyterms, merged over the ones route #5 returns, so a relay other than the flagship is transcribed with its
+     * own vocabulary. The server stays authoritative for the model, encoding, languages and the limits
+     * (≤ 100 terms, ≤ 50 chars each, DESIGN §5.1.5); omitted → the server's params are used unchanged.
+     */
+    listening?: CompiledListening | null;
   }): Promise<"live" | "queued" | "denied"> {
     this.call = p.call;
+    this.listening = p.listening ?? null;
     this.runId = p.runId;
     this.caseId = p.caseId;
     this.ctxCarry = p.ctxCarry;
@@ -224,6 +238,25 @@ export class LiveSttChannelManager implements SttChannelManager {
     }
     const resp = await this.o.api.token({ caseId: p.caseId, runId: p.runId, n: 2 });
     return this.onTokenResponse(resp, CHANNELS, false);
+  }
+
+  /**
+   * Route #5's params with this relay's listening laid over them: its scenario prompt, and its keyterms first (the
+   * server's policy terms follow, deduped case-insensitively, within DESIGN §5.1.5's 100 × 50 chars).
+   */
+  private withListening(base: StreamingParams): StreamingParams {
+    const l = this.listening;
+    if (!l) return base;
+    const seen = new Set<string>();
+    const terms: string[] = [];
+    for (const term of [...l.keyterms, ...(base.keyterms_prompt ?? [])]) {
+      const v = term.trim().slice(0, STT_KEYTERM_MAX_CHARS);
+      if (!v || seen.has(v.toLowerCase())) continue;
+      seen.add(v.toLowerCase());
+      terms.push(v);
+      if (terms.length >= STT_KEYTERMS_MAX) break;
+    }
+    return { ...base, ...(l.prompt ? { prompt: l.prompt } : {}), keyterms_prompt: terms };
   }
 
   private newBatcher(): FrameBatcher {
@@ -265,7 +298,7 @@ export class LiveSttChannelManager implements SttChannelManager {
 
   private async connectChannel(ch: Channel, token: string, liveId: string | null, reconnect: boolean): Promise<boolean> {
     const c = this.chs[ch];
-    const base = this.params![ch];
+    const base = this.withListening(this.params![ch]);
     const seed = ch === "customer" && this.ctxCarry === "last_rep_turn" && this.lastRepFinal ? { agent_context: this.lastRepFinal } : {};
     const params: StreamingParams = { ...base, ...seed };
     c.liveId = liveId;

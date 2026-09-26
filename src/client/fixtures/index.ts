@@ -6,6 +6,7 @@ import "client-only";
 
 import type { UiLogEntry, UiPhase } from "@/core/contracts/ext/wp7-ui";
 
+import { buildDental } from "./dental";
 import { buildS01 } from "./s01";
 
 export interface FixtureDef {
@@ -82,6 +83,24 @@ export const FIXTURES: readonly FixtureDef[] = [
     title: "s01 recording ends without a baton pass",
     reaches: ["shadowing"],
     build: () => buildS01({ pass: { kind: "none" } }),
+  },
+  {
+    name: "s01-sim",
+    title: "s01 on a SIMULATED take (TTS voices): the provenance strip reads SIMULATED, and so does the QA card",
+    reaches: ["preflight", "shadowing", "ai-speaking", "paying", "completed"],
+    build: () => buildS01({ humanHalf: "simulated", pass: { kind: "manual", atMs: 110_000 } }),
+  },
+  {
+    name: "dental-deposit",
+    title: "Dental · booking deposit (a second relay): its own fields, stages and deposit phone, from its UiSpec",
+    reaches: ["preflight", "shadowing", "arming", "ai-speaking", "ai-thinking", "paying", "completed"],
+    build: () => buildDental(),
+  },
+  {
+    name: "dental-shadowing",
+    title: "Dental · the human half only: four dental facts in the case card, grouped as the relay groups them",
+    reaches: ["preflight", "shadowing"],
+    build: () => buildDental({ stopAtMs: 40_000 }),
   },
   {
     name: "s01-qa-failed",

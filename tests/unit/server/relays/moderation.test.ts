@@ -53,12 +53,12 @@ describe("OpenAIModerator", () => {
   it("one request with the pinned model, $0 reserve → settle, not flagged", async () => {
     const { client, requests } = fakeClient(clean);
     const { ledger, log } = fakeLedger();
-    const m = new OpenAIModerator({ client: () => client, ledger: () => ledger, env: () => "dev-wp14b" });
+    const m = new OpenAIModerator({ client: () => client, ledger: () => ledger, env: () => "test-wp14b-env" });
     expect(await m.check("Hello there\nWe take a deposit", { refId: "rv_1" })).toEqual({ flagged: false, categories: [] });
     expect(requests).toHaveLength(1);
     expect(requests[0]!.body).toEqual({ model: MODERATION_MODEL, input: ["Hello there\nWe take a deposit"] });
     expect(requests[0]!.opts).toMatchObject({ maxRetries: 0 });
-    expect(log).toEqual(["reserve:openai:moderation:rv_1:0:dev-wp14b", "settle:led_1:0"]);
+    expect(log).toEqual(["reserve:openai:moderation:rv_1:0:test-wp14b-env", "settle:led_1:0"]);
   });
 
   it("flagged: the union of flagged categories, sorted; a flag without categories is 'unspecified'", async () => {

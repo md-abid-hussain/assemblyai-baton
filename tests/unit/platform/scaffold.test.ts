@@ -16,8 +16,11 @@ describe("initial migration (DESIGN §4.2)", () => {
   const journal = JSON.parse(readFileSync(join(ROOT, "drizzle", "meta", "_journal.json"), "utf8")) as { entries: { tag: string }[] };
 
   it("is ONE migration that creates every table", () => {
-    // WP14b: 0001_relays (PLATFORM §2.4) is the one additive migration after the initial one.
-    expect(journal.entries.map((e) => e.tag)).toEqual(["0000_init", "0001_relays"]);
+    // WP14b: 0001_relays (PLATFORM §2.4) is additive on top of the initial one.
+    // WP19: 0002_saas (SAAS §2.7, the Better Auth + SaaS tables and the org columns) and 0003_audit_guard (the
+    // append-only trigger on `audit_log`) are additive on top of that. TASKS-v3 §2 rule 14 — no other WP adds one,
+    // so this list is the whole journal and a fork in it fails here.
+    expect(journal.entries.map((e) => e.tag)).toEqual(["0000_init", "0001_relays", "0002_saas", "0003_audit_guard"]);
     for (const t of ALL_TABLES) expect(sql).toContain(`CREATE TABLE "${t}"`);
     expect((sql.match(/CREATE TABLE/g) ?? []).length).toBe(ALL_TABLES.length);
   });

@@ -1,0 +1,13 @@
+{
+  "callId": "s02_sim_20260925T110000Z",
+  "reviewed": false,
+  "mentions": [],
+  "handoff": {
+    "lineStartMs": 84512,
+    "lineEndMs": 88617,
+    "acceptStartMs": 88947,
+    "acceptEndMs": 90237
+  },
+  "diagnosisEndsMs": null,
+  "tailStartsMs": 90237
+}

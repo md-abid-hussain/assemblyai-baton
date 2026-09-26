@@ -15,6 +15,20 @@
       "when": 1790313391855,
       "tag": "0001_relays",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790353425691,
+      "tag": "0002_saas",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1790353436027,
+      "tag": "0003_audit_guard",
+      "breakpoints": true
     }
   ]
 }

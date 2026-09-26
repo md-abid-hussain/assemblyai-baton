@@ -7,13 +7,13 @@ import type { TurnInput } from "../../../src/core/contracts/turns";
 import { activityFromPeaks, computePeaks } from "../../../src/core/scenario/peaks";
 import { planCalls, type PlannedCall } from "../../../src/core/scenario/build";
 import { isCompleteCache, monoTurnInputs, perChannelTurnInputs } from "../../../src/core/scenario/stt-cache";
-import { loadKit, PILOT_SCENARIOS, readLabels, readSplit, readSttCache, type PipelinePaths } from "../../calls/lib/kit-io";
+import { loadKit, PILOT_SCENARIOS, readLabels, readSplit, readSttCache, takeDirOf, type PipelinePaths } from "../../calls/lib/kit-io";
 
 /** The usable takes (plan) with their labels, from the kit + WP9 data. */
 export function planFromKit(paths: PipelinePaths): PlannedCall[] {
   const kit = loadKit(paths);
   const takes = kit.sidecars.filter((s) => s.state === "downloaded").flatMap((sc) => {
-    const pcm = readSplit(paths.callsDir, sc.base);
+    const pcm = readSplit(takeDirOf(paths, sc), sc.base);
     if (!pcm) return [];
     let labels = null;
     try {
@@ -39,7 +39,7 @@ export function cachedTurns(paths: PipelinePaths, callId: string, variant: SttVa
   const records = readSttCache(paths.dataRoot, callId, variant);
   if (!records || !isCompleteCache(records, variant)) return null;
   if (variant !== "mono_diar") return perChannelTurnInputs(records, caseId);
-  const pcm = readSplit(paths.callsDir, callId);
+  const pcm = readSplit(paths.callsDir, callId) ?? readSplit(paths.simTakesDir, callId);
   if (!pcm) throw new Error(`${callId}: mono_diar attribution needs the split WAVs`);
   const activity = { rep: activityFromPeaks(computePeaks(pcm.rep, pcm.sampleRate)), customer: activityFromPeaks(computePeaks(pcm.customer, pcm.sampleRate)) };
   return monoTurnInputs(records, activity, caseId).turns;

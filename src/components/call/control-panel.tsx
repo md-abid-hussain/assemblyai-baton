@@ -13,8 +13,7 @@ import { Switch as SwitchPrimitive } from "radix-ui";
 import { useBaton, shallowEqual } from "@/client/store/hooks";
 import { isTerminalPayment } from "@/client/store/reduce";
 import {
-  formatDuration, formatMmSs, isRecordedAi, names, passEstimate, passState, protocolActive, protocolSteps, STAGE_LABEL,
-  stageTracker,
+  formatDuration, formatMmSs, isRecordedAi, names, passEstimate, passState, protocolActive, protocolSteps, stageTracker,
 } from "@/client/store/selectors";
 import type { ToolRailItem } from "@/core/contracts/ext/wp7-ui";
 import type { Suggestion } from "@/core/contracts/services";
@@ -74,8 +73,7 @@ export function PassButton({ compact = false }: { compact?: boolean }) {
 
 function PassSection() {
   const actions = useActions();
-  const cs = useBaton((s) => s.caseState);
-  const est = passEstimate(cs);
+  const est = useBaton(passEstimate, (a, b) => a.text === b.text);
   const st = useBaton(passState, shallowEqual);
   const handoff = useBaton((s) => s.context?.handoff ?? null);
   const rep = useBaton((s) => names(s).rep);
@@ -155,18 +153,18 @@ export function ProtocolStepper() {
 // ------------------------------------------------------------------------------------------------ AI half
 
 function StageTracker() {
-  const stages = useBaton(stageTracker, (a, b) => a.every((x, i) => x.status === b[i]?.status));
+  const stages = useBaton(stageTracker, (a, b) => a.length === b.length && a.every((x, i) => x.status === b[i]?.status && x.label === b[i]?.label));
   return (
     <div>
       <Eyebrow as="h3" className="mb-2">
         Stage
       </Eyebrow>
-      <ol className="grid grid-cols-4 gap-1" aria-label="AI stages">
+      <ol className="grid gap-1" style={{ gridTemplateColumns: `repeat(${Math.max(1, stages.length)}, minmax(0, 1fr))` }} aria-label="AI stages">
         {stages.map((st) => (
           <li key={st.stage} aria-current={st.status === "active" ? "step" : undefined}>
             <div className={cn("h-1.5 rounded-full", st.status === "done" ? "bg-(--ai)" : st.status === "active" ? "bg-(--ai)/55" : "bg-(--bt-line)")} />
             <div className={cn("bt-display mt-1 text-center text-xs font-semibold", st.status === "pending" ? "text-(--bt-faint)" : "text-(--bt-ink)")}>
-              {STAGE_LABEL[st.stage]}
+              {st.label}
               <span className="sr-only"> ({st.status})</span>
             </div>
           </li>

@@ -5,6 +5,10 @@
  *   --calls-dir / BATON_CALLS_DIR        kit output (manifest.json, raw/*.json, split/*.wav). READ-ONLY.
  *                                        Default: <main checkout>/data/calls (a worktree under .wt/ reads the main
  *                                        checkout's recordings, because data/calls is git-ignored).
+ *   --sim-takes-dir / BATON_SIM_TAKES_DIR  the same layout, holding takes WP9 GENERATED (scenario/sim-take.ts).
+ *                                        Default: <repo>/data/sim-takes (committed: nobody's voice is in it).
+ *                                        A simulated take is used only for a scenario with no usable real take, so
+ *                                        the real recordings take over by themselves the moment the kit writes them.
  *   --scenarios-dir / BATON_SCENARIOS_DIR  kit scenarios (data/scenarios/sNN.json). Default: <repo>/data/scenarios.
  *   --out / BATON_OUT_ROOT               where src/generated, public/calls, public/data/cached-turns go. Default: <repo>.
  *   --data-root / BATON_DATA_ROOT        where data/{labels,cache} live. Default: <repo>.
@@ -19,7 +23,7 @@ import { deinterleave } from "../../../src/core/audio/pcm";
 import type { SttCacheRecord, SttVariant } from "../../../src/core/contracts/eval";
 import { CallLabelsSchema, type CallLabels } from "../../../src/core/contracts/scenario";
 import type { ChannelPcm } from "../../../src/core/scenario/assets";
-import { KitManifestSchema, KitScenarioSchema, KitSidecarSchema, parseKit, type KitScenario, type KitSidecar } from "../../../src/core/scenario/kit";
+import { isSimulatedTake, KitManifestSchema, KitScenarioSchema, KitSidecarSchema, parseKit, type KitScenario, type KitSidecar } from "../../../src/core/scenario/kit";
 import { parseSttCacheJsonl } from "../../../src/core/scenario/stt-cache";
 
 /** The 5 pilot takes (TASKS WP9 acceptance 3): the chosen takes of these scenarios (override: BATON_PILOT=s01,s02,…). */
@@ -33,9 +37,22 @@ export function mainCheckoutOf(repoRoot: string): string {
   return m ? m[1]! : repoRoot;
 }
 
+/** Any `.../data/calls`, in this checkout or another one. */
+export const isRecordingKitDir = (dir: string): boolean => /(^|[\\/])data[\\/]calls[\\/]?$/i.test(resolve(dir));
+
+/**
+ * `data/calls` belongs to the recording kit and holds real people's voices: no Baton script ever writes into it
+ * (DESIGN §3.1). The check is on the shape of the path, not on one known location, because a worktree, a temp dir
+ * and the main checkout each have their own.
+ */
+export function assertNotRecordingKitDir(dir: string, what: string): void {
+  if (isRecordingKitDir(dir)) throw new Error(`refusing to write ${what} into data/calls (the recording kit's own directory): ${resolve(dir)}`);
+}
+
 export interface PipelinePaths {
   repoRoot: string;
   callsDir: string;
+  simTakesDir: string;
   scenariosDir: string;
   outRoot: string;
   dataRoot: string;
@@ -43,6 +60,7 @@ export interface PipelinePaths {
 
 export interface PathOptions {
   callsDir?: string | undefined;
+  simTakesDir?: string | undefined;
   scenariosDir?: string | undefined;
   outRoot?: string | undefined;
   dataRoot?: string | undefined;
@@ -55,6 +73,7 @@ export function resolvePaths(o: PathOptions = {}, env: Readonly<Record<string, s
   return {
     repoRoot,
     callsDir: pick(o.callsDir, "BATON_CALLS_DIR", join(mainCheckoutOf(repoRoot), "data", "calls")),
+    simTakesDir: pick(o.simTakesDir, "BATON_SIM_TAKES_DIR", join(repoRoot, "data", "sim-takes")),
     scenariosDir: pick(o.scenariosDir, "BATON_SCENARIOS_DIR", join(repoRoot, "data", "scenarios")),
     outRoot: pick(o.outRoot, "BATON_OUT_ROOT", repoRoot),
     dataRoot: pick(o.dataRoot, "BATON_DATA_ROOT", repoRoot),
@@ -65,11 +84,20 @@ export function resolvePaths(o: PathOptions = {}, env: Readonly<Record<string, s
 
 export interface KitInputs {
   scenarios: KitScenario[];
-  /** Every parseable sidecar, sorted by base. */
+  /** Every parseable sidecar, sorted by base: the real takes, plus simulated stand-ins for scenarios with none. */
   sidecars: KitSidecar[];
   manifestChosen: Record<string, string | null> | undefined;
+  /** Scenario ids whose take in `sidecars` is simulated (empty once the real ones are recorded). */
+  simulatedScenarioIds: string[];
   warnings: string[];
 }
+
+/** Which input dir holds a take's `raw/` and `split/`: generated takes live apart from the recordings. */
+export const takeDirOf = (p: Pick<PipelinePaths, "callsDir" | "simTakesDir">, sc: Pick<KitSidecar, "provenance">): string =>
+  isSimulatedTake(sc) ? p.simTakesDir : p.callsDir;
+
+/** A take the plan can use at all: downloaded and not thrown away. */
+const isUsable = (sc: KitSidecar): boolean => sc.state === "downloaded" && sc.review.status !== "discard";
 
 const readJson = (path: string): unknown => JSON.parse(readFileSync(path, "utf8"));
 
@@ -82,36 +110,86 @@ export function loadScenarios(scenariosDir: string): KitScenario[] {
     .map((f) => parseKit(KitScenarioSchema, readJson(join(scenariosDir, f)), `scenarios/${f}`));
 }
 
+/** Sidecars under `<dir>/raw/*.json`. A file that does not parse (the kit may be rewriting it) is a warning. */
+function readSidecars(dir: string, label: string, warnings: string[]): KitSidecar[] {
+  const rawDir = join(dir, "raw");
+  if (!existsSync(rawDir)) return [];
+  const out: KitSidecar[] = [];
+  for (const f of readdirSync(rawDir).filter((x) => x.endsWith(".json")).sort()) {
+    try {
+      out.push(parseKit(KitSidecarSchema, readJson(join(rawDir, f)), `${label}/raw/${f}`));
+    } catch (e) {
+      warnings.push(`${label}/raw/${f}: skipped (${e instanceof Error ? e.message : String(e)})`);
+    }
+  }
+  return out;
+}
+
+/** `<dir>/manifest.json` → scenario id → chosen take. */
+function readManifestChosen(dir: string, label: string, warnings: string[]): Record<string, string | null> | undefined {
+  const mPath = join(dir, "manifest.json");
+  if (!existsSync(mPath)) return undefined;
+  try {
+    const m = parseKit(KitManifestSchema, readJson(mPath), `${label}/manifest.json`);
+    return Object.fromEntries(m.scenarios.map((s) => [s.scenario_id, s.chosen_take]));
+  } catch (e) {
+    warnings.push(`${label}/manifest.json: ignored (${e instanceof Error ? e.message : String(e)})`);
+    return undefined;
+  }
+}
+
 /**
  * Sidecars + manifest. The calls dir must exist (a typo must not look like "no takes" and prune public/calls).
- * A sidecar that does not parse (e.g. the kit is rewriting it right now) is a warning, not a failure.
+ *
+ * Simulated takes (`simTakesDir`, optional) are a FALLBACK, per scenario: they are loaded only for scenarios that
+ * have no usable real take, so recording s01 for real is all it takes for the generated s01 to disappear from
+ * `calls.json`, `public/calls/` and the picker on the next `calls:build`.
  */
-export function loadKit(p: Pick<PipelinePaths, "callsDir" | "scenariosDir">): KitInputs {
+export function loadKit(p: Pick<PipelinePaths, "callsDir" | "scenariosDir"> & { simTakesDir?: string | undefined }): KitInputs {
   if (!existsSync(p.callsDir) || !statSync(p.callsDir).isDirectory()) throw new Error(`calls dir not found: ${p.callsDir} (set --calls-dir or BATON_CALLS_DIR)`);
   const warnings: string[] = [];
   const scenarios = loadScenarios(p.scenariosDir);
-  const rawDir = join(p.callsDir, "raw");
-  const sidecars: KitSidecar[] = [];
-  if (existsSync(rawDir)) {
-    for (const f of readdirSync(rawDir).filter((x) => x.endsWith(".json")).sort()) {
-      try {
-        sidecars.push(parseKit(KitSidecarSchema, readJson(join(rawDir, f)), `raw/${f}`));
-      } catch (e) {
-        warnings.push(`raw/${f}: skipped (${e instanceof Error ? e.message : String(e)})`);
+  const real = readSidecars(p.callsDir, "calls", warnings);
+  const realBases = new Set(real.map((sc) => sc.base));
+
+  const simDir = p.simTakesDir;
+  const haveReal = new Set(real.filter(isUsable).map((sc) => sc.scenario?.id).filter((id): id is string => !!id));
+  const sim: KitSidecar[] = [];
+  const simulatedScenarioIds: string[] = [];
+  if (simDir && simDir !== p.callsDir && existsSync(simDir) && statSync(simDir).isDirectory()) {
+    for (const sc of readSidecars(simDir, "sim-takes", warnings)) {
+      const id = sc.scenario?.id;
+      if (!id) {
+        warnings.push(`sim-takes/raw/${sc.base}.json: no scenario id; ignored`);
+        continue;
       }
+      if (haveReal.has(id)) continue; // a real take exists: the stand-in steps aside
+      if (!isSimulatedTake(sc)) {
+        warnings.push(`sim-takes/raw/${sc.base}.json: no provenance.kind "simulated"; ignored (generated takes must label themselves)`);
+        continue;
+      }
+      if (realBases.has(sc.base)) {
+        warnings.push(`${sc.base}: a real take has the same base; the simulated one is ignored`);
+        continue;
+      }
+      sim.push(sc);
+      if (!simulatedScenarioIds.includes(id)) simulatedScenarioIds.push(id);
     }
   }
+  if (sim.length) warnings.push(`using ${sim.length} SIMULATED take(s) for ${simulatedScenarioIds.join(", ")}: no real recording yet (generated audio, labelled "simulated")`);
+
+  const realChosen = readManifestChosen(p.callsDir, "calls", warnings);
+  const simChosen = sim.length ? readManifestChosen(simDir!, "sim-takes", warnings) : undefined;
   let manifestChosen: Record<string, string | null> | undefined;
-  const mPath = join(p.callsDir, "manifest.json");
-  if (existsSync(mPath)) {
-    try {
-      const m = parseKit(KitManifestSchema, readJson(mPath), "manifest.json");
-      manifestChosen = Object.fromEntries(m.scenarios.map((s) => [s.scenario_id, s.chosen_take]));
-    } catch (e) {
-      warnings.push(`manifest.json: ignored (${e instanceof Error ? e.message : String(e)})`);
-    }
+  if (realChosen || simChosen) {
+    manifestChosen = { ...realChosen };
+    // Only for scenarios the real manifest has nothing for, and only takes we actually loaded.
+    const simBases = new Set(sim.map((s) => s.base));
+    for (const [id, base] of Object.entries(simChosen ?? {})) if (base && !manifestChosen[id] && simBases.has(base)) manifestChosen[id] = base;
   }
-  return { scenarios, sidecars, manifestChosen, warnings };
+
+  const sidecars = [...real, ...sim].sort((a, b) => (a.base < b.base ? -1 : a.base > b.base ? 1 : 0));
+  return { scenarios, sidecars, manifestChosen, simulatedScenarioIds, warnings };
 }
 
 /** `split/<base>_{rep,customer}.wav` (PCM16 mono 8 kHz), or null when either file is missing. */

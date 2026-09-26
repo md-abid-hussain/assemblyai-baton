@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { FixtureConsole } from "@/components/call/fixture-console";
 import { LiveConsole } from "@/components/call/live-console";
 
-import { lookupCall } from "../call-entry";
+import { lookupCall, lookupProvenance } from "../call-entry";
 
 export const metadata: Metadata = {
   title: "Call console",
@@ -32,9 +32,9 @@ export default async function CallPage({ params, searchParams }: { params: Promi
       />
     );
   }
-  const { entry, featuredId, known } = await lookupCall(callId);
+  const [{ entry, featuredId, known }, callProvenance] = await Promise.all([lookupCall(callId), lookupProvenance(callId)]);
   // DESIGN §1.3 P1: an unknown callId redirects to the default call (with a toast on arrival).
   if (known && !entry && featuredId) redirect(`/call/${encodeURIComponent(featuredId)}?unknown=1`);
   // `?express=1` (the landing CTA, PLATFORM §12.1): Express starts by itself after a 3 s countdown.
-  return <LiveConsole callId={callId} call={entry} autoStart={one(sp.express) === "1" ? "express" : null} />;
+  return <LiveConsole callId={callId} call={entry} autoStart={one(sp.express) === "1" ? "express" : null} callProvenance={callProvenance} />;
 }

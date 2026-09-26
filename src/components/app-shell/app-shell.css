@@ -1,0 +1,59 @@
+/**
+ * The `/app` shell's own tokens (SAAS §8.2). WP20.
+ *
+ * Scoped to `.cx-app` rather than `:root`, so the marketing site, the Baton console (`console.css`) and the
+ * Studio keep their own palettes and nothing here leaks onto them. Everything resolves from the shadcn tokens in
+ * `globals.css`, so light and dark come for free and there is exactly one place that decides what "border" means.
+ */
+
+.cx-app {
+  --cx-bar-h: 3.5rem;
+  --cx-nav-w: 15rem;
+  --cx-gutter: 1rem;
+  --cx-rail: color-mix(in oklch, var(--border) 85%, transparent);
+  --cx-surface: color-mix(in oklch, var(--card) 100%, transparent);
+  --cx-raise: color-mix(in oklch, var(--foreground) 3%, var(--card));
+  --cx-ok: var(--success);
+  --cx-warn: var(--warning);
+  --cx-quiet: var(--muted-foreground);
+}
+
+.dark .cx-app {
+  --cx-raise: color-mix(in oklch, var(--foreground) 6%, var(--card));
+}
+
+/* Numerals that line up in a column: run durations, minutes, counts. */
+.cx-num {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+.cx-eyebrow {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--cx-quiet);
+}
+
+/* A hairline that survives sub-pixel rounding better than a 1px border on a scaled row. */
+.cx-hair {
+  box-shadow: inset 0 -1px 0 0 var(--cx-rail);
+}
+
+/* The one place a focus ring is styled for the shell; every interactive element inherits it. */
+.cx-app :focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cx-app *,
+  .cx-app *::before,
+  .cx-app *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,194 @@
+[
+  {
+    "id": "sim_10280948ea62dbbb",
+    "relay": {
+      "slug": "dental-deposit",
+      "title": "Dental · booking deposit",
+      "blueprintHash": "006b276752525cdf0acb0db3247bbfd0c77a221d4c348bd33a3da177f33a21ef"
+    },
+    "sampleIndex": 0,
+    "entry": {
+      "callId": "sim_10280948ea62dbbb",
+      "scenarioId": "relay:dental-deposit",
+      "title": "Dental · booking deposit · simulated call",
+      "source": "twilio8k",
+      "language": "en",
+      "durationMs": 70775,
+      "format": {
+        "encoding": "pcm_mulaw",
+        "sampleRate": 8000
+      },
+      "publishAudio": true,
+      "inEval": false,
+      "featured": false,
+      "picker": "hidden",
+      "decisionPointMs": 63795,
+      "handoff": {
+        "lineStartMs": 63795,
+        "lineEndMs": 67905,
+        "acceptStartMs": 68205,
+        "acceptEndMs": 69775,
+        "declined": false
+      },
+      "recordedAiBundle": null,
+      "customerTailPack": null,
+      "assets": {
+        "rep": "/calls/sim-dental-deposit/rep.ulaw",
+        "customer": "/calls/sim-dental-deposit/customer.ulaw",
+        "peaks": "/calls/sim-dental-deposit/peaks.json"
+      }
+    },
+    "aiClips": {
+      "confirm": {
+        "hash": "1e030c66ab00a9fc5575d5a31ef19c60cc31286b254a089dfc35ed7969593b36",
+        "text": "Yes, that's right.",
+        "durationMs": 1250,
+        "url": "/calls/sim-dental-deposit/clip.1e030c66ab00a9fc5575d5a31ef19c60cc31286b254a089dfc35ed7969593b36.pcm"
+      },
+      "consent": {
+        "hash": "bf4c5e48decefd6b71e37989e840527f8a6c63a303f336ba5f64270e2ce6d367",
+        "text": "Yes, please text me the link.",
+        "durationMs": 2300,
+        "url": "/calls/sim-dental-deposit/clip.bf4c5e48decefd6b71e37989e840527f8a6c63a303f336ba5f64270e2ce6d367.pcm"
+      },
+      "close": {
+        "hash": "67d57afd61a5c61448a96b36cff452b38041dc0039dbaa07426fe376d696e526",
+        "text": "No, that's everything, thanks.",
+        "durationMs": 2850,
+        "url": "/calls/sim-dental-deposit/clip.67d57afd61a5c61448a96b36cff452b38041dc0039dbaa07426fe376d696e526.pcm"
+      },
+      "answer:appointment_time": {
+        "hash": "7b05d34d6afab360b2108a4c1abb969b65b89f5f8992bc94f9fd84ee4a6da780",
+        "text": "It’s 9:30 AM.",
+        "durationMs": 2400,
+        "url": "/calls/sim-dental-deposit/clip.7b05d34d6afab360b2108a4c1abb969b65b89f5f8992bc94f9fd84ee4a6da780.pcm"
+      },
+      "answer:insurance_carrier": {
+        "hash": "49acef05ec418280d37b7bd040d296160c4241ecb42f128d43c0ba410181febf",
+        "text": "It's BrightSmile Plus.",
+        "durationMs": 2450,
+        "url": "/calls/sim-dental-deposit/clip.49acef05ec418280d37b7bd040d296160c4241ecb42f128d43c0ba410181febf.pcm"
+      }
+    },
+    "timeline": [
+      {
+        "i": 0,
+        "speaker": "rep",
+        "tag": "greet",
+        "text": "Hi, Maya Ortiz, this is Dana at Cedar Hollow Dental. I’m calling to confirm your appointment and make sure we have the right details before we finish up.",
+        "startMs": 800,
+        "endMs": 10150,
+        "clipHash": "1ac351ee9889c7be50013b71e0061d9628f3b79e651f1040ef6e69678e1ef608"
+      },
+      {
+        "i": 1,
+        "speaker": "customer",
+        "tag": "answer",
+        "text": "Hi, Dana. Thanks for checking in. I’m glad to confirm it; I want to be sure I have everything right, too.",
+        "startMs": 10617,
+        "endMs": 16637,
+        "clipHash": "8cd29b9078d0d2e21d3918c2a19a7aa4a2650b4bbfa37a902f52f83c4e2cb61e"
+      },
+      {
+        "i": 2,
+        "speaker": "rep",
+        "tag": "ask",
+        "text": "Of course. Could you say your full name for me? I want to match it to the patient record before we go over the appointment.",
+        "startMs": 17271,
+        "endMs": 23381,
+        "clipHash": "cf8ecbcf9f5dea99885ddfecfd0c618f593ddc3efbf732dea92e64050d6e93b0"
+      },
+      {
+        "i": 3,
+        "speaker": "customer",
+        "tag": "answer",
+        "text": "Maya Ortiz. That’s the name I use for my dental visits.",
+        "startMs": 23895,
+        "endMs": 28165,
+        "clipHash": "8207c7fa639792d4d33f19b98b37eee5d759b9fc2e8c25cc41d833f138b63082"
+      },
+      {
+        "i": 4,
+        "speaker": "rep",
+        "tag": "ask",
+        "text": "Thanks, I have Maya Ortiz here. And what procedure are you booked in for?",
+        "startMs": 28711,
+        "endMs": 33191,
+        "clipHash": "0067d48d0aac99c9ad8c86cb0a795d43e87a71370b976c560fd31ad7b55dc43c"
+      },
+      {
+        "i": 5,
+        "speaker": "customer",
+        "tag": "answer",
+        "text": "A cleaning. I’m coming in for my regular cleaning, just as planned.",
+        "startMs": 33704,
+        "endMs": 37664,
+        "clipHash": "18f542884ff5bf54fa02c576bcee5b6980ac1b60aa1e6fd8e80988435638e80b"
+      },
+      {
+        "i": 6,
+        "speaker": "rep",
+        "tag": "readback",
+        "text": "A cleaning, got it. Dr. Alina Booth will see you at our Fairview office. What date do you have for the appointment?",
+        "startMs": 38024,
+        "endMs": 43764,
+        "clipHash": "28309516fbf7ef58bf0a74526cfa7b1712fe261511e771e18bd45f649b0ecd48"
+      },
+      {
+        "i": 7,
+        "speaker": "customer",
+        "tag": "answer",
+        "text": "Tuesday the sixth of October. I wrote it down when I made the appointment, so that’s the date I expected.",
+        "startMs": 44339,
+        "endMs": 50239,
+        "clipHash": "12dd9ebe049a14f82d5922f326c56d96d3f2c0cd20cf309786fd30a4fca7b139"
+      },
+      {
+        "i": 8,
+        "speaker": "rep",
+        "tag": "readback",
+        "text": "I have Tuesday, October sixth, as well. That matches our schedule, and I’ve confirmed the date and cleaning in your record.",
+        "startMs": 50614,
+        "endMs": 57304,
+        "clipHash": "cf88b211f67a603c3ac66ee0f867fd1e066ef3839f842cace9ddc431d68dde5d"
+      },
+      {
+        "i": 9,
+        "speaker": "customer",
+        "tag": "confirm",
+        "text": "Great, that all sounds right. Thanks for walking me through it and confirming the appointment details.",
+        "startMs": 57929,
+        "endMs": 63149,
+        "clipHash": "b9df5d393cd9f5b040be146f03a000bc23f1bcf602ac09e1723fc8907a63db7c"
+      },
+      {
+        "i": 10,
+        "speaker": "rep",
+        "tag": "handoff",
+        "text": "OK if my assistant finishes the booking and the deposit? I'll stay on the line.",
+        "startMs": 63795,
+        "endMs": 67905,
+        "clipHash": "c163e63e68a2e024b4396485c34357287e4b0c16da2a33bce9d9a81caefdeceb"
+      },
+      {
+        "i": 11,
+        "speaker": "customer",
+        "tag": "accept",
+        "text": "Sure, go ahead.",
+        "startMs": 68205,
+        "endMs": 69775,
+        "clipHash": "0e86401a4e38488475bffb7ae19c05339386cc05fa6e136616f78353427e8cfc"
+      }
+    ],
+    "variants": [
+      {
+        "presetId": "add_insurance_carrier",
+        "blueprintHash": "7aaeb41c9238f0c51ff8e7f4a4ca41d53e1a1b52f9c503b0c085403e2c80ac3c"
+      },
+      {
+        "presetId": "deposit_seventy_five",
+        "blueprintHash": "f31f4a8c57031946116eaeaecb589db475e4b5dd79df05561b2b0c6fd2431e62"
+      }
+    ]
+  }
+]

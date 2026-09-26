@@ -237,20 +237,20 @@ describe("compileGreeting: property test (500 random states)", () => {
       const ctx = `#${i}: ${g.text}`;
       for (const re of GREETING_DISCLOSURE_RES) expect(g.text, ctx).toMatch(re);
       expect(g.wordCount, ctx).toBeLessThanOrEqual(GREETING_MAX_WORDS);
-      for (const f of g.asserted) expect(st.fields[f].status, ctx).toBe("VERIFIED");
-      const firstPending = GREETING_PRIORITY.find((f) => st.fields[f].status === "PENDING") ?? null;
+      for (const f of g.asserted) expect(st.fields[f]!.status, ctx).toBe("VERIFIED");
+      const firstPending = GREETING_PRIORITY.find((f) => st.fields[f]!.status === "PENDING") ?? null;
       expect(g.confirms, ctx).toBe(firstPending);
-      if (g.confirms) expect(st.fields[g.confirms].status, ctx).toBe("PENDING");
+      if (g.confirms) expect(st.fields[g.confirms]!.status, ctx).toBe("PENDING");
       const nextSentences = (g.text.match(/Just to confirm|I just need|Ready for the updated premium/g) ?? []).length;
       expect(nextSentences, ctx).toBe(1);
       // No non-VERIFIED value may appear, except the one confirm clause.
       for (const f of Object.keys(st.fields) as FieldId[]) {
-        const fs = st.fields[f];
+        const fs = st.fields[f]!;
         if (fs.status === "VERIFIED" || fs.value === null || f === g.confirms) continue;
         for (const form of formsIn(f, fs.value, policy)) expect(g.text.includes(form), `${ctx}\n  leaked ${f}=${fs.value} as "${form}"`).toBe(false);
       }
       // A VERIFIED premium from the customer is never spoken either.
-      const prem = st.fields.premium_new_monthly_usd;
+      const prem = st.fields.premium_new_monthly_usd!;
       if (prem.value && !(prem.status === "VERIFIED" && prem.source === "rep")) expect(g.text.includes(spokenMoney(prem.value)), ctx).toBe(false);
       expect(compileGreeting(st, policy)).toEqual(g); // deterministic
     }

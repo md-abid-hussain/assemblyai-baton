@@ -138,7 +138,7 @@ describe("update_case_field", () => {
     const second = await tools.handle("update_case_field", { field: "license_state", value: "WI", reason: "customer_corrected" }, ctx);
     expect(second.result).toMatchObject({ result: "accepted", field: "license_state", status: "VERIFIED", value: "WI" });
     expect(second.ui?.conflict).toMatchObject({ field: "license_state" });
-    const fs = cases.cases.get("case_1")!.state.fields.license_state;
+    const fs = cases.cases.get("case_1")!.state.fields.license_state!;
     expect(fs.flags).toContain("customer_corrected_verified");
   });
 

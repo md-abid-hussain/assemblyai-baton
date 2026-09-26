@@ -62,7 +62,7 @@ function deps(o: { bp?: Blueprint; binding?: KernelBinding | null; call?: Catalo
 }
 
 const snapshot = { fields: {}, callClockMs: 1 } as unknown as CaseState;
-const opts: CompileTakeoverOptions = { deployId: "dev-wp14b", voice: "alba", keytermsEnabled: true, compiledBy: "server", payToolMode: "push" };
+const opts: CompileTakeoverOptions = { deployId: "test-wp14b-env", voice: "alba", keytermsEnabled: true, compiledBy: "server", payToolMode: "push" };
 
 const relayCase = (o: Partial<RelayCompileCase> = {}): RelayCompileCase =>
   ({ id: "case_1", callId: "call_s01", policy: policy as PolicyRecord, relayVersionId: "rv_1", simCallId: null, ...o });
@@ -87,9 +87,15 @@ describe("relayTakeoverCompile: which compiler runs (P§4.7)", () => {
     expect(kernel.compiles).toHaveLength(0);
   });
 
-  it("no kernel bound is null too, so the flagship keeps compiling through WP1 (parity)", async () => {
+  it("no kernel bound throws (WP14b·3): a Dental case exists now, and Baton's prompt for it would be wrong", async () => {
+    const { d, kernel } = deps({ binding: null });
+    await expect(relayTakeoverCompile(() => d)({ case: relayCase(), snapshot, opts })).rejects.toMatchObject({ code: "E_MAINTENANCE" });
+    expect(kernel.compiles).toHaveLength(0);
+  });
+
+  it("…but a Baton case is still null with no kernel, so the flagship keeps compiling through WP1 (parity)", async () => {
     const { d } = deps({ binding: null });
-    expect(await relayTakeoverCompile(() => d)({ case: relayCase(), snapshot, opts })).toBeNull();
+    expect(await relayTakeoverCompile(() => d)({ case: relayCase({ relayVersionId: null }), snapshot, opts })).toBeNull();
   });
 
   it("an unknown version throws instead of falling back: a Baton compile of another relay would be a wrong prompt", async () => {

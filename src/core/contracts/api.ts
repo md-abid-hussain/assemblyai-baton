@@ -356,6 +356,8 @@ export const ToolResponseSchema = z.object({
   tools: z.array(VaFunctionToolSchema).optional(),
   /** The next step's input mode (§5.9.1). */
   transcriptionMode: TranscriptionModeSchema.optional(),
+  /** P§4.7: the new stage's goal text when the stage changed, else null (mirrors `ToolOutcome.nextStep`). */
+  nextStep: z.string().nullable().optional(),
   ui: ToolUiSchema.optional(),
 });
 export type ToolResponse = z.infer<typeof ToolResponseSchema>;

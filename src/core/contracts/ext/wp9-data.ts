@@ -16,6 +16,33 @@ import { ScenarioSchema } from "../scenario";
 export const CallScenariosFileSchema = z.record(z.string(), ScenarioSchema);
 export type CallScenariosFile = z.infer<typeof CallScenariosFileSchema>;
 
+/**
+ * `src/generated/call-provenance.json`: how each call in `calls.json` came to exist.
+ *
+ * `CallManifestEntry` is frozen at G0, so this rides alongside it. The values of `humanHalf` are the first two of
+ * `ProvenanceStripSchema.humanHalf` (contracts/v2/api.ts, PLATFORM §7.6) on purpose: a consumer reads
+ * `file[callId]?.humanHalf ?? "recorded"` and passes it straight into the strip. `detail` is the strip's one-line
+ * tooltip. A simulated call must never be described as a recording, and never counts as a recorded take in any
+ * metric (WP9 keeps `reviewed: false` on its labels, so `inEval` stays false).
+ */
+export const CALL_HUMAN_HALVES = ["recorded", "simulated"] as const;
+export const CallHumanHalfSchema = z.enum(CALL_HUMAN_HALVES);
+export type CallHumanHalf = z.infer<typeof CallHumanHalfSchema>;
+
+export const CallProvenanceEntrySchema = z.object({
+  humanHalf: CallHumanHalfSchema,
+  detail: z.string(),
+  /** Simulated calls only; null on a recording. */
+  scriptModel: z.string().nullable(),
+  ttsModel: z.string().nullable(),
+  voices: z.object({ rep: z.string(), customer: z.string() }).nullable(),
+  generatedAt: z.string().nullable(),
+});
+export type CallProvenanceEntry = z.infer<typeof CallProvenanceEntrySchema>;
+
+export const CallProvenanceFileSchema = z.record(z.string(), CallProvenanceEntrySchema);
+export type CallProvenanceFile = z.infer<typeof CallProvenanceFileSchema>;
+
 /** `message.type` of the per-channel trailer record in an STT cache JSONL. */
 export const STT_CACHE_META_TYPE = "BatonCacheMeta" as const;
 

@@ -1,0 +1,75 @@
+{
+  "turns": [
+    {
+      "speaker": "rep",
+      "text": "Hi, Maya Ortiz, this is Dana at Cedar Hollow Dental. I’m calling to confirm your appointment and make sure we have the right details before we finish up.",
+      "tag": "greet"
+    },
+    {
+      "speaker": "customer",
+      "text": "Hi, Dana. Thanks for checking in. I’m glad to confirm it; I want to be sure I have everything right, too.",
+      "tag": "answer"
+    },
+    {
+      "speaker": "rep",
+      "text": "Of course. Could you say your full name for me? I want to match it to the patient record before we go over the appointment.",
+      "tag": "ask"
+    },
+    {
+      "speaker": "customer",
+      "text": "Maya Ortiz. That’s the name I use for my dental visits.",
+      "tag": "answer"
+    },
+    {
+      "speaker": "rep",
+      "text": "Thanks, I have Maya Ortiz here. And what procedure are you booked in for?",
+      "tag": "ask"
+    },
+    {
+      "speaker": "customer",
+      "text": "A cleaning. I’m coming in for my regular cleaning, just as planned.",
+      "tag": "answer"
+    },
+    {
+      "speaker": "rep",
+      "text": "A cleaning, got it. Dr. Alina Booth will see you at our Fairview office. What date do you have for the appointment?",
+      "tag": "readback"
+    },
+    {
+      "speaker": "customer",
+      "text": "Tuesday the sixth of October. I wrote it down when I made the appointment, so that’s the date I expected.",
+      "tag": "answer"
+    },
+    {
+      "speaker": "rep",
+      "text": "I have Tuesday, October sixth, as well. That matches our schedule, and I’ve confirmed the date and cleaning in your record.",
+      "tag": "readback"
+    },
+    {
+      "speaker": "customer",
+      "text": "Great, that all sounds right. Thanks for walking me through it and confirming the appointment details.",
+      "tag": "confirm"
+    },
+    {
+      "speaker": "rep",
+      "text": "OK if my assistant finishes the booking and the deposit? I'll stay on the line.",
+      "tag": "handoff"
+    },
+    {
+      "speaker": "customer",
+      "text": "Sure, go ahead.",
+      "tag": "accept"
+    }
+  ],
+  "left_for_ai": [
+    "appointment_time"
+  ],
+  "ai_half_answers": [
+    {
+      "field": "appointment_time",
+      "spoken": "It’s 9:30 AM."
+    }
+  ],
+  "consent_phrase": "Yes, please text me the link.",
+  "closing_phrase": "No, that's everything, thanks."
+}

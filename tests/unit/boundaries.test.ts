@@ -146,8 +146,17 @@ describe("DESIGN §3.1 import boundaries", () => {
     expect(fmt(hits)).toBe("");
   });
 
-  it('every src/server module imports "server-only" (schema.ts exempt)', () => {
-    const EXEMPT = new Set(["src/server/db/schema.ts"]);
+  it('every src/server module imports "server-only" (the schema files and the auth CLI config are exempt)', () => {
+    // Exempt for one reason only: a tool outside Next's bundler loads the file, and `server-only` throws there.
+    // `drizzle-kit` reads the three schema files; `npx auth generate` reads the config and explicitly refuses one
+    // containing `import "server-only"`. Nothing here is imported by a route at runtime, and the "browser code
+    // never imports src/server" rule above still covers them.
+    const EXEMPT = new Set([
+      "src/server/db/schema.ts",
+      "src/server/db/schema-auth.ts", // WP19: CLI-generated, read by drizzle-kit
+      "src/server/db/schema-saas.ts", // WP19: read by drizzle-kit
+      "src/server/identity/auth.schema-gen.ts", // WP19: the `npx auth generate` entry point
+    ]);
     const missing = listFiles("src/server")
       .filter((f) => !EXEMPT.has(f) && !/\.d\.ts$/.test(f))
       .filter((f) => !/^\s*import\s+["']server-only["'];?/m.test(stripComments(readFileSync(join(ROOT, f), "utf8"))));

@@ -56,6 +56,7 @@ export function PreflightCard() {
   const actions = useActions();
   const env = useConsoleEnv();
   const ctx = useBaton((s) => s.context);
+  const account = useBaton((s) => s.account);
   const plan = useBaton((s) => s.plan);
   const phase = useBaton((s) => s.phase);
   const [cancelled, setCancelled] = useState(false);
@@ -72,7 +73,7 @@ export function PreflightCard() {
       </div>
     );
   }
-  const { rep } = names({ context: ctx });
+  const { rep } = names({ context: ctx, account });
   const replay = plan?.aiHalf === "recorded" || plan?.sttHalf === "cached";
   const expressStart = ctx.decisionPointMs !== null ? Math.max(0, ctx.decisionPointMs - 25_000) : null;
   const expressMin = expressStart !== null ? Math.round((ctx.durationMs - expressStart) / 60_000 + AI_HALF_MIN) : null;

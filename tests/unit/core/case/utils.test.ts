@@ -109,7 +109,7 @@ describe("extractor artefacts (§5.3)", () => {
   it("user input JSON (§5.3 example shape)", () => {
     const policy = policyOf("s01");
     const state = emptyCaseState("c");
-    state.fields.driver_full_name = { ...state.fields.driver_full_name, status: "PENDING", value: "maya raman" };
+    state.fields.driver_full_name = { ...state.fields.driver_full_name!, status: "PENDING", value: "maya raman" };
     const recent = Array.from({ length: 8 }, (_, i) => ({ turnId: `rep-${i}`, channel: "rep" as const, text: `t${i}` }));
     const j = JSON.parse(buildExtractorInput({ callDate: "2026-09-25", policy, state, recent, newTurns: [{ turnId: "customer-9", channel: "customer", text: "Hi" }] })) as {
       call_date: string; call_weekday: string; policy: Record<string, unknown>; case: Record<string, unknown>; recent_turns: unknown[]; new_turns: unknown[];

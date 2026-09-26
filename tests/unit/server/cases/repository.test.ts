@@ -71,6 +71,6 @@ describe.skipIf(!HAS_DB)("PgCaseRepository", () => {
     expect((await h.repo.load(caseId))!.runPlan).toEqual(plan);
     const re = await h.repo.recompute(caseId, { tArmMs: 20_000 });
     expect(re.version).toBe(3);
-    expect(re.fields.driver_dob.status).toBe("PENDING"); // customer-1 ended after the arm point
+    expect(re.fields.driver_dob?.status).toBe("PENDING"); // customer-1 ended after the arm point
   });
 });

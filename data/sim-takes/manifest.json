@@ -1,0 +1,213 @@
+{
+  "generated_at": "2026-09-25T00:00:00.000Z",
+  "recorded": 3,
+  "total": 22,
+  "orphans": [],
+  "scenarios": [
+    {
+      "scenario_id": "s01",
+      "title": "Add 17-year-old daughter Maya to the Civic (golden demo path)",
+      "language": "en",
+      "chosen_take": "s01_sim_20260925T110000Z",
+      "takes": [
+        {
+          "base": "s01_sim_20260925T110000Z",
+          "take": 1,
+          "state": "downloaded",
+          "review": "keep",
+          "duration_s": 135.5,
+          "files": {
+            "stereo": "data/sim-takes/raw/s01_sim_20260925T110000Z.wav",
+            "rep": "data/sim-takes/split/s01_sim_20260925T110000Z_rep.wav",
+            "customer": "data/sim-takes/split/s01_sim_20260925T110000Z_customer.wav"
+          },
+          "all_recording_consent": true,
+          "publishable": true,
+          "warnings": [],
+          "has_overrides": false
+        }
+      ]
+    },
+    {
+      "scenario_id": "s02",
+      "title": "Add 16-year-old son Lucas; start date blurted right before the hand-off",
+      "language": "en",
+      "chosen_take": "s02_sim_20260925T110000Z",
+      "takes": [
+        {
+          "base": "s02_sim_20260925T110000Z",
+          "take": 1,
+          "state": "downloaded",
+          "review": "keep",
+          "duration_s": 92.3,
+          "files": {
+            "stereo": "data/sim-takes/raw/s02_sim_20260925T110000Z.wav",
+            "rep": "data/sim-takes/split/s02_sim_20260925T110000Z_rep.wav",
+            "customer": "data/sim-takes/split/s02_sim_20260925T110000Z_customer.wav"
+          },
+          "all_recording_consent": true,
+          "publishable": true,
+          "warnings": [],
+          "has_overrides": false
+        }
+      ]
+    },
+    {
+      "scenario_id": "s03",
+      "title": "Add 19-year-old daughter Hannah; customer declines the AI and the rep finishes",
+      "language": "en",
+      "chosen_take": "s03_sim_20260925T110000Z",
+      "takes": [
+        {
+          "base": "s03_sim_20260925T110000Z",
+          "take": 1,
+          "state": "downloaded",
+          "review": "keep",
+          "duration_s": 154.5,
+          "files": {
+            "stereo": "data/sim-takes/raw/s03_sim_20260925T110000Z.wav",
+            "rep": "data/sim-takes/split/s03_sim_20260925T110000Z_rep.wav",
+            "customer": "data/sim-takes/split/s03_sim_20260925T110000Z_customer.wav"
+          },
+          "all_recording_consent": true,
+          "publishable": true,
+          "warnings": [],
+          "has_overrides": false
+        }
+      ]
+    },
+    {
+      "scenario_id": "s04",
+      "title": "Add new wife Jasmine; husband corrects her birthday; premium goes down",
+      "language": "en",
+      "chosen_take": null,
+      "takes": []
+    },
+    {
+      "scenario_id": "s05",
+      "title": "Add 18-year-old son Owen; rep never asks the license state (it's Wisconsin)",
+      "language": "en",
+      "chosen_take": null,
+      "takes": []
+    },
+    {
+      "scenario_id": "s06",
+      "title": "Add 16-year-old Zoe; eager mom talks over the rep, blurts a discount at the hand-off",
+      "language": "en",
+      "chosen_take": null,
+      "takes": []
+    },
+    {
+      "scenario_id": "s07",
+      "title": "Add college student Claire (20) for winter break; mom corrects the ZIP",
+      "language": "en",
+      "chosen_take": null,
+      "takes": []
+    },
+    {
+      "scenario_id": "s08",
+      "title": "Add 78-year-old father Walter; rep forgets to ask the start date",
+      "language": "en",
+      "chosen_take": null,
+      "takes": []
+    },
+    {
+      "scenario_id": "s09",
+      "title": "Add 15-year-old Ethan on a learner's permit; noisy living room; price unchanged",
+      "language": "en",
+      "chosen_take": null,
+      "takes": []
+    },
+    {
+      "scenario_id": "s10",
+      "title": "Add partner Alex; 'occasional' becomes primary after advice; asks about the AI first",
+      "language": "en",
+      "chosen_take": null,
+      "takes": []
+    },
+    {
+      "scenario_id": "s11",
+      "title": "Add brother Omar (Michigan license); kids interrupt; car choice comes up at the last second",
+      "language": "en",
+      "chosen_take": null,
+      "takes": []
+    },
+    {
+      "scenario_id": "s12",
+      "title": "Add 16-year-old Ava; rep hands off before the new price is known",
+      "language": "en",
+      "chosen_take": null,
+      "takes": []
+    },
+    {
+      "scenario_id": "s13",
+      "title": "Add son Dominick (22) with an at-fault accident; rep misspells his name",
+      "language": "en",
+      "chosen_take": null,
+      "takes": []
+    },
+    {
+      "scenario_id": "s14",
+      "title": "Add mother Carmen (Florida license); she chimes in; customer refuses the AI",
+      "language": "en",
+      "chosen_take": null,
+      "takes": []
+    },
+    {
+      "scenario_id": "s15",
+      "title": "Add stepdaughter Sophie (17); stepdad doesn't know her exact birthday",
+      "language": "en",
+      "chosen_take": null,
+      "takes": []
+    },
+    {
+      "scenario_id": "s16",
+      "title": "Add roommate Jordan; start date changed to today; 'is it a robot?'",
+      "language": "en",
+      "chosen_take": null,
+      "takes": []
+    },
+    {
+      "scenario_id": "s17",
+      "title": "Add 17-year-old Rohan with a speeding ticket; kitchen noise; mom declines the AI",
+      "language": "en",
+      "chosen_take": null,
+      "takes": []
+    },
+    {
+      "scenario_id": "s18",
+      "title": "Add daughter Leah (18) who takes the Jetta to college; campus ZIP unknown",
+      "language": "en",
+      "chosen_take": null,
+      "takes": []
+    },
+    {
+      "scenario_id": "s19",
+      "title": "Hinglish: mom adds 17-year-old son Arjun; rep speaks English only",
+      "language": "hinglish",
+      "chosen_take": null,
+      "takes": []
+    },
+    {
+      "scenario_id": "s20",
+      "title": "Hinglish both sides: husband adds wife Kavya; 'permit' corrected to full license",
+      "language": "hinglish",
+      "chosen_take": null,
+      "takes": []
+    },
+    {
+      "scenario_id": "s21",
+      "title": "Add nephew Marcus (20) from a noisy street; talks over the rep; changes the car",
+      "language": "en",
+      "chosen_take": null,
+      "takes": []
+    },
+    {
+      "scenario_id": "s22",
+      "title": "Add the family's nanny Gabriela (doesn't live there); two facts never asked",
+      "language": "en",
+      "chosen_take": null,
+      "takes": []
+    }
+  ]
+}

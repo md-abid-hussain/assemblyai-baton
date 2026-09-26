@@ -5,6 +5,7 @@ import type {
 } from "../../core/contracts/case";
 import type { RawPatch, VerifierResult } from "../../core/contracts/extract";
 import type { TurnInput } from "../../core/contracts/turns";
+import type { IntentSpec } from "../../core/contracts/v2/relay";
 
 /**
  * The pure case engine WP3 drives (TASKS WP3 "Consumes": WP1 `applyExtraction`, `deriveCaseState`,
@@ -14,6 +15,11 @@ import type { TurnInput } from "../../core/contracts/turns";
  *
  * Until G1 merges wp/wp1, `defaults.ts` binds a small stub engine (`engine-stub.ts`). The integrator's G1 binding
  * (one file) is in docs/notes/requests/wp3-to-integrator.md.
+ *
+ * **WP14b·3:** every method gained the same optional trailing `spec?: IntentSpec` WP14a·3 put on the core functions
+ * (TASKS-v2 §2 rule 9). Without it the behaviour is Baton's, unchanged. `relay-engine.ts` builds the per-version
+ * engine that supplies it, and the repository, the extract service and the verifier runner pick the engine from
+ * `cases.relay_version_id` instead of holding one for the whole process.
  */
 
 /** An event as WP1's derive takes it (`DerivableEvent`): a FactEvent whose seq may be absent. */
@@ -61,13 +67,13 @@ type TurnText = Pick<TurnInput, "turnId" | "channel" | "text">;
 
 export interface CaseEngine {
   /** A fresh case: every field MISSING. */
-  emptyCaseState(caseId: string): CaseState;
+  emptyCaseState(caseId: string, spec?: IntentSpec): CaseState;
   /** Pure, full recompute from the append-only events, sorted by (turnEndMs, seq) (§5.4). */
-  deriveCaseState(policy: PolicyRecord, events: readonly EngineEvent[], ctx: EngineDeriveCtx): CaseState;
+  deriveCaseState(policy: PolicyRecord, events: readonly EngineEvent[], ctx: EngineDeriveCtx, spec?: IntentSpec): CaseState;
   /** §5.3 post-processing of one raw patch (drop foreign/empty events, party, normalize, evidence, late/cut). */
-  applyExtraction(raw: RawPatch, turns: readonly TurnInput[], ctx: EngineApplyCtx): NewFactEvent[];
+  applyExtraction(raw: RawPatch, turns: readonly TurnInput[], ctx: EngineApplyCtx, spec?: IntentSpec): NewFactEvent[];
   /** F2 step 3: sol's disagreements as `kind:"verifier"` events (G0 encoding). */
-  verifierDisagreementEvents(result: VerifierResult, state: Pick<CaseState, "fields">, turns: readonly TurnInput[], ctx: EngineApplyCtx): NewFactEvent[];
+  verifierDisagreementEvents(result: VerifierResult, state: Pick<CaseState, "fields">, turns: readonly TurnInput[], ctx: EngineApplyCtx, spec?: IntentSpec): NewFactEvent[];
   /** §5.3 "User input" JSON string. */
   buildExtractorInput(i: { callDate: string; policy: PolicyRecord; state: Pick<CaseState, "fields">; recent: readonly TurnText[]; newTurns: readonly TurnText[] }): string;
   extractor: ExtractorArtefacts;

@@ -13,7 +13,8 @@ import { defaultEngine, defaultPlatform } from "./defaults";
 import type { CaseEngine } from "./engine";
 import { ExtractService } from "./extract-service";
 import type { CasesPlatform } from "./platform";
-import { buildPrefill } from "./prefill";
+import { buildPrefill, reextractPrefill } from "./prefill";
+import { defaultEngineFor, type CaseEngineFor, type RelayEngineSource } from "./relay-engine";
 import { PgCaseRepository } from "./repository";
 import { VerifierRunner } from "./verifier-runner";
 
@@ -25,7 +26,10 @@ import { VerifierRunner } from "./verifier-runner";
  */
 export interface CasesDeps {
   db: Db;
+  /** The base (flagship) engine. */
   engine: CaseEngine;
+  /** WP14b·3: the engine of a case's relay version (`relay-engine.ts`); the base engine for a Baton case. */
+  engineFor: CaseEngineFor;
   platform: CasesPlatform;
   data: CaseDataSource;
   repo: PgCaseRepository;
@@ -38,6 +42,8 @@ export interface CasesDeps {
 }
 
 export type CasesDepsOverrides = Partial<Omit<CasesDeps, "repo" | "extract" | "verifierRunner">> & {
+  /** The relay graph the default `engineFor` compiles through (tests inject a fake instead of `getRelaysDeps()`). */
+  relays?: () => Promise<RelayEngineSource>;
   now?: () => number;
   verifierEnabled?: () => boolean;
 };
@@ -55,42 +61,58 @@ function openaiFactory() {
 export function buildCasesDeps(o: CasesDepsOverrides = {}): CasesDeps {
   const db = o.db ?? getDb();
   const engine = o.engine ?? defaultEngine();
+  // `src/server/relays/index.ts` imports this module's `getCaseRepository`, so the relay graph is reached through a
+  // dynamic import (the same shape `relays/index.ts` uses for the sim store): nothing is touched until a case row
+  // actually carries a `relay_version_id`.
+  const engineFor = o.engineFor ?? defaultEngineFor(engine, o.relays ?? (async () => (await import("../relays")).getRelaysDeps()));
   const platform = o.platform ?? defaultPlatform();
   const data = o.data ?? getCaseDataSource();
   const defer = o.defer ?? ((fn) => void fn().catch((err) => depsLog.warn("deferred task failed", { err })));
   const repo = new PgCaseRepository({
     db,
     engine,
+    engineFor,
     policyOf: (id) => data.getPolicy(id),
     prefillPlan: async (i) => {
-      const plan = await buildPrefill(data, { ...i, extractorVersion: engine.extractor.version });
-      if (plan?.uncovered.length) depsLog.warn("prefill turns without cached events", { callId: i.callId, n: plan.uncovered.length });
-      return plan;
+      // WP14b·3: the pin is the RUN's extractor, not the flagship's, so a relay whose fields differ never receives
+      // Baton's cached events (DESIGN §5.3 version pinning).
+      const runEngine = i.relayVersionId ? await engineFor(i.relayVersionId) : engine;
+      const plan = await buildPrefill(data, { ...i, extractorVersion: runEngine.extractor.version });
+      if (!plan) return plan;
+      // P§7.5: a relay whose extractor is not the cache's re-extracts the cached turns in ONE batched call, so a
+      // preset that adds a field shows that field answered at the pass instead of blank. Baton never gets here (its
+      // kernel-compiled extractor id equals EXTRACTOR_VERSION_V3), and neither does a cache-less on-demand sim.
+      const done = plan.versionMismatch && i.relayVersionId
+        ? await reextractPrefill({ extractor, engine: runEngine, recordSpend }, plan, { caseId: i.caseId, policy: i.policy, callDate: i.policy.callDate })
+        : plan;
+      if (done.uncovered.length) depsLog.warn("prefill turns without cached events", { callId: i.callId, n: done.uncovered.length });
+      return done;
     },
   });
   const client = openaiFactory();
   const extractor = o.extractor ?? new OpenAIExtractor({ client, engine });
+  const recordSpend = async ({ caseId, usd, action }: { caseId: string; usd: number; action: string }) => {
+    const ledger = platform.ledger();
+    if (!ledger) return;
+    const r = await ledger.reserve({ provider: "openai", action, refId: caseId, estUsd: usd, env: platform.deployId() });
+    if (r.ok) await ledger.settle(r.id, usd);
+  };
   const verifier = o.verifier ?? new OpenAIVerifier({ client });
   const verifierRunner = new VerifierRunner({
-    repo, engine, verifier,
+    repo, engine, engineFor, verifier,
     ledger: () => platform.ledger(),
     deployId: () => platform.deployId(),
     ...(o.now ? { now: o.now } : {}),
     enabled: o.verifierEnabled ?? (() => !!env().OPENAI_API_KEY),
   });
   const extract = new ExtractService({
-    repo, engine, extractor, data, defer,
+    repo, engine, engineFor, extractor, data, defer,
     maybeRunVerifier: (caseId) => verifierRunner.maybeRun(caseId),
-    recordSpend: async ({ caseId, usd, action }) => {
-      const ledger = platform.ledger();
-      if (!ledger) return;
-      const r = await ledger.reserve({ provider: "openai", action, refId: caseId, estUsd: usd, env: platform.deployId() });
-      if (r.ok) await ledger.settle(r.id, usd);
-    },
+    recordSpend,
     ...(o.now ? { now: o.now } : {}),
   });
   if (engine.impl !== "wp1") depsLog.warn("case engine is the pre-G1 stub (bind WP1 in src/server/cases/defaults.ts)");
-  return { db, engine, platform, data, repo, extractor, verifier, verifierRunner, extract, defer };
+  return { db, engine, engineFor, platform, data, repo, extractor, verifier, verifierRunner, extract, defer };
 }
 
 const g = globalThis as typeof globalThis & { __batonCases?: CasesDeps };

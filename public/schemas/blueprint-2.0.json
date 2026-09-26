@@ -1,0 +1,2371 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://app-2b25-3000.prg1.zerops.app/schemas/blueprint-2.0.json",
+  "title": "Changeover relay blueprint",
+  "description": "One relay, as code: the case fields, the handoff, the playbook the agent follows and the connectors it may call. A file is exactly one blueprint of schema `changeover.blueprint/2.0`, written as YAML 1.2 or JSON, and is validated by this schema, then by the relay linter. Secret values never appear in a blueprint: use a `{ \"$secret\": \"sec_…\" }` reference.",
+  "x-blueprint-schema": "changeover.blueprint/2.0",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Optional editor hint. It is ignored by validation; in YAML use the header comment `# yaml-language-server: $schema=<url>` instead."
+    },
+    "meta": {
+      "type": "object",
+      "properties": {
+        "schema": {
+          "type": "string",
+          "const": "changeover.blueprint/2.0",
+          "description": "The blueprint schema marker. Always `changeover.blueprint/2.0`."
+        },
+        "slug": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]{2,47}$",
+          "description": "URL-safe id, unique inside the organization: lower-case letters, digits and hyphens."
+        },
+        "title": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 60,
+          "description": "The relay's display name, shown in the Studio, the gallery and the run header."
+        },
+        "tagline": {
+          "type": "string",
+          "maxLength": 140,
+          "description": "One sentence for cards and the gallery."
+        },
+        "industry": {
+          "type": "string",
+          "enum": [
+            "insurance",
+            "healthcare",
+            "telecom",
+            "utilities",
+            "financial_services",
+            "retail",
+            "other"
+          ],
+          "description": "The industry this relay belongs to; it drives sample wording and gallery filters."
+        },
+        "locale": {
+          "type": "string",
+          "const": "en-US",
+          "description": "The only supported locale so far: `en-US`."
+        },
+        "intent": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{1,39}$",
+              "description": "snake_case intent id. The extractor's format is named `<id>_patch` and the case JSON carries it."
+            },
+            "summary": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "caseNoun": {
+              "type": "string",
+              "maxLength": 60
+            }
+          },
+          "required": [
+            "id",
+            "summary",
+            "caseNoun"
+          ],
+          "description": "The single intent the relay finishes: its id, a summary line and the noun for the case it builds."
+        },
+        "roles": {
+          "type": "object",
+          "properties": {
+            "rep": {
+              "type": "string",
+              "maxLength": 40
+            },
+            "customer": {
+              "type": "string",
+              "maxLength": 40
+            },
+            "org": {
+              "type": "string",
+              "maxLength": 40
+            }
+          },
+          "required": [
+            "rep",
+            "customer",
+            "org"
+          ],
+          "description": "What the three parties are called in prompts and labels: the rep, the customer and the organization."
+        },
+        "origin": {
+          "type": "string",
+          "enum": [
+            "seed",
+            "user",
+            "draft",
+            "clone"
+          ],
+          "description": "Where the blueprint came from: `seed` (shipped), `user`, `draft` or `clone`."
+        },
+        "sampleOnly": {
+          "type": "boolean",
+          "const": true,
+          "description": "Always true: disclosures and business rules in a blueprint are samples, never legal advice."
+        }
+      },
+      "required": [
+        "schema",
+        "slug",
+        "title",
+        "tagline",
+        "industry",
+        "locale",
+        "intent",
+        "roles",
+        "origin",
+        "sampleOnly"
+      ],
+      "description": "Identity and framing: what this relay is, who the parties are and where it came from."
+    },
+    "context": {
+      "type": "object",
+      "properties": {
+        "facts": {
+          "maxItems": 16,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]{1,39}$"
+              },
+              "label": {
+                "type": "string",
+                "maxLength": 60
+              }
+            },
+            "required": [
+              "key",
+              "label"
+            ]
+          },
+          "description": "The named facts a case may reference as `{fact.<key>}`."
+        },
+        "tables": {
+          "maxItems": 4,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]{1,39}$"
+              },
+              "label": {
+                "type": "string",
+                "maxLength": 60
+              },
+              "columns": {
+                "minItems": 1,
+                "maxItems": 8,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9_]{0,39}$"
+                }
+              },
+              "idColumn": {
+                "type": "string"
+              },
+              "labelColumn": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "label",
+              "columns",
+              "idColumn",
+              "labelColumn"
+            ]
+          },
+          "description": "Table definitions (vehicles, prices, …) that lookups and the case JSON may read."
+        },
+        "samples": {
+          "minItems": 1,
+          "maxItems": 5,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "customer": {
+                "type": "object",
+                "properties": {
+                  "firstName": {
+                    "type": "string",
+                    "maxLength": 40
+                  },
+                  "lastName": {
+                    "type": "string",
+                    "maxLength": 40
+                  },
+                  "phoneLast4": {
+                    "type": "string",
+                    "pattern": "^\\d{4}$"
+                  },
+                  "address": {
+                    "type": "object",
+                    "properties": {
+                      "line1": {
+                        "type": "string",
+                        "maxLength": 80
+                      },
+                      "city": {
+                        "type": "string",
+                        "maxLength": 40
+                      },
+                      "state": {
+                        "type": "string",
+                        "pattern": "^[A-Z]{2}$"
+                      },
+                      "zip": {
+                        "type": "string",
+                        "pattern": "^\\d{5}$"
+                      }
+                    },
+                    "required": [
+                      "line1",
+                      "city",
+                      "state",
+                      "zip"
+                    ]
+                  }
+                },
+                "required": [
+                  "firstName",
+                  "lastName",
+                  "phoneLast4"
+                ]
+              },
+              "org": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "maxLength": 80
+                  },
+                  "repFirstName": {
+                    "type": "string",
+                    "maxLength": 40
+                  }
+                },
+                "required": [
+                  "name",
+                  "repFirstName"
+                ]
+              },
+              "callDate": {
+                "type": "string",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+              },
+              "facts": {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9_]{1,39}$"
+                },
+                "additionalProperties": {
+                  "type": "string",
+                  "maxLength": 200
+                },
+                "description": "Fact values for this sample account, keyed by the fact ids declared in `context.facts`."
+              },
+              "tables": {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9_]{1,39}$"
+                },
+                "additionalProperties": {
+                  "maxItems": 50,
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string",
+                      "maxLength": 40
+                    },
+                    "additionalProperties": {
+                      "type": "string",
+                      "maxLength": 120
+                    }
+                  }
+                },
+                "description": "Table rows for this sample account, keyed by the table ids declared in `context.tables`."
+              }
+            },
+            "required": [
+              "customer",
+              "org",
+              "callDate",
+              "facts",
+              "tables"
+            ]
+          },
+          "description": "Fictional accounts, used by simulated calls, lint and the test runs. At least one."
+        }
+      },
+      "required": [
+        "facts",
+        "tables",
+        "samples"
+      ],
+      "description": "The account context a relay reads: which facts and tables exist, and fictional samples to test with."
+    },
+    "fields": {
+      "minItems": 1,
+      "maxItems": 24,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]{1,39}$",
+            "description": "snake_case field id, referenced as `{f.<id>}` in templates."
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 60,
+            "description": "Short human label, shown on the case card."
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 300,
+            "description": "One line of guidance: it becomes the extractor's field guide line and the tool's value hint."
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "text",
+              "person_name",
+              "date",
+              "number",
+              "integer",
+              "money",
+              "signed_money",
+              "enum",
+              "phone",
+              "zip",
+              "state",
+              "boolean",
+              "email",
+              "id_code",
+              "lookup"
+            ],
+            "description": "The value's kind. It decides the case-card rendering and the default normalizer."
+          },
+          "normalizer": {
+            "type": "string",
+            "enum": [
+              "text",
+              "free_text_lower",
+              "person_name",
+              "date",
+              "date_future",
+              "date_of_birth",
+              "integer",
+              "number",
+              "money",
+              "signed_money",
+              "enum",
+              "boolean",
+              "us_phone",
+              "us_zip5",
+              "us_state",
+              "email",
+              "id_code",
+              "lookup",
+              "insurance.relation",
+              "insurance.license_status",
+              "insurance.vehicle",
+              "insurance.incidents",
+              "insurance.discount",
+              "insurance.age"
+            ],
+            "description": "How raw speech becomes a stored value."
+          },
+          "enumValues": {
+            "maxItems": 20,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "value": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9_]{1,39}$"
+                },
+                "label": {
+                  "type": "string",
+                  "maxLength": 60
+                },
+                "synonyms": {
+                  "maxItems": 12,
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200,
+                    "description": "A JavaScript regular expression source in the safe grammar, validated server-side: no backreferences, no lookaround, and no nested quantifiers (a `*`, `+` or `{n,}` never applies to a group holding an alternation or another quantifier). Matched with the `iu` flags, against at most 1000 characters."
+                  }
+                },
+                "word": {
+                  "type": "string",
+                  "maxLength": 60
+                },
+                "spokenForms": {
+                  "maxItems": 8,
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "maxLength": 60
+                  }
+                },
+                "confirm": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2400,
+                  "description": "Template text: `{path}`, `{path|formatter}` and `{?cond}…{:}…{/?}` sections are rendered server-side. It is parsed and linted, never evaluated as code."
+                },
+                "confirmIfRaw": {
+                  "maxItems": 3,
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "pattern": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 200,
+                        "description": "A JavaScript regular expression source in the safe grammar, validated server-side: no backreferences, no lookaround, and no nested quantifiers (a `*`, `+` or `{n,}` never applies to a group holding an alternation or another quantifier). Matched with the `iu` flags, against at most 1000 characters."
+                      },
+                      "text": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 2400,
+                        "description": "Template text: `{path}`, `{path|formatter}` and `{?cond}…{:}…{/?}` sections are rendered server-side. It is parsed and linted, never evaluated as code."
+                      }
+                    },
+                    "required": [
+                      "pattern",
+                      "text"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "value",
+                "label",
+                "synonyms",
+                "spokenForms"
+              ]
+            },
+            "description": "Required when `type` is `enum`: the closed list of values, their synonyms and spoken forms."
+          },
+          "lookup": {
+            "type": "object",
+            "properties": {
+              "table": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]{1,39}$"
+              },
+              "matchColumns": {
+                "minItems": 1,
+                "maxItems": 4,
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "allowAll": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "table",
+              "matchColumns",
+              "allowAll"
+            ],
+            "description": "Required when `type` is `lookup`: the table and the columns a spoken answer is matched against."
+          },
+          "required": {
+            "type": "boolean",
+            "description": "Whether the case is incomplete until this field is VERIFIED."
+          },
+          "setBy": {
+            "type": "string",
+            "enum": [
+              "rep_only",
+              "ai_allowed",
+              "rep_or_customer"
+            ],
+            "description": "Who may set it: `rep_only`, `ai_allowed` (the agent may write it) or `rep_or_customer`."
+          },
+          "adviceDomain": {
+            "type": "boolean",
+            "description": "True for a rep decision the agent must never raise or change (it is marked decided by the rep)."
+          },
+          "serverResolvable": {
+            "type": "object",
+            "properties": {
+              "value": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]{1,39}$"
+              }
+            },
+            "required": [
+              "value"
+            ],
+            "description": "The named value that supplies this field, so the agent never asks for it."
+          },
+          "promptVisibility": {
+            "type": "string",
+            "enum": [
+              "always",
+              "when_known",
+              "rep_verified_only"
+            ],
+            "description": "When the field appears in the prompt: `always`, `when_known` or `rep_verified_only`."
+          },
+          "validation": {
+            "type": "object",
+            "properties": {
+              "pattern": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200,
+                "description": "A JavaScript regular expression source in the safe grammar, validated server-side: no backreferences, no lookaround, and no nested quantifiers (a `*`, `+` or `{n,}` never applies to a group holding an alternation or another quantifier). Matched with the `iu` flags, against at most 1000 characters."
+              },
+              "min": {
+                "type": "number"
+              },
+              "max": {
+                "type": "number"
+              },
+              "minDaysFromCall": {
+                "type": "integer",
+                "minimum": -36500,
+                "maximum": 3650,
+                "description": "Earliest allowed date, in days from the call date (negative is in the past)."
+              },
+              "maxDaysFromCall": {
+                "type": "integer",
+                "minimum": -36500,
+                "maximum": 3650,
+                "description": "Latest allowed date, in days from the call date."
+              }
+            },
+            "description": "Value limits. A value outside them is kept PENDING with a reason rather than dropped."
+          },
+          "examples": {
+            "maxItems": 4,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 80
+            },
+            "description": "Example values, shown in the Studio and used by the extractor's guide."
+          },
+          "compare": {
+            "type": "string",
+            "enum": [
+              "exact",
+              "token_subset"
+            ],
+            "description": "How two candidate values are compared: `exact`, or `token_subset` for names."
+          },
+          "display": {
+            "type": "string",
+            "enum": [
+              "raw",
+              "title",
+              "first_name",
+              "lower",
+              "spoken_date",
+              "spoken_date_long",
+              "spoken_dob",
+              "spoken_zip",
+              "spoken_chars",
+              "spoken_money",
+              "spoken_monthly",
+              "state_name",
+              "state_with_code",
+              "enum_label",
+              "enum_word",
+              "lookup_label",
+              "underscore_to_space",
+              "insurance.relation_word",
+              "insurance.relation_display",
+              "insurance.license_words",
+              "insurance.license_adjective",
+              "insurance.incidents_display",
+              "as_spoken"
+            ],
+            "description": "The formatter used when the value is displayed or spoken."
+          },
+          "capture": {
+            "type": "object",
+            "properties": {
+              "priority": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 99
+              },
+              "mode": {
+                "type": "string",
+                "enum": [
+                  "min_latency",
+                  "balanced",
+                  "max_accuracy"
+                ]
+              },
+              "entity": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "priority",
+              "mode",
+              "entity"
+            ],
+            "description": "Capture hints: ask priority, the transcription mode to use and whether it is an entity."
+          },
+          "phrases": {
+            "type": "object",
+            "properties": {
+              "ask": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2400,
+                "description": "Template text: `{path}`, `{path|formatter}` and `{?cond}…{:}…{/?}` sections are rendered server-side. It is parsed and linted, never evaluated as code."
+              },
+              "confirm": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2400,
+                "description": "Template text: `{path}`, `{path|formatter}` and `{?cond}…{:}…{/?}` sections are rendered server-side. It is parsed and linted, never evaluated as code."
+              }
+            },
+            "required": [
+              "ask",
+              "confirm"
+            ],
+            "description": "What the agent says: the ask and the confirmation for this field."
+          },
+          "qa": {
+            "type": "object",
+            "properties": {
+              "ask": {
+                "maxItems": 6,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200,
+                  "description": "A JavaScript regular expression source in the safe grammar, validated server-side: no backreferences, no lookaround, and no nested quantifiers (a `*`, `+` or `{n,}` never applies to a group holding an alternation or another quantifier). Matched with the `iu` flags, against at most 1000 characters."
+                }
+              },
+              "weak": {
+                "maxItems": 4,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200,
+                  "description": "A JavaScript regular expression source in the safe grammar, validated server-side: no backreferences, no lookaround, and no nested quantifiers (a `*`, `+` or `{n,}` never applies to a group holding an alternation or another quantifier). Matched with the `iu` flags, against at most 1000 characters."
+                }
+              }
+            },
+            "required": [
+              "ask",
+              "weak"
+            ],
+            "description": "Quality patterns: what counts as having asked for this field, and what counts as a weak ask."
+          },
+          "confirmTool": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]{1,39}$"
+              },
+              "description": {
+                "type": "string",
+                "maxLength": 400
+              },
+              "windowDays": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 365
+              }
+            },
+            "required": [
+              "name",
+              "description",
+              "windowDays"
+            ],
+            "description": "An optional dedicated confirmation tool for a date field, with its own window in days."
+          },
+          "ui": {
+            "type": "object",
+            "properties": {
+              "group": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "maxLength": 30
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "hidden": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "group",
+              "hidden"
+            ],
+            "description": "Studio presentation: the group the field sits in, and whether it is hidden."
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "description",
+          "type",
+          "normalizer",
+          "required",
+          "setBy",
+          "adviceDomain",
+          "promptVisibility",
+          "validation",
+          "examples",
+          "compare",
+          "display",
+          "capture",
+          "phrases",
+          "qa",
+          "ui"
+        ]
+      },
+      "description": "The case fields the relay collects. The order is the order the agent asks in and the order of the tool enum."
+    },
+    "values": {
+      "maxItems": 8,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]{1,39}$"
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 60
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "text",
+              "money",
+              "date",
+              "integer"
+            ]
+          },
+          "ref": {
+            "$ref": "#/$defs/ValueRef",
+            "description": "Where the value comes from. `first_of` tries its refs in order and takes the first that resolves."
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "type",
+          "ref"
+        ]
+      },
+      "description": "Named values (money, dates) the playbook can speak, resolved from fields, facts, tables or built-ins."
+    },
+    "listening": {
+      "type": "object",
+      "properties": {
+        "keyterms": {
+          "maxItems": 60,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 50
+          },
+          "description": "Fixed domain terms that help transcription (product names, jargon)."
+        },
+        "contextKeyterms": {
+          "maxItems": 16,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^(customer\\.(firstName|lastName|fullName)|org\\.(name|repFirstName)|fact\\.[a-z0-9_]+|table\\.[a-z0-9_]+\\.[a-z0-9_]+)$"
+          },
+          "description": "Paths whose values are added as key terms at run time, e.g. `customer.lastName`."
+        },
+        "languageCodes": {
+          "anyOf": [
+            {
+              "type": "array",
+              "prefixItems": [
+                {
+                  "type": "string",
+                  "const": "en"
+                }
+              ],
+              "items": false,
+              "minItems": 1,
+              "maxItems": 1,
+              "description": "The languages to transcribe: `[en]`, or `[en, hi]` for a bilingual call."
+            },
+            {
+              "type": "array",
+              "prefixItems": [
+                {
+                  "type": "string",
+                  "const": "en"
+                },
+                {
+                  "type": "string",
+                  "const": "hi"
+                }
+              ],
+              "items": false,
+              "minItems": 2,
+              "maxItems": 2,
+              "description": "The languages to transcribe: `[en]`, or `[en, hi]` for a bilingual call."
+            }
+          ],
+          "description": "The languages to transcribe: `[en]`, or `[en, hi]` for a bilingual call."
+        },
+        "scenarioPrompt": {
+          "type": "string",
+          "minLength": 40,
+          "maxLength": 1750,
+          "description": "The transcription prompt: what this call is about, in a few sentences."
+        },
+        "tuning": {
+          "type": "string",
+          "enum": [
+            "telephony_8k",
+            "wideband_16k"
+          ],
+          "description": "`telephony_8k` for phone audio, `wideband_16k` for wideband."
+        }
+      },
+      "required": [
+        "keyterms",
+        "contextKeyterms",
+        "languageCodes",
+        "scenarioPrompt",
+        "tuning"
+      ],
+      "description": "Live transcription settings for the call: key terms, languages, the scenario prompt and the tuning."
+    },
+    "handoff": {
+      "type": "object",
+      "properties": {
+        "allowedWhen": {
+          "type": "object",
+          "properties": {
+            "minCallSeconds": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 600
+            },
+            "requireVerified": {
+              "maxItems": 8,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]{1,39}$"
+              }
+            }
+          },
+          "required": [
+            "minCallSeconds",
+            "requireVerified"
+          ],
+          "description": "The gate on the Pass button: a minimum call length and the fields that must be VERIFIED first."
+        },
+        "repLine": {
+          "type": "string",
+          "minLength": 10,
+          "maxLength": 200,
+          "description": "The line the rep says to hand over; the customer's answer to it is the acceptance."
+        },
+        "repLinePatterns": {
+          "maxItems": 4,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "description": "A JavaScript regular expression source in the safe grammar, validated server-side: no backreferences, no lookaround, and no nested quantifiers (a `*`, `+` or `{n,}` never applies to a group holding an alternation or another quantifier). Matched with the `iu` flags, against at most 1000 characters."
+          }
+        },
+        "acceptance": {
+          "type": "object",
+          "properties": {
+            "phrase": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 100
+            },
+            "patterns": {
+              "maxItems": 4,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200,
+                "description": "A JavaScript regular expression source in the safe grammar, validated server-side: no backreferences, no lookaround, and no nested quantifiers (a `*`, `+` or `{n,}` never applies to a group holding an alternation or another quantifier). Matched with the `iu` flags, against at most 1000 characters."
+              }
+            }
+          },
+          "required": [
+            "phrase",
+            "patterns"
+          ],
+          "description": "The customer's go-ahead: the canonical phrase and the patterns that detect it."
+        },
+        "autoBaton": {
+          "type": "boolean",
+          "description": "Arm the pass automatically once the rep line and the acceptance are both heard."
+        },
+        "repReturnLine": {
+          "type": "string",
+          "maxLength": 200,
+          "description": "What the agent says when it hands the call back to the rep."
+        }
+      },
+      "required": [
+        "allowedWhen",
+        "repLine",
+        "repLinePatterns",
+        "acceptance",
+        "autoBaton",
+        "repReturnLine"
+      ],
+      "description": "When and how the baton passes from the rep to the agent."
+    },
+    "playbook": {
+      "type": "object",
+      "properties": {
+        "voice": {
+          "type": "string",
+          "enum": [
+            "alba",
+            "anna",
+            "charles",
+            "estelle",
+            "eve",
+            "george",
+            "giovanni",
+            "iris",
+            "jane",
+            "jean",
+            "juergen",
+            "lola",
+            "mary",
+            "michael",
+            "paul",
+            "rafael",
+            "reid",
+            "vera"
+          ],
+          "description": "The Voice Agent voice."
+        },
+        "persona": {
+          "type": "object",
+          "properties": {
+            "tone": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "extraRules": {
+              "maxItems": 10,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "maxLength": 300
+              }
+            }
+          },
+          "required": [
+            "tone",
+            "extraRules"
+          ],
+          "description": "Tone and extra rules that are added to the prompt."
+        },
+        "subject": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2400,
+          "description": "How the agent refers to what the case is about (a name once known, a noun phrase before that). Template text: `{path}`, `{path|formatter}` and `{?cond}…{:}…{/?}` sections are rendered server-side. It is parsed and linted, never evaluated as code."
+        },
+        "greeting": {
+          "type": "object",
+          "properties": {
+            "opening": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2400,
+              "description": "Must state that this is an AI assistant, not a person, and that the call is recorded. Template text: `{path}`, `{path|formatter}` and `{?cond}…{:}…{/?}` sections are rendered server-side. It is parsed and linted, never evaluated as code."
+            },
+            "summary": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2400,
+              "description": "Template text: `{path}`, `{path|formatter}` and `{?cond}…{:}…{/?}` sections are rendered server-side. It is parsed and linted, never evaluated as code."
+            },
+            "clauses": {
+              "maxItems": 6,
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z0-9_]{1,39}$"
+                  },
+                  "text": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2400,
+                    "description": "Template text: `{path}`, `{path|formatter}` and `{?cond}…{:}…{/?}` sections are rendered server-side. It is parsed and linted, never evaluated as code."
+                  },
+                  "dropOrder": {
+                    "anyOf": [
+                      {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "text",
+                  "dropOrder"
+                ]
+              }
+            },
+            "optOut": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2400,
+              "description": "Template text: `{path}`, `{path|formatter}` and `{?cond}…{:}…{/?}` sections are rendered server-side. It is parsed and linted, never evaluated as code."
+            },
+            "next": {
+              "type": "object",
+              "properties": {
+                "confirm": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2400,
+                  "description": "Template text: `{path}`, `{path|formatter}` and `{?cond}…{:}…{/?}` sections are rendered server-side. It is parsed and linted, never evaluated as code."
+                },
+                "ask": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2400,
+                  "description": "Template text: `{path}`, `{path|formatter}` and `{?cond}…{:}…{/?}` sections are rendered server-side. It is parsed and linted, never evaluated as code."
+                },
+                "ready": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2400,
+                  "description": "Template text: `{path}`, `{path|formatter}` and `{?cond}…{:}…{/?}` sections are rendered server-side. It is parsed and linted, never evaluated as code."
+                }
+              },
+              "required": [
+                "confirm",
+                "ask",
+                "ready"
+              ]
+            },
+            "maxWords": {
+              "type": "integer",
+              "minimum": 20,
+              "maximum": 40,
+              "description": "The rendered greeting must fit in this many words (about 0.34 s per word)."
+            }
+          },
+          "required": [
+            "opening",
+            "summary",
+            "clauses",
+            "optOut",
+            "next",
+            "maxWords"
+          ],
+          "description": "The first thing the agent says: the opening, the summary of the case, the opt-out and what comes next."
+        },
+        "promptTemplate": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2400,
+              "description": "The agent prompt. `null` generates it from this blueprint."
+            },
+            {
+              "type": "null",
+              "description": "The agent prompt. `null` generates it from this blueprint."
+            }
+          ],
+          "description": "The agent prompt. `null` generates it from this blueprint. Template text: `{path}`, `{path|formatter}` and `{?cond}…{:}…{/?}` sections are rendered server-side. It is parsed and linted, never evaluated as code."
+        },
+        "caseJson": {
+          "type": "object",
+          "properties": {
+            "header": {
+              "maxItems": 4,
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "key": {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z0-9_]{0,29}$"
+                  },
+                  "from": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "key",
+                  "from"
+                ]
+              }
+            },
+            "tables": {
+              "maxItems": 2,
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "key": {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z0-9_]{0,29}$"
+                  },
+                  "table": {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z0-9_]{1,39}$"
+                  }
+                },
+                "required": [
+                  "key",
+                  "table"
+                ]
+              }
+            },
+            "maxChars": {
+              "type": "integer",
+              "minimum": 600,
+              "maximum": 2400
+            }
+          },
+          "required": [
+            "header",
+            "tables",
+            "maxChars"
+          ],
+          "description": "What the agent sees of the case: the header keys, the tables to include and a character budget."
+        },
+        "vaKeyterms": {
+          "maxItems": 16,
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Key terms handed to the Voice Agent: context paths and `f.<id>` field references."
+        },
+        "stages": {
+          "minItems": 1,
+          "maxItems": 4,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]{1,39}$"
+              },
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "confirm",
+                  "disclose",
+                  "act",
+                  "close"
+                ]
+              },
+              "label": {
+                "type": "string",
+                "maxLength": 40
+              },
+              "goal": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2400,
+                "description": "What the agent must achieve in this stage, in the words the prompt will use. Template text: `{path}`, `{path|formatter}` and `{?cond}…{:}…{/?}` sections are rendered server-side. It is parsed and linted, never evaluated as code."
+              },
+              "tools": {
+                "minItems": 2,
+                "maxItems": 6,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9_]{1,39}$"
+                },
+                "description": "The tools allowed in this stage, in order. `update_case_field` and `hand_back_to_rep` are required."
+              },
+              "exit": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "type": "string",
+                        "const": "all_required_verified"
+                      }
+                    },
+                    "required": [
+                      "kind"
+                    ],
+                    "description": "What ends the stage: everything verified, a disclosure accepted, a connector succeeded, or the end."
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "type": "string",
+                        "const": "disclosure_accepted"
+                      },
+                      "disclosure": {
+                        "type": "string",
+                        "pattern": "^[a-z][a-z0-9_]{1,39}$"
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "disclosure"
+                    ],
+                    "description": "What ends the stage: everything verified, a disclosure accepted, a connector succeeded, or the end."
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "type": "string",
+                        "const": "connector_succeeded"
+                      },
+                      "connector": {
+                        "type": "string",
+                        "pattern": "^[a-z][a-z0-9_]{1,39}$"
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "connector"
+                    ],
+                    "description": "What ends the stage: everything verified, a disclosure accepted, a connector succeeded, or the end."
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "type": "string",
+                        "const": "end"
+                      }
+                    },
+                    "required": [
+                      "kind"
+                    ],
+                    "description": "What ends the stage: everything verified, a disclosure accepted, a connector succeeded, or the end."
+                  }
+                ],
+                "description": "What ends the stage: everything verified, a disclosure accepted, a connector succeeded, or the end."
+              }
+            },
+            "required": [
+              "id",
+              "kind",
+              "label",
+              "goal",
+              "tools",
+              "exit"
+            ]
+          },
+          "description": "The ordered stages of the call. Each stage lists the tools the agent may use and how it exits."
+        },
+        "disclosures": {
+          "maxItems": 4,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]{1,39}$"
+              },
+              "title": {
+                "type": "string",
+                "maxLength": 60
+              },
+              "text": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2400,
+                "description": "Template text: `{path}`, `{path|formatter}` and `{?cond}…{:}…{/?}` sections are rendered server-side. It is parsed and linted, never evaluated as code."
+              },
+              "criticalTokens": {
+                "maxItems": 8,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2400,
+                  "description": "Template text: `{path}`, `{path|formatter}` and `{?cond}…{:}…{/?}` sections are rendered server-side. It is parsed and linted, never evaluated as code."
+                },
+                "description": "Parts of the text that must be spoken; empty renders are dropped."
+              },
+              "requiresReady": {
+                "type": "boolean",
+                "description": "Refuse to read this until every required field is VERIFIED."
+              },
+              "requiresAccepted": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z0-9_]{1,39}$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "consent": {
+                "type": "boolean",
+                "description": "A yes to this disclosure counts as consent for the acting stage."
+              }
+            },
+            "required": [
+              "id",
+              "title",
+              "text",
+              "criticalTokens",
+              "requiresReady",
+              "requiresAccepted",
+              "consent"
+            ]
+          },
+          "description": "Texts the agent reads verbatim, with the tokens that must survive and what they require first."
+        },
+        "builtinToolText": {
+          "type": "object",
+          "properties": {
+            "updateCaseFieldValueHint": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 300
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "updateCaseFieldValueHint"
+          ],
+          "description": "Overrides for the built-in tool texts; `null` keeps the default."
+        },
+        "sessionCap": {
+          "type": "object",
+          "properties": {
+            "baseSec": {
+              "type": "integer",
+              "minimum": 60,
+              "maximum": 300
+            },
+            "perFieldSec": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 60
+            },
+            "maxSec": {
+              "type": "integer",
+              "minimum": 120,
+              "maximum": 420
+            }
+          },
+          "required": [
+            "baseSec",
+            "perFieldSec",
+            "maxSec"
+          ],
+          "description": "The agent's time budget: a base, a per-field allowance and a hard maximum, in seconds."
+        }
+      },
+      "required": [
+        "voice",
+        "persona",
+        "subject",
+        "greeting",
+        "promptTemplate",
+        "caseJson",
+        "vaKeyterms",
+        "stages",
+        "disclosures",
+        "builtinToolText",
+        "sessionCap"
+      ],
+      "description": "What the agent is and does on the call: its voice, greeting, stages, disclosures and limits."
+    },
+    "connectors": {
+      "maxItems": 6,
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "const": "payment_link"
+              },
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]{1,39}$"
+              },
+              "label": {
+                "type": "string",
+                "maxLength": 60
+              },
+              "toolName": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]{1,39}$"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 10,
+                "maxLength": 400
+              },
+              "provider": {
+                "type": "string",
+                "enum": [
+                  "polar_sandbox",
+                  "mock"
+                ]
+              },
+              "amount": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]{1,39}$"
+              },
+              "esign": {
+                "type": "boolean"
+              },
+              "smsTemplate": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2400,
+                "description": "Template text: `{path}`, `{path|formatter}` and `{?cond}…{:}…{/?}` sections are rendered server-side. It is parsed and linted, never evaluated as code."
+              },
+              "requiresDisclosure": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z0-9_]{1,39}$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "type",
+              "id",
+              "label",
+              "toolName",
+              "description",
+              "provider",
+              "amount",
+              "esign",
+              "smsTemplate",
+              "requiresDisclosure"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "const": "esign_mock"
+              },
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]{1,39}$"
+              },
+              "label": {
+                "type": "string",
+                "maxLength": 60
+              },
+              "toolName": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]{1,39}$"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 10,
+                "maxLength": 400
+              },
+              "documentTitle": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2400,
+                "description": "Template text: `{path}`, `{path|formatter}` and `{?cond}…{:}…{/?}` sections are rendered server-side. It is parsed and linted, never evaluated as code."
+              },
+              "smsTemplate": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2400,
+                "description": "Template text: `{path}`, `{path|formatter}` and `{?cond}…{:}…{/?}` sections are rendered server-side. It is parsed and linted, never evaluated as code."
+              },
+              "requiresDisclosure": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z0-9_]{1,39}$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "type",
+              "id",
+              "label",
+              "toolName",
+              "description",
+              "documentTitle",
+              "smsTemplate",
+              "requiresDisclosure"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "const": "sms_mock"
+              },
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]{1,39}$"
+              },
+              "label": {
+                "type": "string",
+                "maxLength": 60
+              },
+              "toolName": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]{1,39}$"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 10,
+                "maxLength": 400
+              },
+              "template": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2400,
+                "description": "Template text: `{path}`, `{path|formatter}` and `{?cond}…{:}…{/?}` sections are rendered server-side. It is parsed and linted, never evaluated as code."
+              },
+              "params": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "const": "object"
+                  },
+                  "required": {
+                    "maxItems": 8,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "pattern": "^[a-z][a-z0-9_]{1,39}$"
+                    }
+                  },
+                  "properties": {
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string",
+                      "pattern": "^[a-z][a-z0-9_]{1,39}$"
+                    },
+                    "additionalProperties": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "string",
+                            "number",
+                            "integer",
+                            "boolean"
+                          ]
+                        },
+                        "description": {
+                          "type": "string",
+                          "maxLength": 200
+                        },
+                        "enum": {
+                          "maxItems": 20,
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "maxLength": 60
+                          }
+                        },
+                        "pattern": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 200,
+                          "description": "A JavaScript regular expression source in the safe grammar, validated server-side: no backreferences, no lookaround, and no nested quantifiers (a `*`, `+` or `{n,}` never applies to a group holding an alternation or another quantifier). Matched with the `iu` flags, against at most 1000 characters."
+                        },
+                        "examples": {
+                          "maxItems": 3,
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "maxLength": 60
+                          }
+                        }
+                      },
+                      "required": [
+                        "type"
+                      ],
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "required": [
+                  "type",
+                  "required",
+                  "properties"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "type",
+              "id",
+              "label",
+              "toolName",
+              "description",
+              "template",
+              "params"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "const": "http_action"
+              },
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]{1,39}$"
+              },
+              "label": {
+                "type": "string",
+                "maxLength": 60
+              },
+              "toolName": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]{1,39}$"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 10,
+                "maxLength": 400
+              },
+              "method": {
+                "type": "string",
+                "enum": [
+                  "POST",
+                  "GET"
+                ]
+              },
+              "url": {
+                "type": "string",
+                "maxLength": 300,
+                "pattern": "^https:\\/\\/.*",
+                "description": "An `https://` URL. Never put a credential in it; reference a secret instead."
+              },
+              "params": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "const": "object"
+                  },
+                  "required": {
+                    "maxItems": 8,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "pattern": "^[a-z][a-z0-9_]{1,39}$"
+                    }
+                  },
+                  "properties": {
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string",
+                      "pattern": "^[a-z][a-z0-9_]{1,39}$"
+                    },
+                    "additionalProperties": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "string",
+                            "number",
+                            "integer",
+                            "boolean"
+                          ]
+                        },
+                        "description": {
+                          "type": "string",
+                          "maxLength": 200
+                        },
+                        "enum": {
+                          "maxItems": 20,
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "maxLength": 60
+                          }
+                        },
+                        "pattern": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 200,
+                          "description": "A JavaScript regular expression source in the safe grammar, validated server-side: no backreferences, no lookaround, and no nested quantifiers (a `*`, `+` or `{n,}` never applies to a group holding an alternation or another quantifier). Matched with the `iu` flags, against at most 1000 characters."
+                        },
+                        "examples": {
+                          "maxItems": 3,
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "maxLength": 60
+                          }
+                        }
+                      },
+                      "required": [
+                        "type"
+                      ],
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "required": [
+                  "type",
+                  "required",
+                  "properties"
+                ],
+                "additionalProperties": false
+              },
+              "headers": {
+                "maxItems": 4,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "pattern": "^[A-Za-z0-9-]{1,40}$"
+                    },
+                    "value": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "maxLength": 200
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "$secret": {
+                              "type": "string",
+                              "pattern": "^sec_[a-z0-9]{16}$"
+                            }
+                          },
+                          "required": [
+                            "$secret"
+                          ],
+                          "additionalProperties": false
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "value"
+                  ]
+                },
+                "description": "Request headers. A value is a literal string or a `{ \"$secret\": \"sec_…\" }` reference, never a key."
+              },
+              "hmacSecret": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "$secret": {
+                        "type": "string",
+                        "pattern": "^sec_[a-z0-9]{16}$"
+                      }
+                    },
+                    "required": [
+                      "$secret"
+                    ],
+                    "additionalProperties": false,
+                    "description": "The secret used to sign the request body, as a `$secret` reference."
+                  },
+                  {
+                    "type": "null",
+                    "description": "The secret used to sign the request body, as a `$secret` reference."
+                  }
+                ],
+                "description": "The secret used to sign the request body, as a `$secret` reference."
+              },
+              "timeoutMs": {
+                "type": "integer",
+                "minimum": 500,
+                "maximum": 5000,
+                "description": "Request timeout in milliseconds (500-5000)."
+              },
+              "responsePick": {
+                "maxItems": 8,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_]+(\\.[A-Za-z0-9_]+){0,3}$"
+                },
+                "description": "The only response paths handed to the agent; everything else in the response is dropped."
+              },
+              "sideEffect": {
+                "type": "boolean",
+                "description": "True when the call changes something; such a connector is allowed only in an acting or closing stage."
+              }
+            },
+            "required": [
+              "type",
+              "id",
+              "label",
+              "toolName",
+              "description",
+              "method",
+              "url",
+              "params",
+              "headers",
+              "hmacSecret",
+              "timeoutMs",
+              "responsePick",
+              "sideEffect"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "const": "lookup_table"
+              },
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]{1,39}$"
+              },
+              "label": {
+                "type": "string",
+                "maxLength": 60
+              },
+              "toolName": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]{1,39}$"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 10,
+                "maxLength": 400
+              },
+              "table": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]{1,39}$"
+              },
+              "keyColumn": {
+                "type": "string"
+              },
+              "format": {
+                "type": "string",
+                "enum": [
+                  "csv",
+                  "json"
+                ]
+              },
+              "data": {
+                "type": "string",
+                "maxLength": 32768
+              }
+            },
+            "required": [
+              "type",
+              "id",
+              "label",
+              "toolName",
+              "description",
+              "table",
+              "keyColumn",
+              "format",
+              "data"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "const": "completion_webhook"
+              },
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]{1,39}$"
+              },
+              "label": {
+                "type": "string",
+                "maxLength": 60
+              },
+              "url": {
+                "type": "string",
+                "maxLength": 300,
+                "pattern": "^https:\\/\\/.*",
+                "description": "An `https://` URL. Never put a credential in it; reference a secret instead."
+              },
+              "hmacSecret": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "$secret": {
+                        "type": "string",
+                        "pattern": "^sec_[a-z0-9]{16}$"
+                      }
+                    },
+                    "required": [
+                      "$secret"
+                    ],
+                    "additionalProperties": false,
+                    "description": "The secret used to sign the request body, as a `$secret` reference."
+                  },
+                  {
+                    "type": "null",
+                    "description": "The secret used to sign the request body, as a `$secret` reference."
+                  }
+                ],
+                "description": "The secret used to sign the request body, as a `$secret` reference."
+              },
+              "include": {
+                "minItems": 1,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "case",
+                    "qa",
+                    "payment"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "type",
+              "id",
+              "label",
+              "url",
+              "hmacSecret",
+              "include"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "const": "confirmation"
+              },
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]{1,39}$"
+              },
+              "label": {
+                "type": "string",
+                "maxLength": 60
+              },
+              "toolName": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]{1,39}$"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 10,
+                "maxLength": 400
+              },
+              "requires": {
+                "maxItems": 3,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9_]{1,39}$"
+                }
+              },
+              "smsTemplate": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2400,
+                "description": "Template text: `{path}`, `{path|formatter}` and `{?cond}…{:}…{/?}` sections are rendered server-side. It is parsed and linted, never evaluated as code."
+              }
+            },
+            "required": [
+              "type",
+              "id",
+              "label",
+              "toolName",
+              "description",
+              "requires",
+              "smsTemplate"
+            ]
+          }
+        ]
+      },
+      "description": "What the relay may do in the world: payment links, e-sign, SMS, lookups and your own HTTPS endpoints."
+    },
+    "qa": {
+      "type": "object",
+      "properties": {
+        "reaskTargets": {
+          "maxItems": 24,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]{1,39}$"
+          }
+        },
+        "verbatimThreshold": {
+          "type": "number",
+          "minimum": 0.8,
+          "maximum": 1
+        },
+        "adviceLexicon": {
+          "maxItems": 6,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "description": "A JavaScript regular expression source in the safe grammar, validated server-side: no backreferences, no lookaround, and no nested quantifiers (a `*`, `+` or `{n,}` never applies to a group holding an alternation or another quantifier). Matched with the `iu` flags, against at most 1000 characters."
+          }
+        }
+      },
+      "required": [
+        "reaskTargets",
+        "verbatimThreshold",
+        "adviceLexicon"
+      ],
+      "description": "Quality scoring for a finished call: which fields are re-asked, how close a verbatim reading must be, and the advice lexicon."
+    },
+    "extraction": {
+      "type": "object",
+      "properties": {
+        "domainLine": {
+          "type": "string",
+          "maxLength": 300
+        },
+        "intentLine": {
+          "type": "string",
+          "maxLength": 300
+        },
+        "fieldGuide": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 4000,
+              "description": "The verbatim field guide for the extractor. `null` generates it from `fields`."
+            },
+            {
+              "type": "null",
+              "description": "The verbatim field guide for the extractor. `null` generates it from `fields`."
+            }
+          ],
+          "description": "The verbatim field guide for the extractor. `null` generates it from `fields`."
+        },
+        "contextKey": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,29}$"
+        },
+        "context": {
+          "maxItems": 6,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]{0,29}$"
+              },
+              "from": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "key",
+              "from"
+            ]
+          }
+        }
+      },
+      "required": [
+        "domainLine",
+        "intentLine",
+        "fieldGuide",
+        "contextKey",
+        "context"
+      ],
+      "description": "How the transcript is turned into case updates: the domain and intent lines, the field guide and the context keys."
+    },
+    "compliance": {
+      "type": "object",
+      "properties": {
+        "aiDisclosurePatterns": {
+          "minItems": 2,
+          "maxItems": 4,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "description": "A JavaScript regular expression source in the safe grammar, validated server-side: no backreferences, no lookaround, and no nested quantifiers (a `*`, `+` or `{n,}` never applies to a group holding an alternation or another quantifier). Matched with the `iu` flags, against at most 1000 characters."
+          },
+          "description": "Patterns that must match the rendered greeting, proving the AI disclosure was said."
+        },
+        "recordingNoticePattern": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "description": "The pattern proving the recording notice was said. A JavaScript regular expression source in the safe grammar, validated server-side: no backreferences, no lookaround, and no nested quantifiers (a `*`, `+` or `{n,}` never applies to a group holding an alternation or another quantifier). Matched with the `iu` flags, against at most 1000 characters."
+        },
+        "neverCollect": {
+          "minItems": 3,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "card_number",
+              "bank_account",
+              "password",
+              "ssn"
+            ]
+          },
+          "description": "Categories the relay must never collect. At least three."
+        }
+      },
+      "required": [
+        "aiDisclosurePatterns",
+        "recordingNoticePattern",
+        "neverCollect"
+      ],
+      "description": "What must be said and what must never be collected."
+    }
+  },
+  "required": [
+    "meta",
+    "context",
+    "fields",
+    "values",
+    "listening",
+    "handoff",
+    "playbook",
+    "connectors",
+    "qa",
+    "extraction",
+    "compliance"
+  ],
+  "$defs": {
+    "ValueRef": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "field"
+            },
+            "field": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{1,39}$"
+            },
+            "requireRep": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "kind",
+            "field",
+            "requireRep"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "fact"
+            },
+            "key": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{1,39}$"
+            }
+          },
+          "required": [
+            "kind",
+            "key"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "fixed"
+            },
+            "value": {
+              "type": "string",
+              "maxLength": 60
+            }
+          },
+          "required": [
+            "kind",
+            "value"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "lookup"
+            },
+            "table": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{1,39}$"
+            },
+            "keyField": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{1,39}$"
+            },
+            "column": {
+              "type": "string",
+              "maxLength": 40
+            }
+          },
+          "required": [
+            "kind",
+            "table",
+            "keyField",
+            "column"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "builtin"
+            },
+            "id": {
+              "type": "string",
+              "enum": [
+                "insurance.monthly_premium",
+                "insurance.due_today_prorated"
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "id"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "first_of"
+            },
+            "refs": {
+              "minItems": 2,
+              "maxItems": 4,
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/ValueRef"
+              }
+            }
+          },
+          "required": [
+            "kind",
+            "refs"
+          ]
+        }
+      ],
+      "title": "Named value reference",
+      "description": "Where a named value comes from: a case field, an account fact, a fixed string, a table lookup, a built-in, or `first_of`, which tries its refs in order."
+    }
+  }
+}

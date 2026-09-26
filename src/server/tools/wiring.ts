@@ -11,7 +11,11 @@ import { PaymentService, type PaymentsMode } from "../payments/service";
 import { DbPaymentStore } from "../payments/store";
 import { sdkPolarApi } from "../polar/client";
 import { kitRatingSource, type RatingSource } from "../rating";
+import { getConnectorCallLog } from "../connectors";
+import { RelayConnectorRuntime } from "../connectors/runtime";
 import { getToolCore, hasToolCore, setToolCore, type ToolCore } from "./core-port";
+import { defaultRelayRunSource, type RelayRunSource } from "./relay-run-source";
+import { RelayToolServiceImpl } from "./relay-tool-service";
 import { wp1ToolCore, wp2PaymentsModeOverride, wp2RateLimiter, wp2RequireTakeover, wp3CaseSink } from "./defaults";
 import { Wp6ToolService } from "./service";
 import { DbToolStore, type ToolStore } from "./store";
@@ -50,6 +54,8 @@ export interface Wp6Config {
   paymentsModeOverride?: () => Promise<PaymentsMode | null>;
   core?: ToolCore;
   rating?: RatingSource;
+  /** WP16·2: where the generic service finds a case's relay version, compiled relay and account. */
+  runs?: RelayRunSource;
 }
 
 export interface Wp6 {
@@ -60,6 +66,14 @@ export interface Wp6 {
   rateLimiter: RateLimiter;
   webhookSecret: string | null;
   appUrl: string | null;
+  /**
+   * WP16·2 (PLATFORM §6.3 "`/api/tools/[name]` resolves the case"): the generic service, and what the route needs to
+   * choose between it and the legacy Baton one. `null` (route tests that only exercise WP6) keeps every call legacy.
+   */
+  relayTools?: RelayToolServiceImpl | null;
+  relayCaseOf?: (caseId: string) => Promise<{ relayVersionId: string | null; mode: string } | null>;
+  /** `RELAY_ENGINE`: with `kernel`, even a version-less Baton case runs on the kernel (PLATFORM §4.6). */
+  relayEngine?: "legacy" | "kernel";
 }
 
 let cfg: Wp6Config = {};
@@ -108,6 +122,7 @@ export function wp6(): Wp6 {
       taxSuffix: process.env.DISCLOSURE_TAX_SUFFIX?.trim() === "1",
     },
   });
+  const runs = cfg.runs ?? defaultRelayRunSource();
   built = {
     payments,
     tools,
@@ -116,8 +131,54 @@ export function wp6(): Wp6 {
     rateLimiter: cfg.rateLimiter ?? wp2RateLimiter(),
     webhookSecret: e.POLAR_WEBHOOK_SECRET ?? null,
     appUrl: e.APP_URL ?? null,
+    relayTools: new RelayToolServiceImpl({
+      runs,
+      cases: cfg.cases ?? wp3CaseSink(),
+      store: toolStore,
+      payments,
+      connectors: buildConnectorRuntime({ payments, store: toolStore }),
+      callLog: getConnectorCallLog(),
+      config: { deployId: e.BATON_DEPLOY_ID, taxSuffix: process.env.DISCLOSURE_TAX_SUFFIX?.trim() === "1" },
+    }),
+    relayCaseOf: (caseId) => runs.loadCase(caseId),
+    // Not in EnvSchema yet (request wp16-to-wp12 §2): read directly, and default to the submission setting.
+    relayEngine: process.env.RELAY_ENGINE?.trim() === "kernel" ? "kernel" : "legacy",
   };
   return built;
+}
+
+/**
+ * WP16·2, for WP18's published gateway (`docs/notes/requests/wp18-to-wp16.md` §1): the ONE `RelayToolService` this
+ * process runs. It is the same instance `/api/tools/[name]` uses, so a test run and a published run of the same
+ * relay cannot end up on two different stage gates or two different connector runtimes.
+ *
+ * `setPublishDeps({ tools: getRelayToolService })` registers it; see `docs/notes/requests/wp16-to-wp18.md` for why
+ * WP18 owns that line (the gateway route is theirs, and a module-level side effect here would depend on which route
+ * Next.js loaded first).
+ */
+export function getRelayToolService(): RelayToolServiceImpl | null {
+  return wp6().relayTools ?? null;
+}
+
+/**
+ * WP16·2: the `ConnectorRuntime` the generic service dispatches through — the SSRF-guarded HTTP path and the
+ * `connector_calls` log from WP16·1, plus the built-ins' two side effects (create a payment, write a takeover
+ * metric). The secret store is resolved lazily so a process without `AGENT_TOOL_SECRET` still serves Baton.
+ */
+export function buildConnectorRuntime(d: { payments: PaymentService; store: ToolStore }): RelayConnectorRuntime {
+  return new RelayConnectorRuntime({
+    secrets: {
+      resolve: async (ws, ref) => (await import("../secrets")).getSecretStore().resolve(ws, ref),
+      nameOf: async (ws, ref) => (await import("../secrets")).getSecretStore().nameOf(ws, ref),
+    },
+    callLog: getConnectorCallLog(),
+    payments: { create: (i) => d.payments.create(i) },
+    store: {
+      markConnector: (id, r) => d.store.markConnector(id, r),
+      putConfirmationNumber: (id, n) => d.store.putConfirmationNumber(id, n),
+      setCaseStatus: (caseId, status, from) => d.store.setCaseStatus(caseId, status, from),
+    },
+  });
 }
 
 /**

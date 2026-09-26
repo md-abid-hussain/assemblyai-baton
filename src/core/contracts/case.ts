@@ -5,7 +5,17 @@
  * REQUIRED (10), SERVER_RESOLVABLE, REP_ONLY, AI_SETTABLE and ADVICE_DOMAIN also live in add-driver.fields.ts.
  */
 import { z } from "zod";
-import { FIELD_IDS, FIELD_STATUSES } from "../intents/add-driver.fields";
+import { FIELD_STATUSES } from "../intents/add-driver.fields";
+
+/**
+ * P§4.7 (the one widening commit): the id grammar shared by every platform identifier - the same source as
+ * `IdSchema` in contracts/v2/blueprint.ts and `TOOL_NAME_RE` in the published gateway. A field, tool or disclosure
+ * id is now any blueprint id, not one of Baton's literals, so one kernel serves every relay.
+ */
+export const ID_RE = /^[a-z][a-z0-9_]{1,39}$/;
+
+/** Baton's own field vocabulary (the literal union) stays in the intent registry. */
+export type { BatonFieldId } from "../intents/add-driver.fields";
 
 export const CHANNELS = ["rep", "customer"] as const;
 export const ChannelSchema = z.enum(CHANNELS);
@@ -18,7 +28,12 @@ export type Party = z.infer<typeof PartySchema>;
 export const FieldStatusSchema = z.enum(FIELD_STATUSES);
 export type FieldStatus = z.infer<typeof FieldStatusSchema>;
 
-export const FieldIdSchema = z.enum(FIELD_IDS);
+/**
+ * P§4.7: widened from `z.enum(FIELD_IDS)` to the id grammar. Every Baton field id still parses; a relay's fields
+ * now parse too. `BatonFieldId` (re-exported above) is the literal union, and the literal-keyed maps
+ * (`FIELD_LABEL`, `FIELD_KIND`) are indexed with it.
+ */
+export const FieldIdSchema = z.string().regex(ID_RE);
 export type FieldId = z.infer<typeof FieldIdSchema>;
 
 export const STATUS_REASONS = [
@@ -189,8 +204,13 @@ export const PolicyRecordSchema = z.object({
 });
 export type PolicyRecord = z.infer<typeof PolicyRecordSchema>;
 
+/** Baton's two disclosures. A relay declares its own in `blueprint.disclosures` (P§3.2). */
 export const DISCLOSURE_KINDS = ["premium_change", "esign_consent"] as const;
-export const DisclosureKindSchema = z.enum(DISCLOSURE_KINDS);
+export const BatonDisclosureKindSchema = z.enum(DISCLOSURE_KINDS);
+export type BatonDisclosureKind = z.infer<typeof BatonDisclosureKindSchema>;
+
+/** P§4.7: widened from `z.enum(DISCLOSURE_KINDS)` to the id grammar (a relay's disclosure ids). */
+export const DisclosureKindSchema = z.string().regex(ID_RE);
 export type DisclosureKind = z.infer<typeof DisclosureKindSchema>;
 
 export const CasePaymentSchema = z.object({
@@ -205,12 +225,24 @@ export const CasePaymentSchema = z.object({
 });
 export type CasePayment = z.infer<typeof CasePaymentSchema>;
 
+/**
+ * `cases.intent` (P§4.7). "add_driver" is the flagship; every relay run carries "relay" (the blueprint's own
+ * intent id lives in `CompiledRelay.spec.intent`). The DB column is text with no check, so this is a TS-only
+ * widening.
+ */
+export const CASE_INTENTS = ["add_driver", "relay"] as const;
+export const CaseIntentSchema = z.enum(CASE_INTENTS);
+export type CaseIntent = z.infer<typeof CaseIntentSchema>;
+
 export const CaseStateSchema = z.object({
   caseId: z.string(),
-  intent: z.literal("add_driver"),
+  intent: CaseIntentSchema,
   version: z.number().int(),
   callClockMs: z.number(),
-  /** Exhaustive: every FieldId has a FieldState. */
+  /**
+   * P§4.7: open, keyed by the relay's own field ids — a lookup can miss, so index with `?.`.
+   * Baton's kernel still fills all of `FIELD_IDS`; nothing outside Baton may assume that.
+   */
   fields: z.record(FieldIdSchema, FieldStateSchema),
   readiness: ReadinessSchema,
   conflicts: z.array(ConflictCardSchema),

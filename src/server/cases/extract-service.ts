@@ -11,6 +11,7 @@ import { log } from "../log";
 import type { ExtractTurnResult } from "../openai/extractor";
 import type { CaseEngine } from "./engine";
 import { cacheEntryFor, servedEvents } from "./prefill";
+import type { CaseEngineFor } from "./relay-engine";
 import { isFrozenStatus, type ExtractStatus, type PgCaseRepository, type TurnUpdate } from "./repository";
 
 /**
@@ -37,7 +38,14 @@ import { isFrozenStatus, type ExtractStatus, type PgCaseRepository, type TurnUpd
 
 export interface ExtractServiceDeps {
   repo: PgCaseRepository;
+  /** The base (flagship) engine: the batch size, and every case with no `relay_version_id`. */
   engine: CaseEngine;
+  /**
+   * WP14b·3: the engine of a case's relay version (`relay-engine.ts`). It decides the extractor pin compared against
+   * the WP9 cache, the prompt and strict `<intent>_patch` schema luna is called with, and the spec the patch is
+   * post-processed under. Left out, every case extracts as Baton does.
+   */
+  engineFor?: CaseEngineFor;
   extractor: Extractor;
   data: CaseDataSource;
   /** Schedules background work after the response (Next `after`); tests run it inline or collect it. */
@@ -199,9 +207,11 @@ export class ExtractService {
   }
 
   private async runBatch(caseId: string, batch: Job[]): Promise<void> {
-    const { repo, engine, data } = this.d;
+    const { repo, data } = this.d;
     const row = await repo.loadRow(caseId);
     if (!row) throw new BatonError("E_NOT_FOUND", "Unknown case.");
+    // WP14b·3: the relay version's engine, or the base one. Resolved once per batch, from the row we already hold.
+    const engine = row.relayVersionId && this.d.engineFor ? await this.d.engineFor(row.relayVersionId) : this.d.engine;
 
     // 3a. cached events for stt_cache turns (no LLM).
     const cachedJobs: { job: Job; events: NewFactEvent[] }[] = [];
@@ -229,7 +239,9 @@ export class ExtractService {
     this.llmCalls++;
     const res = (await this.d.extractor.extractTurn({
       caseId, policy: cur.policy, callDate: cur.policy.callDate, state: cur.state, recent, newTurns,
-    })) as Partial<ExtractTurnResult> & Awaited<ReturnType<Extractor["extractTurn"]>>;
+      // A relay case extracts with its own prompt, schema and spec; a Baton case leaves this undefined (§5.3).
+      ...(engine === this.d.engine ? {} : { engine }),
+    } as Parameters<Extractor["extractTurn"]>[0])) as Partial<ExtractTurnResult> & Awaited<ReturnType<Extractor["extractTurn"]>>;
     const covered = new Set(res.coveredTurnIds ?? newTurns.map((t) => t.turnId));
     const updates: TurnUpdate[] = newTurns.map((t) => ({ turnId: t.turnId, status: covered.has(t.turnId) ? "done" : "failed", extractMs: res.ms }));
 

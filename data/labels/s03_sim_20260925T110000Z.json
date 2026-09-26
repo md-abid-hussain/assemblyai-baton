@@ -1,0 +1,13 @@
+{
+  "callId": "s03_sim_20260925T110000Z",
+  "reviewed": false,
+  "mentions": [],
+  "handoff": {
+    "lineStartMs": 112502,
+    "lineEndMs": 117336,
+    "acceptStartMs": null,
+    "acceptEndMs": null
+  },
+  "diagnosisEndsMs": null,
+  "tailStartsMs": 117336
+}

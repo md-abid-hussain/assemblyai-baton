@@ -1,0 +1,5023 @@
+{
+  "callId": "sim_10280948ea62dbbb",
+  "variant": "pc_ctx",
+  "transcribedAt": "2026-09-25T11:12:42.564Z",
+  "channels": {
+    "rep": [
+      {
+        "recvMs": 1400,
+        "message": {
+          "turn_order": 0,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "Hi.",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 0,
+              "end": 960,
+              "text": "Hi.",
+              "confidence": 0.886459,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 1800,
+        "message": {
+          "turn_order": 0,
+          "turn_is_formatted": true,
+          "end_of_turn": true,
+          "transcript": "Hi.",
+          "end_of_turn_confidence": 1,
+          "words": [
+            {
+              "start": 0,
+              "end": 1376,
+              "text": "Hi.",
+              "confidence": 0.894274,
+              "word_is_final": true
+            }
+          ],
+          "utterance": "Hi.",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 2300,
+        "message": {
+          "turn_order": 1,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "Maya?",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 1536,
+              "end": 1824,
+              "text": "Maya?",
+              "confidence": 0.786613,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 3200,
+        "message": {
+          "turn_order": 1,
+          "turn_is_formatted": true,
+          "end_of_turn": true,
+          "transcript": "Maya Ortiz.",
+          "end_of_turn_confidence": 1,
+          "words": [
+            {
+              "start": 1536,
+              "end": 1987,
+              "text": "Maya",
+              "confidence": 0.999328,
+              "word_is_final": true
+            },
+            {
+              "start": 2009,
+              "end": 2686,
+              "text": "Ortiz.",
+              "confidence": 0.998438,
+              "word_is_final": true
+            }
+          ],
+          "utterance": "Maya Ortiz.",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 3700,
+        "message": {
+          "turn_order": 2,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "This is Dana.",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 2944,
+              "end": 3045,
+              "text": "This",
+              "confidence": 0.752456,
+              "word_is_final": false
+            },
+            {
+              "start": 3050,
+              "end": 3100,
+              "text": "is",
+              "confidence": 0.991659,
+              "word_is_final": false
+            },
+            {
+              "start": 3105,
+              "end": 3231,
+              "text": "Dana.",
+              "confidence": 0.850335,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 5000,
+        "message": {
+          "turn_order": 2,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "This is Dana at Cedar Hollow Dental.",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 2944,
+              "end": 3132,
+              "text": "This",
+              "confidence": 0.655789,
+              "word_is_final": false
+            },
+            {
+              "start": 3141,
+              "end": 3235,
+              "text": "is",
+              "confidence": 0.992663,
+              "word_is_final": false
+            },
+            {
+              "start": 3244,
+              "end": 3432,
+              "text": "Dana",
+              "confidence": 0.993991,
+              "word_is_final": false
+            },
+            {
+              "start": 3441,
+              "end": 3535,
+              "text": "at",
+              "confidence": 0.963683,
+              "word_is_final": false
+            },
+            {
+              "start": 3544,
+              "end": 3779,
+              "text": "Cedar",
+              "confidence": 0.995636,
+              "word_is_final": false
+            },
+            {
+              "start": 3788,
+              "end": 4071,
+              "text": "Hollow",
+              "confidence": 0.995999,
+              "word_is_final": false
+            },
+            {
+              "start": 4080,
+              "end": 4410,
+              "text": "Dental.",
+              "confidence": 0.903069,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 5400,
+        "message": {
+          "turn_order": 2,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "This is Dana at Cedar Hollow Dental.",
+          "end_of_turn_confidence": 0.224,
+          "words": [
+            {
+              "start": 2944,
+              "end": 3214,
+              "text": "This",
+              "confidence": 0.93183,
+              "word_is_final": false
+            },
+            {
+              "start": 3227,
+              "end": 3362,
+              "text": "is",
+              "confidence": 0.999987,
+              "word_is_final": false
+            },
+            {
+              "start": 3375,
+              "end": 3645,
+              "text": "Dana",
+              "confidence": 0.999946,
+              "word_is_final": false
+            },
+            {
+              "start": 3658,
+              "end": 3793,
+              "text": "at",
+              "confidence": 0.750341,
+              "word_is_final": false
+            },
+            {
+              "start": 3806,
+              "end": 4144,
+              "text": "Cedar",
+              "confidence": 0.99997,
+              "word_is_final": false
+            },
+            {
+              "start": 4157,
+              "end": 4563,
+              "text": "Hollow",
+              "confidence": 0.999992,
+              "word_is_final": false
+            },
+            {
+              "start": 4576,
+              "end": 5049,
+              "text": "Dental.",
+              "confidence": 0.999599,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 5500,
+        "message": {
+          "turn_order": 2,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "This is Dana at Cedar Hollow Dental.",
+          "end_of_turn_confidence": 0.352,
+          "words": [
+            {
+              "start": 2944,
+              "end": 3214,
+              "text": "This",
+              "confidence": 0.93183,
+              "word_is_final": false
+            },
+            {
+              "start": 3227,
+              "end": 3362,
+              "text": "is",
+              "confidence": 0.999987,
+              "word_is_final": false
+            },
+            {
+              "start": 3375,
+              "end": 3645,
+              "text": "Dana",
+              "confidence": 0.999946,
+              "word_is_final": false
+            },
+            {
+              "start": 3658,
+              "end": 3793,
+              "text": "at",
+              "confidence": 0.750341,
+              "word_is_final": false
+            },
+            {
+              "start": 3806,
+              "end": 4144,
+              "text": "Cedar",
+              "confidence": 0.99997,
+              "word_is_final": false
+            },
+            {
+              "start": 4157,
+              "end": 4563,
+              "text": "Hollow",
+              "confidence": 0.999992,
+              "word_is_final": false
+            },
+            {
+              "start": 4576,
+              "end": 5049,
+              "text": "Dental.",
+              "confidence": 0.999599,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 6200,
+        "message": {
+          "turn_order": 2,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "This is Dana at Cedar Hollow Dental. I'm calling",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 2944,
+              "end": 3211,
+              "text": "This",
+              "confidence": 0.508903,
+              "word_is_final": false
+            },
+            {
+              "start": 3224,
+              "end": 3357,
+              "text": "is",
+              "confidence": 0.994276,
+              "word_is_final": false
+            },
+            {
+              "start": 3370,
+              "end": 3637,
+              "text": "Dana",
+              "confidence": 0.996255,
+              "word_is_final": false
+            },
+            {
+              "start": 3650,
+              "end": 3783,
+              "text": "at",
+              "confidence": 0.921257,
+              "word_is_final": false
+            },
+            {
+              "start": 3796,
+              "end": 4130,
+              "text": "Cedar",
+              "confidence": 0.998397,
+              "word_is_final": false
+            },
+            {
+              "start": 4143,
+              "end": 4544,
+              "text": "Hollow",
+              "confidence": 0.998098,
+              "word_is_final": false
+            },
+            {
+              "start": 4557,
+              "end": 5025,
+              "text": "Dental.",
+              "confidence": 0.994898,
+              "word_is_final": false
+            },
+            {
+              "start": 5038,
+              "end": 5238,
+              "text": "I'm",
+              "confidence": 0.728372,
+              "word_is_final": false
+            },
+            {
+              "start": 5251,
+              "end": 5719,
+              "text": "calling",
+              "confidence": 0.997831,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 7400,
+        "message": {
+          "turn_order": 2,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "This is Dana at Cedar Hollow Dental. I'm calling to confirm your appointment.",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 2944,
+              "end": 3179,
+              "text": "This",
+              "confidence": 0.637921,
+              "word_is_final": false
+            },
+            {
+              "start": 3190,
+              "end": 3307,
+              "text": "is",
+              "confidence": 0.996071,
+              "word_is_final": false
+            },
+            {
+              "start": 3318,
+              "end": 3553,
+              "text": "Dana",
+              "confidence": 0.998664,
+              "word_is_final": false
+            },
+            {
+              "start": 3564,
+              "end": 3681,
+              "text": "at",
+              "confidence": 0.848153,
+              "word_is_final": false
+            },
+            {
+              "start": 3692,
+              "end": 3986,
+              "text": "Cedar",
+              "confidence": 0.999328,
+              "word_is_final": false
+            },
+            {
+              "start": 3997,
+              "end": 4350,
+              "text": "Hollow",
+              "confidence": 0.998953,
+              "word_is_final": false
+            },
+            {
+              "start": 4361,
+              "end": 4773,
+              "text": "Dental.",
+              "confidence": 0.996532,
+              "word_is_final": false
+            },
+            {
+              "start": 4784,
+              "end": 4960,
+              "text": "I'm",
+              "confidence": 0.938948,
+              "word_is_final": false
+            },
+            {
+              "start": 4971,
+              "end": 5383,
+              "text": "calling",
+              "confidence": 0.998937,
+              "word_is_final": false
+            },
+            {
+              "start": 5394,
+              "end": 5511,
+              "text": "to",
+              "confidence": 0.997097,
+              "word_is_final": false
+            },
+            {
+              "start": 5522,
+              "end": 5934,
+              "text": "confirm",
+              "confidence": 0.9994,
+              "word_is_final": false
+            },
+            {
+              "start": 5945,
+              "end": 6180,
+              "text": "your",
+              "confidence": 0.995222,
+              "word_is_final": false
+            },
+            {
+              "start": 6191,
+              "end": 6897,
+              "text": "appointment.",
+              "confidence": 0.727053,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 8800,
+        "message": {
+          "turn_order": 2,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "This is Dana at Cedar Hollow Dental. I'm calling to confirm your appointment and make sure we have the right information.",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 2944,
+              "end": 3145,
+              "text": "This",
+              "confidence": 0.597827,
+              "word_is_final": false
+            },
+            {
+              "start": 3155,
+              "end": 3255,
+              "text": "is",
+              "confidence": 0.999498,
+              "word_is_final": false
+            },
+            {
+              "start": 3265,
+              "end": 3466,
+              "text": "Dana",
+              "confidence": 0.998414,
+              "word_is_final": false
+            },
+            {
+              "start": 3476,
+              "end": 3576,
+              "text": "at",
+              "confidence": 0.934177,
+              "word_is_final": false
+            },
+            {
+              "start": 3586,
+              "end": 3837,
+              "text": "Cedar",
+              "confidence": 0.999586,
+              "word_is_final": false
+            },
+            {
+              "start": 3847,
+              "end": 4148,
+              "text": "Hollow",
+              "confidence": 0.99956,
+              "word_is_final": false
+            },
+            {
+              "start": 4158,
+              "end": 4510,
+              "text": "Dental.",
+              "confidence": 0.998614,
+              "word_is_final": false
+            },
+            {
+              "start": 4520,
+              "end": 4670,
+              "text": "I'm",
+              "confidence": 0.96728,
+              "word_is_final": false
+            },
+            {
+              "start": 4680,
+              "end": 5032,
+              "text": "calling",
+              "confidence": 0.99992,
+              "word_is_final": false
+            },
+            {
+              "start": 5042,
+              "end": 5142,
+              "text": "to",
+              "confidence": 0.999709,
+              "word_is_final": false
+            },
+            {
+              "start": 5152,
+              "end": 5504,
+              "text": "confirm",
+              "confidence": 0.999938,
+              "word_is_final": false
+            },
+            {
+              "start": 5514,
+              "end": 5715,
+              "text": "your",
+              "confidence": 0.999531,
+              "word_is_final": false
+            },
+            {
+              "start": 5725,
+              "end": 6278,
+              "text": "appointment",
+              "confidence": 0.999514,
+              "word_is_final": false
+            },
+            {
+              "start": 6288,
+              "end": 6438,
+              "text": "and",
+              "confidence": 0.987444,
+              "word_is_final": false
+            },
+            {
+              "start": 6448,
+              "end": 6649,
+              "text": "make",
+              "confidence": 0.999177,
+              "word_is_final": false
+            },
+            {
+              "start": 6659,
+              "end": 6860,
+              "text": "sure",
+              "confidence": 0.999334,
+              "word_is_final": false
+            },
+            {
+              "start": 6870,
+              "end": 6970,
+              "text": "we",
+              "confidence": 0.996625,
+              "word_is_final": false
+            },
+            {
+              "start": 6980,
+              "end": 7181,
+              "text": "have",
+              "confidence": 0.996765,
+              "word_is_final": false
+            },
+            {
+              "start": 7191,
+              "end": 7341,
+              "text": "the",
+              "confidence": 0.990279,
+              "word_is_final": false
+            },
+            {
+              "start": 7351,
+              "end": 7602,
+              "text": "right",
+              "confidence": 0.708016,
+              "word_is_final": false
+            },
+            {
+              "start": 7612,
+              "end": 8215,
+              "text": "information.",
+              "confidence": 0.608379,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 10100,
+        "message": {
+          "turn_order": 2,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "This is Dana at Cedar Hollow Dental. I'm calling to confirm your appointment and make sure we have the right details before we",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 2944,
+              "end": 3190,
+              "text": "This",
+              "confidence": 0.601153,
+              "word_is_final": false
+            },
+            {
+              "start": 3202,
+              "end": 3325,
+              "text": "is",
+              "confidence": 0.999274,
+              "word_is_final": false
+            },
+            {
+              "start": 3337,
+              "end": 3583,
+              "text": "Dana",
+              "confidence": 0.998949,
+              "word_is_final": false
+            },
+            {
+              "start": 3595,
+              "end": 3718,
+              "text": "at",
+              "confidence": 0.933175,
+              "word_is_final": false
+            },
+            {
+              "start": 3730,
+              "end": 4038,
+              "text": "Cedar",
+              "confidence": 0.999677,
+              "word_is_final": false
+            },
+            {
+              "start": 4050,
+              "end": 4420,
+              "text": "Hollow",
+              "confidence": 0.999591,
+              "word_is_final": false
+            },
+            {
+              "start": 4432,
+              "end": 4863,
+              "text": "Dental.",
+              "confidence": 0.999033,
+              "word_is_final": false
+            },
+            {
+              "start": 4875,
+              "end": 5060,
+              "text": "I'm",
+              "confidence": 0.973383,
+              "word_is_final": false
+            },
+            {
+              "start": 5072,
+              "end": 5503,
+              "text": "calling",
+              "confidence": 0.999907,
+              "word_is_final": false
+            },
+            {
+              "start": 5515,
+              "end": 5638,
+              "text": "to",
+              "confidence": 0.999606,
+              "word_is_final": false
+            },
+            {
+              "start": 5650,
+              "end": 6081,
+              "text": "confirm",
+              "confidence": 0.999929,
+              "word_is_final": false
+            },
+            {
+              "start": 6093,
+              "end": 6339,
+              "text": "your",
+              "confidence": 0.999371,
+              "word_is_final": false
+            },
+            {
+              "start": 6351,
+              "end": 7029,
+              "text": "appointment",
+              "confidence": 0.999338,
+              "word_is_final": false
+            },
+            {
+              "start": 7041,
+              "end": 7226,
+              "text": "and",
+              "confidence": 0.990888,
+              "word_is_final": false
+            },
+            {
+              "start": 7238,
+              "end": 7484,
+              "text": "make",
+              "confidence": 0.999353,
+              "word_is_final": false
+            },
+            {
+              "start": 7496,
+              "end": 7742,
+              "text": "sure",
+              "confidence": 0.999496,
+              "word_is_final": false
+            },
+            {
+              "start": 7754,
+              "end": 7877,
+              "text": "we",
+              "confidence": 0.998877,
+              "word_is_final": false
+            },
+            {
+              "start": 7889,
+              "end": 8135,
+              "text": "have",
+              "confidence": 0.998251,
+              "word_is_final": false
+            },
+            {
+              "start": 8147,
+              "end": 8332,
+              "text": "the",
+              "confidence": 0.997832,
+              "word_is_final": false
+            },
+            {
+              "start": 8344,
+              "end": 8652,
+              "text": "right",
+              "confidence": 0.998238,
+              "word_is_final": false
+            },
+            {
+              "start": 8664,
+              "end": 9095,
+              "text": "details",
+              "confidence": 0.997675,
+              "word_is_final": false
+            },
+            {
+              "start": 9107,
+              "end": 9477,
+              "text": "before",
+              "confidence": 0.939237,
+              "word_is_final": false
+            },
+            {
+              "start": 9489,
+              "end": 9612,
+              "text": "we",
+              "confidence": 0.989798,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 11000,
+        "message": {
+          "turn_order": 2,
+          "turn_is_formatted": true,
+          "end_of_turn": true,
+          "transcript": "This is Dana at Cedar Hollow Dental. I'm calling to confirm your appointment and make sure we have the right details before we finish up.",
+          "end_of_turn_confidence": 1,
+          "words": [
+            {
+              "start": 2944,
+              "end": 3200,
+              "text": "This",
+              "confidence": 0.869602,
+              "word_is_final": true
+            },
+            {
+              "start": 3212,
+              "end": 3340,
+              "text": "is",
+              "confidence": 0.999964,
+              "word_is_final": true
+            },
+            {
+              "start": 3352,
+              "end": 3608,
+              "text": "Dana",
+              "confidence": 0.999931,
+              "word_is_final": true
+            },
+            {
+              "start": 3620,
+              "end": 3748,
+              "text": "at",
+              "confidence": 0.894565,
+              "word_is_final": true
+            },
+            {
+              "start": 3760,
+              "end": 4080,
+              "text": "Cedar",
+              "confidence": 0.999937,
+              "word_is_final": true
+            },
+            {
+              "start": 4092,
+              "end": 4476,
+              "text": "Hollow",
+              "confidence": 0.999981,
+              "word_is_final": true
+            },
+            {
+              "start": 4488,
+              "end": 4936,
+              "text": "Dental.",
+              "confidence": 0.999116,
+              "word_is_final": true
+            },
+            {
+              "start": 4948,
+              "end": 5140,
+              "text": "I'm",
+              "confidence": 0.999928,
+              "word_is_final": true
+            },
+            {
+              "start": 5152,
+              "end": 5600,
+              "text": "calling",
+              "confidence": 0.999977,
+              "word_is_final": true
+            },
+            {
+              "start": 5612,
+              "end": 5740,
+              "text": "to",
+              "confidence": 0.99994,
+              "word_is_final": true
+            },
+            {
+              "start": 5752,
+              "end": 6200,
+              "text": "confirm",
+              "confidence": 0.999991,
+              "word_is_final": true
+            },
+            {
+              "start": 6212,
+              "end": 6468,
+              "text": "your",
+              "confidence": 0.999971,
+              "word_is_final": true
+            },
+            {
+              "start": 6480,
+              "end": 7185,
+              "text": "appointment",
+              "confidence": 0.999949,
+              "word_is_final": true
+            },
+            {
+              "start": 7197,
+              "end": 7389,
+              "text": "and",
+              "confidence": 0.997143,
+              "word_is_final": true
+            },
+            {
+              "start": 7401,
+              "end": 7657,
+              "text": "make",
+              "confidence": 0.999661,
+              "word_is_final": true
+            },
+            {
+              "start": 7669,
+              "end": 7925,
+              "text": "sure",
+              "confidence": 0.999994,
+              "word_is_final": true
+            },
+            {
+              "start": 7937,
+              "end": 8065,
+              "text": "we",
+              "confidence": 0.99983,
+              "word_is_final": true
+            },
+            {
+              "start": 8077,
+              "end": 8333,
+              "text": "have",
+              "confidence": 0.999981,
+              "word_is_final": true
+            },
+            {
+              "start": 8345,
+              "end": 8537,
+              "text": "the",
+              "confidence": 0.999848,
+              "word_is_final": true
+            },
+            {
+              "start": 8549,
+              "end": 8869,
+              "text": "right",
+              "confidence": 0.999982,
+              "word_is_final": true
+            },
+            {
+              "start": 8881,
+              "end": 9329,
+              "text": "details",
+              "confidence": 0.999978,
+              "word_is_final": true
+            },
+            {
+              "start": 9341,
+              "end": 9725,
+              "text": "before",
+              "confidence": 0.996368,
+              "word_is_final": true
+            },
+            {
+              "start": 9737,
+              "end": 9865,
+              "text": "we",
+              "confidence": 0.999894,
+              "word_is_final": true
+            },
+            {
+              "start": 9877,
+              "end": 10261,
+              "text": "finish",
+              "confidence": 0.999817,
+              "word_is_final": true
+            },
+            {
+              "start": 10273,
+              "end": 10465,
+              "text": "up.",
+              "confidence": 0.999145,
+              "word_is_final": true
+            }
+          ],
+          "utterance": "This is Dana at Cedar Hollow Dental. I'm calling to confirm your appointment and make sure we have the right details before we finish up.",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 17900,
+        "message": {
+          "turn_order": 3,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "Of course.",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 16256,
+              "end": 16506,
+              "text": "Of",
+              "confidence": 0.980452,
+              "word_is_final": false
+            },
+            {
+              "start": 16531,
+              "end": 17407,
+              "text": "course.",
+              "confidence": 0.689314,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 19100,
+        "message": {
+          "turn_order": 3,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "Of course, could you say",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 16256,
+              "end": 16480,
+              "text": "Of",
+              "confidence": 0.9972,
+              "word_is_final": false
+            },
+            {
+              "start": 16502,
+              "end": 17288,
+              "text": "course,",
+              "confidence": 0.787102,
+              "word_is_final": false
+            },
+            {
+              "start": 17310,
+              "end": 17871,
+              "text": "could",
+              "confidence": 0.999793,
+              "word_is_final": false
+            },
+            {
+              "start": 17893,
+              "end": 18229,
+              "text": "you",
+              "confidence": 0.999979,
+              "word_is_final": false
+            },
+            {
+              "start": 18251,
+              "end": 18587,
+              "text": "say",
+              "confidence": 0.991748,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 20400,
+        "message": {
+          "turn_order": 3,
+          "turn_is_formatted": true,
+          "end_of_turn": true,
+          "transcript": "Of course, could you say your full name for me?",
+          "end_of_turn_confidence": 1,
+          "words": [
+            {
+              "start": 16256,
+              "end": 16439,
+              "text": "Of",
+              "confidence": 0.997188,
+              "word_is_final": true
+            },
+            {
+              "start": 16457,
+              "end": 17098,
+              "text": "course,",
+              "confidence": 0.790571,
+              "word_is_final": true
+            },
+            {
+              "start": 17116,
+              "end": 17574,
+              "text": "could",
+              "confidence": 0.999463,
+              "word_is_final": true
+            },
+            {
+              "start": 17592,
+              "end": 17866,
+              "text": "you",
+              "confidence": 0.999994,
+              "word_is_final": true
+            },
+            {
+              "start": 17884,
+              "end": 18158,
+              "text": "say",
+              "confidence": 0.999942,
+              "word_is_final": true
+            },
+            {
+              "start": 18176,
+              "end": 18542,
+              "text": "your",
+              "confidence": 0.999995,
+              "word_is_final": true
+            },
+            {
+              "start": 18560,
+              "end": 18926,
+              "text": "full",
+              "confidence": 0.999995,
+              "word_is_final": true
+            },
+            {
+              "start": 18944,
+              "end": 19310,
+              "text": "name",
+              "confidence": 0.999995,
+              "word_is_final": true
+            },
+            {
+              "start": 19328,
+              "end": 19602,
+              "text": "for",
+              "confidence": 0.999984,
+              "word_is_final": true
+            },
+            {
+              "start": 19620,
+              "end": 19894,
+              "text": "me?",
+              "confidence": 0.999953,
+              "word_is_final": true
+            }
+          ],
+          "utterance": "Of course, could you say your full name for me?",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 20800,
+        "message": {
+          "turn_order": 4,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "I want to make",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 20160,
+              "end": 20184,
+              "text": "I",
+              "confidence": 0.474211,
+              "word_is_final": false
+            },
+            {
+              "start": 20188,
+              "end": 20287,
+              "text": "want",
+              "confidence": 0.968594,
+              "word_is_final": false
+            },
+            {
+              "start": 20291,
+              "end": 20340,
+              "text": "to",
+              "confidence": 0.841675,
+              "word_is_final": false
+            },
+            {
+              "start": 20344,
+              "end": 20443,
+              "text": "make",
+              "confidence": 0.5968,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 22100,
+        "message": {
+          "turn_order": 4,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "want to match it to the patient record.",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 20160,
+              "end": 20336,
+              "text": "want",
+              "confidence": 0.296359,
+              "word_is_final": false
+            },
+            {
+              "start": 20344,
+              "end": 20432,
+              "text": "to",
+              "confidence": 0.999793,
+              "word_is_final": false
+            },
+            {
+              "start": 20440,
+              "end": 20660,
+              "text": "match",
+              "confidence": 0.999917,
+              "word_is_final": false
+            },
+            {
+              "start": 20668,
+              "end": 20756,
+              "text": "it",
+              "confidence": 0.999778,
+              "word_is_final": false
+            },
+            {
+              "start": 20764,
+              "end": 20852,
+              "text": "to",
+              "confidence": 0.999386,
+              "word_is_final": false
+            },
+            {
+              "start": 20860,
+              "end": 20992,
+              "text": "the",
+              "confidence": 0.998916,
+              "word_is_final": false
+            },
+            {
+              "start": 21000,
+              "end": 21308,
+              "text": "patient",
+              "confidence": 0.99989,
+              "word_is_final": false
+            },
+            {
+              "start": 21316,
+              "end": 21624,
+              "text": "record.",
+              "confidence": 0.962898,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 23500,
+        "message": {
+          "turn_order": 4,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "I want to match it to the patient record before we go over the appointment details.",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 20160,
+              "end": 20199,
+              "text": "I",
+              "confidence": 0.449751,
+              "word_is_final": false
+            },
+            {
+              "start": 20206,
+              "end": 20362,
+              "text": "want",
+              "confidence": 0.888241,
+              "word_is_final": false
+            },
+            {
+              "start": 20369,
+              "end": 20447,
+              "text": "to",
+              "confidence": 0.99554,
+              "word_is_final": false
+            },
+            {
+              "start": 20454,
+              "end": 20650,
+              "text": "match",
+              "confidence": 0.996783,
+              "word_is_final": false
+            },
+            {
+              "start": 20657,
+              "end": 20735,
+              "text": "it",
+              "confidence": 0.995606,
+              "word_is_final": false
+            },
+            {
+              "start": 20742,
+              "end": 20820,
+              "text": "to",
+              "confidence": 0.995024,
+              "word_is_final": false
+            },
+            {
+              "start": 20827,
+              "end": 20944,
+              "text": "the",
+              "confidence": 0.996654,
+              "word_is_final": false
+            },
+            {
+              "start": 20951,
+              "end": 21225,
+              "text": "patient",
+              "confidence": 0.996962,
+              "word_is_final": false
+            },
+            {
+              "start": 21232,
+              "end": 21467,
+              "text": "record",
+              "confidence": 0.989769,
+              "word_is_final": false
+            },
+            {
+              "start": 21474,
+              "end": 21709,
+              "text": "before",
+              "confidence": 0.759695,
+              "word_is_final": false
+            },
+            {
+              "start": 21716,
+              "end": 21794,
+              "text": "we",
+              "confidence": 0.998278,
+              "word_is_final": false
+            },
+            {
+              "start": 21801,
+              "end": 21879,
+              "text": "go",
+              "confidence": 0.997102,
+              "word_is_final": false
+            },
+            {
+              "start": 21886,
+              "end": 22042,
+              "text": "over",
+              "confidence": 0.997218,
+              "word_is_final": false
+            },
+            {
+              "start": 22049,
+              "end": 22166,
+              "text": "the",
+              "confidence": 0.990345,
+              "word_is_final": false
+            },
+            {
+              "start": 22173,
+              "end": 22604,
+              "text": "appointment",
+              "confidence": 0.36921,
+              "word_is_final": false
+            },
+            {
+              "start": 22611,
+              "end": 22924,
+              "text": "details.",
+              "confidence": 0.639878,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 24100,
+        "message": {
+          "turn_order": 4,
+          "turn_is_formatted": true,
+          "end_of_turn": true,
+          "transcript": "I want to match it to the patient record before we go over the appointment.",
+          "end_of_turn_confidence": 1,
+          "words": [
+            {
+              "start": 20160,
+              "end": 20215,
+              "text": "I",
+              "confidence": 0.641306,
+              "word_is_final": true
+            },
+            {
+              "start": 20226,
+              "end": 20446,
+              "text": "want",
+              "confidence": 0.916852,
+              "word_is_final": true
+            },
+            {
+              "start": 20457,
+              "end": 20567,
+              "text": "to",
+              "confidence": 0.99999,
+              "word_is_final": true
+            },
+            {
+              "start": 20578,
+              "end": 20853,
+              "text": "match",
+              "confidence": 0.999961,
+              "word_is_final": true
+            },
+            {
+              "start": 20864,
+              "end": 20974,
+              "text": "it",
+              "confidence": 0.999944,
+              "word_is_final": true
+            },
+            {
+              "start": 20985,
+              "end": 21095,
+              "text": "to",
+              "confidence": 0.999812,
+              "word_is_final": true
+            },
+            {
+              "start": 21106,
+              "end": 21271,
+              "text": "the",
+              "confidence": 0.999836,
+              "word_is_final": true
+            },
+            {
+              "start": 21282,
+              "end": 21668,
+              "text": "patient",
+              "confidence": 0.999983,
+              "word_is_final": true
+            },
+            {
+              "start": 21679,
+              "end": 22010,
+              "text": "record",
+              "confidence": 0.999648,
+              "word_is_final": true
+            },
+            {
+              "start": 22021,
+              "end": 22352,
+              "text": "before",
+              "confidence": 0.945419,
+              "word_is_final": true
+            },
+            {
+              "start": 22363,
+              "end": 22473,
+              "text": "we",
+              "confidence": 0.999975,
+              "word_is_final": true
+            },
+            {
+              "start": 22484,
+              "end": 22594,
+              "text": "go",
+              "confidence": 0.999949,
+              "word_is_final": true
+            },
+            {
+              "start": 22605,
+              "end": 22825,
+              "text": "over",
+              "confidence": 0.99999,
+              "word_is_final": true
+            },
+            {
+              "start": 22836,
+              "end": 23001,
+              "text": "the",
+              "confidence": 0.999901,
+              "word_is_final": true
+            },
+            {
+              "start": 23012,
+              "end": 23674,
+              "text": "appointment.",
+              "confidence": 0.999734,
+              "word_is_final": true
+            }
+          ],
+          "utterance": "I want to match it to the patient record before we go over the appointment.",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 29300,
+        "message": {
+          "turn_order": 5,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "Thanks.",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 27744,
+              "end": 28870,
+              "text": "Thanks.",
+              "confidence": 0.934339,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 29800,
+        "message": {
+          "turn_order": 5,
+          "turn_is_formatted": true,
+          "end_of_turn": true,
+          "transcript": "Thanks.",
+          "end_of_turn_confidence": 1,
+          "words": [
+            {
+              "start": 27744,
+              "end": 29414,
+              "text": "Thanks.",
+              "confidence": 0.995229,
+              "word_is_final": true
+            }
+          ],
+          "utterance": "Thanks.",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 30200,
+        "message": {
+          "turn_order": 6,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "I have",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 29568,
+              "end": 29623,
+              "text": "I",
+              "confidence": 0.997363,
+              "word_is_final": false
+            },
+            {
+              "start": 29634,
+              "end": 29855,
+              "text": "have",
+              "confidence": 0.988507,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 31800,
+        "message": {
+          "turn_order": 6,
+          "turn_is_formatted": true,
+          "end_of_turn": true,
+          "transcript": "I have Maya Ortiz here.",
+          "end_of_turn_confidence": 1,
+          "words": [
+            {
+              "start": 29568,
+              "end": 29648,
+              "text": "I",
+              "confidence": 0.992049,
+              "word_is_final": true
+            },
+            {
+              "start": 29664,
+              "end": 29987,
+              "text": "have",
+              "confidence": 0.999967,
+              "word_is_final": true
+            },
+            {
+              "start": 30003,
+              "end": 30326,
+              "text": "Maya",
+              "confidence": 0.999981,
+              "word_is_final": true
+            },
+            {
+              "start": 30342,
+              "end": 30746,
+              "text": "Ortiz",
+              "confidence": 0.999994,
+              "word_is_final": true
+            },
+            {
+              "start": 30762,
+              "end": 31166,
+              "text": "here.",
+              "confidence": 0.999099,
+              "word_is_final": true
+            }
+          ],
+          "utterance": "I have Maya Ortiz here.",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 32300,
+        "message": {
+          "turn_order": 7,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "And what",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 31520,
+              "end": 31640,
+              "text": "And",
+              "confidence": 0.921493,
+              "word_is_final": false
+            },
+            {
+              "start": 31648,
+              "end": 31808,
+              "text": "what",
+              "confidence": 0.997458,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 33700,
+        "message": {
+          "turn_order": 7,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "And what procedure are you booked in for?",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 31520,
+              "end": 31655,
+              "text": "And",
+              "confidence": 0.986737,
+              "word_is_final": false
+            },
+            {
+              "start": 31664,
+              "end": 31844,
+              "text": "what",
+              "confidence": 0.999832,
+              "word_is_final": false
+            },
+            {
+              "start": 31853,
+              "end": 32259,
+              "text": "procedure",
+              "confidence": 0.999992,
+              "word_is_final": false
+            },
+            {
+              "start": 32268,
+              "end": 32403,
+              "text": "are",
+              "confidence": 0.999969,
+              "word_is_final": false
+            },
+            {
+              "start": 32412,
+              "end": 32547,
+              "text": "you",
+              "confidence": 0.999994,
+              "word_is_final": false
+            },
+            {
+              "start": 32556,
+              "end": 32827,
+              "text": "booked",
+              "confidence": 0.999978,
+              "word_is_final": false
+            },
+            {
+              "start": 32836,
+              "end": 32926,
+              "text": "in",
+              "confidence": 0.999978,
+              "word_is_final": false
+            },
+            {
+              "start": 32935,
+              "end": 33115,
+              "text": "for?",
+              "confidence": 0.999857,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 33800,
+        "message": {
+          "turn_order": 7,
+          "turn_is_formatted": true,
+          "end_of_turn": true,
+          "transcript": "And what procedure are you booked in for?",
+          "end_of_turn_confidence": 1,
+          "words": [
+            {
+              "start": 31520,
+              "end": 31682,
+              "text": "And",
+              "confidence": 0.990169,
+              "word_is_final": true
+            },
+            {
+              "start": 31692,
+              "end": 31908,
+              "text": "what",
+              "confidence": 0.999951,
+              "word_is_final": true
+            },
+            {
+              "start": 31918,
+              "end": 32406,
+              "text": "procedure",
+              "confidence": 0.999996,
+              "word_is_final": true
+            },
+            {
+              "start": 32416,
+              "end": 32578,
+              "text": "are",
+              "confidence": 0.99999,
+              "word_is_final": true
+            },
+            {
+              "start": 32588,
+              "end": 32750,
+              "text": "you",
+              "confidence": 0.999996,
+              "word_is_final": true
+            },
+            {
+              "start": 32760,
+              "end": 33085,
+              "text": "booked",
+              "confidence": 0.999996,
+              "word_is_final": true
+            },
+            {
+              "start": 33095,
+              "end": 33203,
+              "text": "in",
+              "confidence": 0.99999,
+              "word_is_final": true
+            },
+            {
+              "start": 33213,
+              "end": 33429,
+              "text": "for?",
+              "confidence": 0.999962,
+              "word_is_final": true
+            }
+          ],
+          "utterance": "And what procedure are you booked in for?",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 38700,
+        "message": {
+          "turn_order": 8,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "A crown.",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 37024,
+              "end": 37188,
+              "text": "A",
+              "confidence": 0.977561,
+              "word_is_final": false
+            },
+            {
+              "start": 37220,
+              "end": 38206,
+              "text": "crown.",
+              "confidence": 0.640355,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 39900,
+        "message": {
+          "turn_order": 8,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "A cleaning, got it.",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 37024,
+              "end": 37172,
+              "text": "A",
+              "confidence": 0.997142,
+              "word_is_final": false
+            },
+            {
+              "start": 37201,
+              "end": 38536,
+              "text": "cleaning,",
+              "confidence": 0.90891,
+              "word_is_final": false
+            },
+            {
+              "start": 38565,
+              "end": 39010,
+              "text": "got",
+              "confidence": 0.999969,
+              "word_is_final": false
+            },
+            {
+              "start": 39039,
+              "end": 39484,
+              "text": "it.",
+              "confidence": 0.849941,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 41300,
+        "message": {
+          "turn_order": 8,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "A cleaning, got it. Dr. Alina Booth will see you",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 37024,
+              "end": 37113,
+              "text": "A",
+              "confidence": 0.996294,
+              "word_is_final": false
+            },
+            {
+              "start": 37130,
+              "end": 37934,
+              "text": "cleaning,",
+              "confidence": 0.943443,
+              "word_is_final": false
+            },
+            {
+              "start": 37951,
+              "end": 38219,
+              "text": "got",
+              "confidence": 0.999964,
+              "word_is_final": false
+            },
+            {
+              "start": 38236,
+              "end": 38504,
+              "text": "it.",
+              "confidence": 0.991302,
+              "word_is_final": false
+            },
+            {
+              "start": 38521,
+              "end": 38789,
+              "text": "Dr.",
+              "confidence": 0.996454,
+              "word_is_final": false
+            },
+            {
+              "start": 38806,
+              "end": 39253,
+              "text": "Alina",
+              "confidence": 0.999713,
+              "word_is_final": false
+            },
+            {
+              "start": 39270,
+              "end": 39717,
+              "text": "Booth",
+              "confidence": 0.999856,
+              "word_is_final": false
+            },
+            {
+              "start": 39734,
+              "end": 40091,
+              "text": "will",
+              "confidence": 0.999489,
+              "word_is_final": false
+            },
+            {
+              "start": 40108,
+              "end": 40376,
+              "text": "see",
+              "confidence": 0.999347,
+              "word_is_final": false
+            },
+            {
+              "start": 40393,
+              "end": 40661,
+              "text": "you",
+              "confidence": 0.983556,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 42600,
+        "message": {
+          "turn_order": 8,
+          "turn_is_formatted": true,
+          "end_of_turn": true,
+          "transcript": "A cleaning, got it. Dr. Alina Booth will see you at our Fairview office.",
+          "end_of_turn_confidence": 1,
+          "words": [
+            {
+              "start": 37024,
+              "end": 37106,
+              "text": "A",
+              "confidence": 0.99604,
+              "word_is_final": true
+            },
+            {
+              "start": 37122,
+              "end": 37860,
+              "text": "cleaning,",
+              "confidence": 0.955713,
+              "word_is_final": true
+            },
+            {
+              "start": 37876,
+              "end": 38122,
+              "text": "got",
+              "confidence": 0.999934,
+              "word_is_final": true
+            },
+            {
+              "start": 38138,
+              "end": 38384,
+              "text": "it.",
+              "confidence": 0.994355,
+              "word_is_final": true
+            },
+            {
+              "start": 38400,
+              "end": 38646,
+              "text": "Dr.",
+              "confidence": 0.999711,
+              "word_is_final": true
+            },
+            {
+              "start": 38662,
+              "end": 39072,
+              "text": "Alina",
+              "confidence": 0.999889,
+              "word_is_final": true
+            },
+            {
+              "start": 39088,
+              "end": 39498,
+              "text": "Booth",
+              "confidence": 0.999942,
+              "word_is_final": true
+            },
+            {
+              "start": 39514,
+              "end": 39842,
+              "text": "will",
+              "confidence": 0.999929,
+              "word_is_final": true
+            },
+            {
+              "start": 39858,
+              "end": 40104,
+              "text": "see",
+              "confidence": 0.999994,
+              "word_is_final": true
+            },
+            {
+              "start": 40120,
+              "end": 40366,
+              "text": "you",
+              "confidence": 0.999996,
+              "word_is_final": true
+            },
+            {
+              "start": 40382,
+              "end": 40546,
+              "text": "at",
+              "confidence": 0.999985,
+              "word_is_final": true
+            },
+            {
+              "start": 40562,
+              "end": 40808,
+              "text": "our",
+              "confidence": 0.999978,
+              "word_is_final": true
+            },
+            {
+              "start": 40824,
+              "end": 41480,
+              "text": "Fairview",
+              "confidence": 0.999526,
+              "word_is_final": true
+            },
+            {
+              "start": 41496,
+              "end": 42070,
+              "text": "office.",
+              "confidence": 0.998675,
+              "word_is_final": true
+            }
+          ],
+          "utterance": "A cleaning, got it. Dr. Alina Booth will see you at our Fairview office.",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 43000,
+        "message": {
+          "turn_order": 9,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "What day",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 42336,
+              "end": 42496,
+              "text": "What",
+              "confidence": 0.998399,
+              "word_is_final": false
+            },
+            {
+              "start": 42504,
+              "end": 42624,
+              "text": "day",
+              "confidence": 0.543261,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 44600,
+        "message": {
+          "turn_order": 9,
+          "turn_is_formatted": true,
+          "end_of_turn": true,
+          "transcript": "What date do you have for the appointment?",
+          "end_of_turn_confidence": 1,
+          "words": [
+            {
+              "start": 42336,
+              "end": 42522,
+              "text": "What",
+              "confidence": 0.98566,
+              "word_is_final": true
+            },
+            {
+              "start": 42531,
+              "end": 42717,
+              "text": "date",
+              "confidence": 0.999904,
+              "word_is_final": true
+            },
+            {
+              "start": 42726,
+              "end": 42819,
+              "text": "do",
+              "confidence": 0.999683,
+              "word_is_final": true
+            },
+            {
+              "start": 42828,
+              "end": 42967,
+              "text": "you",
+              "confidence": 0.999986,
+              "word_is_final": true
+            },
+            {
+              "start": 42976,
+              "end": 43162,
+              "text": "have",
+              "confidence": 0.999983,
+              "word_is_final": true
+            },
+            {
+              "start": 43171,
+              "end": 43310,
+              "text": "for",
+              "confidence": 0.999798,
+              "word_is_final": true
+            },
+            {
+              "start": 43319,
+              "end": 43458,
+              "text": "the",
+              "confidence": 0.998719,
+              "word_is_final": true
+            },
+            {
+              "start": 43467,
+              "end": 44026,
+              "text": "appointment?",
+              "confidence": 0.999976,
+              "word_is_final": true
+            }
+          ],
+          "utterance": "What date do you have for the appointment?",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 51100,
+        "message": {
+          "turn_order": 10,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "I",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 49600,
+              "end": 50752,
+              "text": "I",
+              "confidence": 0.978857,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 52300,
+        "message": {
+          "turn_order": 10,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "I have Tuesday, October",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 49600,
+              "end": 49708,
+              "text": "I",
+              "confidence": 0.997595,
+              "word_is_final": false
+            },
+            {
+              "start": 49729,
+              "end": 50163,
+              "text": "have",
+              "confidence": 0.999956,
+              "word_is_final": false
+            },
+            {
+              "start": 50184,
+              "end": 51053,
+              "text": "Tuesday,",
+              "confidence": 0.99821,
+              "word_is_final": false
+            },
+            {
+              "start": 51074,
+              "end": 51835,
+              "text": "October",
+              "confidence": 0.841788,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 53600,
+        "message": {
+          "turn_order": 10,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "I have Tuesday, October 6th as well.",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 49600,
+              "end": 49712,
+              "text": "I",
+              "confidence": 0.999424,
+              "word_is_final": false
+            },
+            {
+              "start": 49734,
+              "end": 50185,
+              "text": "have",
+              "confidence": 0.999986,
+              "word_is_final": false
+            },
+            {
+              "start": 50207,
+              "end": 51109,
+              "text": "Tuesday,",
+              "confidence": 0.999973,
+              "word_is_final": false
+            },
+            {
+              "start": 51131,
+              "end": 51920,
+              "text": "October",
+              "confidence": 0.999985,
+              "word_is_final": false
+            },
+            {
+              "start": 51942,
+              "end": 52280,
+              "text": "6th",
+              "confidence": 0.999855,
+              "word_is_final": false
+            },
+            {
+              "start": 52302,
+              "end": 52527,
+              "text": "as",
+              "confidence": 0.872202,
+              "word_is_final": false
+            },
+            {
+              "start": 52549,
+              "end": 53113,
+              "text": "well.",
+              "confidence": 0.999793,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 53800,
+        "message": {
+          "turn_order": 10,
+          "turn_is_formatted": true,
+          "end_of_turn": true,
+          "transcript": "I have Tuesday, October 6th as well.",
+          "end_of_turn_confidence": 1,
+          "words": [
+            {
+              "start": 49600,
+              "end": 49720,
+              "text": "I",
+              "confidence": 0.999415,
+              "word_is_final": true
+            },
+            {
+              "start": 49744,
+              "end": 50224,
+              "text": "have",
+              "confidence": 0.999987,
+              "word_is_final": true
+            },
+            {
+              "start": 50248,
+              "end": 51208,
+              "text": "Tuesday,",
+              "confidence": 0.999969,
+              "word_is_final": true
+            },
+            {
+              "start": 51232,
+              "end": 52072,
+              "text": "October",
+              "confidence": 0.999984,
+              "word_is_final": true
+            },
+            {
+              "start": 52096,
+              "end": 52456,
+              "text": "6th",
+              "confidence": 0.999874,
+              "word_is_final": true
+            },
+            {
+              "start": 52480,
+              "end": 52720,
+              "text": "as",
+              "confidence": 0.863354,
+              "word_is_final": true
+            },
+            {
+              "start": 52744,
+              "end": 53344,
+              "text": "well.",
+              "confidence": 0.999915,
+              "word_is_final": true
+            }
+          ],
+          "utterance": "I have Tuesday, October 6th as well.",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 54300,
+        "message": {
+          "turn_order": 11,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "That's",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 53600,
+              "end": 53888,
+              "text": "That's",
+              "confidence": 0.754338,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 55500,
+        "message": {
+          "turn_order": 11,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "That matches our schedule.",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 53600,
+              "end": 53833,
+              "text": "That",
+              "confidence": 0.999095,
+              "word_is_final": false
+            },
+            {
+              "start": 53844,
+              "end": 54252,
+              "text": "matches",
+              "confidence": 0.999988,
+              "word_is_final": false
+            },
+            {
+              "start": 54263,
+              "end": 54437,
+              "text": "our",
+              "confidence": 0.999949,
+              "word_is_final": false
+            },
+            {
+              "start": 54448,
+              "end": 54972,
+              "text": "schedule.",
+              "confidence": 0.998925,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 55600,
+        "message": {
+          "turn_order": 11,
+          "turn_is_formatted": true,
+          "end_of_turn": true,
+          "transcript": "That matches our schedule.",
+          "end_of_turn_confidence": 1,
+          "words": [
+            {
+              "start": 53600,
+              "end": 53871,
+              "text": "That",
+              "confidence": 0.998974,
+              "word_is_final": true
+            },
+            {
+              "start": 53884,
+              "end": 54358,
+              "text": "matches",
+              "confidence": 0.999993,
+              "word_is_final": true
+            },
+            {
+              "start": 54371,
+              "end": 54574,
+              "text": "our",
+              "confidence": 0.999978,
+              "word_is_final": true
+            },
+            {
+              "start": 54587,
+              "end": 55197,
+              "text": "schedule.",
+              "confidence": 0.999035,
+              "word_is_final": true
+            }
+          ],
+          "utterance": "That matches our schedule.",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 56000,
+        "message": {
+          "turn_order": 12,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "I have confirmed",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 55328,
+              "end": 55348,
+              "text": "I",
+              "confidence": 0.451715,
+              "word_is_final": false
+            },
+            {
+              "start": 55352,
+              "end": 55432,
+              "text": "have",
+              "confidence": 0.441497,
+              "word_is_final": false
+            },
+            {
+              "start": 55436,
+              "end": 55616,
+              "text": "confirmed",
+              "confidence": 0.689343,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 57400,
+        "message": {
+          "turn_order": 12,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "I've confirmed the date and cleaning in your chart.",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 55328,
+              "end": 55460,
+              "text": "I've",
+              "confidence": 0.784831,
+              "word_is_final": false
+            },
+            {
+              "start": 55466,
+              "end": 55763,
+              "text": "confirmed",
+              "confidence": 0.998369,
+              "word_is_final": false
+            },
+            {
+              "start": 55769,
+              "end": 55868,
+              "text": "the",
+              "confidence": 0.972914,
+              "word_is_final": false
+            },
+            {
+              "start": 55874,
+              "end": 56006,
+              "text": "date",
+              "confidence": 0.989594,
+              "word_is_final": false
+            },
+            {
+              "start": 56012,
+              "end": 56111,
+              "text": "and",
+              "confidence": 0.976911,
+              "word_is_final": false
+            },
+            {
+              "start": 56117,
+              "end": 56381,
+              "text": "cleaning",
+              "confidence": 0.994836,
+              "word_is_final": false
+            },
+            {
+              "start": 56387,
+              "end": 56453,
+              "text": "in",
+              "confidence": 0.457062,
+              "word_is_final": false
+            },
+            {
+              "start": 56459,
+              "end": 56591,
+              "text": "your",
+              "confidence": 0.5176,
+              "word_is_final": false
+            },
+            {
+              "start": 56597,
+              "end": 56795,
+              "text": "chart.",
+              "confidence": 0.693474,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 57900,
+        "message": {
+          "turn_order": 12,
+          "turn_is_formatted": true,
+          "end_of_turn": true,
+          "transcript": "I've confirmed the date and cleaning in your record.",
+          "end_of_turn_confidence": 1,
+          "words": [
+            {
+              "start": 55328,
+              "end": 55524,
+              "text": "I've",
+              "confidence": 0.938701,
+              "word_is_final": true
+            },
+            {
+              "start": 55533,
+              "end": 55975,
+              "text": "confirmed",
+              "confidence": 0.999984,
+              "word_is_final": true
+            },
+            {
+              "start": 55984,
+              "end": 56131,
+              "text": "the",
+              "confidence": 0.996506,
+              "word_is_final": true
+            },
+            {
+              "start": 56140,
+              "end": 56336,
+              "text": "date",
+              "confidence": 0.999524,
+              "word_is_final": true
+            },
+            {
+              "start": 56345,
+              "end": 56492,
+              "text": "and",
+              "confidence": 0.998912,
+              "word_is_final": true
+            },
+            {
+              "start": 56501,
+              "end": 56893,
+              "text": "cleaning",
+              "confidence": 0.999831,
+              "word_is_final": true
+            },
+            {
+              "start": 56902,
+              "end": 57000,
+              "text": "in",
+              "confidence": 0.999829,
+              "word_is_final": true
+            },
+            {
+              "start": 57009,
+              "end": 57205,
+              "text": "your",
+              "confidence": 0.999962,
+              "word_is_final": true
+            },
+            {
+              "start": 57214,
+              "end": 57557,
+              "text": "record.",
+              "confidence": 0.999703,
+              "word_is_final": true
+            }
+          ],
+          "utterance": "I've confirmed the date and cleaning in your record.",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 64300,
+        "message": {
+          "turn_order": 13,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "Okay.",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 62784,
+              "end": 63968,
+              "text": "Okay.",
+              "confidence": 0.844515,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 65500,
+        "message": {
+          "turn_order": 13,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "Okay, if my assistant",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 62784,
+              "end": 63394,
+              "text": "Okay,",
+              "confidence": 0.985882,
+              "word_is_final": false
+            },
+            {
+              "start": 63418,
+              "end": 63662,
+              "text": "if",
+              "confidence": 0.999025,
+              "word_is_final": false
+            },
+            {
+              "start": 63686,
+              "end": 63930,
+              "text": "my",
+              "confidence": 0.999317,
+              "word_is_final": false
+            },
+            {
+              "start": 63954,
+              "end": 65053,
+              "text": "assistant",
+              "confidence": 0.999931,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 66800,
+        "message": {
+          "turn_order": 13,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "Okay, if my assistant finishes the booking and the deposit,",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 62784,
+              "end": 63126,
+              "text": "Okay,",
+              "confidence": 0.984436,
+              "word_is_final": false
+            },
+            {
+              "start": 63139,
+              "end": 63276,
+              "text": "if",
+              "confidence": 0.999848,
+              "word_is_final": false
+            },
+            {
+              "start": 63289,
+              "end": 63426,
+              "text": "my",
+              "confidence": 0.999911,
+              "word_is_final": false
+            },
+            {
+              "start": 63439,
+              "end": 64056,
+              "text": "assistant",
+              "confidence": 0.999973,
+              "word_is_final": false
+            },
+            {
+              "start": 64069,
+              "end": 64617,
+              "text": "finishes",
+              "confidence": 0.999975,
+              "word_is_final": false
+            },
+            {
+              "start": 64630,
+              "end": 64835,
+              "text": "the",
+              "confidence": 0.999793,
+              "word_is_final": false
+            },
+            {
+              "start": 64848,
+              "end": 65328,
+              "text": "booking",
+              "confidence": 0.999968,
+              "word_is_final": false
+            },
+            {
+              "start": 65341,
+              "end": 65546,
+              "text": "and",
+              "confidence": 0.999192,
+              "word_is_final": false
+            },
+            {
+              "start": 65559,
+              "end": 65764,
+              "text": "the",
+              "confidence": 0.999095,
+              "word_is_final": false
+            },
+            {
+              "start": 65777,
+              "end": 66325,
+              "text": "deposit,",
+              "confidence": 0.896026,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 68000,
+        "message": {
+          "turn_order": 13,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "Okay, if my assistant finishes the booking and the deposit, I'll stay on the",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 62784,
+              "end": 63144,
+              "text": "Okay,",
+              "confidence": 0.991635,
+              "word_is_final": false
+            },
+            {
+              "start": 63158,
+              "end": 63302,
+              "text": "if",
+              "confidence": 0.999922,
+              "word_is_final": false
+            },
+            {
+              "start": 63316,
+              "end": 63460,
+              "text": "my",
+              "confidence": 0.99991,
+              "word_is_final": false
+            },
+            {
+              "start": 63474,
+              "end": 64123,
+              "text": "assistant",
+              "confidence": 0.999973,
+              "word_is_final": false
+            },
+            {
+              "start": 64137,
+              "end": 64714,
+              "text": "finishes",
+              "confidence": 0.999988,
+              "word_is_final": false
+            },
+            {
+              "start": 64728,
+              "end": 64944,
+              "text": "the",
+              "confidence": 0.99996,
+              "word_is_final": false
+            },
+            {
+              "start": 64958,
+              "end": 65463,
+              "text": "booking",
+              "confidence": 0.999987,
+              "word_is_final": false
+            },
+            {
+              "start": 65477,
+              "end": 65693,
+              "text": "and",
+              "confidence": 0.999942,
+              "word_is_final": false
+            },
+            {
+              "start": 65707,
+              "end": 65923,
+              "text": "the",
+              "confidence": 0.999938,
+              "word_is_final": false
+            },
+            {
+              "start": 65937,
+              "end": 66514,
+              "text": "deposit,",
+              "confidence": 0.999931,
+              "word_is_final": false
+            },
+            {
+              "start": 66528,
+              "end": 66816,
+              "text": "I'll",
+              "confidence": 0.999916,
+              "word_is_final": false
+            },
+            {
+              "start": 66830,
+              "end": 67118,
+              "text": "stay",
+              "confidence": 0.999938,
+              "word_is_final": false
+            },
+            {
+              "start": 67132,
+              "end": 67276,
+              "text": "on",
+              "confidence": 0.999685,
+              "word_is_final": false
+            },
+            {
+              "start": 67290,
+              "end": 67506,
+              "text": "the",
+              "confidence": 0.997491,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 68500,
+        "message": {
+          "turn_order": 13,
+          "turn_is_formatted": true,
+          "end_of_turn": true,
+          "transcript": "Okay, if my assistant finishes the booking and the deposit, I'll stay on the line.",
+          "end_of_turn_confidence": 1,
+          "words": [
+            {
+              "start": 62784,
+              "end": 63156,
+              "text": "Okay,",
+              "confidence": 0.993643,
+              "word_is_final": true
+            },
+            {
+              "start": 63170,
+              "end": 63319,
+              "text": "if",
+              "confidence": 0.999918,
+              "word_is_final": true
+            },
+            {
+              "start": 63333,
+              "end": 63482,
+              "text": "my",
+              "confidence": 0.99998,
+              "word_is_final": true
+            },
+            {
+              "start": 63496,
+              "end": 64167,
+              "text": "assistant",
+              "confidence": 0.999982,
+              "word_is_final": true
+            },
+            {
+              "start": 64181,
+              "end": 64777,
+              "text": "finishes",
+              "confidence": 0.999989,
+              "word_is_final": true
+            },
+            {
+              "start": 64791,
+              "end": 65014,
+              "text": "the",
+              "confidence": 0.999978,
+              "word_is_final": true
+            },
+            {
+              "start": 65028,
+              "end": 65550,
+              "text": "booking",
+              "confidence": 0.999992,
+              "word_is_final": true
+            },
+            {
+              "start": 65564,
+              "end": 65787,
+              "text": "and",
+              "confidence": 0.999975,
+              "word_is_final": true
+            },
+            {
+              "start": 65801,
+              "end": 66024,
+              "text": "the",
+              "confidence": 0.999961,
+              "word_is_final": true
+            },
+            {
+              "start": 66038,
+              "end": 66634,
+              "text": "deposit,",
+              "confidence": 0.999947,
+              "word_is_final": true
+            },
+            {
+              "start": 66648,
+              "end": 66946,
+              "text": "I'll",
+              "confidence": 0.999967,
+              "word_is_final": true
+            },
+            {
+              "start": 66960,
+              "end": 67258,
+              "text": "stay",
+              "confidence": 0.999972,
+              "word_is_final": true
+            },
+            {
+              "start": 67272,
+              "end": 67421,
+              "text": "on",
+              "confidence": 0.999992,
+              "word_is_final": true
+            },
+            {
+              "start": 67435,
+              "end": 67658,
+              "text": "the",
+              "confidence": 0.999994,
+              "word_is_final": true
+            },
+            {
+              "start": 67672,
+              "end": 68044,
+              "text": "line.",
+              "confidence": 0.999702,
+              "word_is_final": true
+            }
+          ],
+          "utterance": "Okay, if my assistant finishes the booking and the deposit, I'll stay on the line.",
+          "type": "Turn"
+        }
+      }
+    ],
+    "customer": [
+      {
+        "recvMs": 11200,
+        "message": {
+          "turn_order": 0,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "Hi.",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 9632,
+              "end": 10816,
+              "text": "Hi.",
+              "confidence": 0.946692,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 11900,
+        "message": {
+          "turn_order": 0,
+          "turn_is_formatted": true,
+          "end_of_turn": true,
+          "transcript": "Hi, Dana.",
+          "end_of_turn_confidence": 1,
+          "words": [
+            {
+              "start": 9632,
+              "end": 10334,
+              "text": "Hi,",
+              "confidence": 0.829814,
+              "word_is_final": true
+            },
+            {
+              "start": 10380,
+              "end": 11550,
+              "text": "Dana.",
+              "confidence": 0.988558,
+              "word_is_final": true
+            }
+          ],
+          "utterance": "Hi, Dana.",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 12300,
+        "message": {
+          "turn_order": 1,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "Thanks for",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 11584,
+              "end": 11792,
+              "text": "Thanks",
+              "confidence": 0.994346,
+              "word_is_final": false
+            },
+            {
+              "start": 11798,
+              "end": 11902,
+              "text": "for",
+              "confidence": 0.772145,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 13400,
+        "message": {
+          "turn_order": 1,
+          "turn_is_formatted": true,
+          "end_of_turn": true,
+          "transcript": "Thanks for checking in.",
+          "end_of_turn_confidence": 1,
+          "words": [
+            {
+              "start": 11584,
+              "end": 11984,
+              "text": "Thanks",
+              "confidence": 0.999658,
+              "word_is_final": true
+            },
+            {
+              "start": 11997,
+              "end": 12197,
+              "text": "for",
+              "confidence": 0.999997,
+              "word_is_final": true
+            },
+            {
+              "start": 12210,
+              "end": 12744,
+              "text": "checking",
+              "confidence": 0.999997,
+              "word_is_final": true
+            },
+            {
+              "start": 12757,
+              "end": 12957,
+              "text": "in.",
+              "confidence": 0.99542,
+              "word_is_final": true
+            }
+          ],
+          "utterance": "Thanks for checking in.",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 13900,
+        "message": {
+          "turn_order": 2,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "I'm glad",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 13120,
+              "end": 13240,
+              "text": "I'm",
+              "confidence": 0.994483,
+              "word_is_final": false
+            },
+            {
+              "start": 13248,
+              "end": 13408,
+              "text": "glad",
+              "confidence": 0.998801,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 15200,
+        "message": {
+          "turn_order": 2,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "I'm glad to confirm it. I want",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 13120,
+              "end": 13310,
+              "text": "I'm",
+              "confidence": 0.996651,
+              "word_is_final": false
+            },
+            {
+              "start": 13322,
+              "end": 13575,
+              "text": "glad",
+              "confidence": 0.999806,
+              "word_is_final": false
+            },
+            {
+              "start": 13587,
+              "end": 13713,
+              "text": "to",
+              "confidence": 0.999859,
+              "word_is_final": false
+            },
+            {
+              "start": 13725,
+              "end": 14169,
+              "text": "confirm",
+              "confidence": 0.999972,
+              "word_is_final": false
+            },
+            {
+              "start": 14181,
+              "end": 14371,
+              "text": "it.",
+              "confidence": 0.994064,
+              "word_is_final": false
+            },
+            {
+              "start": 14383,
+              "end": 14446,
+              "text": "I",
+              "confidence": 0.735672,
+              "word_is_final": false
+            },
+            {
+              "start": 14458,
+              "end": 14711,
+              "text": "want",
+              "confidence": 0.91688,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 16500,
+        "message": {
+          "turn_order": 2,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "I'm glad to confirm it. I want to be sure I have everything",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 13120,
+              "end": 13294,
+              "text": "I'm",
+              "confidence": 0.981422,
+              "word_is_final": false
+            },
+            {
+              "start": 13305,
+              "end": 13538,
+              "text": "glad",
+              "confidence": 0.999671,
+              "word_is_final": false
+            },
+            {
+              "start": 13549,
+              "end": 13665,
+              "text": "to",
+              "confidence": 0.999763,
+              "word_is_final": false
+            },
+            {
+              "start": 13676,
+              "end": 14084,
+              "text": "confirm",
+              "confidence": 0.999956,
+              "word_is_final": false
+            },
+            {
+              "start": 14095,
+              "end": 14269,
+              "text": "it.",
+              "confidence": 0.99439,
+              "word_is_final": false
+            },
+            {
+              "start": 14280,
+              "end": 14338,
+              "text": "I",
+              "confidence": 0.95262,
+              "word_is_final": false
+            },
+            {
+              "start": 14349,
+              "end": 14582,
+              "text": "want",
+              "confidence": 0.998369,
+              "word_is_final": false
+            },
+            {
+              "start": 14593,
+              "end": 14709,
+              "text": "to",
+              "confidence": 0.999715,
+              "word_is_final": false
+            },
+            {
+              "start": 14720,
+              "end": 14836,
+              "text": "be",
+              "confidence": 0.999671,
+              "word_is_final": false
+            },
+            {
+              "start": 14847,
+              "end": 15080,
+              "text": "sure",
+              "confidence": 0.999787,
+              "word_is_final": false
+            },
+            {
+              "start": 15091,
+              "end": 15149,
+              "text": "I",
+              "confidence": 0.998724,
+              "word_is_final": false
+            },
+            {
+              "start": 15160,
+              "end": 15393,
+              "text": "have",
+              "confidence": 0.999349,
+              "word_is_final": false
+            },
+            {
+              "start": 15404,
+              "end": 15986,
+              "text": "everything",
+              "confidence": 0.998853,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 17300,
+        "message": {
+          "turn_order": 2,
+          "turn_is_formatted": true,
+          "end_of_turn": true,
+          "transcript": "I'm glad to confirm it. I want to be sure I have everything right too.",
+          "end_of_turn_confidence": 1,
+          "words": [
+            {
+              "start": 13120,
+              "end": 13311,
+              "text": "I'm",
+              "confidence": 0.996024,
+              "word_is_final": true
+            },
+            {
+              "start": 13323,
+              "end": 13577,
+              "text": "glad",
+              "confidence": 0.999977,
+              "word_is_final": true
+            },
+            {
+              "start": 13589,
+              "end": 13716,
+              "text": "to",
+              "confidence": 0.999916,
+              "word_is_final": true
+            },
+            {
+              "start": 13728,
+              "end": 14173,
+              "text": "confirm",
+              "confidence": 0.999988,
+              "word_is_final": true
+            },
+            {
+              "start": 14185,
+              "end": 14376,
+              "text": "it.",
+              "confidence": 0.762955,
+              "word_is_final": true
+            },
+            {
+              "start": 14388,
+              "end": 14451,
+              "text": "I",
+              "confidence": 0.999519,
+              "word_is_final": true
+            },
+            {
+              "start": 14463,
+              "end": 14717,
+              "text": "want",
+              "confidence": 0.999453,
+              "word_is_final": true
+            },
+            {
+              "start": 14729,
+              "end": 14856,
+              "text": "to",
+              "confidence": 0.999996,
+              "word_is_final": true
+            },
+            {
+              "start": 14868,
+              "end": 14995,
+              "text": "be",
+              "confidence": 0.999915,
+              "word_is_final": true
+            },
+            {
+              "start": 15007,
+              "end": 15261,
+              "text": "sure",
+              "confidence": 0.999995,
+              "word_is_final": true
+            },
+            {
+              "start": 15273,
+              "end": 15336,
+              "text": "I",
+              "confidence": 0.999971,
+              "word_is_final": true
+            },
+            {
+              "start": 15348,
+              "end": 15602,
+              "text": "have",
+              "confidence": 0.999989,
+              "word_is_final": true
+            },
+            {
+              "start": 15614,
+              "end": 16250,
+              "text": "everything",
+              "confidence": 0.99999,
+              "word_is_final": true
+            },
+            {
+              "start": 16262,
+              "end": 16580,
+              "text": "right",
+              "confidence": 0.999987,
+              "word_is_final": true
+            },
+            {
+              "start": 16592,
+              "end": 16846,
+              "text": "too.",
+              "confidence": 0.947044,
+              "word_is_final": true
+            }
+          ],
+          "utterance": "I'm glad to confirm it. I want to be sure I have everything right too.",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 24400,
+        "message": {
+          "turn_order": 3,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "Maya",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 22912,
+              "end": 24000,
+              "text": "Maya",
+              "confidence": 0.983317,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 25700,
+        "message": {
+          "turn_order": 3,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "Maya Ortiz.",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 22912,
+              "end": 23815,
+              "text": "Maya",
+              "confidence": 0.998315,
+              "word_is_final": false
+            },
+            {
+              "start": 23860,
+              "end": 25215,
+              "text": "Ortiz.",
+              "confidence": 0.987399,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 26300,
+        "message": {
+          "turn_order": 3,
+          "turn_is_formatted": true,
+          "end_of_turn": true,
+          "transcript": "Maya Ortiz.",
+          "end_of_turn_confidence": 1,
+          "words": [
+            {
+              "start": 22912,
+              "end": 23941,
+              "text": "Maya",
+              "confidence": 0.998817,
+              "word_is_final": true
+            },
+            {
+              "start": 23992,
+              "end": 25535,
+              "text": "Ortiz.",
+              "confidence": 0.983322,
+              "word_is_final": true
+            }
+          ],
+          "utterance": "Maya Ortiz.",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 26700,
+        "message": {
+          "turn_order": 4,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "That's",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 25664,
+              "end": 25952,
+              "text": "That's",
+              "confidence": 0.747568,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 27800,
+        "message": {
+          "turn_order": 4,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "That's the name I use for my",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 25664,
+              "end": 26052,
+              "text": "That's",
+              "confidence": 0.999941,
+              "word_is_final": false
+            },
+            {
+              "start": 26064,
+              "end": 26258,
+              "text": "the",
+              "confidence": 0.999992,
+              "word_is_final": false
+            },
+            {
+              "start": 26270,
+              "end": 26529,
+              "text": "name",
+              "confidence": 0.999985,
+              "word_is_final": false
+            },
+            {
+              "start": 26541,
+              "end": 26605,
+              "text": "I",
+              "confidence": 0.999973,
+              "word_is_final": false
+            },
+            {
+              "start": 26617,
+              "end": 26811,
+              "text": "use",
+              "confidence": 0.999833,
+              "word_is_final": false
+            },
+            {
+              "start": 26823,
+              "end": 27017,
+              "text": "for",
+              "confidence": 0.999927,
+              "word_is_final": false
+            },
+            {
+              "start": 27029,
+              "end": 27158,
+              "text": "my",
+              "confidence": 0.922922,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 29000,
+        "message": {
+          "turn_order": 4,
+          "turn_is_formatted": true,
+          "end_of_turn": true,
+          "transcript": "That's the name I use for my dental visits.",
+          "end_of_turn_confidence": 1,
+          "words": [
+            {
+              "start": 25664,
+              "end": 26120,
+              "text": "That's",
+              "confidence": 0.999458,
+              "word_is_final": true
+            },
+            {
+              "start": 26135,
+              "end": 26363,
+              "text": "the",
+              "confidence": 0.999995,
+              "word_is_final": true
+            },
+            {
+              "start": 26378,
+              "end": 26682,
+              "text": "name",
+              "confidence": 0.999986,
+              "word_is_final": true
+            },
+            {
+              "start": 26697,
+              "end": 26773,
+              "text": "I",
+              "confidence": 0.99999,
+              "word_is_final": true
+            },
+            {
+              "start": 26788,
+              "end": 27016,
+              "text": "use",
+              "confidence": 0.999941,
+              "word_is_final": true
+            },
+            {
+              "start": 27031,
+              "end": 27259,
+              "text": "for",
+              "confidence": 0.999991,
+              "word_is_final": true
+            },
+            {
+              "start": 27274,
+              "end": 27426,
+              "text": "my",
+              "confidence": 0.999985,
+              "word_is_final": true
+            },
+            {
+              "start": 27441,
+              "end": 27897,
+              "text": "dental",
+              "confidence": 0.999987,
+              "word_is_final": true
+            },
+            {
+              "start": 27912,
+              "end": 28444,
+              "text": "visits.",
+              "confidence": 0.999903,
+              "word_is_final": true
+            }
+          ],
+          "utterance": "That's the name I use for my dental visits.",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 34200,
+        "message": {
+          "turn_order": 5,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "A",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 32736,
+              "end": 33842,
+              "text": "A",
+              "confidence": 0.719065,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 35000,
+        "message": {
+          "turn_order": 5,
+          "turn_is_formatted": true,
+          "end_of_turn": true,
+          "transcript": "A cleaning.",
+          "end_of_turn_confidence": 1,
+          "words": [
+            {
+              "start": 32736,
+              "end": 32919,
+              "text": "A",
+              "confidence": 0.998093,
+              "word_is_final": true
+            },
+            {
+              "start": 32955,
+              "end": 34608,
+              "text": "cleaning.",
+              "confidence": 0.998301,
+              "word_is_final": true
+            }
+          ],
+          "utterance": "A cleaning.",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 35400,
+        "message": {
+          "turn_order": 6,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "I'm coming",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 34752,
+              "end": 34856,
+              "text": "I'm",
+              "confidence": 0.960141,
+              "word_is_final": false
+            },
+            {
+              "start": 34862,
+              "end": 35070,
+              "text": "coming",
+              "confidence": 0.998405,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 36700,
+        "message": {
+          "turn_order": 6,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "I'm coming in for my regular cleaning.",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 34752,
+              "end": 34887,
+              "text": "I'm",
+              "confidence": 0.947814,
+              "word_is_final": false
+            },
+            {
+              "start": 34896,
+              "end": 35167,
+              "text": "coming",
+              "confidence": 0.994145,
+              "word_is_final": false
+            },
+            {
+              "start": 35176,
+              "end": 35266,
+              "text": "in",
+              "confidence": 0.997183,
+              "word_is_final": false
+            },
+            {
+              "start": 35275,
+              "end": 35410,
+              "text": "for",
+              "confidence": 0.996391,
+              "word_is_final": false
+            },
+            {
+              "start": 35419,
+              "end": 35509,
+              "text": "my",
+              "confidence": 0.995515,
+              "word_is_final": false
+            },
+            {
+              "start": 35518,
+              "end": 35835,
+              "text": "regular",
+              "confidence": 0.997033,
+              "word_is_final": false
+            },
+            {
+              "start": 35844,
+              "end": 36251,
+              "text": "cleaning.",
+              "confidence": 0.845328,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 37200,
+        "message": {
+          "turn_order": 6,
+          "turn_is_formatted": true,
+          "end_of_turn": true,
+          "transcript": "I'm coming in for my regular cleaning.",
+          "end_of_turn_confidence": 1,
+          "words": [
+            {
+              "start": 34752,
+              "end": 34937,
+              "text": "I'm",
+              "confidence": 0.99132,
+              "word_is_final": true
+            },
+            {
+              "start": 34949,
+              "end": 35319,
+              "text": "coming",
+              "confidence": 0.999958,
+              "word_is_final": true
+            },
+            {
+              "start": 35331,
+              "end": 35454,
+              "text": "in",
+              "confidence": 0.999994,
+              "word_is_final": true
+            },
+            {
+              "start": 35466,
+              "end": 35651,
+              "text": "for",
+              "confidence": 0.999989,
+              "word_is_final": true
+            },
+            {
+              "start": 35663,
+              "end": 35786,
+              "text": "my",
+              "confidence": 0.999995,
+              "word_is_final": true
+            },
+            {
+              "start": 35798,
+              "end": 36229,
+              "text": "regular",
+              "confidence": 0.999993,
+              "word_is_final": true
+            },
+            {
+              "start": 36241,
+              "end": 36796,
+              "text": "cleaning.",
+              "confidence": 0.999535,
+              "word_is_final": true
+            }
+          ],
+          "utterance": "I'm coming in for my regular cleaning.",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 37600,
+        "message": {
+          "turn_order": 7,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "Just a",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 36928,
+              "end": 37149,
+              "text": "Just",
+              "confidence": 0.512822,
+              "word_is_final": false
+            },
+            {
+              "start": 37160,
+              "end": 37215,
+              "text": "a",
+              "confidence": 0.534188,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 38300,
+        "message": {
+          "turn_order": 7,
+          "turn_is_formatted": true,
+          "end_of_turn": true,
+          "transcript": "Just as planned.",
+          "end_of_turn_confidence": 1,
+          "words": [
+            {
+              "start": 36928,
+              "end": 37185,
+              "text": "Just",
+              "confidence": 0.902759,
+              "word_is_final": true
+            },
+            {
+              "start": 37197,
+              "end": 37325,
+              "text": "as",
+              "confidence": 0.999976,
+              "word_is_final": true
+            },
+            {
+              "start": 37337,
+              "end": 37852,
+              "text": "planned.",
+              "confidence": 0.998309,
+              "word_is_final": true
+            }
+          ],
+          "utterance": "Just as planned.",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 45000,
+        "message": {
+          "turn_order": 8,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "2.",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 43392,
+              "end": 44480,
+              "text": "2.",
+              "confidence": 0.750288,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 46200,
+        "message": {
+          "turn_order": 8,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "Tuesday the 6th of",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 43392,
+              "end": 44454,
+              "text": "Tuesday",
+              "confidence": 0.997899,
+              "word_is_final": false
+            },
+            {
+              "start": 44484,
+              "end": 44939,
+              "text": "the",
+              "confidence": 0.531162,
+              "word_is_final": false
+            },
+            {
+              "start": 44969,
+              "end": 45424,
+              "text": "6th",
+              "confidence": 0.999857,
+              "word_is_final": false
+            },
+            {
+              "start": 45454,
+              "end": 45757,
+              "text": "of",
+              "confidence": 0.997493,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 47400,
+        "message": {
+          "turn_order": 8,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "Tuesday, the 6th of October. I wrote",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 43392,
+              "end": 44310,
+              "text": "Tuesday,",
+              "confidence": 0.894218,
+              "word_is_final": false
+            },
+            {
+              "start": 44332,
+              "end": 44676,
+              "text": "the",
+              "confidence": 0.995915,
+              "word_is_final": false
+            },
+            {
+              "start": 44698,
+              "end": 45042,
+              "text": "6th",
+              "confidence": 0.99994,
+              "word_is_final": false
+            },
+            {
+              "start": 45064,
+              "end": 45293,
+              "text": "of",
+              "confidence": 0.999987,
+              "word_is_final": false
+            },
+            {
+              "start": 45315,
+              "end": 46233,
+              "text": "October.",
+              "confidence": 0.932009,
+              "word_is_final": false
+            },
+            {
+              "start": 46255,
+              "end": 46369,
+              "text": "I",
+              "confidence": 0.944719,
+              "word_is_final": false
+            },
+            {
+              "start": 46391,
+              "end": 46965,
+              "text": "wrote",
+              "confidence": 0.981425,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 48700,
+        "message": {
+          "turn_order": 8,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "Tuesday, the 6th of October. I wrote it down when I made the appointment.",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 43392,
+              "end": 44001,
+              "text": "Tuesday,",
+              "confidence": 0.980832,
+              "word_is_final": false
+            },
+            {
+              "start": 44016,
+              "end": 44244,
+              "text": "the",
+              "confidence": 0.993116,
+              "word_is_final": false
+            },
+            {
+              "start": 44259,
+              "end": 44487,
+              "text": "6th",
+              "confidence": 0.999913,
+              "word_is_final": false
+            },
+            {
+              "start": 44502,
+              "end": 44654,
+              "text": "of",
+              "confidence": 0.999982,
+              "word_is_final": false
+            },
+            {
+              "start": 44669,
+              "end": 45278,
+              "text": "October.",
+              "confidence": 0.962328,
+              "word_is_final": false
+            },
+            {
+              "start": 45293,
+              "end": 45369,
+              "text": "I",
+              "confidence": 0.998811,
+              "word_is_final": false
+            },
+            {
+              "start": 45384,
+              "end": 45764,
+              "text": "wrote",
+              "confidence": 0.999977,
+              "word_is_final": false
+            },
+            {
+              "start": 45779,
+              "end": 45931,
+              "text": "it",
+              "confidence": 0.999985,
+              "word_is_final": false
+            },
+            {
+              "start": 45946,
+              "end": 46250,
+              "text": "down",
+              "confidence": 0.999993,
+              "word_is_final": false
+            },
+            {
+              "start": 46265,
+              "end": 46569,
+              "text": "when",
+              "confidence": 0.999946,
+              "word_is_final": false
+            },
+            {
+              "start": 46584,
+              "end": 46660,
+              "text": "I",
+              "confidence": 0.999977,
+              "word_is_final": false
+            },
+            {
+              "start": 46675,
+              "end": 46979,
+              "text": "made",
+              "confidence": 0.999984,
+              "word_is_final": false
+            },
+            {
+              "start": 46994,
+              "end": 47222,
+              "text": "the",
+              "confidence": 0.999915,
+              "word_is_final": false
+            },
+            {
+              "start": 47237,
+              "end": 48150,
+              "text": "appointment.",
+              "confidence": 0.977867,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 49900,
+        "message": {
+          "turn_order": 8,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "Tuesday, the 6th of October. I wrote it down when I made the appointment, so that's the date",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 43392,
+              "end": 44009,
+              "text": "Tuesday,",
+              "confidence": 0.936356,
+              "word_is_final": false
+            },
+            {
+              "start": 44024,
+              "end": 44255,
+              "text": "the",
+              "confidence": 0.9967,
+              "word_is_final": false
+            },
+            {
+              "start": 44270,
+              "end": 44501,
+              "text": "6th",
+              "confidence": 0.99994,
+              "word_is_final": false
+            },
+            {
+              "start": 44516,
+              "end": 44670,
+              "text": "of",
+              "confidence": 0.999987,
+              "word_is_final": false
+            },
+            {
+              "start": 44685,
+              "end": 45302,
+              "text": "October.",
+              "confidence": 0.987659,
+              "word_is_final": false
+            },
+            {
+              "start": 45317,
+              "end": 45394,
+              "text": "I",
+              "confidence": 0.998804,
+              "word_is_final": false
+            },
+            {
+              "start": 45409,
+              "end": 45794,
+              "text": "wrote",
+              "confidence": 0.999971,
+              "word_is_final": false
+            },
+            {
+              "start": 45809,
+              "end": 45963,
+              "text": "it",
+              "confidence": 0.999984,
+              "word_is_final": false
+            },
+            {
+              "start": 45978,
+              "end": 46286,
+              "text": "down",
+              "confidence": 0.999995,
+              "word_is_final": false
+            },
+            {
+              "start": 46301,
+              "end": 46609,
+              "text": "when",
+              "confidence": 0.999979,
+              "word_is_final": false
+            },
+            {
+              "start": 46624,
+              "end": 46701,
+              "text": "I",
+              "confidence": 0.99999,
+              "word_is_final": false
+            },
+            {
+              "start": 46716,
+              "end": 47024,
+              "text": "made",
+              "confidence": 0.999991,
+              "word_is_final": false
+            },
+            {
+              "start": 47039,
+              "end": 47270,
+              "text": "the",
+              "confidence": 0.999972,
+              "word_is_final": false
+            },
+            {
+              "start": 47285,
+              "end": 48210,
+              "text": "appointment,",
+              "confidence": 0.991683,
+              "word_is_final": false
+            },
+            {
+              "start": 48225,
+              "end": 48379,
+              "text": "so",
+              "confidence": 0.999889,
+              "word_is_final": false
+            },
+            {
+              "start": 48394,
+              "end": 48856,
+              "text": "that's",
+              "confidence": 0.999932,
+              "word_is_final": false
+            },
+            {
+              "start": 48871,
+              "end": 49102,
+              "text": "the",
+              "confidence": 0.999872,
+              "word_is_final": false
+            },
+            {
+              "start": 49117,
+              "end": 49425,
+              "text": "date",
+              "confidence": 0.918953,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 50900,
+        "message": {
+          "turn_order": 8,
+          "turn_is_formatted": true,
+          "end_of_turn": true,
+          "transcript": "Tuesday, the 6th of October. I wrote it down when I made the appointment, so that's the date I expected.",
+          "end_of_turn_confidence": 1,
+          "words": [
+            {
+              "start": 43392,
+              "end": 44026,
+              "text": "Tuesday,",
+              "confidence": 0.969914,
+              "word_is_final": true
+            },
+            {
+              "start": 44041,
+              "end": 44278,
+              "text": "the",
+              "confidence": 0.995341,
+              "word_is_final": true
+            },
+            {
+              "start": 44293,
+              "end": 44530,
+              "text": "6th",
+              "confidence": 0.999906,
+              "word_is_final": true
+            },
+            {
+              "start": 44545,
+              "end": 44703,
+              "text": "of",
+              "confidence": 0.999985,
+              "word_is_final": true
+            },
+            {
+              "start": 44718,
+              "end": 45352,
+              "text": "October.",
+              "confidence": 0.99619,
+              "word_is_final": true
+            },
+            {
+              "start": 45367,
+              "end": 45446,
+              "text": "I",
+              "confidence": 0.99986,
+              "word_is_final": true
+            },
+            {
+              "start": 45461,
+              "end": 45857,
+              "text": "wrote",
+              "confidence": 0.999964,
+              "word_is_final": true
+            },
+            {
+              "start": 45872,
+              "end": 46030,
+              "text": "it",
+              "confidence": 0.99999,
+              "word_is_final": true
+            },
+            {
+              "start": 46045,
+              "end": 46362,
+              "text": "down",
+              "confidence": 0.999999,
+              "word_is_final": true
+            },
+            {
+              "start": 46377,
+              "end": 46694,
+              "text": "when",
+              "confidence": 0.99999,
+              "word_is_final": true
+            },
+            {
+              "start": 46709,
+              "end": 46788,
+              "text": "I",
+              "confidence": 0.999997,
+              "word_is_final": true
+            },
+            {
+              "start": 46803,
+              "end": 47120,
+              "text": "made",
+              "confidence": 0.999996,
+              "word_is_final": true
+            },
+            {
+              "start": 47135,
+              "end": 47372,
+              "text": "the",
+              "confidence": 0.999986,
+              "word_is_final": true
+            },
+            {
+              "start": 47387,
+              "end": 48338,
+              "text": "appointment,",
+              "confidence": 0.997831,
+              "word_is_final": true
+            },
+            {
+              "start": 48353,
+              "end": 48511,
+              "text": "so",
+              "confidence": 0.999975,
+              "word_is_final": true
+            },
+            {
+              "start": 48526,
+              "end": 49001,
+              "text": "that's",
+              "confidence": 0.999964,
+              "word_is_final": true
+            },
+            {
+              "start": 49016,
+              "end": 49253,
+              "text": "the",
+              "confidence": 0.999991,
+              "word_is_final": true
+            },
+            {
+              "start": 49268,
+              "end": 49585,
+              "text": "date",
+              "confidence": 0.96122,
+              "word_is_final": true
+            },
+            {
+              "start": 49600,
+              "end": 49679,
+              "text": "I",
+              "confidence": 0.999647,
+              "word_is_final": true
+            },
+            {
+              "start": 49694,
+              "end": 50407,
+              "text": "expected.",
+              "confidence": 0.996078,
+              "word_is_final": true
+            }
+          ],
+          "utterance": "Tuesday, the 6th of October. I wrote it down when I made the appointment, so that's the date I expected.",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 58600,
+        "message": {
+          "turn_order": 9,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "Great.",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 56960,
+              "end": 58112,
+              "text": "Great.",
+              "confidence": 0.949594,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 59800,
+        "message": {
+          "turn_order": 9,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "Great, that all sounds right.",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 56960,
+              "end": 57503,
+              "text": "Great,",
+              "confidence": 0.983427,
+              "word_is_final": false
+            },
+            {
+              "start": 57521,
+              "end": 57883,
+              "text": "that",
+              "confidence": 0.999976,
+              "word_is_final": false
+            },
+            {
+              "start": 57901,
+              "end": 58172,
+              "text": "all",
+              "confidence": 0.999971,
+              "word_is_final": false
+            },
+            {
+              "start": 58190,
+              "end": 58733,
+              "text": "sounds",
+              "confidence": 0.999975,
+              "word_is_final": false
+            },
+            {
+              "start": 58751,
+              "end": 59294,
+              "text": "right.",
+              "confidence": 0.838199,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 60100,
+        "message": {
+          "turn_order": 9,
+          "turn_is_formatted": true,
+          "end_of_turn": true,
+          "transcript": "Great, that all sounds right.",
+          "end_of_turn_confidence": 1,
+          "words": [
+            {
+              "start": 56960,
+              "end": 57607,
+              "text": "Great,",
+              "confidence": 0.989956,
+              "word_is_final": true
+            },
+            {
+              "start": 57628,
+              "end": 58059,
+              "text": "that",
+              "confidence": 0.999989,
+              "word_is_final": true
+            },
+            {
+              "start": 58080,
+              "end": 58403,
+              "text": "all",
+              "confidence": 0.999981,
+              "word_is_final": true
+            },
+            {
+              "start": 58424,
+              "end": 59071,
+              "text": "sounds",
+              "confidence": 0.99999,
+              "word_is_final": true
+            },
+            {
+              "start": 59092,
+              "end": 59739,
+              "text": "right.",
+              "confidence": 0.997176,
+              "word_is_final": true
+            }
+          ],
+          "utterance": "Great, that all sounds right.",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 60500,
+        "message": {
+          "turn_order": 10,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "Thanks for",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 59872,
+              "end": 60059,
+              "text": "Thanks",
+              "confidence": 0.996685,
+              "word_is_final": false
+            },
+            {
+              "start": 60065,
+              "end": 60158,
+              "text": "for",
+              "confidence": 0.916763,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 62000,
+        "message": {
+          "turn_order": 10,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "Thanks for walking me through it, and",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 59872,
+              "end": 60170,
+              "text": "Thanks",
+              "confidence": 0.998849,
+              "word_is_final": false
+            },
+            {
+              "start": 60179,
+              "end": 60328,
+              "text": "for",
+              "confidence": 0.999976,
+              "word_is_final": false
+            },
+            {
+              "start": 60337,
+              "end": 60684,
+              "text": "walking",
+              "confidence": 0.999988,
+              "word_is_final": false
+            },
+            {
+              "start": 60693,
+              "end": 60792,
+              "text": "me",
+              "confidence": 0.999993,
+              "word_is_final": false
+            },
+            {
+              "start": 60801,
+              "end": 61148,
+              "text": "through",
+              "confidence": 0.999993,
+              "word_is_final": false
+            },
+            {
+              "start": 61157,
+              "end": 61306,
+              "text": "it,",
+              "confidence": 0.863758,
+              "word_is_final": false
+            },
+            {
+              "start": 61315,
+              "end": 61464,
+              "text": "and",
+              "confidence": 0.997715,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 63300,
+        "message": {
+          "turn_order": 10,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "Thanks for walking me through it and confirming the appointment details.",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 59872,
+              "end": 60145,
+              "text": "Thanks",
+              "confidence": 0.992915,
+              "word_is_final": false
+            },
+            {
+              "start": 60154,
+              "end": 60290,
+              "text": "for",
+              "confidence": 0.999912,
+              "word_is_final": false
+            },
+            {
+              "start": 60299,
+              "end": 60617,
+              "text": "walking",
+              "confidence": 0.99997,
+              "word_is_final": false
+            },
+            {
+              "start": 60626,
+              "end": 60717,
+              "text": "me",
+              "confidence": 0.999965,
+              "word_is_final": false
+            },
+            {
+              "start": 60726,
+              "end": 61044,
+              "text": "through",
+              "confidence": 0.999983,
+              "word_is_final": false
+            },
+            {
+              "start": 61053,
+              "end": 61144,
+              "text": "it",
+              "confidence": 0.999915,
+              "word_is_final": false
+            },
+            {
+              "start": 61153,
+              "end": 61289,
+              "text": "and",
+              "confidence": 0.953245,
+              "word_is_final": false
+            },
+            {
+              "start": 61298,
+              "end": 61753,
+              "text": "confirming",
+              "confidence": 0.999957,
+              "word_is_final": false
+            },
+            {
+              "start": 61762,
+              "end": 61898,
+              "text": "the",
+              "confidence": 0.999743,
+              "word_is_final": false
+            },
+            {
+              "start": 61907,
+              "end": 62407,
+              "text": "appointment",
+              "confidence": 0.999855,
+              "word_is_final": false
+            },
+            {
+              "start": 62416,
+              "end": 62780,
+              "text": "details.",
+              "confidence": 0.992964,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 63800,
+        "message": {
+          "turn_order": 10,
+          "turn_is_formatted": true,
+          "end_of_turn": true,
+          "transcript": "Thanks for walking me through it and confirming the appointment details.",
+          "end_of_turn_confidence": 1,
+          "words": [
+            {
+              "start": 59872,
+              "end": 60205,
+              "text": "Thanks",
+              "confidence": 0.998518,
+              "word_is_final": true
+            },
+            {
+              "start": 60216,
+              "end": 60382,
+              "text": "for",
+              "confidence": 0.999976,
+              "word_is_final": true
+            },
+            {
+              "start": 60393,
+              "end": 60781,
+              "text": "walking",
+              "confidence": 0.999987,
+              "word_is_final": true
+            },
+            {
+              "start": 60792,
+              "end": 60903,
+              "text": "me",
+              "confidence": 0.999997,
+              "word_is_final": true
+            },
+            {
+              "start": 60914,
+              "end": 61302,
+              "text": "through",
+              "confidence": 0.999997,
+              "word_is_final": true
+            },
+            {
+              "start": 61313,
+              "end": 61424,
+              "text": "it",
+              "confidence": 0.999983,
+              "word_is_final": true
+            },
+            {
+              "start": 61435,
+              "end": 61601,
+              "text": "and",
+              "confidence": 0.931638,
+              "word_is_final": true
+            },
+            {
+              "start": 61612,
+              "end": 62167,
+              "text": "confirming",
+              "confidence": 0.999938,
+              "word_is_final": true
+            },
+            {
+              "start": 62178,
+              "end": 62344,
+              "text": "the",
+              "confidence": 0.999894,
+              "word_is_final": true
+            },
+            {
+              "start": 62355,
+              "end": 62965,
+              "text": "appointment",
+              "confidence": 0.999971,
+              "word_is_final": true
+            },
+            {
+              "start": 62976,
+              "end": 63420,
+              "text": "details.",
+              "confidence": 0.998823,
+              "word_is_final": true
+            }
+          ],
+          "utterance": "Thanks for walking me through it and confirming the appointment details.",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 68900,
+        "message": {
+          "turn_order": 11,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "Sure.",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 67360,
+              "end": 68482,
+              "text": "Sure.",
+              "confidence": 0.922874,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 69400,
+        "message": {
+          "turn_order": 11,
+          "turn_is_formatted": true,
+          "end_of_turn": true,
+          "transcript": "Sure.",
+          "end_of_turn_confidence": 1,
+          "words": [
+            {
+              "start": 67360,
+              "end": 69026,
+              "text": "Sure.",
+              "confidence": 0.992787,
+              "word_is_final": true
+            }
+          ],
+          "utterance": "Sure.",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 69900,
+        "message": {
+          "turn_order": 12,
+          "turn_is_formatted": true,
+          "end_of_turn": false,
+          "transcript": "Go ahead.",
+          "end_of_turn_confidence": 0,
+          "words": [
+            {
+              "start": 69184,
+              "end": 69254,
+              "text": "Go",
+              "confidence": 0.998178,
+              "word_is_final": false
+            },
+            {
+              "start": 69261,
+              "end": 69471,
+              "text": "ahead.",
+              "confidence": 0.823536,
+              "word_is_final": false
+            }
+          ],
+          "utterance": "",
+          "type": "Turn"
+        }
+      },
+      {
+        "recvMs": 70400,
+        "message": {
+          "turn_order": 12,
+          "turn_is_formatted": true,
+          "end_of_turn": true,
+          "transcript": "Go ahead.",
+          "end_of_turn_confidence": 1,
+          "words": [
+            {
+              "start": 69184,
+              "end": 69386,
+              "text": "Go",
+              "confidence": 0.996404,
+              "word_is_final": true
+            },
+            {
+              "start": 69406,
+              "end": 70014,
+              "text": "ahead.",
+              "confidence": 0.998579,
+              "word_is_final": true
+            }
+          ],
+          "utterance": "Go ahead.",
+          "type": "Turn"
+        }
+      }
+    ]
+  }
+}

@@ -43,10 +43,23 @@ export interface ExtractTurnResult extends ExtractTurnOutput {
   noFacts: boolean;
 }
 
+/** The slice of `CaseEngine` one extraction needs: the prompt/schema pin, the input builder and the post-processing. */
+export type ExtractorEngine = Pick<CaseEngine, "applyExtraction" | "buildExtractorInput" | "extractor">;
+
+/**
+ * WP14b·3: the engine of the case's relay version rides as an OPTIONAL extra key on the input. `ExtractTurnInput`
+ * is frozen v1 (contracts/extract.ts), and widening a parameter keeps this class assignable to the `Extractor` port,
+ * so one extractor instance serves every relay. `ExtractService` resolves it once per batch from
+ * `cases.relay_version_id`; omitted (a Baton case, or a caller that predates this), the constructor's engine is used
+ * and the behaviour is byte-identical to before.
+ */
+export type RelayExtractTurnInput = ExtractTurnInput & { engine?: ExtractorEngine };
+
 export interface OpenAIExtractorOptions {
   /** An OpenAI client, or a lazy factory (the key is read only when the first turn arrives). */
   client: OpenAI | (() => OpenAI);
-  engine: Pick<CaseEngine, "applyExtraction" | "buildExtractorInput" | "extractor">;
+  /** The default (flagship) engine: used whenever an input carries no per-case `engine`. */
+  engine: ExtractorEngine;
   maxOutputTokens?: number;
   /** Override the computed budget (tests). */
   timeoutMs?: number;
@@ -99,10 +112,11 @@ export class OpenAIExtractor implements Extractor {
     return this.o.timeoutMs ?? extractTimeoutMs(this.o.maxOutputTokens);
   }
 
-  async extractTurn(input: ExtractTurnInput): Promise<ExtractTurnResult> {
+  async extractTurn(input: RelayExtractTurnInput): Promise<ExtractTurnResult> {
     const now = this.o.now ?? (() => performance.now());
     const t0 = now();
-    const art = this.o.engine.extractor;
+    const eng = input.engine ?? this.o.engine;
+    const art = eng.extractor;
     const newTurns = [...input.newTurns].sort((a, b) => a.endMs - b.endMs || a.recvMs - b.recvMs);
     const usage = { input: 0, output: 0 };
     let usd = 0;
@@ -122,10 +136,10 @@ export class OpenAIExtractor implements Extractor {
     };
     if (!newTurns.length) return done([], [], 0, null, true);
 
-    const first = await this.attempt(input, input.recent, newTurns);
+    const first = await this.attempt(eng, input, input.recent, newTurns);
     account(first.ok ? first.usage : first.usage);
     if (first.ok) {
-      return done(this.post(first.patch, newTurns, input), newTurns, 1, null, first.patch.no_facts);
+      return done(this.post(eng, first.patch, newTurns, input), newTurns, 1, null, first.patch.no_facts);
     }
     exLog.warn("extraction attempt failed", { caseId: input.caseId, code: first.code, message: first.message, ms: Math.round(first.ms), turns: newTurns.length });
     if (!first.retry) return done([], [], 1, { code: first.code, message: first.message }, false);
@@ -136,22 +150,22 @@ export class OpenAIExtractor implements Extractor {
     }
     const newest = newTurns.at(-1)!;
     const recent = [...input.recent, ...newTurns.slice(0, -1)].slice(-art.recentTurns);
-    const second = await this.attempt(input, recent, [newest]);
+    const second = await this.attempt(eng, input, recent, [newest]);
     account(second.ok ? second.usage : second.usage);
     if (second.ok) {
-      return done(this.post(second.patch, [newest], input), [newest], 2, { code: first.code, message: first.message }, second.patch.no_facts);
+      return done(this.post(eng, second.patch, [newest], input), [newest], 2, { code: first.code, message: first.message }, second.patch.no_facts);
     }
     exLog.warn("extraction retry failed", { caseId: input.caseId, code: second.code, message: second.message, ms: Math.round(second.ms) });
     return done([], [], 2, { code: second.code, message: second.message }, false);
   }
 
-  private post(patch: RawPatch, turns: TurnInput[], input: ExtractTurnInput): NewFactEvent[] {
-    return this.o.engine.applyExtraction(patch, turns, { caseId: input.caseId, policy: input.policy, callDate: input.callDate });
+  private post(eng: ExtractorEngine, patch: RawPatch, turns: TurnInput[], input: ExtractTurnInput): NewFactEvent[] {
+    return eng.applyExtraction(patch, turns, { caseId: input.caseId, policy: input.policy, callDate: input.callDate });
   }
 
-  private async attempt(input: ExtractTurnInput, recent: readonly TurnInput[], newTurns: readonly TurnInput[]): Promise<Attempt> {
-    const art = this.o.engine.extractor;
-    const userInput = this.o.engine.buildExtractorInput({ callDate: input.callDate, policy: input.policy, state: input.state, recent, newTurns });
+  private async attempt(eng: ExtractorEngine, input: ExtractTurnInput, recent: readonly TurnInput[], newTurns: readonly TurnInput[]): Promise<Attempt> {
+    const art = eng.extractor;
+    const userInput = eng.buildExtractorInput({ callDate: input.callDate, policy: input.policy, state: input.state, recent, newTurns });
     const t0 = performance.now();
     const ctl = new AbortController();
     const timeoutMs = this.timeoutMs;

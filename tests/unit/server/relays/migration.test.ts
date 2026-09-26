@@ -12,7 +12,7 @@ import { fileURLToPath } from "node:url";
 import pg from "pg";
 import { afterAll, describe, expect, it } from "vitest";
 
-import { ALL_TABLES, EVERY_TABLE, RELAY_TABLES } from "@/server/db/schema";
+import { ALL_TABLES, EVERY_TABLE, EVERY_TABLE_V3, RELAY_TABLES } from "@/server/db/schema";
 import { runMigrations } from "../../../../scripts/migrate";
 import { BASE_DB_URL, HAS_DB } from "../cases/helpers/test-db";
 
@@ -95,20 +95,27 @@ describe.skipIf(!HAS_DB)("0001_relays.sql (Postgres)", () => {
     }
   }
 
+  // WP14b·4: the teardown drops one scratch database per test, each behind its own admin connection. Serially,
+  // under the full suite's DB contention, that overran vitest's 20 s hook budget and failed a green file. In
+  // parallel with an explicit budget it is one round trip's worth of wall clock, and the budget is generous
+  // because a leaked scratch database is worse than a slow teardown.
   afterAll(async () => {
     if (saved === undefined) delete process.env.MIGRATIONS_DIR;
     else process.env.MIGRATIONS_DIR = saved;
-    for (const n of made) await admin((c) => c.query(`drop database if exists "${n}" with (force)`)).catch(() => undefined);
-  });
+    await Promise.all(
+      made.map((n) => admin((c) => c.query(`drop database if exists "${n}" with (force)`)).catch(() => undefined)),
+    );
+  }, 90_000);
 
   it("applies on a fresh database; a second run is a no-op", async () => {
     const url = await freshDb("fresh");
     const first = await runMigrations(url);
-    expect(first.applied).toBe(2);
-    expect(first.tables).toBe(EVERY_TABLE.length);
+    // 0000 + 0001 + WP19's 0002_saas and 0003_audit_guard (TASKS-v3 §2 rule 14: the journal ends here).
+    expect(first.applied).toBe(4);
+    expect(first.tables).toBe(EVERY_TABLE_V3.length);
     const again = await runMigrations(url);
     expect(again.applied).toBe(0);
-    expect(again.tables).toBe(EVERY_TABLE.length);
+    expect(again.tables).toBe(EVERY_TABLE_V3.length);
     const cols = await query<{ table_name: string; column_name: string }>(
       url,
       "select table_name, column_name from information_schema.columns where table_schema='public' and ((table_name='cases' and column_name in ('relay_version_id','sim_call_id')) or (table_name='relays' and column_name='last_used_at') or (table_name='connector_calls' and column_name='args_hash') or (table_name='relay_versions' and column_name in ('moderation','preset')) or (table_name='sim_calls' and column_name='kind'))",
@@ -134,8 +141,9 @@ describe.skipIf(!HAS_DB)("0001_relays.sql (Postgres)", () => {
     }
     await query(url, "insert into cases (id, mode, scenario_id, policy, state, visitor_id, ip_key) values ('c1','watch','s01','{}','{}','v','i')");
     const up = await runMigrations(url);
-    expect(up.applied).toBe(1);
-    expect(up.tables).toBe(EVERY_TABLE.length);
+    // 0001 plus WP19's 0002/0003: the Zerops path upgrades a populated 0000 database in one start.
+    expect(up.applied).toBe(3);
+    expect(up.tables).toBe(EVERY_TABLE_V3.length);
     const [row] = await query<{ id: string; relay_version_id: string | null; sim_call_id: string | null }>(url, "select id, relay_version_id, sim_call_id from cases");
     expect(row).toEqual({ id: "c1", relay_version_id: null, sim_call_id: null });
     expect((await runMigrations(url)).applied).toBe(0);

@@ -7,7 +7,8 @@
  *  1. the one-time product "Baton demo: policy change payment (sandbox)" with a nominal fixed catalog price (every
  *     checkout overrides it with an ad-hoc, tax-inclusive price);
  *  2. one fictional demo customer per scenario (the scenario's fictional policyholder and US address; externalId
- *     `baton-demo-<scenarioId>`), so a checkout with `customerId` prefills and locks name and email.
+ *     `baton-demo-<scenarioId>`), so a checkout with `customerId` prefills and locks name and email;
+ *  3. the generic RELAY demo customer (key "relay", WP16·2), which every relay's `payment_link` bills.
  * Prints POLAR_PRODUCT_ID and POLAR_DEMO_CUSTOMERS (ids are not secrets). `--write-env` also sets both in `.env`.
  *
  * Emails: `POLAR_DEMO_CUSTOMER_EMAIL=name@domain` (the org member's alias, DESIGN §3.4) gives `name+baton-sNN@domain`.
@@ -29,6 +30,18 @@ interface KitScenario {
   id: string;
   customer: { name: string; address: { street: string; city: string; state: string; zip: string } };
 }
+
+/**
+ * WP16·2 (PLATFORM §6.1 "Adapter"): the ONE generic demo customer every RELAY payment bills. `POLAR_DEMO_CUSTOMERS`
+ * is keyed by Baton scenario id, and a relay has no scenario, so `payment_link` looks up the key "relay" instead
+ * (`RELAY_DEMO_CUSTOMER_KEY`). Without this entry the sandbox checkout still works, but it asks the judge for a name
+ * and an email mid-demo. Fictional, like every scenario customer; the address is `RELAY_FALLBACK_ADDRESS` from
+ * `src/server/payments/relay-account.ts`, and a unit test holds the two together.
+ */
+export const RELAY_DEMO_SCENARIO: KitScenario = {
+  id: "relay",
+  customer: { name: "Jordan Avery", address: { street: "418 Harborview Lane", city: "Lakewood", state: "OH", zip: "44107" } },
+};
 
 export function demoEmail(base: string | undefined, scenarioId: string): string {
   if (base && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(base)) {
@@ -120,8 +133,10 @@ async function main(): Promise<void> {
     console.log(`product created: ${productId}`);
   }
 
+  // The Baton scenarios, plus the one generic relay customer (WP16·2) unless `--scenarios` leaves it out.
+  const wanted = [...loadScenarios(only), ...(!only || only.includes(RELAY_DEMO_SCENARIO.id) ? [RELAY_DEMO_SCENARIO] : [])];
   const customers: Record<string, string> = {};
-  for (const s of loadScenarios(only)) {
+  for (const s of wanted) {
     customers[s.id] = await ensureCustomer(polar, s, process.env.POLAR_DEMO_CUSTOMER_EMAIL?.trim(), updateEmail);
     console.log(`customer ${s.id}: ${customers[s.id]} (${s.customer.name}, fictional)`);
   }

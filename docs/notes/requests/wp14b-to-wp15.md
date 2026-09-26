@@ -44,3 +44,48 @@ From WP14b·1 (D1 Fri Sep 25). The shapes are `contracts/v2/api.ts`. These are t
   **422 `E_MODERATION_FLAGGED`** with a top-level `categories: string[]` (show "Edit the flagged text"), 503
   `E_MAINTENANCE` while the kernel is unbound or for non-Baton relays until WP14b·3 (D2). A `relayId` you own
   snapshots your draft first (the same version as `POST /versions` when nothing changed).
+
+## WP14b·4 update: `GET/PUT /api/relays/:id/source` has landed — Save can move off `/draft`
+
+TASKS-v3 §7 (WP15·1) says Save uses `PUT /api/relays/:id/draft` "until WP14b·4's `/source` lands". It has landed
+(`src/app/api/relays/[id]/source/route.ts`). Both routes keep working; `/source` is the one that keeps the
+author's text.
+
+**Why it matters for the Code tab:** `/draft` takes a blueprint, so a save through it **loses the file** —
+comments, key order, formatting. The canonical blueprint is still `relays.draft` and the hash is still
+`sha256(canonicalJson(bp))`, so a **comment-only or formatting-only edit changes the text and not the hash**, and
+still creates no version. That is only true through `/source`.
+
+```
+GET /api/relays/:id/source?format=yaml|json&version=N
+  → 200 RelaySourceView { relayId, version, rev, hash, format, text, stored }
+```
+
+- `stored:false` means nothing was ever saved as text (a relay written through the forms, or a gallery relay
+  seeded from JSON) and the server serialized the canonical draft for you. **The Code tab opens on any relay** —
+  render it exactly the same way; "generated" is a label, not a different mode.
+- `format` converts. YAML→YAML keeps comments; anything→JSON loses them, which is the codec's documented rule.
+- `version=N` is that version's text **as it stood at snapshot time**; a later draft edit never rewrites it.
+- A foreign id is 404, same body as an unknown id. A gallery relay reads 200.
+
+```
+PUT /api/relays/:id/source   { source: { format, text }, expectedRev }
+  → 200 { rev, hash, diagnostics }        saved
+  → 409 { rev, hash }                     stale expectedRev — never a silent overwrite
+  → 422 { diagnostics }                   syntax / zod / credential error — nothing saved
+  → 403 E_READ_ONLY                       a gallery relay
+```
+
+Three behaviours worth wiring the UI to rather than guessing:
+
+1. **Lint errors save; syntax, zod and credential errors do not.** Lint blocks Test and Publish, not Save
+   (P§3.4). So a 200 can still carry `diagnostics` — show them, do not treat the save as failed.
+2. **`diagnostics` carry ranges** (`CodeDiagnostic`), so they place as Monaco markers directly; on the textarea
+   fallback (K-MONACO) the line number is enough.
+3. **409 carries the current `rev` and `hash`**, deliberately, so you can offer a diff instead of a reload. The
+   server never merges.
+
+Body cap is `MAX_SOURCE_BYTES` (256 KiB), refused before parse. Import/create-from-source is
+`RelaySourceStore.create` — say the word and WP14b will expose it on `POST /api/relays` as
+`{ kind: "source", source }` rather than having the Studio round-trip through a parse; it is a small addition to
+a WP14b file and the store method already exists.

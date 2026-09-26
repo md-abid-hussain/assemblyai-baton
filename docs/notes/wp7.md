@@ -202,3 +202,147 @@ panel on the deploy. PNGs + `report.json` land in `test-results/wp7-shots` (git-
 - AI-half evidence clips depend on the signed OGG being fetchable cross-origin (bucket CORS). If it is not, WP8 could
   add a JSON variant of #21 that returns the signed URL, and the page would set `<audio src>` directly.
 - The rep's "I'm back" line (`playRepBack`) and the autopilot/typed customer inputs wait for WP11.
+
+## WP7·3 (D2 AM): `RelayConsole` from `UiSpec`, the provenance strip, production polish
+
+Resumed after an interrupted attempt that had left three sound commits on the branch (`2d02a3b`, `d1a1cde`,
+`5355441`) plus a dirty tree. The dirty change (the flagship fallback's `repOnly` set, narrowed to the four fields the
+blueprint actually marks `rep_only`) and the new `ui-spec.test.ts` were correct against
+`data/relays/baton-add-driver.json`, so they were committed first (`d8cece7`); then `git merge main` (`0ca99c1`,
+clean: it brought only WP12's secret-scan marker and a relay-code test) and `npm run migrate` (no-op, 25 tables).
+Commits: `d8cece7`, `af6546c`, `0abd3c1`, `64c2131`, `cd6ae0c`, `48bf49d`, `d6247c0`, `8a7e000`.
+
+### Done
+
+Carried in from the interrupted attempt and re-verified against the merged tree, not merely re-read:
+
+- **`RelayConsole({callId, relayVersionId, mode})`** (`src/components/call/relay-console.tsx`). `live-console.tsx` is
+  now its flagship wrapper. Four modes (`flagship` / `test` / `shared` / `published`); it owns its store, session and
+  lifecycle, and disposes on unmount and on `pagehide`.
+- **The case card, stage strip, QA card and phone render from the run's `UiSpec`** (`src/client/store/ui-spec.ts`:
+  `specOf`, `labelsOf`, `requiredOf`, `groupsOf`, `caseTitleOf`, `relayChip`). No spec (a fixture log, a v1 server) →
+  `BATON_UI_SPEC`, the flagship's own spec written out by hand.
+- **The provenance strip** (`src/components/call/provenance-strip.tsx` + `provenance()` in `selectors.ts`): four
+  segments, one strip per run, the "Relay: <title> v<n>" chip, and the sim QA wording (`qaVerifiedCopy`).
+- **`api.ts`** parses `CreateCaseResponseV2` (`relay` / `provenance` / `listening` / `account`) with a v1 fallback and
+  a widened case state; the orchestrator pins a relay version, dispatches `ui.relay`, and merges
+  `src/generated/call-provenance.json` over the server's human half (G2b open item §6.1, client half).
+- **`LiveSttChannelManager.open({listening})`**: a relay other than the flagship is transcribed with its own prompt
+  and keyterms.
+- **The Dental fixture** (`src/client/fixtures/dental.ts`; `dental-deposit` + `dental-shadowing`) and `s01-sim`.
+
+New in this unit:
+
+- **Relay-agnostic copy** (`af6546c`). Three places still spoke Baton on every relay:
+  - `agentNameOf(spec)` — **"Baton" is the flagship relay, never the product** (PLATFORM §2 glossary), so only the
+    flagship's console says "Baton is listening silently"; every other relay's says "The relay agent is listening
+    silently". "Pass the baton" is the universal action and is unchanged everywhere.
+  - `paySteps(spec)` from `UiSpec.phone` — the paying copy no longer promises an e-sign a relay does not have
+    ("Pay with the Polar sandbox test card, or skip with a simulated payment." on Dental).
+  - `passEstimate` counts required fields that are **not `repOnly`** instead of Baton's `SERVER_RESOLVABLE_SET`. On
+    Baton that is the same single field (`premium_new_monthly_usd`), so the flagship's number does not move.
+  - Deleted the now-dead `modeBadge` (the stacked RECORDED AI SESSION / CACHED REPLAY badge the strip replaced) and
+    `fieldLabel`. No component had used either since `2d02a3b`.
+- **One a11y regression found and fixed** (`48bf49d`, see the browser pass). Each strip segment was a `<span>` with
+  `aria-label`, which ARIA prohibits on a generic element: axe/Lighthouse failed `aria-prohibited-attr` (weight 7) on
+  **every** console state, taking the page from 100 to 96. The segment is now `role="group"`.
+- **`docs/notes/requests/wp7-to-wp15.md`**: the Test-tab embedding contract (props, what `mode` already guarantees,
+  what WP7·4 still brings, and the Dental-blueprint coupling).
+
+### Decisions
+
+- **"No spec" is not a different relay.** `BATON_UI_SPEC` is pinned against `compileRelay(baton-add-driver.json).ui`
+  (`ui-spec.test.ts`), and the console renders **byte-identically** with it and without it in every s01 state
+  (acceptance 2 below). That is the whole safety claim of making the console spec-driven, so it is tested as an
+  equality over rendered markup rather than as a snapshot file nobody re-reads.
+- **`repOnly` is the generic "the AI never asks for this"**, replacing Baton's `SERVER_RESOLVABLE`. It is the same
+  field on Baton, and it is the only signal a `UiSpec` carries for it.
+- Left alone deliberately: the **fallback banner labels** ("CACHED REPLAY: transcribed live by AssemblyAI on …") that
+  WP4's `cached-replay.ts` and WP5 put in `fallback.label`. They are event data in the labelled-fallback notice, not a
+  stacked badge in the chrome, and TASKS-v2 §4 gives WP7 that file "changed only for relay listening pass-through".
+- The Dental `smsSender` is honoured by the phone **dock** (`UiSpec.phone.smsSender`); the "Harborview Insurance"
+  string inside WP6's `MockPhone.tsx` is WP6/WP16's file and was not touched.
+
+### [VERIFY] results
+
+**None of SAAS §16's `[VERIFY]` items is owned by WP7** (checked in the first hour against `docs/SAAS.md` §16: every
+row is WP19·2/·3, WP21·1, WP22·1, WP23·1/·2, WP15·1 or WP12). Nothing to record, and no fallback of ours is in play.
+The two live-API behaviours this unit leans on are settled facts, not `[VERIFY]`s: the `keyterms_prompt` limits
+(DESIGN §5.1.5, 100 × 50 chars, enforced in `withListening`) and `CreateCaseResponseV2`'s shape (frozen at C2).
+
+### Tests
+
+- `npm run typecheck` clean. `npm test`: **167 files, 2409 passed** (worktree, local Postgres).
+- `next build --webpack` passes in the worktree (Turbopack still cannot build inside a junctioned worktree, G1 note).
+- **`tests/unit/ui/relay-console.test.tsx` (new, 84 tests)** — the WP7 acceptance list:
+  - **2.** For every s01 fixture × every state it reaches, the console's markup with `BATON_UI_SPEC` is
+    **byte-identical** to its markup with no spec. Two guards keep that from being vacuous: a renamed, non-flagship
+    spec must change the render, and each render must exceed 2 kB.
+  - **3.** `dental-deposit` renders its own labels and groups and **no** Baton field; its own stage labels ("Deposit
+    terms", never "Disclose"); a deposit phone with no e-sign, "Cedar Hollow Dental" and not "Harborview"; "The relay
+    agent", never "Baton", while "Pass the baton" stays; and a pass estimate that ignores the rep-only deposit.
+  - **4.** Every fixture, in every state it reaches, carries **exactly one** strip with exactly one of each of the
+    four `data-provenance` segments; the tags are pinned for recorded, simulated (+ the detail line), text dry run,
+    cached replay and a recorded AI half; each segment is a named `role="group"`; and no console source file renders
+    a retired badge string any more.
+  - **5.** unchanged in `boundaries-ui.test.ts` (no console file imports `src/server/**`).
+  - plus the per-mode inputs: `shared` and `published` never offer the mic (PLATFORM §8.3).
+- `tests/unit/client/stt/channel-manager.test.ts` (+2): the relay's listening laid over route #5's params — its
+  prompt, its keyterms first, the server's after, deduped case-insensitively, capped at 100 × 50 chars, with the
+  audio contract (encoding, sample rate) still the server's; and **no** listening leaves the params byte-equal.
+- `tests/unit/ui/orchestrator.test.ts` (+3): `listening` is forwarded **only** for a non-flagship relay (not for the
+  flagship, not for a v1 server that sends no v2 fields); and `call-provenance.json` overriding the server's human
+  half flips the strip to SIMULATED, the customer to synthetic and the QA badge to "customer audio simulated", while
+  a recorded take keeps "Verified from recording".
+- `ui-spec.test.ts` pins both `BATON_UI_SPEC` and `DENTAL_UI_SPEC` against the compiled blueprints on disk.
+
+### Browser pass (acceptance 1 and 4, $0)
+
+`tests/unit/ui/browser/console-shots.ts` against `next dev --webpack -p 3108`, extended in this unit with a `FIXTURE`
+switch, a **second relay pass** (Dental at 1366×768 and 390: shadowing, paying, completed) and a per-shot read of the
+strip's four rendered tags (a missing or wrong strip now fails the run).
+
+**50 states, minimum a11y 98**, phone clipped in 0, horizontal scroll in 0, provenance strip wrong in 0, and the
+MockPhone flow SMS → e-sign → Sign → Simulate → **Paid** at both sizes. The dev log had **zero** errors, warnings or
+hydration notices across the whole pass. Every state is 100 except the six with the QA dialog open, which stay at 98
+for `landmark-one-main` — Radix `aria-hidden`s the console, so there is no visible `<main>` while the modal is up;
+real Lighthouse says the same and WP7·2 already decided not to chase it.
+
+The first run of this pass is what caught the `aria-prohibited-attr` regression (96 everywhere). After the fix the
+Baton states match WP7·2's numbers exactly, and the Dental states match them too — the same components, a different
+relay. PNGs + `report.json` land in `test-results/wp7-shots` (git-ignored); re-run the harness rather than trusting
+old PNGs.
+
+**Suite note:** the first `npm test` of this session reproduced the WP7·2 cold-machine flake exactly — 3 files timing
+out at 20 s (`core/relay-code/roundtrip`, `server/relays/registry`) under `fileParallelism`. Each passed alone in
+3–19 s and the warm full run was 167/167 green in 23 s. Still contention, still not a code regression.
+
+### Live spend
+
+**$0.** Nothing live ran: fixture logs and fake transports only. No AssemblyAI, OpenAI or Polar call was made.
+
+### What the integrator must do
+
+1. Nothing new for the merge itself: `wp/wp7` still carries `wp/wp5` and `wp/wp6` (see
+   `docs/notes/requests/wp7-to-integrator.md` items 1–2), and this unit added no dependency and no migration.
+2. **G2b open item §6.1 is closed on the client** (`src/generated/call-provenance.json` → the strip's human half, with
+   a test). The **server half** — `/api/cases` stating the same thing in `CreateCaseResponseV2.provenance` — is
+   WP14b's and is not in this branch. Until it lands, a call whose provenance file says `simulated` is still labelled
+   correctly, because the page's merge wins; a call missing from that file is labelled `recorded`.
+3. `src/generated/calls.json` is still `[]` in this worktree, so `/call/s01` shows "Call unavailable" here. Unchanged
+   from WP7·2 item 3: it needs WP9's manifest deployed.
+4. The Dental console fixture is pinned against `data/relays/dental-deposit.json`. If WP17 changes that blueprint's
+   fields, groups, stage labels or phone, `tests/unit/ui/ui-spec.test.ts` fails **by design**; update
+   `DENTAL_UI_SPEC` in `src/client/fixtures/dental.ts` to match rather than loosening the test.
+5. `docs/notes/requests/wp7-to-wp15.md` is the Test-tab embedding contract for WP15·3.
+
+### Where WP7·4 starts
+
+- `mode="test"`: "Back to editor" inside the console and the post-run **"What the AI inherited"** panel (the case
+  snapshot taken at compile, with evidence chips) — the orchestrator already keeps that snapshot for the provisional
+  QA, so the panel is a reader, not new plumbing.
+- The gallery **Run** entry (`mode="test"` on the pre-generated sim, Express) and `mode="published"` wired to WP18's
+  injected controller factory (`RelayConsoleProps.wiring`).
+- The end card's **"Open your workspace →"** (`/app` through `/start`, TASKS-v3 §7); the `/call` path still needs no
+  session.
+- The "Answer the AI yourself (mic)" toggle on a sim in `mode="test"` (WP11's autopilot is the other half).

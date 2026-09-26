@@ -373,3 +373,104 @@ $0. No AssemblyAI, OpenAI or Zerops calls in this run.
 **WP14a·3 is complete.** The integrator guidance is unchanged from the section above: merge `wp/wp14a` at `HEAD` with
 `--no-ff` (the post-G2 condition of §2 rule 9 is met and verified), then re-run the oracle check on merged `main`. The
 "Still open for WP14a·4" list is unchanged.
+
+---
+
+## WP14a·4: the P§4.7 contract-widening commit, additive only (D2 Sat Sep 26, 09:40–10:05 IST)
+
+A usage-limit interruption hit this slot too. On arrival the widening commit `6f38a93` was already in place and
+sound, with four request files drafted but uncommitted; `main` had moved on (`99c1f2b`, the per-line secret-scan
+marker). This run **committed the leftovers, merged `main`, and verified the widening on the merged tree**, which
+is the part the interrupted run had not done. Per the unit's scope — the one contract-widening commit, then stop —
+no new kernel work was started.
+
+### Done
+
+| # | Commit | What |
+|---|---|---|
+| 1 | `6f38a93` (kept from the interrupted run) | the widening itself: `FieldIdSchema`, `ToolNameSchema` and `DisclosureKindSchema` become `ID_RE` = `/^[a-z][a-z0-9_]{1,39}$/`; `cases.intent` gains `"relay"`; `ToolOutcome`/`ToolResponse` gain `nextStep`; `BatonFieldId`/`BatonToolNameSchema`/`BatonDisclosureKindSchema` keep Baton's vocabulary; 34 files, +343/−120 |
+| 2 | `2a350db` | the four request files (`wp14a-to-{wp7,wp9,wp14b,wp16}.md`), which list every file the widening touched outside WP14a's paths, for its owner |
+| 3 | `057100d` | one stale doc comment: `CaseStateSchema.fields` still said *"Exhaustive: every FieldId has a FieldState"*, which is exactly the assumption the widening invalidates. It now says the map is open and to index with `?.`. Comment only |
+| 4 | `wp14a-to-wp23.md` | a flake found while verifying — see "For the integrator" below |
+
+`git merge --no-edit main` brought in `99c1f2b` cleanly (2 files, no conflicts). `npm run migrate` on `baton_wp14a`:
+`schema up to date (no-op)`, 25 public tables.
+
+### Decisions
+
+1. **The widening is additive, and that is now audited rather than asserted.** Diffing the exported-name set of
+   `6f38a93` over `src/`: every `export` the commit removes reappears in the same commit, except `FieldId`, which
+   moved from `add-driver.fields.ts` (where it was `(typeof FIELD_IDS)[number]`) to `contracts/case.ts` (where it
+   is `z.infer<typeof FieldIdSchema>` = `string`). Nothing imported `FieldId` from the fields module — the only
+   cross-module import there is `contracts/case.ts:18` re-exporting `BatonFieldId` — so no import path broke.
+   `fieldLabel` (`client/store/selectors.ts:394`) kept its name and signature and now delegates to `fieldLabelOf`.
+2. **`isFieldId` narrows to `BatonFieldId`, deliberately.** It still tests membership of `FIELD_IDS`, so it is the
+   same predicate with the same runtime behaviour; the guard type is the same set of strings it always was. A
+   generic "is this a well-formed id" check is `FieldIdSchema.safeParse`, not `isFieldId`.
+3. **The two places that must *not* widen are pinned by tests, not by comments.** Route #14's 404 and
+   `toolCallsOf`'s "known tools only" both went through `ToolNameSchema`, which no longer answers "is this one of
+   the six"; both now use `BatonToolNameSchema`. Two existing tests caught each of them, which is the reason to
+   trust the rest of the mechanical fallout.
+4. **The `vitest.config.ts` global `testTimeout` was left alone** (decision 4 of the flake below). It is shared,
+   and raising it to cure one file would slow every other file's failure reporting.
+
+### [VERIFY] results
+
+**None are owned by this unit.** SAAS §16's register has 15 rows; their owners are WP19·2 (×4), WP19·3, WP22·1
+(×2), WP21·1 (×3), WP23·1 (×2), WP15·1, WP23·2 and WP12-at-G3. No row names WP14a, and the widening depends on no
+library option — `ID_RE` is our own regex and zod's `z.string().regex()` is core API already used throughout the
+v2 contracts. Recorded here so the first-hour check is closed rather than skipped.
+
+### Tests
+
+| Check | Result |
+|---|---|
+| `npm run typecheck` (`tsc --noEmit`) | clean, exit 0 — run twice, before and after the comment fix |
+| `npm test` | **166 files, 2316 tests** — green on 2 of 5 runs; the other 3 red *only* on WP23's `relay-code/roundtrip.test.ts` timeout (below) |
+| `npx vitest run tests/unit/core/relay tests/unit/contracts` | 26 files, 624 passed |
+| `npx tsx scripts/relay/snapshot-legacy.ts --check` | `oracle up to date` |
+| `node scripts/ci/secret-scan.mjs` | 248 files in `origin/main..HEAD`, 16 values checked, **hits=0** |
+
+`tests/unit/core/relay/contracts-widening.test.ts` (121 lines, from `6f38a93`) is the unit's own evidence: every
+Baton field id, tool name and disclosure kind still parses under all three widened schemas; a relay's ids parse and
+malformed ids (`""`, `A`, `Driver_DOB`, `1field`, `_field`, `has-dash`, 41 chars, `ä`) do not; and `ID_RE.source`
+equals the grammar PLATFORM names, so it cannot drift from v2's `IdSchema` or the gateway's `TOOL_NAME_RE`.
+
+### Live spend
+
+**$0.** No AssemblyAI, OpenAI, Polar or Zerops call in this run; `RUN_LIVE` was never set. The flagship's s01/s02
+takes are still the simulated ones.
+
+### What the integrator must do
+
+1. **Merge `wp/wp14a` at `HEAD` with `--no-ff`, then re-run the oracle check on merged `main`.** The P§4.7
+   condition ("merged at G2+ with a full typecheck") is met: `main` is merged in, typecheck is clean, the suite is
+   green apart from the pre-existing flake.
+2. **Hand the four request files to their owners.** The one that cannot wait is
+   `wp14a-to-wp14b.md`: `src/server/db/schema.ts:50` still declares `intent: text("intent", { enum: ["add_driver"] })`.
+   The column is text with no DB check and nothing writes it today (the insert takes the default), so nothing is
+   broken now — but the first relay case to write its intent needs WP14b's one-word change first.
+3. **`tests/unit/core/relay-code/roundtrip.test.ts` is flaky on `main`, and it is not the widening.** It fails
+   `Error: Test timed out in 20000ms` on the "200 YAML edits" cases when the suite's 166 workers contend; it passes
+   every time when run alone. Those paths are byte-identical between `main` and `wp/wp14a`. **If a full-suite run
+   goes red there, re-run that one file before bisecting.** `wp14a-to-wp23.md` has the timings and two one-file
+   fixes for WP23.
+
+### Still open (not this unit — TASKS-v2 WP14a T4 remainder)
+
+Unchanged and deliberately not started, per the unit's "then stop":
+
+- the browser compile-time benchmark (acceptance 7);
+- the P§4.4 Dental tool-result fixture, which still needs WP16·2's `RelayToolService`;
+- `cannedCaseState` still emits `intent: "add_driver"` for every relay — a one-line change whenever WP14b wants
+  `"relay"` (the parity corpus pins Baton only).
+
+The `TUNING_8K` request from WP9 arrived and is **answered** (`wp14a-to-wp9.md`): `stt-params.ts` unchanged,
+`TUNING_8K` stays provisional, and `repLinePatterns` is an **OR** — whoever writes the auto-baton detector should
+read that file, along with WP9's accepted constraint that the acceptance window gates on word end timestamps, never
+on `recvMs`.
+
+### Where the next WP14a unit starts
+
+There is no WP14a·5 in TASKS-v3 §5. If a slot frees up, the three "still open" items above are the backlog, in that
+order; the Dental fixture is the only one with a dependency (WP16·2).

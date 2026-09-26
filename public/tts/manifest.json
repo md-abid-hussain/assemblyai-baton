@@ -1,0 +1,340 @@
+{
+  "version": 1,
+  "generatedAt": "2026-09-26T12:31:55.237Z",
+  "model": "gpt-4o-mini-tts-2025-12-15",
+  "voice": "marin",
+  "clips": [
+    {
+      "hash": "00910e4efef12e1f69c6a8b6d5d73c0c2781db8a0641c0ca2cc11240fe0c3621",
+      "text": "Ohio.",
+      "durationMs": 1300,
+      "voice": "synthetic"
+    },
+    {
+      "hash": "053e024bf1e0c92da82c8ec4260b00210e857c04680236ba8b0954b528ce551b",
+      "text": "Sure.",
+      "durationMs": 350,
+      "voice": "synthetic"
+    },
+    {
+      "hash": "0afc7f4193b2823a2444f22ed1892f7d0f5ee1784c40c2b6a9344360bf21cab9",
+      "text": "Yes, text me the link. No paper copy, thanks.",
+      "durationMs": 3650,
+      "voice": "synthetic"
+    },
+    {
+      "hash": "0e7c46eded50b13641d1b59c25112e3638b1478ac81b0557c3af7781b7cd0b9e",
+      "text": "The 2021 Honda Civic.",
+      "durationMs": 2450,
+      "voice": "synthetic"
+    },
+    {
+      "hash": "1e030c66ab00a9fc5575d5a31ef19c60cc31286b254a089dfc35ed7969593b36",
+      "text": "Yes, that's right.",
+      "durationMs": 2200,
+      "voice": "synthetic"
+    },
+    {
+      "hash": "2023ecdf40642a53079bbce87970efdf9c5016ed047336881d9293029302d72c",
+      "text": "Friday, October 2nd, please.",
+      "durationMs": 2650,
+      "voice": "synthetic"
+    },
+    {
+      "hash": "207c565ce14f282ff4cbd7b73779a6e8a5081bad2a0cc4b2577d5e341fd22343",
+      "text": "No, it's a probationary license.",
+      "durationMs": 2900,
+      "voice": "synthetic"
+    },
+    {
+      "hash": "2172666d75f8bcc09027931bb73725a0c4b33cac8c7db624c785cc569ecf805d",
+      "text": "No, it's the 2021 Honda Civic.",
+      "durationMs": 3450,
+      "voice": "synthetic"
+    },
+    {
+      "hash": "291eb2e587da2ca429489e4e0d85c026532de1ebcca38f0355b2e8903c4138ca",
+      "text": "Maya is 17.",
+      "durationMs": 1600,
+      "voice": "synthetic"
+    },
+    {
+      "hash": "2d42d8d6893233dbdc8347d52beafb1322f9c1074b5bf143ca97396c3a14650d",
+      "text": "March 14th, 2009.",
+      "durationMs": 2850,
+      "voice": "synthetic"
+    },
+    {
+      "hash": "41d45f063ad98adda0b7030d32a03a8f160c939cf924f3fbe2c1502a171b793e",
+      "text": "Maya will be the primary driver of the 2021 Honda Civic.",
+      "durationMs": 4900,
+      "voice": "synthetic"
+    },
+    {
+      "hash": "42aa6341d8171706cb8de90846b728d93f467abc2cbc989885a1644022c57658",
+      "text": "Maya has had no tickets or accidents in the last three years.",
+      "durationMs": 5700,
+      "voice": "synthetic"
+    },
+    {
+      "hash": "5125705e97538a1df7577a0f5d0801aa819177438b41bf77ae4098a86bdf5fb6",
+      "text": "No, that's everything. Thanks, bye!",
+      "durationMs": 3100,
+      "voice": "synthetic"
+    },
+    {
+      "hash": "5363b4fe6e17550874266c7e7280dd760f32fb39d7abc2303b7e5374c600a296",
+      "text": "Sorry, could you repeat that?",
+      "durationMs": 2000,
+      "voice": "synthetic"
+    },
+    {
+      "hash": "54778ddc2debfd72719a94c121ee0711af8cd85d29eb8c2aa363c78b6c61a46a",
+      "text": "17.",
+      "durationMs": 1750,
+      "voice": "synthetic"
+    },
+    {
+      "hash": "59424c66ea84dad9a2f42090a96129cf2972ad3d260c201fd5fcf613564730aa",
+      "text": "No, it's March 14th, 2009.",
+      "durationMs": 3800,
+      "voice": "synthetic"
+    },
+    {
+      "hash": "60f1fb2c3596acd707af06f81e3dab6dc1e16e6e3cd7543c7c54dc425fc21f42",
+      "text": "Okay.",
+      "durationMs": 1000,
+      "voice": "synthetic"
+    },
+    {
+      "hash": "694d40c5145bdf3922bcfe836fd9dbdd4e1be60904d70e9e9b12f2f435870f90",
+      "text": "Maya's license is from Ohio.",
+      "durationMs": 2250,
+      "voice": "synthetic"
+    },
+    {
+      "hash": "75c536280f39d310a8147f750bafb711560b90156986ac42c87569815578ca13",
+      "text": "No tickets or accidents.",
+      "durationMs": 2450,
+      "voice": "synthetic"
+    },
+    {
+      "hash": "8a5c153ae54359d4a1c35c7933b74d4ba837108061d014aa5df8287663181745",
+      "text": "No, it's Ohio.",
+      "durationMs": 2300,
+      "voice": "synthetic"
+    },
+    {
+      "hash": "9799f19b23c07829ea03d354da0e16cd4bb2c39c7be0fd6f7974be3318ec8fae",
+      "text": "The new driver's name is Maya Raman.",
+      "durationMs": 3150,
+      "voice": "synthetic"
+    },
+    {
+      "hash": "9d74e17653e2778d6e7a83a1ebc7143aa5542be3616c852841f172cf9ffb356e",
+      "text": "No, it's Maya Raman.",
+      "durationMs": 2650,
+      "voice": "synthetic"
+    },
+    {
+      "hash": "a1a5c57604877170a6883ac20cfcd644c2c7f6e1887564d4c2ac6142c6cdba81",
+      "text": "Maya is my child.",
+      "durationMs": 2100,
+      "voice": "synthetic"
+    },
+    {
+      "hash": "a1d5a0470a1e76e46ad061bad488ae64e5a2dc1231a10f016697abfe2505a485",
+      "text": "No, it's 4 4 1 0 7.",
+      "durationMs": 3900,
+      "voice": "synthetic"
+    },
+    {
+      "hash": "a2da5cb78448f2f7861809ee0647dfb3290156536fa9d9be556118ff0060025c",
+      "text": "No, it's Friday, October 2nd.",
+      "durationMs": 3350,
+      "voice": "synthetic"
+    },
+    {
+      "hash": "a2fa2c2bd62e63688dfc7e5283b4b0d110a05848e3d4eb42c2ea56e2731bdead",
+      "text": "Can I talk to Daniel?",
+      "durationMs": 1700,
+      "voice": "synthetic"
+    },
+    {
+      "hash": "a5b601a607fc2306650fedad124fd812d2d0807c90c9ce0eacf3e0484dd47beb",
+      "text": "Maya's date of birth is March 14th, 2009.",
+      "durationMs": 4300,
+      "voice": "synthetic"
+    },
+    {
+      "hash": "a61b55eb753e472ad75d3d60bef75203e8959c15532daa51556a9834a2061aca",
+      "text": "A probationary license.",
+      "durationMs": 2150,
+      "voice": "synthetic"
+    },
+    {
+      "hash": "aeb9fd47228a7a5caea6f1c9fc25b6dd8bd9703014e30e2e88453599d62316f4",
+      "text": "It's 4 4 1 0 7.",
+      "durationMs": 3950,
+      "voice": "synthetic"
+    },
+    {
+      "hash": "b6bdb855f38eda6d600838e940376ee8c532de2d3ba91b84692ee4be1b1cd7ee",
+      "text": "No, it's every day.",
+      "durationMs": 2700,
+      "voice": "synthetic"
+    },
+    {
+      "hash": "c141291861e018003d6547eac689c2a9c21c2172f40ba3a8ad4655e7b332e169",
+      "text": "Actually, Maya will mainly drive the Highlander.",
+      "durationMs": 3050,
+      "voice": "synthetic"
+    },
+    {
+      "hash": "c312de1741e3443f0c9c58454033e23786fe94f316eac80686154293a9b2e489",
+      "text": "Maya is your child.",
+      "durationMs": 1850,
+      "voice": "synthetic"
+    },
+    {
+      "hash": "c5d766dd30d697d5b9de5a02689880354266946867d3634f99e68371751dc9ae",
+      "text": "The car is kept at ZIP code 4 4 1 0 7.",
+      "durationMs": 3850,
+      "voice": "synthetic"
+    },
+    {
+      "hash": "c70f05b85ca47925edf4369483bec394698851770cecfea11c3122352d171003",
+      "text": "Maya will mainly drive the 2021 Honda Civic.",
+      "durationMs": 4350,
+      "voice": "synthetic"
+    },
+    {
+      "hash": "c928e3e887ab7b1ac34aee33a97ae70a6c12c5b199af9252cd64e0f4d7cfdecd",
+      "text": "No, it's no tickets or accidents.",
+      "durationMs": 2650,
+      "voice": "synthetic"
+    },
+    {
+      "hash": "d10d20ad6a36780645e67ea8b97c8e558160621c85512eb440ed74714d0080be",
+      "text": "Okay, I'm paying now.",
+      "durationMs": 2000,
+      "voice": "synthetic"
+    },
+    {
+      "hash": "d30a34db2a1cb3df006225bc3829fc6f7a903ce545356acf97e46798bad3f98b",
+      "text": "Every day.",
+      "durationMs": 1450,
+      "voice": "synthetic"
+    },
+    {
+      "hash": "d318a4b5d490bc9761ae5837d67e491db3947869425e6f132ba059cfc123dfd7",
+      "text": "No, it's 17.",
+      "durationMs": 2400,
+      "voice": "synthetic"
+    },
+    {
+      "hash": "d7f90880b042aef691f8b7fcdd864fb1b754c1a886e6394582f424079b839c29",
+      "text": "Yes, go ahead.",
+      "durationMs": 1950,
+      "voice": "synthetic"
+    },
+    {
+      "hash": "d9c32fa1f6b837e68f59ff5ecef962f3670a49e2499de5199aa4db4dd444a4d0",
+      "text": "It's Maya Raman.",
+      "durationMs": 1950,
+      "voice": "synthetic"
+    },
+    {
+      "hash": "de16d7e6dbbe48933477356a8c12cbdcc6478395d3d22e78e1755b9506553a86",
+      "text": "I'm not sure, sorry.",
+      "durationMs": 1400,
+      "voice": "synthetic"
+    },
+    {
+      "hash": "df9c151bf995e56d6c397c634fedcd5bb5e122f5c1fe8be4b59e7c746fc36fcb",
+      "text": "The change should start Friday, October 2nd.",
+      "durationMs": 3500,
+      "voice": "synthetic"
+    },
+    {
+      "hash": "f867ffd87e98947af5d31f3fd74a308929d426af8803f7afe74e0db12b3c3791",
+      "text": "No, it's my child.",
+      "durationMs": 2300,
+      "voice": "synthetic"
+    },
+    {
+      "hash": "ffba215940e8b3b1ce038175664ae2bb7f7d9d3c42ea70b44a1eb032ef3cc53f",
+      "text": "Maya has a probationary license.",
+      "durationMs": 2650,
+      "voice": "synthetic"
+    }
+  ],
+  "calls": {
+    "s01_sim_20260925T110000Z": {
+      "scenarioId": "s01",
+      "truth": {
+        "driver_full_name": "maya raman",
+        "driver_dob": "2009-03-14",
+        "driver_age": "17",
+        "driver_relation": "child",
+        "license_state": "OH",
+        "license_status": "provisional",
+        "incidents_3y": "none",
+        "vehicle_assignment": "veh1",
+        "operator_type": "primary",
+        "garaging_zip": "44107",
+        "effective_date": "2026-10-02",
+        "good_student_discount": "eligible",
+        "coverage_change": "none - keeps current 50/100/50 liability limits",
+        "premium_new_monthly_usd": "142.00",
+        "premium_change_monthly_usd": "46.00"
+      },
+      "clips": [
+        "1e030c66ab00a9fc5575d5a31ef19c60cc31286b254a089dfc35ed7969593b36",
+        "d7f90880b042aef691f8b7fcdd864fb1b754c1a886e6394582f424079b839c29",
+        "0afc7f4193b2823a2444f22ed1892f7d0f5ee1784c40c2b6a9344360bf21cab9",
+        "d10d20ad6a36780645e67ea8b97c8e558160621c85512eb440ed74714d0080be",
+        "5125705e97538a1df7577a0f5d0801aa819177438b41bf77ae4098a86bdf5fb6",
+        "a2fa2c2bd62e63688dfc7e5283b4b0d110a05848e3d4eb42c2ea56e2731bdead",
+        "5363b4fe6e17550874266c7e7280dd760f32fb39d7abc2303b7e5374c600a296",
+        "60f1fb2c3596acd707af06f81e3dab6dc1e16e6e3cd7543c7c54dc425fc21f42",
+        "053e024bf1e0c92da82c8ec4260b00210e857c04680236ba8b0954b528ce551b",
+        "de16d7e6dbbe48933477356a8c12cbdcc6478395d3d22e78e1755b9506553a86",
+        "d9c32fa1f6b837e68f59ff5ecef962f3670a49e2499de5199aa4db4dd444a4d0",
+        "9d74e17653e2778d6e7a83a1ebc7143aa5542be3616c852841f172cf9ffb356e",
+        "9799f19b23c07829ea03d354da0e16cd4bb2c39c7be0fd6f7974be3318ec8fae",
+        "2d42d8d6893233dbdc8347d52beafb1322f9c1074b5bf143ca97396c3a14650d",
+        "59424c66ea84dad9a2f42090a96129cf2972ad3d260c201fd5fcf613564730aa",
+        "a5b601a607fc2306650fedad124fd812d2d0807c90c9ce0eacf3e0484dd47beb",
+        "54778ddc2debfd72719a94c121ee0711af8cd85d29eb8c2aa363c78b6c61a46a",
+        "d318a4b5d490bc9761ae5837d67e491db3947869425e6f132ba059cfc123dfd7",
+        "291eb2e587da2ca429489e4e0d85c026532de1ebcca38f0355b2e8903c4138ca",
+        "a1a5c57604877170a6883ac20cfcd644c2c7f6e1887564d4c2ac6142c6cdba81",
+        "f867ffd87e98947af5d31f3fd74a308929d426af8803f7afe74e0db12b3c3791",
+        "c312de1741e3443f0c9c58454033e23786fe94f316eac80686154293a9b2e489",
+        "00910e4efef12e1f69c6a8b6d5d73c0c2781db8a0641c0ca2cc11240fe0c3621",
+        "8a5c153ae54359d4a1c35c7933b74d4ba837108061d014aa5df8287663181745",
+        "694d40c5145bdf3922bcfe836fd9dbdd4e1be60904d70e9e9b12f2f435870f90",
+        "a61b55eb753e472ad75d3d60bef75203e8959c15532daa51556a9834a2061aca",
+        "207c565ce14f282ff4cbd7b73779a6e8a5081bad2a0cc4b2577d5e341fd22343",
+        "ffba215940e8b3b1ce038175664ae2bb7f7d9d3c42ea70b44a1eb032ef3cc53f",
+        "75c536280f39d310a8147f750bafb711560b90156986ac42c87569815578ca13",
+        "c928e3e887ab7b1ac34aee33a97ae70a6c12c5b199af9252cd64e0f4d7cfdecd",
+        "42aa6341d8171706cb8de90846b728d93f467abc2cbc989885a1644022c57658",
+        "0e7c46eded50b13641d1b59c25112e3638b1478ac81b0557c3af7781b7cd0b9e",
+        "2172666d75f8bcc09027931bb73725a0c4b33cac8c7db624c785cc569ecf805d",
+        "c70f05b85ca47925edf4369483bec394698851770cecfea11c3122352d171003",
+        "d30a34db2a1cb3df006225bc3829fc6f7a903ce545356acf97e46798bad3f98b",
+        "b6bdb855f38eda6d600838e940376ee8c532de2d3ba91b84692ee4be1b1cd7ee",
+        "41d45f063ad98adda0b7030d32a03a8f160c939cf924f3fbe2c1502a171b793e",
+        "aeb9fd47228a7a5caea6f1c9fc25b6dd8bd9703014e30e2e88453599d62316f4",
+        "a1d5a0470a1e76e46ad061bad488ae64e5a2dc1231a10f016697abfe2505a485",
+        "c5d766dd30d697d5b9de5a02689880354266946867d3634f99e68371751dc9ae",
+        "2023ecdf40642a53079bbce87970efdf9c5016ed047336881d9293029302d72c",
+        "a2da5cb78448f2f7861809ee0647dfb3290156536fa9d9be556118ff0060025c",
+        "df9c151bf995e56d6c397c634fedcd5bb5e122f5c1fe8be4b59e7c746fc36fcb",
+        "c141291861e018003d6547eac689c2a9c21c2172f40ba3a8ad4655e7b332e169"
+      ]
+    }
+  }
+}

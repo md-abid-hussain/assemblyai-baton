@@ -18,6 +18,9 @@ import type { CallHandoff, CallManifestEntry, Peaks } from "../scenario";
 import type { Suggestion } from "../services";
 import type { ToolName } from "../tools";
 import type { TurnInput } from "../turns";
+import type { ProvenanceStrip } from "../v2/api";
+import type { AccountRecord } from "../v2/blueprint";
+import type { UiSpec } from "../v2/relay";
 
 /** DESIGN §1.4 S2 page states (store `ui.phase`). */
 export const UI_PHASES = [
@@ -113,6 +116,12 @@ export interface UiCallContext {
  */
 export type UiAction =
   | { t: number; type: "ui.context"; context: UiCallContext }
+  /**
+   * What relay this run is, how it renders and where it comes from (PLATFORM §7.6): the `UiSpec`, the run's
+   * `ProvenanceStrip` and the `AccountRecord`, all from `CreateCaseResponseV2`. `relay: null` means "the flagship
+   * defaults" (a fixture log, or a server too old to send them), and the console falls back to `BATON_UI_SPEC`.
+   */
+  | { t: number; type: "ui.relay"; relay: UiSpec | null; provenance: ProvenanceStrip | null; account: AccountRecord | null }
   | { t: number; type: "ui.start"; kind: "express" | "full"; startOffsetMs: number }
   | { t: number; type: "ui.clock"; callMs: number; playing: boolean }
   | { t: number; type: "ui.session-ids"; ids: { rep?: string; customer?: string; va?: string } }
@@ -137,6 +146,12 @@ export interface Wp7UiState {
   /** Latest page-clock time seen. */
   t: number;
   context: UiCallContext | null;
+  /** The run's `UiSpec` (labels, groups, required set, stage labels, phone); null → `BATON_UI_SPEC`. */
+  relay: UiSpec | null;
+  /** The run's provenance strip as the server stated it (the console updates the segments it alone knows). */
+  provenance: ProvenanceStrip | null;
+  /** The run's account (customer, org, rep first name); null on a fixture log, where the policy record is used. */
+  account: AccountRecord | null;
   plan: RunPlan | null;
   started: { kind: "express" | "full"; startOffsetMs: number; t: number } | null;
   mode: "live" | "cached_replay" | "recorded_ai";

@@ -1,0 +1,168 @@
+{
+  "callId": "s01_sim_20260925T110000Z",
+  "scenarioId": "s01",
+  "provenance": "Simulated audio: script by gpt-6-luna, voices by gpt-4o-mini-tts. Fictional people.",
+  "scriptModel": "gpt-6-luna",
+  "ttsModel": "gpt-4o-mini-tts-2025-12-15",
+  "voices": {
+    "rep": "cedar",
+    "customer": "marin"
+  },
+  "repairs": [],
+  "handoffIndex": 16,
+  "acceptIndex": 17,
+  "turns": [
+    {
+      "index": 0,
+      "beat": 1,
+      "who": "rep",
+      "startMs": 400,
+      "endMs": 8289,
+      "text": "Hi, this is Daniel Reyes with Harborview Insurance Agency in Cleveland. This call is recorded for quality and training. How can I help?"
+    },
+    {
+      "index": 1,
+      "beat": 2,
+      "who": "customer",
+      "startMs": 8621,
+      "endMs": 12478,
+      "text": "I’d like to add my daughter to my car insurance. She just got her license."
+    },
+    {
+      "index": 2,
+      "beat": 3,
+      "who": "rep",
+      "startMs": 12879,
+      "endMs": 18140,
+      "text": "Congratulations to her! Could I get the policyholder’s name and policy number so I can pull it up?"
+    },
+    {
+      "index": 3,
+      "beat": 4,
+      "who": "customer",
+      "startMs": 18331,
+      "endMs": 24308,
+      "text": "I’m Priya Raman, and my policy number is N-B-M, four-four-one-eight, two-zero-seven."
+    },
+    {
+      "index": 4,
+      "beat": 5,
+      "who": "rep",
+      "startMs": 24569,
+      "endMs": 34657,
+      "text": "I found your Northbeam Mutual policy. I have 1427 Belle Avenue, Lakewood, Ohio, 44107. What’s your daughter’s full name and date of birth?"
+    },
+    {
+      "index": 5,
+      "beat": 6,
+      "who": "customer",
+      "startMs": 34988,
+      "endMs": 42246,
+      "text": "Maya Raman, M-A-Y-A. Her birthday is March 14th, 2009, and she’s seventeen."
+    },
+    {
+      "index": 6,
+      "beat": 7,
+      "who": "rep",
+      "startMs": 42647,
+      "endMs": 52382,
+      "text": "I have Maya Raman, born March 14th, 2009. Which state issued her license, what kind is it, and has she had any tickets or accidents?"
+    },
+    {
+      "index": 7,
+      "beat": 8,
+      "who": "customer",
+      "startMs": 52573,
+      "endMs": 58599,
+      "text": "Ohio. Her probationary license, she passed last Tuesday. No tickets, nothing."
+    },
+    {
+      "index": 8,
+      "beat": 9,
+      "who": "rep",
+      "startMs": 58859,
+      "endMs": 71274,
+      "text": "Which car will she drive most? List Maya as the primary driver on the car she will actually drive most; rating her on the wrong car can cause trouble at claim time. And where is it parked overnight?"
+    },
+    {
+      "index": 9,
+      "beat": 10,
+      "who": "customer",
+      "startMs": 71604,
+      "endMs": 77400,
+      "text": "The Civic. She'll drive it every day to school, and it's parked at home, 44107."
+    },
+    {
+      "index": 10,
+      "beat": 11,
+      "who": "rep",
+      "startMs": 77800,
+      "endMs": 95547,
+      "text": "With a B average, a 3.0 GPA or better, she qualifies for the good-student discount; send a report card within 30 days. With a new teen driver many families raise liability limits from 50/100 to 100/300; that would add about $11 a month."
+    },
+    {
+      "index": 11,
+      "beat": 12,
+      "who": "customer",
+      "startMs": 95737,
+      "endMs": 99560,
+      "text": "She has a 3.6 GPA. Let’s keep the limits as they are for now."
+    },
+    {
+      "index": 12,
+      "beat": 13,
+      "who": "rep",
+      "startMs": 99820,
+      "endMs": 102849,
+      "text": "When would you like Maya added to the policy?"
+    },
+    {
+      "index": 13,
+      "beat": 14,
+      "who": "customer",
+      "startMs": 103179,
+      "endMs": 107509,
+      "text": "Next Friday, October 2nd. That’s when she starts driving to school."
+    },
+    {
+      "index": 14,
+      "beat": 15,
+      "who": "rep",
+      "startMs": 107909,
+      "endMs": 120293,
+      "text": "So that’s Maya, primary on the Civic, starting Friday, October 2nd. With the good-student discount included, the new premium is $142 a month, up $46 from your $96."
+    },
+    {
+      "index": 15,
+      "beat": 16,
+      "who": "customer",
+      "startMs": 120482,
+      "endMs": 124549,
+      "text": "Oof, that’s a bit much, but okay. Go ahead."
+    },
+    {
+      "index": 16,
+      "beat": 17,
+      "who": "rep",
+      "startMs": 124808,
+      "endMs": 129640,
+      "text": "OK if my assistant finishes the paperwork? I'll be one tap away if you need me."
+    },
+    {
+      "index": 17,
+      "beat": 18,
+      "who": "customer",
+      "startMs": 129969,
+      "endMs": 131197,
+      "text": "Sure, go ahead."
+    },
+    {
+      "index": 18,
+      "beat": 19,
+      "who": "rep",
+      "startMs": 131596,
+      "endMs": 134593,
+      "text": "You’ll hear my assistant in a second. Thanks for calling."
+    }
+  ]
+}

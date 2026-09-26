@@ -2,12 +2,13 @@ import "server-only";
 
 import { and, desc, eq, inArray, sql } from "drizzle-orm";
 
-import type { CaseStatus, PolicyRecord } from "../../core/contracts/case";
+import { PAYMENT_STATUSES, type CaseStatus, type PaymentStatus, type PolicyRecord } from "../../core/contracts/case";
 import type { RunPlan } from "../../core/contracts/run";
 import type { TakeoverOutcome } from "../../core/contracts/takeover";
 import type { TakeoverPhase } from "../../core/contracts/events";
 import type { Db } from "../db/client";
-import { cases, takeovers } from "../db/schema";
+import { cases, payments, relayVersions, takeovers } from "../db/schema";
+import { recordTerminalRun, type TerminalRun } from "./terminal-usage";
 
 /**
  * Row access for the takeover routes (DESIGN §4.2 `takeovers`, the case status flips of §4.4 #9/#13).
@@ -246,6 +247,12 @@ export class DrizzleTakeoverStore implements TakeoverStore {
         .update(cases)
         .set({ status: p.outcome, updatedAt: p.endedAt })
         .where(and(eq(cases.id, t.caseId), inArray(cases.status, [...ENDABLE_CASE_STATUSES])));
+
+      // WP14b·4 (SAAS §4.5, §7): `run.completed` and the usage rows belong to THIS transaction — a run that ended
+      // and a run that was metered are the same fact. Guarded by the `first` path we are already on, so a replayed
+      // /end emits nothing, and keyed on the takeover id besides.
+      await recordTerminalRun(await terminalRunOf(tx, t, p), tx);
+
       return { first: true, record: u ? recordOf(u) : null };
     });
   }
@@ -266,4 +273,66 @@ export class DrizzleTakeoverStore implements TakeoverStore {
       .limit(limit);
     return rows.map((r) => r.timings ?? {});
   }
+}
+
+
+/**
+ * Assemble the `run.completed` payload from the rows the end transaction already holds (WP14b·4).
+ *
+ * Three small reads inside the transaction, all by primary key or by an indexed case id: the case (its org, its
+ * relay version, whether it played a sim), the relay version (id and number) and the payment, if any. The
+ * alternative — emitting from a job after the fact — would let a run end without its event, which is exactly the
+ * gap the "in the same transaction" note in `contracts/v3/events.ts` exists to close.
+ */
+type Tx = Parameters<Parameters<Db["transaction"]>[0]>[0];
+
+/** `payments.status` is an untyped text column; anything unrecognised reads as "none" rather than leaking through. */
+const paymentStatusOf = (s: string | null | undefined): PaymentStatus =>
+  s && (PAYMENT_STATUSES as readonly string[]).includes(s) ? (s as PaymentStatus) : "none";
+
+async function terminalRunOf(tx: Tx, t: typeof takeovers.$inferSelect, p: EndPatch): Promise<TerminalRun> {
+  const [c] = await tx
+    .select({ orgId: cases.orgId, relayVersionId: cases.relayVersionId, simCallId: cases.simCallId })
+    .from(cases)
+    .where(eq(cases.id, t.caseId));
+
+  let relayId: string | null = null;
+  let relayVersion: number | null = null;
+  if (c?.relayVersionId) {
+    const [v] = await tx
+      .select({ relayId: relayVersions.relayId, version: relayVersions.version })
+      .from(relayVersions)
+      .where(eq(relayVersions.id, c.relayVersionId));
+    relayId = v?.relayId ?? null;
+    relayVersion = v?.version ?? null;
+  }
+
+  const [pay] = await tx
+    .select({ status: payments.status })
+    .from(payments)
+    .where(eq(payments.caseId, t.caseId))
+    .orderBy(desc(payments.createdAt))
+    .limit(1);
+
+  const metrics = t.metrics as Record<string, unknown>;
+  const aiSeconds = typeof metrics.billedSeconds === "number"
+    ? metrics.billedSeconds
+    : Math.max(0, (p.endedAt.getTime() - t.armedAt.getTime()) / 1000);
+
+  return {
+    takeoverId: t.id,
+    caseId: t.caseId,
+    orgId: c?.orgId ?? null,
+    relayId,
+    relayVersion,
+    // A case that played a simulated call never cost AssemblyAI minutes, so it is metered at quantity 0.
+    source: c?.simCallId ? "simulated" : "recorded",
+    outcome: p.outcome,
+    stagesReached: t.stage ? [t.stage] : [],
+    aiSeconds,
+    paymentStatus: paymentStatusOf(pay?.status),
+    startedAt: t.armedAt,
+    passedAt: p.outcome === "completed" ? p.endedAt : null,
+    endedAt: p.endedAt,
+  };
 }

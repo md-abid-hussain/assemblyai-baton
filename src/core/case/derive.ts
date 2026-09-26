@@ -140,15 +140,16 @@ export function deriveV1(policy: PolicyRecord, events: readonly DerivableEvent[]
   for (const f of fieldIdsOf(spec, FIELD_IDS)) fields[f] = emptyFieldState(f);
   for (const e of sorted) {
     if (e.kind === "question" || e.kind === "verifier" || e.valueNorm === null) continue;
-    if (!fields[e.field]) continue;   // a field this intent does not have
+    const cur = fields[e.field];
+    if (!cur) continue;   // a field this intent does not have (P§4.7: `fields` is keyed by any id)
     fields[e.field] = {
-      ...fields[e.field],
+      ...cur,
       status: "VERIFIED",
       reason: "stated_once",
       value: e.valueNorm,
       display: ops.display(e.field, e.valueNorm, e.valueRaw),
       source: e.party,
-      evidence: e.evidence ? [e.evidence, ...fields[e.field].evidence].slice(0, 3) : fields[e.field].evidence,
+      evidence: e.evidence ? [e.evidence, ...cur.evidence].slice(0, 3) : cur.evidence,
       updatedAtMs: e.turnEndMs,
     };
   }

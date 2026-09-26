@@ -5,6 +5,7 @@ import { V2_ERROR_STATUS, type LintIssue, type V2ErrorCode } from "../../core/co
 import { batonErrorResponse, errorResponse, json, type RouteCtx } from "../auth/http";
 import { EnvError } from "../env";
 import { log } from "../log";
+import { SaasError, saasErrorResponse } from "../saas/errors";
 
 /**
  * Route plumbing for WP14b's `/api/relays/**`: WP12's `src/server/auth/http.ts` conventions (JSON + no-store,
@@ -41,6 +42,10 @@ export function relayRoute<P extends Record<string, string>>(
     try {
       return await fn(req, ctx);
     } catch (e) {
+      // WP14b·4: `requirePrincipal` and the plan checks raise `SaasError`, which keeps its own §6.3 envelope
+      // (`{error:{code,message,docs_url}}` + the 401's `{start}`). The v2 codes below are untouched, so a v2 client
+      // that never authenticates sees byte-identical responses.
+      if (e instanceof SaasError) return saasErrorResponse(e);
       if (e instanceof RelayError) return relayErrorResponse(e);
       if (e instanceof BatonError) return batonErrorResponse(e);
       if (e instanceof EnvError) {

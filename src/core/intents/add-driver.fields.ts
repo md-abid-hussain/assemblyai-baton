@@ -1,7 +1,7 @@
 /**
  * add-driver.fields.ts - the `add_driver` intent's field registry (WP0a).
  *
- * FieldId === the recording kit's FactField (tools/recording-kit/src/scenarios.ts FACT_FIELDS), copied here
+ * BatonFieldId === the recording kit's FactField (tools/recording-kit/src/scenarios.ts FACT_FIELDS), copied here
  * so product code never imports the kit. tests/unit/core/fields-parity.test.ts asserts equality of
  * FACT_FIELDS, REQUIRED_FIELDS, RELATIONS, LICENSE_STATUSES, OPERATOR_TYPES, DISCOUNT_VALUES, STATUSES,
  * LANGUAGES and HANDOFF_RESPONSES against the kit, and validates every data/scenarios/sNN.json against them.
@@ -20,13 +20,13 @@ export const FIELD_IDS = [
   "coverage_change", "underwriting_review",
   "premium_new_monthly_usd", "premium_change_monthly_usd", "amount_due_today_usd",
 ] as const;
-export type FieldId = (typeof FIELD_IDS)[number];
+export type BatonFieldId = (typeof FIELD_IDS)[number];
 
 /** The intent's required slots (kit REQUIRED_FIELDS, 10). `Readiness.requiredTotal` = 10. */
 export const REQUIRED_FIELDS = [
   "driver_full_name", "driver_dob", "driver_relation", "license_state", "license_status",
   "vehicle_assignment", "operator_type", "garaging_zip", "effective_date", "premium_new_monthly_usd",
-] as const satisfies readonly FieldId[];
+] as const satisfies readonly BatonFieldId[];
 export type RequiredField = (typeof REQUIRED_FIELDS)[number];
 
 /** Field statuses (kit STATUSES). */
@@ -67,48 +67,52 @@ export type UsState = (typeof US_STATES)[number];
 // ------------------------------------------------------------------------------------------ product field sets (DESIGN §4.1)
 
 /** If not VERIFIED from the rep, get_disclosure supplies it from the rating tool; never asked by the AI. */
-export const SERVER_RESOLVABLE = ["premium_new_monthly_usd"] as const satisfies readonly FieldId[];
+export const SERVER_RESOLVABLE = ["premium_new_monthly_usd"] as const satisfies readonly BatonFieldId[];
 
 /** Only a REP statement (or an AI tool update) can make these VERIFIED. */
 export const REP_ONLY = [
   "premium_new_monthly_usd", "premium_change_monthly_usd", "amount_due_today_usd", "underwriting_review",
-] as const satisfies readonly FieldId[];
+] as const satisfies readonly BatonFieldId[];
 
 /** The `update_case_field` enum: fields the Voice Agent may set (DESIGN §5.8). */
 export const AI_SETTABLE = [
   "driver_full_name", "driver_dob", "driver_relation", "license_state", "license_status",
   "license_number", "incidents_3y", "vehicle_assignment", "operator_type", "garaging_zip",
-] as const satisfies readonly FieldId[];
+] as const satisfies readonly BatonFieldId[];
 export type AiSettableField = (typeof AI_SETTABLE)[number];
 
 /** The AI never raises or changes these; rep only (they go under `decided_by_rep` in the prompt). */
 export const ADVICE_DOMAIN = [
   "coverage_change", "good_student_discount", "driver_training_discount", "distant_student_discount",
   "mature_driver_discount", "underwriting_review",
-] as const satisfies readonly FieldId[];
+] as const satisfies readonly BatonFieldId[];
 
 /** Money fields: normalized as dollars with 2 decimals ("142.00", "-12.50"). */
 export const MONEY_FIELDS = [
   "premium_new_monthly_usd", "premium_change_monthly_usd", "amount_due_today_usd",
-] as const satisfies readonly FieldId[];
+] as const satisfies readonly BatonFieldId[];
 
 export const DISCOUNT_FIELDS = [
   "good_student_discount", "driver_training_discount", "distant_student_discount", "mature_driver_discount",
-] as const satisfies readonly FieldId[];
+] as const satisfies readonly BatonFieldId[];
 
-const setOf = (xs: readonly FieldId[]): ReadonlySet<FieldId> => new Set<FieldId>(xs);
-export const REQUIRED_SET: ReadonlySet<FieldId> = setOf(REQUIRED_FIELDS);
-export const REP_ONLY_SET: ReadonlySet<FieldId> = setOf(REP_ONLY);
-export const AI_SETTABLE_SET: ReadonlySet<FieldId> = setOf(AI_SETTABLE);
-export const ADVICE_DOMAIN_SET: ReadonlySet<FieldId> = setOf(ADVICE_DOMAIN);
-export const SERVER_RESOLVABLE_SET: ReadonlySet<FieldId> = setOf(SERVER_RESOLVABLE);
-export const MONEY_FIELD_SET: ReadonlySet<FieldId> = setOf(MONEY_FIELDS);
+/**
+ * P§4.7: the sets and predicates take `string`, because `FieldId` (contracts/case) is now any id and a generic
+ * relay's field may be asked about here. Membership is still exactly the Baton vocabulary above.
+ */
+const setOf = (xs: readonly BatonFieldId[]): ReadonlySet<string> => new Set<string>(xs);
+export const REQUIRED_SET: ReadonlySet<string> = setOf(REQUIRED_FIELDS);
+export const REP_ONLY_SET: ReadonlySet<string> = setOf(REP_ONLY);
+export const AI_SETTABLE_SET: ReadonlySet<string> = setOf(AI_SETTABLE);
+export const ADVICE_DOMAIN_SET: ReadonlySet<string> = setOf(ADVICE_DOMAIN);
+export const SERVER_RESOLVABLE_SET: ReadonlySet<string> = setOf(SERVER_RESOLVABLE);
+export const MONEY_FIELD_SET: ReadonlySet<string> = setOf(MONEY_FIELDS);
 
-export const isFieldId = (x: unknown): x is FieldId => typeof x === "string" && (FIELD_IDS as readonly string[]).includes(x);
-export const isRequired = (f: FieldId): boolean => REQUIRED_SET.has(f);
-export const isRepOnly = (f: FieldId): boolean => REP_ONLY_SET.has(f);
-export const isAiSettable = (f: FieldId): f is AiSettableField => AI_SETTABLE_SET.has(f);
-export const isAdviceDomain = (f: FieldId): boolean => ADVICE_DOMAIN_SET.has(f);
+export const isFieldId = (x: unknown): x is BatonFieldId => typeof x === "string" && (FIELD_IDS as readonly string[]).includes(x);
+export const isRequired = (f: string): boolean => REQUIRED_SET.has(f);
+export const isRepOnly = (f: string): boolean => REP_ONLY_SET.has(f);
+export const isAiSettable = (f: string): f is AiSettableField => AI_SETTABLE_SET.has(f);
+export const isAdviceDomain = (f: string): boolean => ADVICE_DOMAIN_SET.has(f);
 
 // ------------------------------------------------------------------------------------------ value kinds and labels (= kit)
 
@@ -117,7 +121,7 @@ export type FieldKind =
   | { t: "string" } | { t: "date" } | { t: "int" } | { t: "state" } | { t: "zip" } | { t: "vehicle" }
   | { t: "money" } | { t: "signed_money" } | { t: "boolean" } | { t: "enum"; values: readonly string[] };
 
-export const FIELD_KIND: Readonly<Record<FieldId, FieldKind>> = {
+export const FIELD_KIND: Readonly<Record<BatonFieldId, FieldKind>> = {
   driver_full_name: { t: "string" },
   driver_dob: { t: "date" },
   driver_age: { t: "int" },
@@ -142,7 +146,7 @@ export const FIELD_KIND: Readonly<Record<FieldId, FieldKind>> = {
 };
 
 /** Human labels (kit FIELD_LABEL) for the case card. */
-export const FIELD_LABEL: Readonly<Record<FieldId, string>> = {
+export const FIELD_LABEL: Readonly<Record<BatonFieldId, string>> = {
   driver_full_name: "New driver's full name",
   driver_dob: "Date of birth",
   driver_age: "Age",
@@ -165,3 +169,11 @@ export const FIELD_LABEL: Readonly<Record<FieldId, string>> = {
   premium_change_monthly_usd: "Monthly premium change",
   amount_due_today_usd: "Amount due today",
 };
+
+/**
+ * P§4.7 accessors for the two literal-keyed maps. The maps stay keyed by `BatonFieldId`; these take any id, so a
+ * caller holding a widened `FieldId` (a relay's field) needs no cast and gets a sane answer: the id itself as a
+ * label, and no legacy value kind.
+ */
+export const fieldLabelOf = (f: string): string => (isFieldId(f) ? FIELD_LABEL[f] : f);
+export const fieldKindOf = (f: string): FieldKind | null => (isFieldId(f) ? FIELD_KIND[f] : null);

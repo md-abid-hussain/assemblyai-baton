@@ -30,6 +30,7 @@ import { cases, jobs, liveSessions, payments, takeovers } from "../db/schema";
 import { log, scrub } from "../log";
 import { buildQaInput, keytermsOf, type VaTimeline } from "../qa/build-input";
 import { wp8, type Wp8Ports } from "../qa/deps";
+import { emitCaseVerified } from "../qa/domain-events";
 import {
   ensurePendingVerification,
   findVerifyJob,
@@ -315,6 +316,9 @@ async function compute(p: Wp8Ports, s: VerifyState, transcript: Transcript | nul
   const qa = QaResultSchema.parse({ ...computeQa(input), provisional: false });
   const now = p.now();
   await markVerificationCompleted(db, s.takeoverId, qa, { transcriptId: t.id, audioDurationSec: t.audio_duration ?? null, now });
+  // SAAS §7.1: the run's QA is now non-provisional, so `case.verified` goes to the outbox (a no-op until the run
+  // carries an org). It never throws into the job: a failed emit must not fail a finished verification.
+  await emitCaseVerified(db, { takeoverId: s.takeoverId, qa, appUrl: p.config().appUrl });
   const ledger = p.ledger();
   if (ledger && s.asyncLedgerId) {
     await ledger.settle(s.asyncLedgerId, billableSeconds(t, true) * VERIFY_PRICES.ASYNC_USD_PER_CH_SEC).catch((err: unknown) => vlog.warn("async ledger settle failed", { err }));

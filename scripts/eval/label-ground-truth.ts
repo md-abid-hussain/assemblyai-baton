@@ -31,7 +31,7 @@ import {
   buildLocatorInput, LOCATOR_FORMAT, LOCATOR_PROMPT, locatorFacts, resolveLabels, utterancesFromTranscript, type LocatorOutput, type TranscriptLike,
 } from "../../src/core/scenario/labels";
 import { stableJson } from "../../src/core/scenario/assets";
-import { labelsAutoPath, labelsPath, loadKit, parseFlags, PILOT_SCENARIOS, readLabels, readSplit, resolvePaths, str, type PipelinePaths } from "../calls/lib/kit-io";
+import { labelsAutoPath, labelsPath, loadKit, parseFlags, PILOT_SCENARIOS, readLabels, readSplit, resolvePaths, str, takeDirOf, type PipelinePaths } from "../calls/lib/kit-io";
 
 export const ASYNC_USD_PER_CHANNEL_SEC = 0.0035 / 60;
 
@@ -67,7 +67,7 @@ async function transcribe(paths: PipelinePaths, c: PlannedCall, force: boolean):
   loadEnv();
   const key = process.env.ASSEMBLYAI_API_KEY?.trim();
   if (!key) throw new Error("ASSEMBLYAI_API_KEY missing (value never printed)");
-  const pcm = readSplit(paths.callsDir, c.entry.callId);
+  const pcm = readSplit(takeDirOf(paths, c.sidecar), c.entry.callId);
   if (!pcm) throw new Error(`${c.entry.callId}: split WAVs missing`);
   const { rep, customer } = equalizeChannels(pcm.rep, pcm.customer);
   const wav = encodeWav(interleave(rep, customer), pcm.sampleRate, 2);
@@ -158,12 +158,12 @@ async function labelOne(paths: PipelinePaths, c: PlannedCall, kit: KitScenario, 
 
 async function main(): Promise<void> {
   const f = parseFlags(process.argv.slice(2), {
-    calls: "string", force: "boolean", retranscribe: "boolean", "dry-run": "boolean", "calls-dir": "string", "scenarios-dir": "string", "data-root": "string",
+    calls: "string", force: "boolean", retranscribe: "boolean", "dry-run": "boolean", "calls-dir": "string", "sim-takes-dir": "string", "scenarios-dir": "string", "data-root": "string",
   });
-  const paths = resolvePaths({ callsDir: str(f["calls-dir"]), scenariosDir: str(f["scenarios-dir"]), dataRoot: str(f["data-root"]) });
+  const paths = resolvePaths({ callsDir: str(f["calls-dir"]), simTakesDir: str(f["sim-takes-dir"]), scenariosDir: str(f["scenarios-dir"]), dataRoot: str(f["data-root"]) });
   const kit = loadKit(paths);
   const takes = kit.sidecars.filter((s) => s.state === "downloaded").flatMap((sc) => {
-    const pcm = readSplit(paths.callsDir, sc.base);
+    const pcm = readSplit(takeDirOf(paths, sc), sc.base);
     return pcm ? [{ sidecar: sc, durationMs: Math.round((Math.max(pcm.rep.length, pcm.customer.length) / pcm.sampleRate) * 1000), labels: null }] : [];
   });
   const plan = planCalls({ scenarios: kit.scenarios, takes });

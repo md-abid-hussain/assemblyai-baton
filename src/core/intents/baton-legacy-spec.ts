@@ -20,7 +20,7 @@ import {
   normalizeField, spokenForms, targetedFields,
 } from "./add-driver";
 import {
-  ADVICE_DOMAIN, AI_SETTABLE, FIELD_IDS, FIELD_LABEL, REP_ONLY, REQUIRED_FIELDS, SERVER_RESOLVABLE,
+  ADVICE_DOMAIN, AI_SETTABLE, FIELD_IDS, REP_ONLY, REQUIRED_FIELDS, SERVER_RESOLVABLE, fieldLabelOf,
 } from "./add-driver.fields";
 
 const fid = (f: string): FieldId => f as FieldId;
@@ -37,7 +37,7 @@ const spec: IntentSpec = {
   serverResolvable: new Set<string>(SERVER_RESOLVABLE),
   priority: GREETING_PRIORITY,
   entityFields: ENTITY_FIELDS as ReadonlySet<string>,
-  label: (f: string) => FIELD_LABEL[fid(f)],
+  label: (f: string) => fieldLabelOf(f),
   normalize: (f: string, raw: string | number | boolean | null | undefined, ctx: { callDate: string; account: AccountRecord }) =>
     normalizeField(fid(f), raw, { policy: policyFor(ctx.account), callDate: ctx.callDate }),
   display: (f: string, norm: string, account: AccountRecord, raw?: string | null) => displayValue(fid(f), norm, policyFor(account), raw),

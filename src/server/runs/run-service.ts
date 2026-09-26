@@ -7,6 +7,7 @@ import { BatonError } from "../../core/contracts/errors";
 import type { RunPlan } from "../../core/contracts/run";
 import type { CallManifestEntry } from "../../core/contracts/scenario";
 import type { LimitsAuthority, RunService } from "../../core/contracts/services";
+import { accountFor } from "../../core/relay/account";
 import { newId } from "../../lib/ids";
 import type { Db } from "../db/client";
 import { cases, liveSessions } from "../db/schema";
@@ -72,7 +73,8 @@ export class DbRunService implements RunService {
     const remainingMs = Math.max(30_000, (call?.durationMs ?? DEFAULT_CALL_DURATION_MS) - startOffsetMs);
     const flags = await this.d.authority.flags();
     const denial = modeDenial(flags);
-    const rep = c.policy?.repFirstName || "the rep";
+    // WP14b·3: a relay case stores an AccountRecord in `cases.policy`; `accountFor` reads either kind.
+    const rep = (c.policy ? accountFor(c.policy).org.repFirstName : "") || "the rep";
 
     // ---- STT half
     let sttHalf: RunPlan["sttHalf"] = "live";

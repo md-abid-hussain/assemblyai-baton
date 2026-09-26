@@ -1,0 +1,136 @@
+{
+  "callId": "s02_sim_20260925T110000Z",
+  "scenarioId": "s02",
+  "provenance": "Simulated audio: script by gpt-6-luna, voices by gpt-4o-mini-tts. Fictional people.",
+  "scriptModel": "gpt-6-luna",
+  "ttsModel": "gpt-4o-mini-tts-2025-12-15",
+  "voices": {
+    "rep": "cedar",
+    "customer": "marin"
+  },
+  "repairs": [],
+  "handoffIndex": 12,
+  "acceptIndex": 13,
+  "turns": [
+    {
+      "index": 0,
+      "beat": 1,
+      "who": "rep",
+      "startMs": 400,
+      "endMs": 6914,
+      "text": "Hi, this is Carmen Ortiz with Mesa Ridge Insurance Group in Mesa. This call is recorded. How can I help?"
+    },
+    {
+      "index": 1,
+      "beat": 2,
+      "who": "customer",
+      "startMs": 7246,
+      "endMs": 12953,
+      "text": "I need to add my son. He passed his road test this morning. I'm on lunch, so quick please."
+    },
+    {
+      "index": 2,
+      "beat": 3,
+      "who": "rep",
+      "startMs": 13354,
+      "endMs": 16504,
+      "text": "Sure. Can I get the policyholder name and policy number?"
+    },
+    {
+      "index": 3,
+      "beat": 4,
+      "who": "customer",
+      "startMs": 16695,
+      "endMs": 22782,
+      "text": "Mark Delgado. The policy number is B-S-C, two-two-nine-zero, three-one-six."
+    },
+    {
+      "index": 4,
+      "beat": 5,
+      "who": "rep",
+      "startMs": 23043,
+      "endMs": 25791,
+      "text": "Found it. What's your son's full name and date of birth?"
+    },
+    {
+      "index": 5,
+      "beat": 6,
+      "who": "customer",
+      "startMs": 26122,
+      "endMs": 32268,
+      "text": "Lucas, L-U-C-A-S, Delgado. June 2nd, 2010. He's sixteen."
+    },
+    {
+      "index": 6,
+      "beat": 7,
+      "who": "rep",
+      "startMs": 32669,
+      "endMs": 40656,
+      "text": "I have Lucas Delgado, born June 2nd, 2010. What state is his license from, what type is it, and any tickets?"
+    },
+    {
+      "index": 7,
+      "beat": 8,
+      "who": "customer",
+      "startMs": 40847,
+      "endMs": 47532,
+      "text": "Arizona. The graduated license, he passed this morning. Nothing, he's brand new."
+    },
+    {
+      "index": 8,
+      "beat": 9,
+      "who": "rep",
+      "startMs": 47792,
+      "endMs": 59729,
+      "text": "Which car will he drive? Since it'll be his daily car, list Lucas as primary on the Corolla; Elena becomes an occasional driver on it. Where's it parked? Driver's ed can earn a discount."
+    },
+    {
+      "index": 9,
+      "beat": 10,
+      "who": "customer",
+      "startMs": 60059,
+      "endMs": 69449,
+      "text": "The Corolla, that'll be his car, every day. In our garage, 85213. He did the driver's ed course at school in May."
+    },
+    {
+      "index": 10,
+      "beat": 11,
+      "who": "rep",
+      "startMs": 69849,
+      "endMs": 79774,
+      "text": "Okay, Lucas will be primary on the Corolla, it's parked at home, and I've applied the driver-training discount. It'll be $171 a month, up $53."
+    },
+    {
+      "index": 11,
+      "beat": 12,
+      "who": "customer",
+      "startMs": 79964,
+      "endMs": 84252,
+      "text": "Fine. Last thing, it has to start tomorrow because he's driving to his game."
+    },
+    {
+      "index": 12,
+      "beat": 13,
+      "who": "rep",
+      "startMs": 84512,
+      "endMs": 88617,
+      "text": "Got it. OK if my assistant wraps up the paperwork? I'm right here."
+    },
+    {
+      "index": 13,
+      "beat": 14,
+      "who": "customer",
+      "startMs": 88947,
+      "endMs": 90237,
+      "text": "Yeah, go ahead."
+    },
+    {
+      "index": 14,
+      "beat": 15,
+      "who": "rep",
+      "startMs": 90637,
+      "endMs": 91352,
+      "text": "One second."
+    }
+  ]
+}

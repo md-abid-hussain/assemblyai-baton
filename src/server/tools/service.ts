@@ -5,6 +5,7 @@ import { BatonError } from "../../core/contracts/errors";
 import type { EsignSummary, StagePayload } from "../../core/contracts/ext/wp6-payments";
 import type { NewFactEvent } from "../../core/contracts/case";
 import type { CaseRepository, ToolContext, ToolOutcome, ToolService } from "../../core/contracts/services";
+import { payLinkOf, spokenChars } from "../connectors/text";
 import type { CaseSink } from "./wiring";
 import type { TranscriptionMode } from "../../core/contracts/takeover";
 import type { ToolArgs, ToolName } from "../../core/contracts/tools";
@@ -491,22 +492,10 @@ export function monthDay(iso: string): string {
   return `${MONTHS[m - 1]} ${ordinal(d)}`;
 }
 
-/** "END-48213" → "E N D 4 8 2 1 3". */
-export const spokenChars = (s: string): string => s.replace(/[^A-Za-z0-9]/g, "").split("").join(" ");
+/** WP16·2: one implementation, shared with the generic connector built-ins (`connectors/text.ts`). */
+export { payLinkOf, spokenChars };
 
-/** The SMS link shown on the MockPhone (a page of ours, never Polar's URL). */
-export function payLinkOf(origin: string, paymentId: string): string {
-  const o = (() => {
-    try {
-      return new URL(origin).origin;
-    } catch {
-      return "";
-    }
-  })();
-  return `${o}/pay/${paymentId}`;
-}
-
-/** S6: "Harborview: Review & sign your change to policy NBM-4418207: <link>". */
+/** S6:"Harborview: Review & sign your change to policy NBM-4418207: <link>". */
 export function smsPayLink(policy: Pick<PolicyRecord, "agencyName" | "policyNumber">, link: string): string {
   const brand = policy.agencyName.split(/\s+/)[0] ?? policy.agencyName;
   return `${brand}: Review & sign your change to policy ${policy.policyNumber}: ${link}`;

@@ -14,6 +14,7 @@ import type { RunPlan } from "@/core/contracts/run";
 import type { Suggestion } from "@/core/contracts/services";
 import type { TurnInput } from "@/core/contracts/turns";
 
+import { BATON_UI_SPEC } from "../store/ui-spec";
 import {
   emptyCaseState, evidenceFor, FixtureLog, S01_POLICY, setField, syntheticPeaks, turnInput, withConflicts, type ScriptTurn,
 } from "./builder";
@@ -31,6 +32,11 @@ export interface S01Options {
   ending?: "complete" | "handback";
   /** Stop the log at this call-clock ms (shadowing-only fixtures). */
   stopAtMs?: number;
+  /**
+   * How this take's audio was made (PLATFORM §7.6). The takes that ship today are generated, so the sim variant
+   * exists to render exactly what a judge sees on them; "recorded" is the D1 role-play take.
+   */
+  humanHalf?: "recorded" | "simulated";
   /** Rep reads the date of birth back wrong → an open conflict card. */
   conflict?: boolean;
   paused?: { atMs: number };
@@ -151,7 +157,20 @@ export function buildS01(o: S01Options = {}): UiLogEntry[] {
   };
 
   // ---------------------------------------------------------------- pre-flight
+  const simulated = o.humanHalf === "simulated";
   L.add(0, { type: "ui.context", context: s01Context() });
+  L.add(1, {
+    type: "ui.relay",
+    relay: BATON_UI_SPEC,
+    provenance: {
+      humanHalf: simulated ? "simulated" : "recorded",
+      transcription: { kind: cached ? "cached" : "live", date: cached ? "2026-09-26" : null },
+      aiHalf: { kind: recordedPlan ? "recorded" : "live", date: recordedPlan ? "2026-09-25" : null },
+      customerInAiHalf: recordedPlan ? "recorded" : simulated ? "synthetic" : "recorded",
+      detail: simulated ? "Simulated audio: script by gpt-6-luna, voices by gpt-4o-mini-tts. Fictional people." : null,
+    },
+    account: null,
+  });
   L.add(PRE_T - 100, { type: "call.loaded", callId: S01_CALL_ID, durationMs: S01_DURATION_MS });
   L.add(PRE_T, { type: "run.plan", plan });
   L.add(PRE_T + 10, { type: "ui.autopilot", on: true });

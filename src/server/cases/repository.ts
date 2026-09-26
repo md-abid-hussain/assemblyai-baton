@@ -10,12 +10,15 @@ import type { RunPlan } from "../../core/contracts/run";
 import type { CaseRepository } from "../../core/contracts/services";
 import type { DrainReport } from "../../core/contracts/takeover";
 import type { TurnInput, TurnSource, WordTiming } from "../../core/contracts/turns";
+import type { AccountRecord } from "../../core/contracts/v2";
 import { BatonError } from "../../core/contracts/errors";
+import { storedAccount } from "../../core/relay/account";
 import { newId } from "../../lib/ids";
 import type { Db } from "../db/client";
 import { cases, factEvents, takeovers, turns, verifierRuns } from "../db/schema";
 import type { CaseEngine, EngineDeriveCtx } from "./engine";
 import type { PrefillPlan } from "./prefill";
+import type { CaseEngineFor } from "./relay-engine";
 
 /**
  * `CaseRepository` on Postgres (TASKS §2; DESIGN §4.2, §4.5 F1/F2, §5.5.4 rule 2).
@@ -43,6 +46,12 @@ export interface CaseRow {
   ipKey: string;
   tArmMs: number | null;
   runPlan: RunPlan | null;
+  /**
+   * 0001: the relay version this case runs (WP14b·2), or null for a Baton case. WP14b·3 reads it on every load: it
+   * chooses the case engine (`relay-engine.ts`), and it tells `policy` apart — a relay row's `policy` jsonb is a
+   * `StoredAccount` (`$kind:"account"`), a Baton row's is a `PolicyRecord`.
+   */
+  relayVersionId: string | null;
 }
 
 export type ExtractStatus = "pending" | "done" | "failed" | "skipped";
@@ -81,11 +90,15 @@ export const isFrozenStatus = (s: CaseStatus): boolean => TERMINAL_OR_AI.has(s);
 
 const turnRowId = (caseId: string, turnId: string): string => `${caseId}:${turnId}`;
 
+function errNoScenario(scenarioId: string): never {
+  throw new BatonError("E_NOT_FOUND", `Unknown scenario ${scenarioId}.`);
+}
+
 function caseOf(r: typeof cases.$inferSelect): CaseRow {
   return {
     id: r.id, mode: r.mode, callId: r.callId, scenarioId: r.scenarioId, policy: r.policy as unknown as PolicyRecord,
     state: r.state as unknown as CaseState, version: r.version, status: r.status, visitorId: r.visitorId, ipKey: r.ipKey,
-    tArmMs: r.tArmMs, runPlan: (r.runPlan as unknown as RunPlan | null) ?? null,
+    tArmMs: r.tArmMs, runPlan: (r.runPlan as unknown as RunPlan | null) ?? null, relayVersionId: r.relayVersionId ?? null,
   };
 }
 
@@ -126,11 +139,24 @@ const turnRow = (t: TurnInput, status: ExtractStatus, extractMs: number | null =
 
 export interface PgCaseRepositoryDeps {
   db: Db;
+  /** The base (flagship) engine. A relay case runs `engineFor(row.relayVersionId)` instead. */
   engine: CaseEngine;
+  /**
+   * WP14b·3: the engine of a case's relay version (`relay-engine.ts`). Left out, every case runs the base engine —
+   * which is exactly right for a server with no kernel bound, and for the WP3 unit tests that inject a stub.
+   */
+  engineFor?: CaseEngineFor;
   /** Resolves a scenario's policy for `create` (data source). */
   policyOf: (scenarioId: string) => Promise<PolicyRecord | null>;
-  /** Express prefill source (§5.1.6); `create` applies it when `prefillUntilMs` is given. */
-  prefillPlan?: (i: { caseId: string; callId: string; untilMs: number }) => Promise<PrefillPlan | null>;
+  /**
+   * Express prefill source (§5.1.6); `create` applies it when `prefillUntilMs` is given. WP14b·3 passes the run's
+   * extractor version and relay version too, so a relay whose extractor differs from the cache re-extracts (P§7.5).
+   */
+  prefillPlan?: (i: {
+    caseId: string; callId: string; untilMs: number; relayVersionId: string | null;
+    /** The row as it was just written: a `PolicyRecord` (Baton) or a `StoredAccount` (a relay). */
+    policy: PolicyRecord;
+  }) => Promise<PrefillPlan | null>;
   newCaseId?: () => string;
   /** Wall clock (ms) for `frozenAt` (the F1 late-pending window). */
   now?: () => number;
@@ -149,24 +175,47 @@ export class PgCaseRepository implements CaseRepository {
     mode: CaseMode; callId: string | null; scenarioId: string; visitorId: string; ipKey: string; prefillUntilMs?: number;
     /** 0001: the relay version this run executes (WP14b·2), and the sim it plays (`sim_calls.id`), if any. */
     relayVersionId?: string | null; simCallId?: string | null;
+    /**
+     * WP14b·3: a relay run's account, stored in `cases.policy` with `$kind:"account"` (P§4.2). Given, the scenario's
+     * `PolicyRecord` is never looked up — a Dental case has no Baton policy, and inventing one would put Baton's
+     * facts in the row. Omitted, the behaviour is exactly the v1 one.
+     */
+    account?: AccountRecord;
+    /**
+     * 0002_saas (SAAS §2.4, §7): the org this run belongs to and the account that started it, from the session
+     * principal when there is one. Both stay null on the device-only demo path, which is unchanged: `POST
+     * /api/cases` is a device route in v3 too, and a run with no org is simply a run with no tenant to bill.
+     */
+    orgId?: string | null;
+    createdByUserId?: string | null;
   }): Promise<{ caseId: string; state: CaseState; policy: PolicyRecord }> {
-    const policy = await this.d.policyOf(input.scenarioId);
-    if (!policy) throw new BatonError("E_NOT_FOUND", `Unknown scenario ${input.scenarioId}.`);
+    const relayVersionId = input.relayVersionId ?? null;
+    const stored: PolicyRecord = input.account
+      ? (storedAccount(input.account) as unknown as PolicyRecord)
+      : (await this.d.policyOf(input.scenarioId)) ?? errNoScenario(input.scenarioId);
     const caseId = this.d.newCaseId?.() ?? newId();
-    const state = this.d.engine.deriveCaseState(policy, [], { caseId, version: 0 });
+    const engine = await this.engineOf(relayVersionId);
+    const state = engine.deriveCaseState(stored, [], { caseId, version: 0 });
     await this.d.db.insert(cases).values({
-      id: caseId, mode: input.mode, callId: input.callId, scenarioId: input.scenarioId, policy: policy as unknown as Record<string, unknown>,
+      id: caseId, mode: input.mode, callId: input.callId, scenarioId: input.scenarioId, policy: stored as unknown as Record<string, unknown>,
       state: state as unknown as Record<string, unknown>, version: 0, status: "shadowing", visitorId: input.visitorId, ipKey: input.ipKey,
-      relayVersionId: input.relayVersionId ?? null, simCallId: input.simCallId ?? null,
+      relayVersionId, simCallId: input.simCallId ?? null,
+      orgId: input.orgId ?? null, createdByUserId: input.createdByUserId ?? null,
+      ...(input.account ? { intent: "relay" as const } : {}),
     });
     if (input.prefillUntilMs !== undefined && input.prefillUntilMs > 0 && input.callId && this.d.prefillPlan) {
-      const plan = await this.d.prefillPlan({ caseId, callId: input.callId, untilMs: input.prefillUntilMs });
+      const plan = await this.d.prefillPlan({ caseId, callId: input.callId, untilMs: input.prefillUntilMs, relayVersionId, policy: stored });
       if (plan && plan.turns.length) {
         const r = await this.prefill(caseId, plan.turns, plan.events);
-        return { caseId, state: r.state, policy };
+        return { caseId, state: r.state, policy: stored };
       }
     }
-    return { caseId, state, policy };
+    return { caseId, state, policy: stored };
+  }
+
+  /** The engine a case row runs on: its relay version's (WP14b·3), or the base engine. */
+  private engineOf(relayVersionId: string | null): Promise<CaseEngine> | CaseEngine {
+    return relayVersionId && this.d.engineFor ? this.d.engineFor(relayVersionId) : this.d.engine;
   }
 
   async load(caseId: string): Promise<{
@@ -442,7 +491,7 @@ export class PgCaseRepository implements CaseRepository {
       payment: row.state.payment ?? null,
       confirmationNumber: row.state.confirmationNumber ?? null,
     };
-    const state = this.d.engine.deriveCaseState(row.policy, events, ctx);
+    const state = (await this.engineOf(row.relayVersionId)).deriveCaseState(row.policy, events, ctx);
     await tx.update(cases).set({
       state: state as unknown as Record<string, unknown>,
       version,

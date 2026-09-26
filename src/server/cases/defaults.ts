@@ -20,6 +20,8 @@ import type { CasesPlatform } from "./platform";
  */
 const wp1Engine: CaseEngine = {
   impl: "wp1",
+  // WP14b·3: the optional trailing `spec` of each core function (WP14a·3 spec injection) is part of the port now, so
+  // these are still the plain WP1 functions — `relayCaseEngine` is the only caller that passes a spec.
   emptyCaseState, deriveCaseState, applyExtraction, verifierDisagreementEvents, buildExtractorInput,
   extractor: {
     prompt: EXTRACTOR_PROMPT_V3, format: ADD_DRIVER_PATCH_FORMAT, model: EXTRACTOR_MODEL_ID, effort: EXTRACTOR_REASONING_EFFORT,

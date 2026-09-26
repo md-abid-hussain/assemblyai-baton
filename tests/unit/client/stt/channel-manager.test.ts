@@ -65,6 +65,39 @@ describe("open + feed", () => {
     expect(s.mgr.metrics.beginChecks.every((b) => b.ok)).toBe(true);
   });
 
+  it("a relay's compiled listening is laid over the server's params (its prompt, its keyterms first, deduped, capped)", async () => {
+    // WP7·3 / PLATFORM §7.6: a relay other than the flagship is transcribed with its own vocabulary. The server
+    // stays authoritative for model, encoding, languages and the DESIGN §5.1.5 limits (≤ 100 terms, ≤ 50 chars).
+    const s = setup();
+    const serverTerms = buildSttParams(call8k, policy, "rep").keyterms_prompt ?? [];
+    expect(serverTerms.length).toBeGreaterThan(0);
+    await s.mgr.open({
+      ...s.openArgs,
+      listening: {
+        keyterms: ["Cedar Hollow Dental", "periodontal scaling", serverTerms[0] as string, "x".repeat(70), "  "],
+        prompt: "A dental receptionist takes a booking deposit.",
+        languageCodes: ["en"],
+        tuning: "telephony_8k",
+      },
+    });
+    const p = s.conn.latest("rep").params as { prompt?: string; keyterms_prompt?: string[]; sample_rate?: number; encoding?: string };
+    expect(p.prompt).toBe("A dental receptionist takes a booking deposit.");
+    // The relay's terms come first, the server's follow, the duplicate appears once and nothing is over 50 chars.
+    expect(p.keyterms_prompt?.slice(0, 3)).toEqual(["Cedar Hollow Dental", "periodontal scaling", serverTerms[0]]);
+    expect(p.keyterms_prompt).toContain("x".repeat(50));
+    expect(p.keyterms_prompt?.filter((t) => t === serverTerms[0])).toHaveLength(1);
+    expect(p.keyterms_prompt?.every((t) => t.trim().length > 0 && t.length <= 50)).toBe(true);
+    expect(p.keyterms_prompt!.length).toBeLessThanOrEqual(100);
+    // Never the relay's business: the audio contract stays the server's.
+    expect(p).toMatchObject({ encoding: "pcm_mulaw", sample_rate: 8000 });
+  });
+
+  it("no listening (the flagship, or a server without v2) leaves the server's params untouched", async () => {
+    const s = setup();
+    await s.mgr.open(s.openArgs);
+    expect(s.conn.latest("rep").params).toEqual(buildSttParams(call8k, policy, "rep"));
+  });
+
   it.each([
     ["8 kHz µ-law", call8k, 800],
     ["16 kHz PCM16", call16k, 1600],

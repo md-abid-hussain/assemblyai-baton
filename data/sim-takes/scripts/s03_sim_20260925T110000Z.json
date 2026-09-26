@@ -1,0 +1,184 @@
+{
+  "callId": "s03_sim_20260925T110000Z",
+  "scenarioId": "s03",
+  "provenance": "Simulated audio: script by gpt-6-luna, voices by gpt-4o-mini-tts. Fictional people.",
+  "scriptModel": "gpt-6-luna",
+  "ttsModel": "gpt-4o-mini-tts-2025-12-15",
+  "voices": {
+    "rep": "cedar",
+    "customer": "marin"
+  },
+  "repairs": [],
+  "handoffIndex": 14,
+  "acceptIndex": null,
+  "turns": [
+    {
+      "index": 0,
+      "beat": 1,
+      "who": "rep",
+      "startMs": 400,
+      "endMs": 7644,
+      "text": "Hi, this is Marcus Bell with Ironbridge Insurance Agency in Pittsburgh. This call is recorded. How can I help?"
+    },
+    {
+      "index": 1,
+      "beat": 2,
+      "who": "customer",
+      "startMs": 7976,
+      "endMs": 12298,
+      "text": "Hi, my daughter moved back home, and she needs to be on the car insurance."
+    },
+    {
+      "index": 2,
+      "beat": 3,
+      "who": "rep",
+      "startMs": 12699,
+      "endMs": 17698,
+      "text": "Of course. May I have your name and policy number? And could you confirm your address?"
+    },
+    {
+      "index": 3,
+      "beat": 4,
+      "who": "customer",
+      "startMs": 17889,
+      "endMs": 30783,
+      "text": "Janet Kowalski. My policy number is S-R-I, seven-seven-three-zero, one-five-eight. The address is 5816 Northumberland Street, Pittsburgh, Pennsylvania, 15217."
+    },
+    {
+      "index": 4,
+      "beat": 5,
+      "who": "rep",
+      "startMs": 31044,
+      "endMs": 40428,
+      "text": "Thanks, Janet. What’s Hannah’s full name and date of birth? What state issued her license, and is it a regular license? Any tickets or accidents in the past three years?"
+    },
+    {
+      "index": 5,
+      "beat": 6,
+      "who": "customer",
+      "startMs": 40759,
+      "endMs": 53647,
+      "text": "Hannah, H-A-N-N-A-H, Kowalski. She was born May 21st, 2007, and she's nineteen. She has a Pennsylvania license, a regular license, she's had it since seventeen. No, never."
+    },
+    {
+      "index": 6,
+      "beat": 7,
+      "who": "rep",
+      "startMs": 54048,
+      "endMs": 67624,
+      "text": "So that’s Hannah Kowalski, born May 21st, 2007. Everyone of driving age living in the household needs to be listed, so adding Hannah is the right call. Which car will she drive, and where is it kept?"
+    },
+    {
+      "index": 7,
+      "beat": 8,
+      "who": "customer",
+      "startMs": 67815,
+      "endMs": 73892,
+      "text": "She'll be driving the Accord most days. It'll be kept here at the house, 15217."
+    },
+    {
+      "index": 8,
+      "beat": 9,
+      "who": "rep",
+      "startMs": 74152,
+      "endMs": 80139,
+      "text": "Is she a full-time student with a B average? That could qualify her for a good-student discount."
+    },
+    {
+      "index": 9,
+      "beat": 10,
+      "who": "customer",
+      "startMs": 80469,
+      "endMs": 82959,
+      "text": "No, she's part-time at community college."
+    },
+    {
+      "index": 10,
+      "beat": 11,
+      "who": "rep",
+      "startMs": 83359,
+      "endMs": 92714,
+      "text": "The good-student discount needs a full-time student with a B average; part-time doesn't qualify, but call us if she goes full-time. When would you like the change to start?"
+    },
+    {
+      "index": 11,
+      "beat": 12,
+      "who": "customer",
+      "startMs": 92904,
+      "endMs": 94543,
+      "text": "Monday, the 28th."
+    },
+    {
+      "index": 12,
+      "beat": 13,
+      "who": "rep",
+      "startMs": 94803,
+      "endMs": 110308,
+      "text": "To confirm, Hannah will be the primary driver on the Accord, starting Monday, September 28th. That brings your premium to $188 a month, up $57, with $18.40 due today for the rest of this billing period."
+    },
+    {
+      "index": 13,
+      "beat": 14,
+      "who": "customer",
+      "startMs": 110638,
+      "endMs": 112102,
+      "text": "Okay, that's fine."
+    },
+    {
+      "index": 14,
+      "beat": 15,
+      "who": "rep",
+      "startMs": 112502,
+      "endMs": 117336,
+      "text": "OK if my assistant finishes the paperwork? I'll be one tap away if you need me."
+    },
+    {
+      "index": 15,
+      "beat": 16,
+      "who": "customer",
+      "startMs": 117525,
+      "endMs": 121009,
+      "text": "Oh, I'd rather just finish with you, if that's all right."
+    },
+    {
+      "index": 16,
+      "beat": 17,
+      "who": "rep",
+      "startMs": 121268,
+      "endMs": 132062,
+      "text": "No problem. Adding Hannah changes your premium to $188 a month, prorated for the rest of your term, from Monday, September 28th; it becomes part of your policy on that date."
+    },
+    {
+      "index": 17,
+      "beat": 18,
+      "who": "rep",
+      "startMs": 132391,
+      "endMs": 139904,
+      "text": "Is it okay to text a secure link to the number on file so you can e-sign and pay the $18.40 due today?"
+    },
+    {
+      "index": 18,
+      "beat": 19,
+      "who": "customer",
+      "startMs": 140303,
+      "endMs": 143835,
+      "text": "Yes, that's fine. I got the text and paid."
+    },
+    {
+      "index": 19,
+      "beat": 20,
+      "who": "rep",
+      "startMs": 144024,
+      "endMs": 150511,
+      "text": "Great, that's all done. Updated ID cards will be sent by email. Is there anything else I can help with today?"
+    },
+    {
+      "index": 20,
+      "beat": 21,
+      "who": "customer",
+      "startMs": 150769,
+      "endMs": 153556,
+      "text": "No, thank you, Marcus. I appreciate your help."
+    }
+  ]
+}

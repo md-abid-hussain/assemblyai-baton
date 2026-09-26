@@ -380,12 +380,16 @@ describe("schemas reject invalid input", () => {
     ["StreamingParams agent_context > 1750", api.StreamingParamsSchema, { agent_context: "a".repeat(1751) }],
     ["SessionReport bad kind", api.SessionReportSchema, { sessionId: "s", kind: "tts", event: "opened" }],
     ["TakeoverEvents heartbeat:false", api.TakeoverEventsRequestSchema, { heartbeat: false }],
-    ["CaseState missing a field", contracts.CaseStateSchema, (() => {
+    ["CaseState bad field id", contracts.CaseStateSchema, (() => {
+      // P§4.7: the field map is keyed by the id grammar, so a state may carry any relay's fields (see the
+      // acceptance below) but never a malformed id. "Missing a Baton field" is no longer a schema error:
+      // completeness is the kernel's job (`readiness`), not the wire contract's.
       const s = caseState() as unknown as { fields: Record<string, unknown> };
+      s.fields["Amount-Due"] = s.fields.amount_due_today_usd;
       delete s.fields.amount_due_today_usd;
       return s;
     })()],
-    ["FieldState > 3 evidence", contracts.FieldStateSchema, { ...caseState().fields.driver_dob, evidence: [0, 1, 2, 3].map(() => caseState().fields.driver_dob.evidence[0]) }],
+    ["FieldState > 3 evidence", contracts.FieldStateSchema, { ...caseState().fields.driver_dob, evidence: [0, 1, 2, 3].map(() => caseState().fields.driver_dob?.evidence[0]) }],
     ["CallAudioFormat 8 kHz PCM16", contracts.CallAudioFormatSchema, { encoding: "pcm_s16le", sampleRate: 8000 }],
     ["BatonEvent unknown type", contracts.BatonEventSchema, { t: 0, type: "nope" }],
     ["TurnInput bad source", contracts.TurnInputSchema, { ...turn, source: "whisper" }],
@@ -403,6 +407,13 @@ describe("schemas reject invalid input", () => {
       expect(schema.safeParse(value).success).toBe(false);
     });
   }
+
+  it("accepts a relay's own field ids in CaseState (P§4.7)", () => {
+    const s = caseState() as unknown as { intent: string; fields: Record<string, unknown> };
+    s.intent = "relay";
+    s.fields.appointment_date = { ...(s.fields.driver_dob as Record<string, unknown>), field: "appointment_date" };
+    expect(contracts.CaseStateSchema.safeParse(s).success).toBe(true);
+  });
 
   it("strips unknown keys on strict-shaped request bodies", () => {
     const parsed = api.StartRunRequestSchema.parse({ caseId: "c", callId: "k", express: false, evil: 1 });

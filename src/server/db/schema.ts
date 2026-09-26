@@ -47,7 +47,9 @@ export const cases = pgTable(
     mode: text("mode", { enum: ["watch", "live", "spot", "synthetic"] }).notNull(),
     callId: text("call_id"),
     scenarioId: text("scenario_id").notNull(),
-    intent: text("intent", { enum: ["add_driver"] }).notNull().default("add_driver"),
+    // P§4.7: `cases.intent` gains "relay" (every non-flagship relay run). Text with no DB check, so this is a TS-only
+    // widening — `0001_relays.sql` did not touch the column and `drizzle-kit generate` still shows no diff.
+    intent: text("intent", { enum: ["add_driver", "relay"] }).notNull().default("add_driver"),
     policy: jsonb("policy").$type<Json>().notNull(),
     /** Latest derived `CaseState` (a denormalized cache of the fact events). */
     state: jsonb("state").$type<Json>().notNull(),
@@ -69,11 +71,20 @@ export const cases = pgTable(
     relayVersionId: text("relay_version_id"),
     /** 0001: the simulated call (`sim_calls.id`) this run plays, if any. */
     simCallId: text("sim_call_id"),
+    /**
+     * 0002_saas (SAAS §2.4): the org that owns and is billed for the run — the runner's active org for Studio,
+     * gallery and Baton runs (null until a session exists, claimed later), the publication's org for published
+     * runs. Null on every legacy device run.
+     */
+    orgId: text("org_id"),
+    /** 0002_saas: the Better Auth user who started the run, when there was a session. No FK (SAAS §2.7). */
+    createdByUserId: text("created_by_user_id"),
   },
   (t) => [
     index("cases_visitor_created_idx").on(t.visitorId, t.createdAt),
     index("cases_created_idx").on(t.createdAt),
     index("cases_relay_version_idx").on(t.relayVersionId, t.createdAt),
+    index("cases_org_created_idx").on(t.orgId, t.createdAt.desc()),
   ],
 );
 
@@ -444,6 +455,12 @@ export const relays = pgTable(
     /** Any read/save/run; drives the LRU eviction (PLATFORM §10.2). */
     lastUsedAt: ts("last_used_at").notNull().defaultNow(),
     deletedAt: ts("deleted_at"),
+    /** 0002_saas (SAAS §2.4): the Better Auth user who created it. No FK (SAAS §2.7). */
+    createdByUserId: text("created_by_user_id"),
+    /** 0002_saas (SAAS §5.2): the author's own YAML/JSON text, ≤ 256 KiB. Null = serialize the canonical draft. */
+    draftSource: text("draft_source"),
+    /** 0002_saas: `yaml` | `json`. */
+    draftSourceFormat: text("draft_source_format", { enum: ["yaml", "json"] }),
   },
   (t) => [
     index("relays_ws_updated_idx").on(t.workspaceId, t.updatedAt),
@@ -473,6 +490,10 @@ export const relayVersions = pgTable(
      */
     preset: jsonb("preset").$type<Json>(),
     createdAt: createdAt(),
+    /** 0002_saas (SAAS §2.4, §5.2): the source text as it stood at snapshot time. */
+    source: text("source"),
+    /** 0002_saas: `yaml` | `json`. */
+    sourceFormat: text("source_format", { enum: ["yaml", "json"] }),
   },
   (t) => [
     uniqueIndex("relay_versions_relay_version_uq").on(t.relayId, t.version),
@@ -499,6 +520,8 @@ export const relayPublications = pgTable("relay_publications", {
   lastUsedAt: ts("last_used_at"),
   createdAt: createdAt(),
   deletedAt: ts("deleted_at"),
+  /** 0002_saas (SAAS §2.4): denormalized from the relay, so plan counts do not need the join. */
+  orgId: text("org_id"),
 });
 
 /** WP16: AES-GCM encrypted connector secrets (never serialized). */
@@ -542,6 +565,8 @@ export const connectorCalls = pgTable(
     result: jsonb("result").$type<Json>(),
     errorCode: text("error_code"),
     createdAt: createdAt(),
+    /** 0002_saas (SAAS §2.4): denormalized for Usage and Analytics, which must not join through the case. */
+    orgId: text("org_id"),
   },
   (t) => [
     index("connector_calls_version_idx").on(t.relayVersionId, t.createdAt),
@@ -632,5 +657,38 @@ export const ALL_TABLES = [
   "health_checks",
 ] as const;
 
-/** Every table of every migration (0000 + 0001). */
+/** Every table of every migration (0000 + 0001). WP19's `0002` tables are `SAAS_TABLE_NAMES` / `EVERY_TABLE_V3`. */
 export const EVERY_TABLE = [...ALL_TABLES, ...RELAY_TABLES] as const;
+
+/**
+ * Tables of migration 0002_saas (SAAS §2.7): the Better Auth tables, then ours.
+ *
+ * Better Auth's `verification` model is mapped to **`auth_verifications`**: `usePlural: true` would otherwise name
+ * it `verifications`, which `0000_init` already owns (the QA verification of a takeover, above). v2's schema is
+ * frozen, so Better Auth's name is the one that moves; see `src/server/identity/auth.ts`.
+ */
+export const SAAS_TABLE_NAMES = [
+  "users",
+  "sessions",
+  "accounts",
+  "auth_verifications",
+  "organizations",
+  "members",
+  "invitations",
+  "org_meta",
+  "org_entitlements",
+  "usage_events",
+  "domain_events",
+  "webhook_endpoints",
+  "webhook_deliveries",
+  "webhook_inbox_requests",
+  "audit_log",
+] as const;
+
+/** Every table of every migration (0000 + 0001 + 0002). `0003` adds a trigger, not a table. */
+export const EVERY_TABLE_V3 = [...EVERY_TABLE, ...SAAS_TABLE_NAMES] as const;
+
+// WP19's re-export (TASKS-v3 §6 carve-out 2): drizzle-kit reads one schema entry point, and `getDb()` needs the
+// SaaS tables in its query builder. Both new files are WP19's; everything above this line is WP14b's.
+export * from "./schema-auth";
+export * from "./schema-saas";

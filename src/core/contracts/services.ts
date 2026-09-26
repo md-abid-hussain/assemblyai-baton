@@ -72,8 +72,13 @@ export interface CaseRepository {
 export interface Extractor { extractTurn(input: ExtractTurnInput): Promise<ExtractTurnOutput> }   // never called inside a DB transaction
 export interface Verifier { verifyCase(input: { caseId: string; policy: PolicyRecord; callDate: string; turns: TurnInput[] }): Promise<VerifierResult & { ms: number; usd: number }> }
 export interface ToolContext { caseId: string; takeoverId: string; callId: string; visitorId: string; origin: string }
+/**
+ * P§4.7 adds `nextStep`: the new stage's goal text when the stage changed, else null - optional here, required in
+ * `RelayToolOutcome` (contracts/v2/services.ts, WP16). The Baton tool service may leave it undefined.
+ */
 export interface ToolOutcome { result: Record<string, unknown>; stage?: Stage; systemPrompt?: string; tools?: VaFunctionTool[];
-  transcriptionMode?: TranscriptionMode; ui?: { sms?: string; link?: string; paymentId?: string; conflict?: ConflictCard } }
+  transcriptionMode?: TranscriptionMode; nextStep?: string | null;
+  ui?: { sms?: string; link?: string; paymentId?: string; conflict?: ConflictCard } }
 export interface ToolService { handle<N extends ToolName>(name: N, args: ToolArgs[N], ctx: ToolContext): Promise<ToolOutcome> }
 export interface PaymentProvider { kind: "polar" | "mock";
   createCheckout(i: { paymentId: string; caseId: string; takeoverId: string; scenarioId: string; amountCents: number; policy: PolicyRecord; origin: string }):

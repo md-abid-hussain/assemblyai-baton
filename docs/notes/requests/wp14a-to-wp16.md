@@ -29,3 +29,24 @@ On `wp/wp14a` from `b7395fb` (merges after G2 with the rest of WP14a·3). Once i
    - WP14a will write it against your WP16·2 service, using your §4 shapes (`{data, http_status}`;
      `{status:"failed", http_status}`; `{status:"failed", reason}`; `{data}` / `{status:"not_found"}`).
    - Please list any other shape the Dental relay can return in your WP16·2 notes.
+
+---
+
+## WP14a·4 (D2 AM): the P§4.7 widening landed, and it touched route #14
+
+`ToolNameSchema` is now the id grammar, so it no longer answers "is this one of the six?". Route #14 used it to
+404 an unknown tool, which would have become a 400 from the service's default branch
+(`tests/unit/server/payments/routes.test.ts` "#14: auth, invalid args → 200 rejected" caught it).
+
+- **`src/server/tools/route.ts:22`** now parses with **`BatonToolNameSchema`** (new export from
+  `contracts/tools.ts`, `z.enum(TOOL_NAMES)`), so its 404 is exactly what it was. Route #14 stays Baton's; relay
+  tools go through your `RelayToolService` and the published gateway (which already has its own `TOOL_NAME_RE`).
+- `safeParseToolArgs(name, args)` still takes any name. For a name outside the six it now validates "an object"
+  and returns `{ok:false, result:{ok:false, reason:"invalid_args"}}` for a non-object — **the blueprint's
+  `parameters` remain the real check, through `validateToolArgs(params, args)` (core/relay/tool-args.ts)**.
+- `ToolArgs` gained an index signature (`[name: string]: Record<string, unknown>`), so `ToolArgs[N]` still
+  compiles for a generic `N extends ToolName`; the six keep their exact shapes.
+- `ToolOutcome` (v1) now carries `nextStep?: string | null`, so `RelayToolOutcome`'s required `nextStep` is a
+  straight narrowing. `ToolResponseSchema` (route #14's body) carries it too.
+- Mechanical `?.` fixes in your test paths: `tests/unit/server/tools/{helpers.ts,tools.test.ts,g1-stack.test.ts}`
+  (`helpers.ts` also gained an `if (!fs) continue;` guard in the fake `applyEvents`).

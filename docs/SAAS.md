@@ -325,9 +325,18 @@ BEGIN
 END $$;
 CREATE TRIGGER audit_log_append_only BEFORE UPDATE OR DELETE ON audit_log
   FOR EACH ROW EXECUTE FUNCTION audit_log_append_only();
+
+CREATE OR REPLACE FUNCTION audit_log_no_truncate() RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+  RAISE EXCEPTION 'audit_log is append-only';
+END $$;
+CREATE TRIGGER audit_log_no_truncate BEFORE TRUNCATE ON audit_log
+  FOR EACH STATEMENT EXECUTE FUNCTION audit_log_no_truncate();
 ```
 
 The retention purge runs `SET LOCAL changeover.audit_purge = 'on'` inside its own transaction.
+
+**The second trigger is not redundant.** A row-level trigger never fires for `TRUNCATE`, and §17/research §7 deliberately do no `REVOKE`/ownership hardening at hackathon scope, so without it the app's own role could erase the entire log in one statement — which would make the §10.6 threat-table row ("Audit tampering → the append-only trigger") untrue. It has **no purge escape hatch**: the §3.5 purge is age-scoped and deletes rows, so nothing legitimate truncates this table.
 
 ### 2.8 Migration order and `TENANCY_MODE`
 

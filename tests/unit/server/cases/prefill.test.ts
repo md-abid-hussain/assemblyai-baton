@@ -66,7 +66,7 @@ describe.skipIf(!HAS_DB)("Express prefill and cached events", () => {
     const aTurns = await hp.repo.listTurns(prefilled);
     expect(aTurns.map((x) => x.turnId)).toEqual(dialog.turns.filter((f) => f.endMs <= until).map((f) => cachedIdOf(f.turnId)));
     expect(aTurns.every((x) => x.extractStatus === "done" && x.source === "stt_cache")).toBe(true);
-    expect(a.state.fields.driver_dob.status).toBe("VERIFIED");
+    expect(a.state.fields.driver_dob?.status).toBe("VERIFIED");
 
     // the same cached finals replayed one by one through /api/extract's service (source stt_cache → cached events)
     const hr = harness(t, { data: source() });

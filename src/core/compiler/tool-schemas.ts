@@ -6,7 +6,7 @@
  * `description`, `pattern`, `examples`. No `format`, no `oneOf`/`anyOf`, no `$ref`. `validateFirstUpdate` enforces it.
  */
 import type { Stage } from "../contracts/case";
-import type { ToolName, VaFunctionTool } from "../contracts/tools";
+import type { BatonToolName, VaFunctionTool } from "../contracts/tools";
 import { AI_SETTABLE } from "../intents/add-driver.fields";
 
 /** `PAY_TOOL_MODE` (§5.8): `hold` (default) or the `push` fallback if T-D1-1 fails. */
@@ -15,7 +15,8 @@ export type PayToolMode = "hold" | "push";
 /** The only JSON-schema keywords a tool's `parameters` may use (§5.8). */
 export const ALLOWED_SCHEMA_KEYWORDS = ["type", "required", "properties", "enum", "description", "pattern", "examples"] as const;
 
-export const TOOL_SCHEMAS: Readonly<Record<ToolName, VaFunctionTool>> = {
+/** The six built-in schemas stay keyed by the literal union (P§4.7); a relay builds its tools from its blueprint. */
+export const TOOL_SCHEMAS: Readonly<Record<BatonToolName, VaFunctionTool>> = {
   confirm_effective_date: {
     type: "function",
     name: "confirm_effective_date",
@@ -122,7 +123,7 @@ export const PAY_LINK_PUSH_TOOL: VaFunctionTool = {
 };
 
 /** §5.8 stage lists (always the full list; `update_case_field` and `hand_back_to_rep` are in every stage). */
-export const STAGE_TOOL_NAMES: Readonly<Record<Stage, readonly ToolName[]>> = {
+export const STAGE_TOOL_NAMES: Readonly<Record<Stage, readonly BatonToolName[]>> = {
   confirm: ["confirm_effective_date", "update_case_field", "hand_back_to_rep"],
   disclose: ["get_disclosure", "confirm_effective_date", "update_case_field", "hand_back_to_rep"],
   pay: ["send_esign_and_pay_link", "get_disclosure", "update_case_field", "hand_back_to_rep"],

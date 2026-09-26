@@ -1,38 +1,20 @@
 "use client";
-/** Top bar (title, call date, mode badge, plain-words notice, HUD), narrator strip, provenance banner, fallback / error banners. */
-import { AlertOctagonIcon, CircleAlertIcon, FlaskConicalIcon, HistoryIcon, HomeIcon, InfoIcon, PlayIcon, RadioIcon, RotateCcwIcon } from "lucide-react";
+/**
+ * Top bar (title, call date, plain-words notice, HUD), narrator strip and the fallback / error banners.
+ *
+ * The run's provenance lives in ONE place, `ProvenanceStrip` (PLATFORM §7.6): this bar carries no LIVE STT /
+ * CACHED REPLAY / RECORDED AI SESSION badge any more, and no provenance banner. The dev-only FIXTURE marker stays,
+ * because it says what is driving the page, not where the run comes from.
+ */
+import { AlertOctagonIcon, CircleAlertIcon, FlaskConicalIcon, HistoryIcon, HomeIcon, InfoIcon, PlayIcon, RotateCcwIcon } from "lucide-react";
 
 import { useBaton, shallowEqual } from "@/client/store/hooks";
-import { formatCallDate, formatMmSs, modeBadge, narrator, phaseCopy, planNotice, provenance, softNotice } from "@/client/store/selectors";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { formatCallDate, formatMmSs, narrator, phaseCopy, planNotice, softNotice } from "@/client/store/selectors";
 import { cn } from "@/lib/utils";
 
-import { BatonMark, LiveDot, ThemeToggle } from "../common/bits";
+import { BatonMark, ThemeToggle } from "../common/bits";
 import { useActions, useConsoleEnv } from "../common/console-context";
 import { LatencyHud } from "../hud/latency-hud";
-
-export function ModeBadge() {
-  const b = useBaton(modeBadge, shallowEqual);
-  const cls = {
-    live: "border-(--bt-live)/50 bg-(--verified-bg) text-(--verified-fg)",
-    cached: "border-(--bt-cached)/50 bg-(--bt-cached-bg) text-(--bt-cached)",
-    recorded: "border-(--bt-cached)/50 bg-(--bt-cached-bg) text-(--bt-cached) bt-hatch",
-  }[b.tone];
-  const Icon = b.tone === "live" ? RadioIcon : HistoryIcon;
-  return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <button type="button" className={cn("bt-display inline-flex h-7 shrink-0 items-center gap-1.5 rounded-md border px-2 text-[11px] font-bold tracking-wider focus-visible:ring-2 focus-visible:ring-(--ai) focus-visible:outline-none", cls)} aria-label={`${b.label}: ${b.tooltip}`}>
-          {b.tone === "live" ? <LiveDot className="text-(--bt-live)" /> : <Icon className="size-3.5" aria-hidden="true" />}
-          {b.label}
-        </button>
-      </TooltipTrigger>
-      <TooltipContent side="bottom" className="max-w-80">
-        {b.tooltip}
-      </TooltipContent>
-    </Tooltip>
-  );
-}
 
 export function TopBar() {
   const ctx = useBaton((s) => s.context);
@@ -65,7 +47,6 @@ export function TopBar() {
             <FlaskConicalIcon className="size-3.5" aria-hidden="true" /> FIXTURE
           </span>
         ) : null}
-        <ModeBadge />
         <div className="hidden md:block">
           <LatencyHud />
         </div>
@@ -164,35 +145,3 @@ export function Banners() {
     </>
   );
 }
-
-/**
- * The run's provenance as one line (TASKS-v2 WP7 "the provenance text as a banner"; WP7·3's provenance strip replaces
- * it). Each segment has a one-line tooltip.
- */
-export function ProvenanceBanner({ className }: { className?: string }) {
-  const env = useConsoleEnv();
-  const customerInput = env.inputs && !env.inputs.autopilot ? "mic" : "synthetic";
-  const segs = useBaton((s) => provenance(s, { customerInput }), shallowEqualSegments);
-  const ready = useBaton((s) => !!s.context);
-  if (!ready) return null;
-  return (
-    <div role="note" aria-label="Where this run comes from" className={cn("flex flex-wrap items-center gap-x-3 border-b border-(--bt-line) bg-(--bt-panel) px-4 text-[11.5px] leading-snug", className)}>
-      {segs.map((g) => (
-        <Tooltip key={g.key}>
-          <TooltipTrigger asChild>
-            <span tabIndex={0} className="inline-flex min-h-6 items-center gap-1 rounded focus-visible:ring-2 focus-visible:ring-(--ai) focus-visible:outline-none">
-              <span className="text-(--bt-muted)">{g.label}:</span>
-              <span className="font-semibold text-(--bt-ink)">{g.value}</span>
-            </span>
-          </TooltipTrigger>
-          <TooltipContent side="bottom" className="max-w-72">
-            {g.tooltip}
-          </TooltipContent>
-        </Tooltip>
-      ))}
-    </div>
-  );
-}
-
-const shallowEqualSegments = (a: ReturnType<typeof provenance>, b: ReturnType<typeof provenance>): boolean =>
-  a.length === b.length && a.every((x, i) => x.value === b[i]?.value && x.tooltip === b[i]?.tooltip);

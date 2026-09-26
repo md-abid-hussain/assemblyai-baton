@@ -9,6 +9,7 @@
  *   src/generated/calls.json            CallManifestEntry[] (featured, picker, hashed asset URLs, handoff, bundles)
  *   src/generated/scenarios.json        Scenario[] (one per kit scenario; the chosen take's overrides applied)
  *   src/generated/call-scenarios.json   callId → Scenario (each take's own overrides; the eval's truth)
+ *   src/generated/call-provenance.json  callId → recorded | simulated, for the provenance strip (§7.6)
  *   public/calls/<callId>/…             rep/customer µ-law + peaks, PUBLISHABLE takes only (others are pruned)
  *   public/data/cached-turns/<callId>.json   from the take's complete pc_ctx STT cache, publishable takes only
  *
@@ -19,12 +20,15 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 
+import type { CallProvenanceFile } from "../../src/core/contracts/ext/wp9-data";
 import type { CallManifestEntry, Scenario } from "../../src/core/contracts/scenario";
 import { callAssetFiles, stableJson, takeAudioOf } from "../../src/core/scenario/assets";
 import { planCalls, type TakeInput } from "../../src/core/scenario/build";
+import { isSimulatedTake, type KitSidecar } from "../../src/core/scenario/kit";
+import { RECORDED_PROVENANCE_DETAIL } from "../../src/core/scenario/sim-take";
 import { cachedTurnsFileOf, isCompleteCache } from "../../src/core/scenario/stt-cache";
 import {
-  loadKit, parseFlags, pruneDir, readLabels, readSplit, readSttCache, resolvePaths, sha256HexOf, str, writeIfChanged, type PipelinePaths,
+  loadKit, parseFlags, pruneDir, readLabels, readSplit, readSttCache, resolvePaths, sha256HexOf, str, takeDirOf, writeIfChanged, type PipelinePaths,
 } from "./lib/kit-io";
 
 export interface BuildOptions {
@@ -67,6 +71,15 @@ function findTailPack(outRoot: string, scenarioId: string): string | null {
   return existsSync(join(outRoot, "public", "tts", "voice", scenarioId, "manifest.json")) ? `/tts/voice/${encodeURIComponent(scenarioId)}/manifest.json` : null;
 }
 
+/** How each call came to exist, for the provenance strip (§7.6). A kit sidecar has no `provenance`: it is a recording. */
+function provenanceOf(sc: KitSidecar): CallProvenanceFile[string] {
+  const p = sc.provenance;
+  if (!isSimulatedTake(sc) || !p) {
+    return { humanHalf: "recorded", detail: RECORDED_PROVENANCE_DETAIL, scriptModel: null, ttsModel: null, voices: null, generatedAt: null };
+  }
+  return { humanHalf: "simulated", detail: p.detail, scriptModel: p.script_model, ttsModel: p.tts_model, voices: p.voices, generatedAt: p.generated_at };
+}
+
 export function buildCalls(paths: PipelinePaths, o: BuildOptions = {}): BuildReport {
   const log = o.log ?? (() => undefined);
   const kit = loadKit(paths);
@@ -77,7 +90,7 @@ export function buildCalls(paths: PipelinePaths, o: BuildOptions = {}): BuildRep
   const audioOf = new Map<string, ReturnType<typeof takeAudioOf>>();
   for (const sc of kit.sidecars) {
     if (sc.state !== "downloaded") continue;
-    const pcm = readSplit(paths.callsDir, sc.base);
+    const pcm = readSplit(takeDirOf(paths, sc), sc.base);
     if (!pcm) {
       warnings.push(`${sc.base}: split WAVs missing; skipped`);
       continue;
@@ -153,16 +166,21 @@ export function buildCalls(paths: PipelinePaths, o: BuildOptions = {}): BuildRep
   prune("public/data/cached-turns", cachedTurnFiles);
 
   const callScenarios = Object.fromEntries(plan.calls.map((c) => [c.entry.callId, c.scenario]));
+  const provenance: CallProvenanceFile = Object.fromEntries(plan.calls.map((c) => [c.entry.callId, provenanceOf(c.sidecar)]));
   write("src/generated/calls.json", stableJson(calls));
   write("src/generated/scenarios.json", stableJson(plan.scenarios));
   write("src/generated/call-scenarios.json", stableJson(callScenarios));
+  write("src/generated/call-provenance.json", stableJson(provenance));
 
   const featured = calls.filter((c) => c.featured);
+  const simulated = Object.values(provenance).filter((p) => p.humanHalf === "simulated").length;
   log(
     `calls:build  ${kit.scenarios.length} scenarios, ${kit.sidecars.length} sidecars → ${calls.length} usable takes ` +
       `(${calls.filter((c) => c.publishAudio).length} published, ${calls.filter((c) => c.inEval).length} in eval, ` +
-      `${calls.filter((c) => c.picker === "main").length} main / ${calls.filter((c) => c.picker === "more").length} more), ` +
-      `featured: ${featured[0]?.callId ?? "none"}; ${changed.length} file(s) ${o.check ? "stale" : "changed"}`,
+      `${calls.filter((c) => c.picker === "main").length} main / ${calls.filter((c) => c.picker === "more").length} more, ` +
+      `${simulated} simulated), featured: ${featured[0]?.callId ?? "none"}` +
+      `${featured[0] && provenance[featured[0].callId]?.humanHalf === "simulated" ? " (SIMULATED)" : ""}; ` +
+      `${changed.length} file(s) ${o.check ? "stale" : "changed"}`,
   );
   return { calls, scenarios: plan.scenarios, warnings, changed };
 }
@@ -170,14 +188,21 @@ export function buildCalls(paths: PipelinePaths, o: BuildOptions = {}): BuildRep
 async function main(): Promise<void> {
   const f = parseFlags(process.argv.slice(2), {
     "calls-dir": "string",
+    "sim-takes-dir": "string",
     "scenarios-dir": "string",
     out: "string",
     "data-root": "string",
     featured: "string",
     check: "boolean",
   });
-  const paths = resolvePaths({ callsDir: str(f["calls-dir"]), scenariosDir: str(f["scenarios-dir"]), outRoot: str(f.out), dataRoot: str(f["data-root"]) });
-  console.log(`inputs: calls=${paths.callsDir} scenarios=${paths.scenariosDir}\noutputs: ${paths.outRoot} (data: ${paths.dataRoot})`);
+  const paths = resolvePaths({
+    callsDir: str(f["calls-dir"]),
+    simTakesDir: str(f["sim-takes-dir"]),
+    scenariosDir: str(f["scenarios-dir"]),
+    outRoot: str(f.out),
+    dataRoot: str(f["data-root"]),
+  });
+  console.log(`inputs: calls=${paths.callsDir} sim-takes=${paths.simTakesDir} scenarios=${paths.scenariosDir}\noutputs: ${paths.outRoot} (data: ${paths.dataRoot})`);
   const r = buildCalls(paths, { ...(str(f.featured) ? { featuredScenarioId: str(f.featured)! } : {}), check: f.check === true, log: (l) => console.log(l) });
   for (const w of r.warnings) console.warn(`warn: ${w}`);
   for (const c of r.changed) console.log(`  ${f.check ? "stale" : "wrote"} ${c}`);

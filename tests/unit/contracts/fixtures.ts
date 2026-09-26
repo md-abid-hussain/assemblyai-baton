@@ -2,7 +2,7 @@
  * Valid sample values for every contract (used by the zod round-trip tests). Other WPs may import these as
  * starting points for their own fixtures; they are fictional (s01: Priya adds Maya to the 2021 Civic).
  */
-import { FIELD_IDS, REQUIRED_FIELDS, type FieldId } from "../../../src/core/intents/add-driver.fields";
+import { FIELD_IDS, REQUIRED_FIELDS, type BatonFieldId as FieldId } from "../../../src/core/intents/add-driver.fields";
 import type {
   CallLabels, CallManifestEntry, CaseState, CompiledTakeover, DrainReport, Evidence, FactEvent, FieldState, PolicyRecord,
   QaResult, RunPlan, Scenario, SweepPoint, TurnInput, VaFunctionTool,

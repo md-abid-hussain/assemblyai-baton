@@ -1,0 +1,109 @@
+{
+  "kit": "baton-recording-kit",
+  "sidecar_version": 1,
+  "base": "s01_sim_20260925T110000Z",
+  "created_at": "2026-09-25T11:00:00.000Z",
+  "updated_at": "2026-09-25T11:00:00.000Z",
+  "state": "downloaded",
+  "provenance": {
+    "kind": "simulated",
+    "detail": "Simulated audio: script by gpt-6-luna, voices by gpt-4o-mini-tts. Fictional people.",
+    "script_model": "gpt-6-luna",
+    "tts_model": "gpt-4o-mini-tts-2025-12-15",
+    "voices": {
+      "rep": "cedar",
+      "customer": "marin"
+    },
+    "generated_at": "2026-09-25T11:00:00.000Z",
+    "replaced_by_real_takes": true
+  },
+  "scenario": {
+    "id": "s01",
+    "title": "Add 17-year-old daughter Maya to the Civic (golden demo path)",
+    "language": "en",
+    "file": "data/scenarios/s01.json",
+    "sha256": "cc742af12d6461c22cf3201b0e38e60522a1322b92d96702e4ada6f4c108a8bd"
+  },
+  "take": 1,
+  "review": {
+    "status": "keep",
+    "notes": [
+      "SIMULATED take: no human was recorded.",
+      "Simulated audio: script by gpt-6-luna, voices by gpt-4o-mini-tts. Fictional people.",
+      "It is a stand-in for the flagship path and is dropped automatically as soon as a real take of this scenario exists."
+    ],
+    "fact_overrides": {},
+    "status_overrides": {}
+  },
+  "channel_map": {
+    "1": "rep",
+    "2": "customer"
+  },
+  "dialed_first": "rep",
+  "participants": {
+    "rep": {
+      "key": "simulated-rep",
+      "display_name": "Daniel Reyes",
+      "phone_masked": null,
+      "consent": {
+        "recording": true,
+        "scope": "public"
+      },
+      "voice": "cedar"
+    },
+    "customer": {
+      "key": "simulated-customer",
+      "display_name": "Priya Raman",
+      "phone_masked": null,
+      "consent": {
+        "recording": true,
+        "scope": "public"
+      },
+      "voice": "marin"
+    }
+  },
+  "consent": {
+    "all_recording_consent": true,
+    "publishable": true
+  },
+  "twilio": {
+    "call_sid": null,
+    "from_masked": null,
+    "call_status": null,
+    "recording_sid": null,
+    "recording_status": null,
+    "recording_duration_s": 135.5,
+    "recording_channels": 2,
+    "recording_source": "simulated"
+  },
+  "files": {
+    "stereo": "data/sim-takes/raw/s01_sim_20260925T110000Z.wav",
+    "rep": "data/sim-takes/split/s01_sim_20260925T110000Z_rep.wav",
+    "customer": "data/sim-takes/split/s01_sim_20260925T110000Z_customer.wav"
+  },
+  "audio": {
+    "source_sample_rate": 24000,
+    "source_channels": 2,
+    "source_format": "PCM 16-bit",
+    "output_sample_rate": 8000,
+    "duration_s": 135.5,
+    "channels": {
+      "rep": {
+        "rms_dbfs": -24,
+        "peak_dbfs": -3,
+        "active_ratio": null,
+        "first_active_s": null,
+        "clipped_ratio": 0
+      },
+      "customer": {
+        "rms_dbfs": -24.9,
+        "peak_dbfs": -3,
+        "active_ratio": null,
+        "first_active_s": null,
+        "clipped_ratio": 0
+      }
+    },
+    "overlap_ratio": 0,
+    "warnings": []
+  }
+}

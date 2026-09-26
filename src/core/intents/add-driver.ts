@@ -14,7 +14,7 @@ import {
   STATE_NAMES, spokenChars, spokenDate, spokenDob, spokenMoney, spokenMonthly, spokenZip, stateName,
 } from "../compiler/spoken";
 import {
-  DISCOUNT_VALUES, FIELD_LABEL, LICENSE_STATUSES, OPERATOR_TYPES, RELATIONS, US_STATES, type DiscountValue,
+  DISCOUNT_VALUES, LICENSE_STATUSES, OPERATOR_TYPES, RELATIONS, US_STATES, fieldLabelOf, type DiscountValue,
   type LicenseStatus, type OperatorType, type Relation,
 } from "./add-driver.fields";
 
@@ -297,7 +297,8 @@ export function normalizeField(field: FieldId, raw: string | number | boolean | 
   if (raw === null || raw === undefined) return null;
   const r = String(raw).trim();
   if (!r) return null;
-  let norm: string | null;
+  // P4.7: FieldId is any id now, so the switch is no longer exhaustive - a relay field has no legacy normalizer.
+  let norm: string | null = null;
   switch (field) {
     case "driver_full_name": norm = normName(r); break;
     case "driver_dob": norm = normDob(r, ctx.callDate); break;
@@ -353,6 +354,7 @@ export function displayValue(field: FieldId, norm: string, policy: Pick<PolicyRe
     case "premium_new_monthly_usd":
     case "premium_change_monthly_usd": return spokenMonthly(norm);
     case "amount_due_today_usd": return spokenMoney(norm);
+    default: return norm;   // P4.7: not a Baton field; the normalized value is the display
   }
 }
 
@@ -424,7 +426,7 @@ export function confirmPhrase(field: FieldId, value: string, pc: PhraseCtx): str
     case "effective_date": return `the change should start ${spokenDate(value)}`;
     case "license_number": return `${d}'s license number is ${spokenChars(value)}`;
     case "driver_age": return `${d} is ${value}`;
-    default: return `the ${FIELD_LABEL[field].toLowerCase()} is ${displayValue(field, value, pc.policy, pc.raw)}`;
+    default: return `the ${fieldLabelOf(field).toLowerCase()} is ${displayValue(field, value, pc.policy, pc.raw)}`;
   }
 }
 
@@ -443,7 +445,7 @@ export function askPhrase(field: FieldId, pc: PhraseCtx): string {
     case "garaging_zip": return "the ZIP code where the car is kept overnight";
     case "effective_date": return "the date you'd like this change to start";
     case "license_number": return `${d}'s license number`;
-    default: return `the ${FIELD_LABEL[field].toLowerCase()}`;
+    default: return `the ${fieldLabelOf(field).toLowerCase()}`;
   }
 }
 

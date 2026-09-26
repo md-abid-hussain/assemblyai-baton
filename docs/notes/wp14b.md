@@ -423,3 +423,309 @@ with the reasons above.
 4. The compile port needs no further wiring: binding the kernel switches every relay case to
    `compiled.takeover(...)` on its own. Acceptance 5's parity check is then "an s01/s02/s05 pass compiles
    deep-equal through the port and through WP1", which `protocol.compile.relayVersionId` makes easy to assert.
+
+---
+
+## WP14b·3: the widening lands, the Dental server path, presets, Express re-extraction, kernel parity (D2 Sat Sep 26, ≈11:55–13:10 IST)
+
+Seven commits, `2dcc272`…`65abfd0`. `main` was already merged (0 behind at start and at finish); `npm run migrate`
+was a no-op (`baton_wp14b`, 25 public tables). The unit was resumed after an interruption: four modified files and
+one untracked `src/server/engine/mode.ts` were on disk, typechecked clean, and were committed as `e420d27` after
+review rather than rewritten.
+
+### Done
+
+**1. The relay case engine (`2dcc272`) — the P§4.7 widening is what unblocked it.**
+`src/server/cases/relay-engine.ts` wraps WP1's `CaseEngine` with ONE version's `IntentSpec` and the compiled relay's
+dynamic extractor. Because WP14a·3 put the optional trailing `spec?: IntentSpec` on every core function, the wrapper
+adds no new core path — it only chooses the spec. With it:
+
+- **the non-Baton gate in `createRelayCase` is gone.** A relay case stores an `AccountRecord` with `$kind:"account"`
+  in `cases.policy` (P§4.2 `storedAccount`) and `intent:"relay"`; `schema.ts:50`'s enum gained `"relay"`, the
+  one-word change WP14a·4 asked for. The column is text with no DB check, and **`drizzle-kit generate` still says
+  "No schema changes"** — re-verified this unit, so acceptance 1 is unaffected;
+- `accountFor()` reads either shape, so the stored row flows straight through the unchanged `PolicyRecord`
+  parameter. A Baton row still maps with `policyToAccount`, which is why the flagship is byte-identical with a spec
+  or without one;
+- `extractor.version` is the compiled relay's `versionId`, not `EXTRACTOR_VERSION_V3`.
+
+**2. Express re-extraction (`c990cef`, P§7.5).** That version pin is the point: a relay whose fields differ has a
+different prompt and a different strict schema, so WP9's `pc_ctx` cache of a recorded call must not be served to it.
+`prefill.ts` compares the two ids and, for a relay run, re-extracts the cached turns in ONE batched call instead. For
+the flagship compiled through the kernel the generated prompt and schema are byte-identical to V3, so the ids are
+equal and the caches keep being served — no regression and no extra spend on the Baton path.
+
+**3. The Dental server path end to end (`0022484`), `tests/unit/server/engine/dental.test.ts` (238 lines).** Real
+Postgres, the REAL WP14a kernel and the REAL WP1 case engine; the only fakes are the upstreams (a local `Extractor`
+returning a patch; no audio, STT or VA). It pins the relay row, the Dental `UiSpec`/listening/provenance with
+`policy: null`, extraction through `compiled.extractor` (Dental field ids in the derived state, Baton's 21 absent), a
+Baton case on the same server still on the flagship engine, and **the "add a field" preset** (P§7.5.3) really adding
+`insurance_carrier`, with an extractor pin that differs from the base relay's — which is what makes Express
+re-extract instead of serving a cache. That is acceptances 2 ("their preset versions run") and 4.
+
+**4. `RELAY_ENGINE` (`e420d27`, `src/server/engine/mode.ts`, P§4.6).** `legacy` is the default **and the submission
+setting** (P§0 P3). Under `kernel`, `kernelPinnedBaton` pins a plain Baton run to the seeded flagship version, so the
+case records `relay_version_id` and every engine call passes `compiled.spec` — while the row stays a *Baton* row
+(`intent:"add_driver"`, a `PolicyRecord` in `cases.policy`), because the parity claim is that the blueprint
+reproduces the flagship, not that it replaces its data. Read from `process.env` (not `EnvSchema`: `env.ts` is WP12's;
+`requests/wp14b-to-wp12.md`), and an unknown value logs once and falls back to `legacy`.
+
+**5. The stored account through the two remaining readers (`e420d27`).** `takeover-compile.ts` reads the stored
+account straight back instead of guessing, and `run-service.ts` takes `repFirstName` through `accountFor`.
+
+**6. `buildQaInput`'s relay half (`e420d27`, `4710dd6`) — acceptance 6.** `src/server/engine/qa-context.ts` reads the
+three sets `build-input.ts` used to hard-code off `CompiledRelay`: `toolNames` (the union over `STAGES` of
+`compiled.tools(stage)`), `disclosureIds` (`compiled.ui.disclosures`, blueprint order) and `spec` (for
+`entityFields`). `buildQaInput(sources, relay?)`, `toolCallsOf(t, known?)`, `disclosuresOf(…, relay?)` and
+`keytermsOf(…, spec?)` all take it as an optional trailing argument, so **omitted, every output is Baton's byte for
+byte** — WP18's `tests/unit/server/verify/build-input.test.ts` passes untouched.
+
+**7. Kernel parity over Postgres (`3e52c45`) — acceptance 5.** `tests/unit/server/engine/parity.pg.test.ts`.
+
+### Decisions
+
+- **`relayTakeoverCompile` with no kernel bound now THROWS `E_MAINTENANCE` instead of returning null.** Until this
+  unit the only relay that could create a case was the flagship, whose WP1 compile is the parity target, so falling
+  back was correct. Now a Dental case exists, and a Baton compile of one would hand the Voice Agent Baton's prompt
+  and Baton's tools for a dental booking — a wrong result where a 503 is the right one. The test that asserted the
+  old behaviour was rewritten into two, so the Baton half of the claim is still pinned.
+- **The QA context fails SOFT, the run path fails HARD.** `relayQaContextFor` answers null for a Baton case, an
+  unwired relay graph *and* a compile failure. QA runs after the call, on a pass that already happened, so the worst
+  a missing context can do is score a relay run with Baton's sets; losing the whole verification would be strictly
+  worse. `relayTakeoverCompile` is the opposite, for the reason above. Both are tested.
+- **A defect found and fixed: every Dental run was losing its HUD latency.**
+  `TakeoverMetricsReadSchema.disclosures` is a `partialRecord` over Baton's two `DisclosureKind`s, so a relay's own
+  ids fail the key — and because the failure is at the top-level `safeParse`, `readMetrics` returned `{}` and `hud`
+  went with it. `readMetrics` now retries once without the `disclosures` key; a Baton run never reaches the retry.
+  The relay's texts are read from the raw value by `disclosuresOf`. Both halves are pinned by tests, and the widening
+  that would delete both workarounds is `requests/wp14b-to-wp18.md` §10.
+- **`QaSources.policy` and `keytermsOf`'s `policy` widened to `PolicyRecord | AccountRecord`.** A relay case's row
+  really does hold an account; typing it as a `PolicyRecord` would have been a lie the compiler could not catch.
+  `Wp8QaInput.policy` is unchanged: `buildQaInput` converts with WP14a's `policyFor`, which returns a `PolicyRecord`
+  untouched.
+- **The parity test asserts the listed difference rather than ignoring it.** `promptVersion` must match
+  `/^relay:[0-9a-f]{8}$/` and must NOT equal WP1's; everything else is deep-equal.
+- **A hard-coded `deployId` was removed from two test files.** The shared pre-commit hook blocks any staged literal
+  equal to a `.env` value, and that string happened to be this worktree's `BATON_DEPLOY_ID`. The tests now use
+  `"test-wp14b-env"`, and `moderation.ts`'s doc comment no longer quotes the local value. The hook was never
+  bypassed, here or anywhere in this unit.
+
+### [VERIFY] results
+
+**None are WP14b's.** SAAS §16's table has fifteen rows, owned by WP19·2 (4), WP19·3, WP22·1 (2), WP21·1 (3),
+WP23·1 (2), WP15·1, WP23·2 and WP12. Checked at the start of the unit; nothing to record, and nothing in this unit
+depends on a library option taken from a docs summary.
+
+### Tests
+
+`npm run typecheck` clean. **`npm test` green: 2347 passed, 0 failed, 0 skipped, 169 files** (the full
+`npx vitest run --maxWorkers=4`, which also picks up the four `tests/e2e` files, is 2352 passed | 9 skipped). The
+connection-pool flake of `requests/wp14b-to-wp12.md` §6 did not reproduce in either run.
+
+- **`tests/unit/server/engine/parity.pg.test.ts` (13, new, Postgres, $0)** — the REAL `data/relays/*.json` through
+  `FsGallerySource`, the REAL kernel binding, the real registry, the real LRU factory, the real port:
+  - the switch: unset, blank and a TYPO (`kernal`) all read `legacy`; `kernel` reads `kernel`;
+  - `legacy`: a plain Baton case keeps `relay_version_id` null and a v1 response;
+  - `kernel`: the same request pins the seeded flagship version id, and `intent` and the `PolicyRecord` are untouched;
+  - **acceptance 5: s01 × s02 × s05 at `early`/`middle`/`handoff` — nine points, each deep-equal to WP1's
+    `compileTakeover` apart from `promptVersion`**;
+  - the second `forVersion` is the same object, so nine points cost one compile.
+  - *Note for anyone copying the env helper:* it `await`s inside the `try`. The synchronous version restored
+    `RELAY_ENGINE` before the in-flight route read it, and the pin silently fell back to legacy.
+- **`tests/unit/server/engine/qa-context.test.ts` (13, new, no DB, $0)** — the real kernel over the mini Dental
+  blueprint. Every case is a pair, with and without the context: the disclosure ids (`deposit_terms` vs
+  `premium_change`), the tool names (`send_deposit_link` kept / `confirm_effective_date` dropped, and the reverse),
+  `made_up_tool` dropped either way (P§4.7 widened `ToolNameSchema`, so the old `ToolNameSchema.safeParse` would have
+  let it through), the entity fields (`patient_name` vs `driver_full_name`), the stored account arriving at QA as a
+  `PolicyRecord`, the HUD-latency rescue, and `relayQaContextFor`'s three null paths plus the compile-failure path.
+  It also pins that `log_crm_note` is **absent**: the blueprint declares that connector but no stage offers it.
+- **`tests/unit/server/engine/dental.test.ts` (238 lines, Postgres)** and the `runs.test.ts` additions for the lifted
+  gate, from the earlier commits of this unit.
+- `takeover-compile.test.ts`: the "no kernel is null" case became two (throw for a relay case, null for a Baton one).
+
+### Live spend
+
+**$0.** No AssemblyAI, no OpenAI, no Zerops, no deploy, no production HTTP. The parity test seeds the gallery with a
+pre-clearing moderator, so no relay text reached `omni-moderation-latest` (which is free anyway, but was not called).
+`RUN_LIVE` was never set. Running total for WP14b across four sittings: **$0.00** of the $0.05 budget.
+
+### What the integrator must do
+
+1. Merge `wp/wp14b` (WP14b paths, plus `src/server/cases/**` and `src/server/runs/**`, WP14b's since G1, and
+   `src/server/takeovers/**` since G2). No new env vars and no new GUI secrets.
+2. **`RELAY_ENGINE` is not in `EnvSchema`** — it is read from `process.env`, because `src/server/env.ts` is WP12's.
+   `requests/wp14b-to-wp12.md` asks for the line. **Leave it unset for the submission** (P§0 P3: `legacy`).
+3. **`requests/wp14b-to-wp18.md` §9 is the last of acceptance 6.** Three edits in `verify-takeover.ts` (WP18's file)
+   pass the relay QA context into the verify job. Without them a Dental run is still scored with Baton's tool names,
+   entity fields and disclosure kinds. §10 is the contract widening that would delete two workarounds in
+   `build-input.ts`.
+4. Items 3 and 5 of the WP14b·2 list still stand (WP17's `sims` port is bound since G2b; the
+   `requests/wp14b-to-wp12.md` §6 pool note).
+5. Nothing under `drizzle/**` changed. `0001_relays.sql` is unchanged, and `drizzle-kit generate` reports no diff
+   after the `cases.intent` widening.
+
+### Acceptance status (TASKS-v2 WP14b)
+
+| # | Item | Status |
+|---|---|---|
+| 1 | Migration applies, second run a no-op, no `drizzle-kit` diff | **PASS**, re-verified after the `intent` widening |
+| 2 | Gallery relays read-only, but their preset versions run | **PASS** (the "add a field" preset runs end to end) |
+| 3 | Seed: two boots create 0 new versions | **PASS** (unchanged since ·1) |
+| 4 | Dental `UiSpec`/listening/provenance + `<intent>_patch`; flagged moderation blocks the run | **PASS** |
+| 5 | Kernel parity over Postgres | **PASS** — 9 points, deep-equal apart from the listed `promptVersion` |
+| 6 | WP8's QA fixture equal through `buildQaInput` | **PASS** for the contract (WP18's suite is green untouched, and the relay half is built and tested). The three-line call-site wiring is `requests/wp14b-to-wp18.md` §9, because `verify-takeover.ts` is WP18's file |
+
+**T3 is complete**, and with it TASKS-v2 WP14b (T1, T2, T3).
+
+### Where WP14b·4 starts
+
+WP14b·4 is the SaaS adoption (TASKS-v3 §7, +0.5 T, D2 ≈14:00–16:30), which is new work rather than a continuation:
+
+1. **`RelaySourceStore`** in `src/server/relays/**` and `GET/PUT /api/relays/:id/source` (TASKS-v3 §6, §3 priority 8).
+   WP15·1 saves through `PUT /api/relays/:id/draft` until it lands.
+2. **`GuestSeeder`** (§3 priority 3): the guest org seeded with Baton pinned and a Dental copy carrying a YAML source.
+   WP19·2 ships the default no-op seeder, so this can land after C3b without blocking it.
+3. **Tenancy** (§3 priority 5): `requirePrincipal` on every org route, `cases.org_id`, and WP14b's rows in the
+   cross-tenant suite. Every route this unit touched is still visitor-scoped; none gained or changed an org route.
+4. Before any of it: `git merge main` for WP19·2's `0002`/`0003` and its one re-export line in `schema.ts`
+   (TASKS-v3 §6 carve-out 2) — WP14b must not have the file open when that line goes in.
+
+---
+
+## WP14b·4: SaaS adoption — tenancy, the source store, the guest seeder, usage (D2 Sat Sep 26, ≈14:00–16:30 IST)
+
+TASKS-v3 §7 WP14b·4, §3 priorities 3, 5 and 8, §5 cell "D2 13:00–17:00". Seven commits on `wp/wp14b`
+(`d0e6d2d` → `f87bdff`), `main` merged in at `2d7258c` (C3b: WP19's `0002_saas` / `0003_audit_guard` and the one
+`schema.ts` re-export line — the §6 carve-out 2 landed cleanly and WP14b did not have the file open).
+
+### Done
+
+1. **Tenancy on every relay route.** `workspaceFor` → `relayPrincipal(req, perm)` → `requirePrincipal`
+   (`src/server/relays/index.ts`). All ten handlers in `src/server/relays/routes.ts` go through it —
+   list, create, get, update, delete, draft, versions, compiled, and the two new source handlers — so there is
+   **one** place that decides a workspace for `/api/relays/**`, which is what makes the SAAS §11 manifest rows
+   assertable rather than ten separate accidents. `SaasError` maps through the existing `relayRoute` wrapper.
+   A principal with no org is `E_AUTH_REQUIRED` ("Start a free workspace to continue"), not a 500.
+
+2. **`RelaySourceStore`** (`src/server/relays/source-store.ts`, `PgRelaySourceStore`) over WP19's `0002` columns
+   (`relays.draft_source` / `draft_source_format`, `relay_versions.source` / `source_format`), plus
+   **`GET/PUT /api/relays/:id/source`**. `get` falls back to serializing the canonical draft with `stored:false`,
+   so the Code tab opens on **any** relay, not only on ones authored as code. `save` is conflict-checked on
+   `expectedRev`, never merging. `create` is the CLI's first `push` / the Studio's Import.
+   `captureVersionSource` keeps a version's text as it stood at snapshot time (wired into the snapshot route),
+   and a dedup'd snapshot leaves the existing version's source alone.
+
+3. **`GuestSeeder`** (`src/server/relays/guest-seeder.ts`, `PgGuestSeeder`): one read, one insert, no compile, no
+   moderation, no version row — the Dental gallery relay cloned as "Dental deposit (your copy)" with secrets
+   stripped and a real YAML source under a two-line header. Baton is **pinned, not cloned** (WP19 does that in
+   the org-creating transaction). A missing template is a warn and an empty result, never a throw.
+
+4. **`/api/cases`**: `org_id` and `created_by_user_id` from the principal (`src/server/cases/tenancy.ts`), the
+   token's `org` claim, and the daily live-run check that **reports rather than throws** — over budget is the
+   labelled replay, 200, not a 402.
+
+5. **The terminal transaction** (`src/server/takeovers/terminal-usage.ts`): `run.completed` +
+   `live_run` + `ai_minutes`, inside `store.end`'s transaction, guarded by its `first` flag *and* by a
+   deterministic idempotency key per write.
+
+6. **The relay count limit** on create / clone / import, plan-aware under `orgs` and the v2 cap under `legacy`,
+   with the **gallery clone exempt** as in v2.
+
+7. **The SAAS §9 audit rows**: `relay.created` / `.cloned` / `.deleted` / `.source_saved`, the actor always taken
+   from the principal and never from a body field.
+
+8. **`installRelaySaasPorts()`** — see decision 5; this was the one real defect found in the second pass.
+
+### Decisions
+
+1. **Everything is additive and inert under `TENANCY_MODE=legacy`.** A device visitor's `orgId` is
+   `ws_<visitorId>`, which is the workspace the v2 code already used, so stamping it changes nothing. That is why
+   the v2 route tests pass **unchanged** rather than having been adjusted — the acceptance line asks for exactly
+   that, and an adjusted test would have hidden a regression.
+
+2. **An audit or usage write that fails is logged, not thrown.** A demo must never lose a save because an audit
+   row could not be written, and a takeover must never lose its end because a metering row could not be. The
+   takeover row is the source of truth; usage is derived and rebuildable.
+
+3. **A comment-only edit changes the text and not the hash.** The canonical blueprint stays `relays.draft` and
+   the version hash stays `sha256(canonicalJson(bp))`; `draft_source` is the author's text *beside* it. This is
+   what keeps formatting churn from creating versions, and it is only true on the `/source` path — `/draft`
+   takes a blueprint and loses the file. WP15 has been told (`requests/wp14b-to-wp15.md`).
+
+4. **Lint errors save; syntax, zod and credential errors do not.** Lint blocks Test and Publish, not Save
+   (P§3.4), so a 200 can still carry diagnostics.
+
+5. **The port registry is populated at boot, not on first relay touch.** `installRelaySaas` runs as a side effect
+   of building the relay graph, which is lazy. `/api/guest/start` (WP19's) reads `getGuestSeeder()` and **never
+   touches the relay graph** — so on a cold container whose first request is a guest start, the registry still
+   held WP19's no-op default and the guest got an empty workspace: no Dental copy, no YAML source. That is the
+   judge path and the landing CTA's background start. It is invisible in tests and in any warm process, which is
+   why it survived the first pass. `installRelaySaasPorts()` (exported from `src/server/relays/index.ts`,
+   idempotent, a re-register rather than a build) closes it, and `src/instrumentation.ts` needs one block beside
+   `[WIRE-PUBLISHING]` — integrator action 1 below.
+
+6. **`created_by_user_id` is provenance only.** SAAS §6.1 forbids authorizing off it; nothing in WP14b's code
+   does, and the request file says so explicitly so WP19·3's manifest can assert it.
+
+7. **`POST /api/cases` is deliberately not a 401 row** in the tenancy manifest: `/call/[id]` has no account
+   behind it, so `caseTenantOf` uses `allowVisitor: true`. Written up as an explicit exception row rather than
+   an omission, so a later change that starts 401ing visitors fails a test instead of the demo.
+
+### [VERIFY] results
+
+**None are WP14b's** — re-checked against SAAS §16 at the start of this unit, as in ·3. The fifteen rows belong
+to WP19·2 (4), WP19·3, WP22·1 (2), WP21·1 (3), WP23·1 (2), WP15·1, WP23·2 and WP12. The nearest neighbour is
+WP23·1's `yaml` row, and it stays WP23's: the source store does not parse YAML itself, it calls the codec
+(`validateSource` / `serialize` / `convert` from `src/core/relay-code`), so the server is authoritative without
+a second parser and without a second `[VERIFY]`.
+
+### Tests
+
+`npm run typecheck` clean. **`npm test` green: 174 files, 2420 tests, 0 failed.**
+
+- **`tests/unit/server/relays/saas.test.ts` (16, Postgres, $0)** — relay-as-code (generated vs stored, the
+  comment-only edit, `?format=` conversion, the 409, the 422, lint-still-saves), the cross-org rows for relays
+  and source, the gallery read-only row, the seeder, the plan check in both modes, the audit coalescing window,
+  the lifecycle rows, and the port installation of decision 5.
+- **`tests/unit/server/takeovers/terminal-usage.pg.test.ts` (4, Postgres, $0)** — the acceptance line: a replayed
+  terminal transition emits **one** `run.completed` and **one** of each usage row; simulated and replay sources
+  are recorded at quantity 0.
+- `tests/unit/server/relays/migration.test.ts` — teardown parallelised (`cd2030f`); the 20 s `afterAll` budget
+  was the suite's contention peak and the cause of the `roundtrip.test.ts` timeout WP14b·4 first reported to
+  WP23 as a blocker. Corrected in that request file to hardening: three consecutive full runs are green, and so
+  were both runs of this pass.
+
+### Live spend
+
+**$0.** No `RUN_LIVE`, no AssemblyAI, no OpenAI, no Polar. Every new test is Postgres-only against
+`baton_wp14b`; the moderation call is stubbed as before. Cumulative WP14b live spend is unchanged from ·3.
+
+### What the integrator must do
+
+1. **`src/instrumentation.ts`: add the `[WIRE-RELAY-SAAS]` block** (verbatim in
+   `docs/notes/requests/wp14b-to-wp19.md` §1). Without it a cold container's first `/api/guest/start` seeds with
+   the no-op default and the guest workspace is empty. Cheap at boot — `getDb()` wraps a `pg` `Pool` that does
+   not connect until its first query, and the rest of the graph is object construction. This is the single
+   highest-value line in the unit and the easiest to forget, because nothing goes red without it.
+2. **WP19·3** takes the manifest rows and the `/api/cases` exception from `requests/wp14b-to-wp19.md` §2–§3.
+3. **WP15·1** can move Save from `PUT /draft` to `PUT /source` (`requests/wp14b-to-wp15.md`, last section). Both
+   routes keep working; only `/source` keeps the author's text. If the Studio would rather not round-trip an
+   Import through a parse, WP14b can add `POST /api/relays {kind:"source"}` — the store method already exists.
+4. **WP23** still has the optional `120_000` timeout on `roundtrip.test.ts` (hardening, nothing is red).
+
+### Acceptance status (TASKS-v3 §7 WP14b·4)
+
+| # | Acceptance line | Status |
+|---|---|---|
+| 1 | The v2 route tests pass unchanged in legacy mode | **PASS** — unchanged, not adjusted; the whole suite is green |
+| 2 | The tenancy manifest rows for relays, source and cases pass in orgs mode | **PASS for the behaviour**, pinned in `saas.test.ts`. The manifest file itself is WP19·3's and does not exist yet; its rows are handed over in `requests/wp14b-to-wp19.md` §2–§3 |
+| 3 | The events and usage rows are idempotent on a replayed terminal transition | **PASS** — `terminal-usage.pg.test.ts`, guarded twice (the `first` flag and a deterministic idempotency key) |
+
+### Where WP14b·5 starts
+
+WP14b has no ·5 in TASKS-v3 §5. If a slot opens, in value order:
+
+1. `POST /api/relays { kind: "source" }` (integrator action 3) — small, and it removes a round-trip from Import.
+2. The `/source` rows of the P2 read endpoints in SAAS §6.2 (`/relays/{id}/source` for the public API, WP22's
+   surface) — the store is already the right shape for it.
+3. Nothing else is owed. TASKS-v2 WP14b (T1–T3) completed at ·3, and WP14b·4's three acceptance lines are met.

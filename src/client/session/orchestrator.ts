@@ -14,7 +14,7 @@
  */
 import "client-only";
 
-import type { CreateCaseResponse } from "@/core/contracts/api";
+
 import type { CaseState, Channel, Evidence } from "@/core/contracts/case";
 import { CachedTurnsFileSchema, type CachedTurnsFile } from "@/core/contracts/eval";
 import { BatonError, isBatonError, type ErrorCode } from "@/core/contracts/errors";
@@ -27,11 +27,12 @@ import type {
   AudioEngine, CallPlayback, CaseSync, CustomerInput, EventSink, MicSource, PageLifecycle, PhoneState, SttChannelManager, Suggestion,
 } from "@/core/contracts/services";
 import type { TurnInput } from "@/core/contracts/turns";
+import type { ProvenanceStrip } from "@/core/contracts/v2/api";
 
 import { expressStart, EXPRESS_LEAD_MS, type ExpressStart } from "../stt/express";
 import type { ConsoleStore } from "../store/store";
 import type { ConsoleActions } from "./actions";
-import type { SessionApi } from "./api";
+import type { CreatedCase, SessionApi } from "./api";
 import { createEvidencePlayer } from "./evidence";
 import { provisionalQa } from "./provisional-qa";
 
@@ -51,7 +52,7 @@ const CHANNELS: readonly Channel[] = ["rep", "customer"];
 export interface SessionContext {
   /** The page sink: the store, plus `stt.final` → `TakeoverController.noteFinal` (WP5 §6.2). */
   sink: EventSink;
-  create: CreateCaseResponse;
+  create: CreatedCase;
   plan: RunPlan;
   call: CallManifestEntry;
   startOffsetMs: number;
@@ -126,6 +127,17 @@ export interface SessionControllers {
 
 export interface CallSessionOptions {
   callId: string;
+  /**
+   * The relay version this run pins (PLATFORM §7.6 `RelayConsole`): a gallery relay, a Try-an-edit preset or a
+   * draft. Null (the flagship) creates the case exactly as before.
+   */
+  relayVersionId?: string | null;
+  /**
+   * The call manifest's own provenance (`src/generated/call-provenance.json`, read on the server by the page).
+   * It overrides the server's human-half segment, so a generated take is never labelled a recording (WP9 contract
+   * `ext/wp9-data.ts`; G2b open item §6.1).
+   */
+  callProvenance?: { humanHalf: "recorded" | "simulated"; detail: string } | null;
   api: SessionApi;
   store: ConsoleStore;
   controllers: SessionControllers | null;
@@ -147,7 +159,7 @@ type StartKind = "express" | "full";
 
 export class CallSession implements ConsoleActions {
   private readonly now: () => number;
-  private create: CreateCaseResponse | null = null;
+  private create: CreatedCase | null = null;
   private plan: RunPlan | null = null;
   private deployId: string | null = null;
   private prefillUntilMs = 0;
@@ -237,7 +249,13 @@ export class CallSession implements ConsoleActions {
 
   private async createCaseAndRun(prefillUntilMs: number, sttOpensPerMin?: number): Promise<void> {
     const { api, callId } = this.o;
-    const create = await api.createCase({ mode: "watch", callId, ...(prefillUntilMs > 0 ? { prefillUntilMs } : {}) });
+    const relayVersionId = this.o.relayVersionId ?? null;
+    const create = await api.createCase({
+      mode: "watch",
+      callId,
+      ...(prefillUntilMs > 0 ? { prefillUntilMs } : {}),
+      ...(relayVersionId ? { relayVersionId } : {}),
+    });
     this.create = create;
     if (create.visitorToken) this.visitorToken = create.visitorToken;
     this.prefillUntilMs = prefillUntilMs;
@@ -263,11 +281,43 @@ export class CallSession implements ConsoleActions {
     };
     const t = this.now();
     this.store.act({ t, type: "ui.context", context });
+    this.store.act({
+      t,
+      type: "ui.relay",
+      relay: create.relay ?? null,
+      provenance: this.provenanceOf(create.provenance ?? null),
+      account: create.account ?? null,
+    });
     this.store.dispatch({ t, type: "call.loaded", callId: call.callId, durationMs: call.durationMs });
     this.store.dispatch({ t, type: "case.state", state: create.state });
     this.plan = await api.startRun({ caseId: create.caseId, callId: call.callId, express: prefillUntilMs > 0 }, create.caseToken);
     this.released = false;
     this.store.dispatch({ t: this.now(), type: "run.plan", plan: this.plan });
+  }
+
+  /**
+   * The run's provenance strip: what the server stated, with the call manifest's own human half laid over it. The
+   * manifest wins, because it is the only record of how the audio was made; a generated take must never be shown
+   * as a recording (PLATFORM §7.6, WP9 `ext/wp9-data.ts`).
+   */
+  private provenanceOf(server: ProvenanceStrip | null): ProvenanceStrip | null {
+    const local = this.o.callProvenance ?? null;
+    if (!server && !local) return null;
+    const base: ProvenanceStrip = server ?? {
+      humanHalf: "recorded",
+      transcription: { kind: "live", date: null },
+      aiHalf: { kind: "live", date: null },
+      customerInAiHalf: "recorded",
+      detail: null,
+    };
+    if (local?.humanHalf !== "simulated" || base.humanHalf === "text_dry_run") return base;
+    return {
+      ...base,
+      humanHalf: "simulated",
+      // A simulated human half has no recorded customer to answer the AI: the stand-in voice does.
+      customerInAiHalf: base.customerInAiHalf === "recorded" ? "synthetic" : base.customerInAiHalf,
+      detail: local.detail,
+    };
   }
 
   // ---------------------------------------------------------------- start (click)
@@ -392,6 +442,8 @@ export class CallSession implements ConsoleActions {
           startOffsetMs: this.startOffsetMs,
           ctxCarry: "last_rep_turn",
           ...(this.express?.seedAgentContext && this.startOffsetMs > 0 ? { seedAgentContext: this.express.seedAgentContext } : {}),
+          // A relay other than the flagship listens with its own prompt and keyterms; Baton keeps route #5's params.
+          ...(create.listening && create.relay && !create.relay.relay.flagship ? { listening: create.listening } : {}),
         });
         // "denied": the manager already switched every channel to the labelled cached replay (WP4 toCached).
         if (r === "queued") await this.waitForStt(stt);

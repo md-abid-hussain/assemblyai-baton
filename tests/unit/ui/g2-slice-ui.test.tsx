@@ -127,10 +127,10 @@ describe("?express=1: the landing CTA's 3 s countdown", () => {
   });
 });
 
-describe("provenance banner", () => {
+describe("provenance strip", () => {
   it("states the four segments in plain words, live and cached", () => {
     const { store } = storeAt("s01-full", "shadowing:end");
-    const live = provenance(store.getState(), { customerInput: "mic" }).map((x) => `${x.label}: ${x.value}`);
+    const live = provenance(store.getState(), { customerInput: "mic" }).segments.map((x) => `${x.label}: ${x.value}`);
     expect(live).toEqual([
       "Human half: recorded role-play, real phone line",
       "Transcription: live AssemblyAI",
@@ -138,7 +138,7 @@ describe("provenance banner", () => {
       "Customer in the AI half: you (mic)",
     ]);
     const rec = storeAt("s01-recorded-ai", "end").store.getState();
-    expect(provenance(rec, { customerInput: "synthetic" }).map((x) => x.value)).toEqual(expect.arrayContaining(["recorded session", "recorded"]));
+    expect(provenance(rec, { customerInput: "synthetic" }).segments.map((x) => x.value)).toEqual(expect.arrayContaining(["recorded session (Fri 25 Sep 2026)", "recorded"]));
   });
 
   it("is on the console (the live page answers with the mic: autopilot and typing are hidden)", () => {

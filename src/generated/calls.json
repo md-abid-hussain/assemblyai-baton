@@ -1,1 +1,95 @@
-[]
+[
+  {
+    "callId": "s01_sim_20260925T110000Z",
+    "scenarioId": "s01",
+    "title": "Add 17-year-old daughter Maya to the Civic (golden demo path)",
+    "source": "twilio8k",
+    "language": "en",
+    "durationMs": 135493,
+    "format": {
+      "encoding": "pcm_mulaw",
+      "sampleRate": 8000
+    },
+    "publishAudio": true,
+    "inEval": false,
+    "featured": true,
+    "picker": "main",
+    "decisionPointMs": 124808,
+    "handoff": {
+      "lineStartMs": 124808,
+      "lineEndMs": 129640,
+      "acceptStartMs": 129969,
+      "acceptEndMs": 131197,
+      "declined": false
+    },
+    "recordedAiBundle": null,
+    "customerTailPack": null,
+    "assets": {
+      "rep": "/calls/s01_sim_20260925T110000Z/rep.76090319.ulaw",
+      "customer": "/calls/s01_sim_20260925T110000Z/customer.7f59e2f5.ulaw",
+      "peaks": "/calls/s01_sim_20260925T110000Z/peaks.98932ab0.json"
+    }
+  },
+  {
+    "callId": "s02_sim_20260925T110000Z",
+    "scenarioId": "s02",
+    "title": "Add 16-year-old son Lucas; start date blurted right before the hand-off",
+    "source": "twilio8k",
+    "language": "en",
+    "durationMs": 92252,
+    "format": {
+      "encoding": "pcm_mulaw",
+      "sampleRate": 8000
+    },
+    "publishAudio": true,
+    "inEval": false,
+    "featured": false,
+    "picker": "main",
+    "decisionPointMs": 84512,
+    "handoff": {
+      "lineStartMs": 84512,
+      "lineEndMs": 88617,
+      "acceptStartMs": 88947,
+      "acceptEndMs": 90237,
+      "declined": false
+    },
+    "recordedAiBundle": null,
+    "customerTailPack": null,
+    "assets": {
+      "rep": "/calls/s02_sim_20260925T110000Z/rep.45a0f63c.ulaw",
+      "customer": "/calls/s02_sim_20260925T110000Z/customer.016a6f8c.ulaw",
+      "peaks": "/calls/s02_sim_20260925T110000Z/peaks.e124d8a7.json"
+    }
+  },
+  {
+    "callId": "s03_sim_20260925T110000Z",
+    "scenarioId": "s03",
+    "title": "Add 19-year-old daughter Hannah; customer declines the AI and the rep finishes",
+    "source": "twilio8k",
+    "language": "en",
+    "durationMs": 154456,
+    "format": {
+      "encoding": "pcm_mulaw",
+      "sampleRate": 8000
+    },
+    "publishAudio": true,
+    "inEval": false,
+    "featured": false,
+    "picker": "more",
+    "decisionPointMs": 112502,
+    "handoff": {
+      "lineStartMs": 112502,
+      "lineEndMs": 117336,
+      "acceptStartMs": null,
+      "acceptEndMs": null,
+      "declined": true
+    },
+    "recordedAiBundle": null,
+    "customerTailPack": null,
+    "assets": {
+      "rep": "/calls/s03_sim_20260925T110000Z/rep.808f8bff.ulaw",
+      "customer": "/calls/s03_sim_20260925T110000Z/customer.e7634ef2.ulaw",
+      "peaks": "/calls/s03_sim_20260925T110000Z/peaks.01e4d844.json"
+    }
+  }
+]

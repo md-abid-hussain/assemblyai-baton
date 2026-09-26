@@ -1,0 +1,2 @@
+# Local TTS clip cache (content-addressed PCM; re-running a build or smoke on a warm cache is $0)
+.cache/

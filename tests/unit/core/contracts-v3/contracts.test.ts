@@ -23,6 +23,10 @@ describe("SAAS §14 errors.ts", () => {
       E_AUTH_REQUIRED: 401, E_ACCOUNT_REQUIRED: 403, E_FORBIDDEN: 403, E_SCOPE: 403, E_CSRF: 403,
       E_USE_APP_API: 403, E_NOT_FOUND: 404, E_CONFLICT: 409, E_VALIDATION: 400, E_UNPROCESSABLE: 422,
       E_PLAN_LIMIT: 402, E_RATE_LIMITED: 429, E_BUSY: 503, E_BILLING_UNAVAILABLE: 503,
+      // WP19·2, additively (§2 rule 12): §14 lists no code for the kill switch §2.8 mandates, and
+      // `E_BILLING_UNAVAILABLE` would name the wrong subsystem. Thrown by the auth catch-all when
+      // `BETTER_AUTH_SECRET` is absent; everything else keeps working on the legacy path.
+      E_AUTH_UNAVAILABLE: 503,
     });
   });
 

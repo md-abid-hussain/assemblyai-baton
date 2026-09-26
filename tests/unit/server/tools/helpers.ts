@@ -13,7 +13,9 @@ import { allowedFrom, type TransitionVia } from "@/server/payments/machine";
 import type { NewPayment, PaymentRecord, PaymentStore, TransitionPatch } from "@/server/payments/store";
 import type { PolarApi, PolarCheckout } from "@/server/polar/client";
 import type { ToolCore } from "@/server/tools/core-port";
-import type { BeginCall, DisclosureRecord, TakeoverRecord, ToolFlowMetrics, ToolStore } from "@/server/tools/store";
+import type {
+  BeginCall, ConnectorSuccessRecord, DisclosureRecord, RelayDisclosureRecord, TakeoverRecord, ToolFlowMetrics, ToolStore,
+} from "@/server/tools/store";
 import { policy as fixturePolicy } from "../../contracts/fixtures";
 
 export const policy: PolicyRecord = fixturePolicy;
@@ -98,7 +100,7 @@ export class MemoryToolStore implements ToolStore {
   addTakeover(t: Partial<TakeoverRecord> & { id: string; caseId: string }): TakeoverRecord {
     const rec: TakeoverRecord = {
       armedAt: new Date(Date.UTC(2026, 8, 25, 12, 0, 0)), tArmMs: 60_000, stage: null, phase: "active", outcome: null,
-      disclosures: {}, confirmationNumber: null, toolFlow: {}, ...t,
+      disclosures: {}, relayDisclosures: {}, connectors: {}, confirmationNumber: null, toolFlow: {}, ...t,
     };
     this.takeovers.set(rec.id, rec);
     if (!this.caseStatus.has(rec.caseId)) this.caseStatus.set(rec.caseId, "ai_active");
@@ -114,7 +116,22 @@ export class MemoryToolStore implements ToolStore {
   }
   async putDisclosure(id: string, d: DisclosureRecord) {
     const t = this.takeovers.get(id);
-    if (t) t.disclosures = { ...t.disclosures, [d.kind]: d };
+    if (t) {
+      t.disclosures = { ...t.disclosures, [d.kind]: d };
+      t.relayDisclosures = { ...t.relayDisclosures, [d.kind]: d };
+    }
+  }
+  /** WP16·2: the same `metrics.disclosures` slot, by blueprint id. */
+  async putRelayDisclosure(id: string, d: RelayDisclosureRecord) {
+    const t = this.takeovers.get(id);
+    if (t) t.relayDisclosures = { ...t.relayDisclosures, [d.kind]: d };
+  }
+  /** WP16·2: first writer wins, so a replay keeps its payment id. */
+  async markConnector(id: string, r: ConnectorSuccessRecord) {
+    const t = this.takeovers.get(id);
+    if (!t) return r;
+    t.connectors = { [r.connectorId]: r, ...t.connectors };
+    return t.connectors[r.connectorId]!;
   }
   async putConfirmationNumber(id: string, n: string) {
     const t = this.takeovers.get(id)!;
@@ -158,7 +175,7 @@ export class MemoryToolStore implements ToolStore {
 const readiness = (fields: Record<FieldId, FieldState>) => {
   let verified = 0, pending = 0, missing = 0, ready = true;
   for (const f of REQUIRED_FIELDS) {
-    const st = fields[f].status;
+    const st = fields[f]?.status ?? "MISSING";
     if (st === "VERIFIED") verified++;
     else if (st === "PENDING") pending++;
     else missing++;
@@ -212,6 +229,7 @@ export class FakeCaseRepo implements Pick<CaseRepository, "load" | "applyEvents"
     for (const e of events) {
       c.events.push(e);
       const fs = c.state.fields[e.field];
+      if (!fs) continue;   // P§4.7: the field map is keyed by any id
       if (e.kind === "tool_update" && e.valueNorm !== null) {
         if (fs.status === "VERIFIED" && fs.value !== null && fs.value !== e.valueNorm) {
           fs.flags = [...fs.flags, "customer_corrected_verified"];

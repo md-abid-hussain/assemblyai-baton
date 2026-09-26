@@ -3,6 +3,7 @@ import "server-only";
 import type { SpendLedger, Verifier } from "../../core/contracts/services";
 import { log } from "../log";
 import type { CaseEngine } from "./engine";
+import type { CaseEngineFor } from "./relay-engine";
 import { plainTurn, type PgCaseRepository } from "./repository";
 
 /**
@@ -26,6 +27,8 @@ export type VerifierSkip = "disabled" | "in_flight" | "not_shadowing" | "too_soo
 export interface VerifierRunnerDeps {
   repo: PgCaseRepository;
   engine: CaseEngine;
+  /** WP14b·3: the engine of a case's relay version, so sol's disagreements are applied under that relay's spec. */
+  engineFor?: CaseEngineFor;
   verifier: Verifier;
   ledger?: () => SpendLedger | null;
   deployId?: () => string;
@@ -88,7 +91,7 @@ export class VerifierRunner {
   }
 
   private async run(caseId: string): Promise<{ ran: true; applied: boolean; disagreements: number } | { ran: false; reason: VerifierSkip }> {
-    const { repo, engine, verifier } = this.d;
+    const { repo, verifier } = this.d;
     const ledger = this.d.ledger?.() ?? null;
     let reservation: string | null = null;
     if (ledger) {
@@ -104,6 +107,7 @@ export class VerifierRunner {
       const row = await repo.loadRow(caseId);
       if (!row) return { ran: false, reason: "no_case" };
       const turns = (await repo.listTurns(caseId)).filter((t) => t.extractStatus !== "skipped").map(plainTurn);
+      const engine = row.relayVersionId && this.d.engineFor ? await this.d.engineFor(row.relayVersionId) : this.d.engine;
       const res = await verifier.verifyCase({ caseId, policy: row.policy, callDate: row.policy.callDate, turns });
       usd = res.usd;
       const { ms, usd: _u, ...result } = res;

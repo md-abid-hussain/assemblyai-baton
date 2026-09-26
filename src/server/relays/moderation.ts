@@ -95,7 +95,7 @@ export interface OpenAIModeratorDeps {
   client: () => Pick<OpenAI, "moderations">;
   /** `getLimitsAuthority().ledger`; null = spend not recorded (unit tests only). A throw = unavailable (fail closed). */
   ledger: () => SpendLedger | null;
-  /** Ledger `env` (BATON_DEPLOY_ID; `dev-wp14b` in local runs). */
+  /** Ledger `env` (the BATON_DEPLOY_ID of the running server). */
   env: () => string;
   timeoutMs?: number;
 }

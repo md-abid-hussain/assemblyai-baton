@@ -25,7 +25,7 @@ function fakeExtractor(o: { failFirst?: string } = {}) {
     seen,
     async extractTurn(i: ExtractTurnInput): Promise<ExtractTurnOutput & { failedTurnIds: string[]; usd: number }> {
       const turn = i.newTurns[0]!;
-      seen.push({ turnId: turn.turnId, knownName: i.state.fields.driver_full_name.value, recent: i.recent.length });
+      seen.push({ turnId: turn.turnId, knownName: i.state.fields.driver_full_name?.value ?? null, recent: i.recent.length });
       if (o.failFirst === turn.turnId && !failed) {
         failed = true;
         return { events: [], ms: 900, usage: { input: 10, output: 0 }, model: "gpt-6-luna", extractorVersion: "vX", cached: false, failedTurnIds: [turn.turnId], usd: 0.00001 };

@@ -104,7 +104,7 @@ function emptyField(field: FieldId): FieldState {
 function readinessOf(fields: Record<FieldId, FieldState>): Readiness {
   let verified = 0, pending = 0, missing = 0, ready = true;
   for (const f of REQUIRED_FIELDS) {
-    const st = fields[f].status;
+    const st = fields[f]?.status ?? "MISSING";
     if (st === "VERIFIED") verified++;
     else if (st === "PENDING") pending++;
     else missing++;

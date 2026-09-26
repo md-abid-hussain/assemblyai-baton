@@ -8,6 +8,7 @@ import { newId as defaultNewId } from "../../lib/ids";
 import { log as rootLog, type Logger } from "../log";
 import type { PolarApi } from "../polar/client";
 import type { MappedPolarEvent } from "../polar/webhook";
+import { emitPaymentSucceeded } from "./domain-events";
 import { formatUsd, fromPolarCheckoutStatus, isTerminal } from "./machine";
 import { MockPaymentProvider, PolarPaymentProvider, polarOriginOf, type PolarProviderConfig } from "./providers";
 import type { PaymentRecord, PaymentStore } from "./store";
@@ -44,6 +45,11 @@ export interface PaymentServiceDeps {
   sleep?: (ms: number) => Promise<void>;
   newId?: () => string;
   log?: Logger;
+  /**
+   * WP16·3 (SAAS §7.1): the `payment.succeeded` emitter, called on every server-made transition to `succeeded`.
+   * Default: `emitPaymentSucceeded` (a no-op until the run's case has an org). Tests pass their own.
+   */
+  emitSucceeded?: (p: PaymentRecord) => Promise<unknown>;
 }
 
 export interface CreatePaymentInput {
@@ -73,6 +79,20 @@ export class PaymentService {
 
   get store(): PaymentStore {
     return this.deps.store;
+  }
+
+  /**
+   * SAAS §7.1: a payment that just became verified is a domain event. It is awaited (so a test sees it, and so a
+   * serverless instance is not killed mid-emit) and it can never fail the transition that produced it.
+   */
+  private async announce(p: PaymentRecord | null | undefined): Promise<void> {
+    if (!p || p.status !== "succeeded") return;
+    try {
+      const emit = this.deps.emitSucceeded ?? ((rec: PaymentRecord) => emitPaymentSucceeded(rec));
+      await emit(p);
+    } catch (err) {
+      this.log.warn("payment.succeeded was not emitted", { paymentId: p.id, err: errName(err) });
+    }
   }
 
   /**
@@ -181,6 +201,7 @@ export class PaymentService {
       { notSimulated: true },
     );
     if (next) this.log.info("payment status from server poll", { paymentId: p.id, from: p.status, to: status });
+    await this.announce(next);
     return next ?? (await this.get(p.id));
   }
 
@@ -210,6 +231,7 @@ export class PaymentService {
       { notSimulated: true },
     );
     if (next) this.log.info("payment status from webhook", { paymentId: p.id, from: p.status, to: ev.status, type: ev.type });
+    await this.announce(next);
     return next ? "applied" : "noop";
   }
 
@@ -237,6 +259,7 @@ export class PaymentService {
       totalAmountCents: p.totalAmountCents ?? p.amountCents,
     });
     if (next) this.log.info("payment simulated", { paymentId: id, from: p.status });
+    await this.announce(next);
     return next ?? (await this.get(id));
   }
 

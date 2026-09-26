@@ -10,14 +10,14 @@ import { describe, expect, it } from "vitest";
 import * as kit from "../../../tools/recording-kit/src/scenarios.ts";
 import {
   AI_SETTABLE, DISCOUNT_VALUES, FIELD_IDS, FIELD_KIND, FIELD_LABEL, FIELD_STATUSES, HANDOFF_RESPONSES, LANGUAGES,
-  LICENSE_STATUSES, OPERATOR_TYPES, RELATIONS, REQUIRED_FIELDS, US_STATES, type FieldId,
+  LICENSE_STATUSES, OPERATOR_TYPES, RELATIONS, REQUIRED_FIELDS, US_STATES, type BatonFieldId as FieldId,
 } from "../../../src/core/intents/add-driver.fields";
 import { FieldIdSchema, FieldStatusSchema, ToolArgsSchemas } from "../../../src/core/contracts";
 
 const ROOT = resolve(fileURLToPath(new URL("../../..", import.meta.url)));
 const SCENARIOS = join(ROOT, "data", "scenarios");
 
-// Compile-time parity: the kit's FactField union is exactly our FieldId.
+// Compile-time parity: the kit's FactField union is exactly our BatonFieldId (P§4.7 widened `FieldId` to any id).
 type Same<X, Y> = (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ? 1 : 2 ? true : false;
 const same = <T extends true>(): T | undefined => undefined;
 same<Same<kit.FactField, FieldId>>();
@@ -27,7 +27,10 @@ same<Same<kit.Relation, (typeof RELATIONS)[number]>>();
 describe("field registry = recording kit", () => {
   it("FACT_FIELDS (order included)", () => {
     expect([...FIELD_IDS]).toEqual([...kit.FACT_FIELDS]);
-    expect(FieldIdSchema.options).toEqual([...kit.FACT_FIELDS]);
+    // P§4.7: FieldIdSchema is the id grammar, not an enum. Every Baton field still parses, and nothing else leaks in.
+    for (const f of kit.FACT_FIELDS) expect(FieldIdSchema.safeParse(f).success, f).toBe(true);
+    expect(FieldIdSchema.safeParse("Driver_DOB").success).toBe(false);
+    expect(FieldIdSchema.safeParse("appointment_date").success).toBe(true);   // a relay's own field id
   });
   it("REQUIRED_FIELDS", () => {
     expect([...REQUIRED_FIELDS]).toEqual([...kit.REQUIRED_FIELDS]);
@@ -76,7 +79,7 @@ describe("data/scenarios conform to our contracts", () => {
       const vehicleIds = s.customer.vehicles.map((v) => v.id);
       for (const [name, fact] of Object.entries(facts)) {
         expect(FIELD_STATUSES).toContain(fact.status_at_handoff);
-        const kind = FIELD_KIND[name as FieldId];
+        const kind = FIELD_KIND[name as FieldId]!;
         const v = fact.value;
         switch (kind.t) {
           case "enum":

@@ -20,6 +20,8 @@ import { auditPage } from "./a11y-audit";
 const BASE = process.env.BASE_URL ?? "http://localhost:3108";
 const OUT = process.env.OUT_DIR ?? "test-results/wp7-shots";
 const ROUTE = process.env.ROUTE ?? "/call/s01"; // /call/<id>?fixture=… renders the same console as a live /call run
+/** The flagship's log by default; WP7·3's second pass runs the Dental relay's through the very same components. */
+const FIXTURE = process.env.FIXTURE ?? "s01-full";
 
 const VIEWPORTS = [
   { name: "1440", width: 1440, height: 900, mobile: false },
@@ -47,12 +49,14 @@ interface Row {
   failing: { id: string; weight: number; items: string[] }[];
   horizontalScroll: boolean;
   phoneInViewport?: boolean;
+  /** WP7·3: the provenance strip's four tags, in order, as the page actually rendered them. */
+  provenance?: string[];
 }
 
 /** `q` is "key=value"; the value is encoded (a raw "+" in `at=paying+3000` would decode as a space). */
-const url = (q: string) => {
+const url = (q: string, fixture = FIXTURE) => {
   const [k, v = ""] = q.split("=");
-  return `${BASE}${ROUTE}?fixture=s01-full&chrome=0&phone=wp6&${k}=${encodeURIComponent(v)}`;
+  return `${BASE}${ROUTE}?fixture=${encodeURIComponent(fixture)}&chrome=0&phone=wp6&${k}=${encodeURIComponent(v)}`;
 };
 
 type Scheme = "light" | "dark";
@@ -78,6 +82,17 @@ async function settle(page: Page, ms = 400): Promise<void> {
 }
 
 const noHScroll = (page: Page) => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1);
+
+/**
+ * The provenance strip as rendered (WP7 acceptance 4): exactly one strip, its four segments in order. An empty array
+ * means the strip is missing, which fails the pass.
+ */
+const provenanceTags = (page: Page) =>
+  page.evaluate(() => {
+    const strips = document.querySelectorAll('[aria-label="Where this run comes from"]');
+    if (strips.length !== 1) return [`STRIPS=${strips.length}`];
+    return [...strips[0]!.querySelectorAll("[data-provenance]")].map((el) => `${el.getAttribute("data-provenance")}:${el.getAttribute("data-tag")}`);
+  });
 
 async function phoneBox(page: Page): Promise<{ inViewport: boolean; box: { x: number; y: number; width: number; height: number } | null }> {
   const loc = page.locator('section[aria-label="Customer\'s phone (simulated)"]').first();
@@ -111,8 +126,9 @@ async function main(): Promise<void> {
           failing: a.audits.filter((x) => x.applicable && !x.pass).map((x) => ({ id: x.id, weight: x.weight, items: x.items })),
         };
         if (st.name === "paying") row.phoneInViewport = (await phoneBox(page)).inViewport;
+        if (st.name !== "countdown") row.provenance = await provenanceTags(page);
         rows.push(row);
-        console.log(`${vp.name.padEnd(9)} ${scheme.padEnd(5)} ${st.name.padEnd(13)} a11y ${String(a.score).padStart(3)}${row.horizontalScroll ? "  H-SCROLL" : ""}${row.phoneInViewport === false ? "  PHONE-CLIPPED" : ""}${row.failing.length ? `  fails: ${row.failing.map((f) => f.id).join(", ")}` : ""}`);
+        console.log(`${vp.name.padEnd(9)} ${scheme.padEnd(5)} ${st.name.padEnd(13)} a11y ${String(a.score).padStart(3)}${row.horizontalScroll ? "  H-SCROLL" : ""}${row.phoneInViewport === false ? "  PHONE-CLIPPED" : ""}${row.provenance?.length ? `  [${row.provenance.join(" ")}]` : ""}${row.failing.length ? `  fails: ${row.failing.map((f) => f.id).join(", ")}` : ""}`);
         await page.context().close();
       }
     }
@@ -152,6 +168,31 @@ async function main(): Promise<void> {
       console.log(`${vp.name.padEnd(9)} phone flow    ${steps.join(" → ")} (final ${store}; in viewport ${inViewport}; e-sign a11y ${esignAudit.score})`);
       await page.context().close();
     }
+    // ---- WP7·3: a second relay through the very same components (its fields, stage labels and deposit phone)
+    for (const vp of VIEWPORTS.filter((v) => v.name === "1366x768" || v.name === "390")) {
+      for (const st of [
+        { name: "dental-shadowing", q: "at=shadowing:end", waitMs: 400 },
+        { name: "dental-paying", q: "at=paying+3000", waitMs: 400 },
+        { name: "dental-completed", q: "at=end", waitMs: 1200 },
+      ]) {
+        const page = await newPage(browser, vp);
+        await page.goto(url(st.q, "dental-deposit"), { waitUntil: "domcontentloaded" });
+        await settle(page, st.waitMs);
+        if (vp.mobile && st.name === "dental-paying") await page.getByRole("tab", { name: /Phone/ }).click().catch(() => undefined);
+        const file = `${vp.name}-${st.name}.png`;
+        await page.screenshot({ path: path.join(OUT, file) });
+        const a = await auditPage(page);
+        const row: Row = {
+          viewport: vp.name, scheme: "light", state: st.name, file, a11y: a.score, horizontalScroll: !(await noHScroll(page)),
+          failing: a.audits.filter((x) => x.applicable && !x.pass).map((x) => ({ id: x.id, weight: x.weight, items: x.items })),
+          provenance: await provenanceTags(page),
+        };
+        if (st.name === "dental-paying") row.phoneInViewport = (await phoneBox(page)).inViewport;
+        rows.push(row);
+        console.log(`${vp.name.padEnd(9)} light ${st.name.padEnd(17)} a11y ${String(a.score).padStart(3)}${row.horizontalScroll ? "  H-SCROLL" : ""}${row.phoneInViewport === false ? "  PHONE-CLIPPED" : ""}  [${row.provenance?.join(" ")}]${row.failing.length ? `  fails: ${row.failing.map((f) => f.id).join(", ")}` : ""}`);
+        await page.context().close();
+      }
+    }
   } finally {
     await browser.close();
   }
@@ -159,8 +200,10 @@ async function main(): Promise<void> {
   const worst = Math.min(...rows.map((r) => r.a11y));
   const clipped = rows.filter((r) => r.phoneInViewport === false);
   const hs = rows.filter((r) => r.horizontalScroll);
-  console.log(`\nminimum a11y ${worst} over ${rows.length} states; phone clipped in ${clipped.length}; horizontal scroll in ${hs.length}. → ${OUT}`);
-  if (worst < 90 || clipped.length || hs.length) process.exitCode = 1;
+  const noStrip = rows.filter((r) => r.provenance && r.provenance.length !== 4);
+  console.log(`\nminimum a11y ${worst} over ${rows.length} states; phone clipped in ${clipped.length}; horizontal scroll in ${hs.length}; provenance strip wrong in ${noStrip.length}. → ${OUT}`);
+  if (noStrip.length) console.log(`strip problems: ${noStrip.map((r) => `${r.viewport}/${r.state} [${r.provenance?.join(" ")}]`).join("; ")}`);
+  if (worst < 90 || clipped.length || hs.length || noStrip.length) process.exitCode = 1;
 }
 
 void main();

@@ -26,6 +26,15 @@ export const V3_ERROR_STATUS = {
    */
   E_BUSY: 503,
   E_BILLING_UNAVAILABLE: 503,
+  /**
+   * The identity layer is not configured or not healthy — K-AUTH (§2.8): no `BETTER_AUTH_SECRET`, or Better Auth
+   * failing on Zerops. The app itself is up: `/call/**`, the Baton console and the device-scoped `/app` all keep
+   * working, so this is the code behind the "Accounts are temporarily unavailable" notice and nothing more.
+   *
+   * Added by WP19·2, additively (TASKS-v3 §2 rule 12). §14 has no code for the kill switch it mandates in §2.8,
+   * and `E_BILLING_UNAVAILABLE` would have been a lie about which subsystem is down.
+   */
+  E_AUTH_UNAVAILABLE: 503,
 } as const;
 export type V3ErrorCode = keyof typeof V3_ERROR_STATUS;
 

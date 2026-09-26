@@ -112,9 +112,9 @@ export async function extractCall(
 async function main(): Promise<void> {
   const f = parseFlags(process.argv.slice(2), {
     version: "string", variant: "string", calls: "string", force: "boolean", "dry-run": "boolean", "max-usd": "string",
-    "calls-dir": "string", "scenarios-dir": "string", "data-root": "string",
+    "calls-dir": "string", "sim-takes-dir": "string", "scenarios-dir": "string", "data-root": "string",
   });
-  const paths = resolvePaths({ callsDir: str(f["calls-dir"]), scenariosDir: str(f["scenarios-dir"]), dataRoot: str(f["data-root"]) });
+  const paths = resolvePaths({ callsDir: str(f["calls-dir"]), simTakesDir: str(f["sim-takes-dir"]), scenariosDir: str(f["scenarios-dir"]), dataRoot: str(f["data-root"]) });
   const v = str(f.version) ?? "v3";
   const configs: [PipelineVersion, SttVariant][] =
     v === "all" ? [...ALL_CONFIGS] : [[v as PipelineVersion, (str(f.variant) as SttVariant | undefined) ?? VERSION_DEFAULT_VARIANT[v as PipelineVersion]]];

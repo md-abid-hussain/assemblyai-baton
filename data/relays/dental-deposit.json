@@ -1,0 +1,411 @@
+{
+  "meta": {
+    "schema": "changeover.blueprint/2.0",
+    "slug": "dental-deposit",
+    "title": "Dental · booking deposit",
+    "tagline": "A front-desk coordinator hands a live call to an AI that confirms the appointment and takes the deposit.",
+    "industry": "healthcare",
+    "locale": "en-US",
+    "intent": {
+      "id": "book_deposit",
+      "summary": "confirm a dental appointment and take the booking deposit",
+      "caseNoun": "dental booking case"
+    },
+    "roles": {
+      "rep": "front-desk coordinator",
+      "customer": "patient",
+      "org": "practice"
+    },
+    "origin": "seed",
+    "sampleOnly": true
+  },
+  "context": {
+    "facts": [
+      { "key": "chart_number", "label": "Chart number" },
+      { "key": "provider_name", "label": "Provider" },
+      { "key": "practice_city", "label": "City" },
+      { "key": "cancellation_hours", "label": "Cancellation window (hours)" },
+      { "key": "treatment_fee_usd", "label": "Treatment fee" }
+    ],
+    "tables": [],
+    "samples": [
+      {
+        "customer": {
+          "firstName": "Maya",
+          "lastName": "Ortiz",
+          "phoneLast4": "4417",
+          "address": { "line1": "118 Larkspur Lane", "city": "Fairview", "state": "OR", "zip": "97024" }
+        },
+        "org": { "name": "Cedar Hollow Dental", "repFirstName": "Dana" },
+        "callDate": "2026-09-25",
+        "facts": {
+          "chart_number": "CH-40827",
+          "provider_name": "Dr. Alina Booth",
+          "practice_city": "Fairview",
+          "cancellation_hours": "48",
+          "treatment_fee_usd": "320"
+        },
+        "tables": {}
+      },
+      {
+        "customer": {
+          "firstName": "Ethan",
+          "lastName": "Park",
+          "phoneLast4": "2630",
+          "address": { "line1": "905 Juniper Court", "city": "Marlowe", "state": "KS", "zip": "66214" }
+        },
+        "org": { "name": "Willow Bend Dental Studio", "repFirstName": "Rosa" },
+        "callDate": "2026-09-25",
+        "facts": {
+          "chart_number": "CH-51163",
+          "provider_name": "Dr. Neel Varma",
+          "practice_city": "Marlowe",
+          "cancellation_hours": "48",
+          "treatment_fee_usd": "280"
+        },
+        "tables": {}
+      }
+    ]
+  },
+  "fields": [
+    {
+      "id": "patient_full_name",
+      "label": "Patient's full name",
+      "description": "The patient's name as spoken.",
+      "type": "person_name",
+      "normalizer": "person_name",
+      "required": true,
+      "setBy": "ai_allowed",
+      "adviceDomain": false,
+      "promptVisibility": "always",
+      "validation": {},
+      "examples": ["Maya Ortiz"],
+      "compare": "token_subset",
+      "display": "title",
+      "capture": { "priority": 1, "mode": "balanced", "entity": true },
+      "phrases": {
+        "ask": "the patient's full name",
+        "confirm": "the appointment is for {f.patient_full_name|title}"
+      },
+      "qa": {
+        "ask": ["\\b(full name|last name|first name|who('s| is) the appointment for|spell)\\b"],
+        "weak": ["\\bname\\b"]
+      },
+      "ui": { "group": "Patient", "hidden": false }
+    },
+    {
+      "id": "procedure",
+      "label": "Procedure",
+      "description": "What the patient is booked in for.",
+      "type": "enum",
+      "normalizer": "enum",
+      "enumValues": [
+        {
+          "value": "cleaning",
+          "label": "Cleaning",
+          "synonyms": ["\\b(cleaning|hygiene|check ?up|prophy)\\b"],
+          "word": "cleaning",
+          "spokenForms": ["cleaning", "check-up", "hygiene visit"]
+        },
+        {
+          "value": "filling",
+          "label": "Filling",
+          "synonyms": ["\\b(filling|cavity|restoration)\\b"],
+          "word": "filling",
+          "spokenForms": ["filling", "cavity"]
+        },
+        {
+          "value": "crown",
+          "label": "Crown",
+          "synonyms": ["\\b(crown|cap)\\b"],
+          "word": "crown",
+          "spokenForms": ["crown", "cap"]
+        },
+        {
+          "value": "extraction",
+          "label": "Extraction",
+          "synonyms": ["\\b(extraction|pull(ed|ing)?|removal)\\b"],
+          "word": "extraction",
+          "spokenForms": ["extraction", "tooth out"]
+        },
+        {
+          "value": "implant_consult",
+          "label": "Implant consultation",
+          "synonyms": ["\\b(implant)\\b"],
+          "word": "implant consultation",
+          "spokenForms": ["implant consult", "implant consultation"]
+        }
+      ],
+      "required": true,
+      "setBy": "ai_allowed",
+      "adviceDomain": false,
+      "promptVisibility": "always",
+      "validation": {},
+      "examples": ["a cleaning"],
+      "compare": "exact",
+      "display": "enum_label",
+      "capture": { "priority": 2, "mode": "balanced", "entity": true },
+      "phrases": {
+        "ask": "what you're booked in for",
+        "confirm": "you're booked in for a {f.procedure|enum_word}"
+      },
+      "qa": {
+        "ask": ["\\b(what (are you|is this) (booked|coming) in for|cleaning or|which (procedure|treatment|visit))\\b"],
+        "weak": ["\\b(procedure|treatment)\\b"]
+      },
+      "ui": { "group": "Appointment", "hidden": false }
+    },
+    {
+      "id": "appointment_date",
+      "label": "Appointment date",
+      "description": "The day of the appointment.",
+      "type": "date",
+      "normalizer": "date_future",
+      "required": true,
+      "setBy": "ai_allowed",
+      "adviceDomain": false,
+      "promptVisibility": "always",
+      "validation": { "minDaysFromCall": 0, "maxDaysFromCall": 180 },
+      "examples": ["2026-10-06"],
+      "compare": "exact",
+      "display": "spoken_date",
+      "capture": { "priority": 3, "mode": "balanced", "entity": true },
+      "phrases": {
+        "ask": "the day you'd like to come in",
+        "confirm": "you're coming in {f.appointment_date|spoken_date}"
+      },
+      "qa": {
+        "ask": ["\\b(what day|which day|what date|when would|when do you want|come in on)\\b"],
+        "weak": ["\\bday\\b"]
+      },
+      "ui": { "group": "Appointment", "hidden": false }
+    },
+    {
+      "id": "appointment_time",
+      "label": "Appointment time",
+      "description": "The time of day of the appointment, as spoken (for example 9:30 AM).",
+      "type": "text",
+      "normalizer": "text",
+      "required": true,
+      "setBy": "ai_allowed",
+      "adviceDomain": false,
+      "promptVisibility": "always",
+      "validation": {},
+      "examples": ["9:30 AM", "2 PM"],
+      "compare": "exact",
+      "display": "raw",
+      "capture": { "priority": 4, "mode": "balanced", "entity": true },
+      "phrases": {
+        "ask": "the time of day that works for you",
+        "confirm": "your appointment is at {f.appointment_time|raw}"
+      },
+      "qa": {
+        "ask": ["\\b(what time|which time|morning or afternoon|time of day|how early|how late)\\b"],
+        "weak": ["\\btime\\b"]
+      },
+      "ui": { "group": "Appointment", "hidden": false }
+    },
+    {
+      "id": "deposit_amount_usd",
+      "label": "Deposit",
+      "description": "The booking deposit in dollars.",
+      "type": "money",
+      "normalizer": "money",
+      "required": false,
+      "setBy": "rep_only",
+      "adviceDomain": false,
+      "promptVisibility": "rep_verified_only",
+      "serverResolvable": { "value": "deposit_due" },
+      "validation": {},
+      "examples": ["50"],
+      "compare": "exact",
+      "display": "spoken_money",
+      "capture": { "priority": 0, "mode": "balanced", "entity": false },
+      "phrases": {
+        "ask": "the deposit amount",
+        "confirm": "the deposit is {f.deposit_amount_usd|spoken_money}"
+      },
+      "qa": { "ask": [], "weak": [] },
+      "ui": { "group": "Deposit", "hidden": false }
+    }
+  ],
+  "values": [
+    {
+      "id": "deposit_due",
+      "label": "Booking deposit",
+      "type": "money",
+      "ref": { "kind": "fixed", "value": "50" }
+    }
+  ],
+  "listening": {
+    "keyterms": [
+      "cleaning",
+      "filling",
+      "crown",
+      "extraction",
+      "implant consultation",
+      "hygienist",
+      "chart number",
+      "booking deposit"
+    ],
+    "contextKeyterms": [
+      "customer.firstName",
+      "customer.lastName",
+      "customer.fullName",
+      "org.name",
+      "org.repFirstName",
+      "fact.provider_name",
+      "fact.chart_number"
+    ],
+    "languageCodes": ["en"],
+    "scenarioPrompt": "Recorded phone call at a US dental practice. A front-desk coordinator and a patient book a treatment appointment: the patient's name, the procedure (cleaning, filling, crown, extraction or implant consultation), the day and time of the appointment, the provider's name, a chart number, and a booking deposit in dollars.",
+    "tuning": "telephony_8k"
+  },
+  "handoff": {
+    "allowedWhen": { "minCallSeconds": 15, "requireVerified": [] },
+    "repLine": "OK if my assistant finishes the booking and the deposit? I'll stay on the line.",
+    "repLinePatterns": [
+      "\\b(finish|finishes|wrap|wraps) (up )?the (booking|deposit)\\b",
+      "\\b(stay on the line|one tap away)\\b"
+    ],
+    "acceptance": {
+      "phrase": "Sure, go ahead.",
+      "patterns": ["\\b(sure|ok|okay|yes|yeah|go ahead|that's fine|fine)\\b"]
+    },
+    "autoBaton": true,
+    "repReturnLine": "I'm bringing the front desk back on the line now."
+  },
+  "playbook": {
+    "voice": "alba",
+    "persona": { "tone": "Warm, brief and plain-spoken US English.", "extraRules": [] },
+    "subject": "{?f.patient_full_name.verified}{f.patient_full_name|first_name}{:}the patient{/?}",
+    "greeting": {
+      "opening": "Hi {customer.firstName}, I'm {rep.firstName}'s AI assistant, not a person. This call is recorded.",
+      "summary": "I'll finish your booking{clause.procedure}{clause.date}{clause.deposit}.",
+      "clauses": [
+        { "id": "procedure", "text": "{?f.procedure.verified} for a {f.procedure|enum_word}{/?}", "dropOrder": 2 },
+        { "id": "date", "text": "{?f.appointment_date.verified} on {f.appointment_date|spoken_date}{/?}", "dropOrder": 0 },
+        { "id": "deposit", "text": " and take the {v.deposit_due|spoken_money} deposit", "dropOrder": 1 }
+      ],
+      "optOut": "Ask for {rep.firstName} anytime.",
+      "next": {
+        "confirm": "Just to confirm, {phrase.confirm}?",
+        "ask": "I just need {phrase.ask}.",
+        "ready": "Ready for the deposit details?"
+      },
+      "maxWords": 40
+    },
+    "promptTemplate": null,
+    "caseJson": {
+      "header": [{ "key": "chart", "from": "fact.chart_number" }],
+      "tables": [],
+      "maxChars": 1200
+    },
+    "vaKeyterms": [
+      "f.patient_full_name",
+      "f.procedure",
+      "customer.fullName",
+      "org.name",
+      "org.repFirstName"
+    ],
+    "stages": [
+      {
+        "id": "confirm",
+        "kind": "confirm",
+        "label": "Confirm",
+        "goal": "Resolve every PENDING and MISSING required field with update_case_field, one at a time. When all required fields are VERIFIED, the system gives you the next step.",
+        "tools": ["update_case_field", "hand_back_to_rep"],
+        "exit": { "kind": "all_required_verified" }
+      },
+      {
+        "id": "disclose",
+        "kind": "disclose",
+        "label": "Deposit terms",
+        "goal": "Call get_disclosure with kind \"deposit_terms\" and read it exactly as written. If the patient agrees, the system gives you the next step. If they decline, call hand_back_to_rep with reason \"customer_declined\".",
+        "tools": ["get_disclosure", "update_case_field", "hand_back_to_rep"],
+        "exit": { "kind": "disclosure_accepted", "disclosure": "deposit_terms" }
+      },
+      {
+        "id": "pay",
+        "kind": "act",
+        "label": "Deposit",
+        "goal": "The patient agreed to the deposit and the text. Call send_deposit_link now. When it returns, say in one short sentence that you texted the secure link and will wait while they pay. Then stay quiet unless asked; the system gives status updates.",
+        "tools": ["send_deposit_link", "get_disclosure", "update_case_field", "hand_back_to_rep"],
+        "exit": { "kind": "connector_succeeded", "connector": "deposit_link" }
+      },
+      {
+        "id": "close",
+        "kind": "close",
+        "label": "Close",
+        "goal": "The deposit is paid. Call send_confirmation, read the confirmation number digit by digit, ask if there is anything else about this booking, then say goodbye.",
+        "tools": ["send_confirmation", "update_case_field", "hand_back_to_rep"],
+        "exit": { "kind": "end" }
+      }
+    ],
+    "disclosures": [
+      {
+        "id": "deposit_terms",
+        "title": "Deposit terms",
+        "text": "Here's how the deposit works. We hold your{?f.appointment_date.known} {f.appointment_date|spoken_date}{/?}{?f.appointment_time.known} at {f.appointment_time|raw}{/?} slot, and the {v.deposit_due|spoken_money} deposit goes toward your treatment. If you cancel less than {fact.cancellation_hours} hours ahead, we keep it. Is it OK if I text a secure link to the number ending in {customer.phoneLast4|spoken_chars} so you can pay it now?",
+        "criticalTokens": [
+          "{v.deposit_due|spoken_money}",
+          "{fact.cancellation_hours}",
+          "{customer.phoneLast4|spoken_chars}"
+        ],
+        "requiresReady": true,
+        "requiresAccepted": null,
+        "consent": true
+      }
+    ],
+    "builtinToolText": {
+      "updateCaseFieldValueHint": "As spoken; the date as YYYY-MM-DD; the time as h:mm AM or PM"
+    },
+    "sessionCap": { "baseSec": 120, "perFieldSec": 15, "maxSec": 300 }
+  },
+  "connectors": [
+    {
+      "type": "payment_link",
+      "id": "deposit_link",
+      "label": "Deposit link",
+      "toolName": "send_deposit_link",
+      "description": "Text the patient a secure link to pay the booking deposit. Only after the patient agreed to the deposit terms and to receiving the text. Returns right after the text is sent; the system tells you when the payment finishes.",
+      "provider": "polar_sandbox",
+      "amount": "deposit_due",
+      "esign": false,
+      "smsTemplate": "{org.name}: pay your {v.deposit_due|spoken_money} booking deposit here.",
+      "requiresDisclosure": "deposit_terms"
+    },
+    {
+      "type": "confirmation",
+      "id": "confirmation",
+      "label": "Confirmation",
+      "toolName": "send_confirmation",
+      "description": "Finalize the booking and text a confirmation. Only after the deposit is confirmed.",
+      "requires": ["deposit_link"],
+      "smsTemplate": "{org.name}: your appointment is confirmed. Thank you, {customer.firstName}."
+    }
+  ],
+  "qa": {
+    "reaskTargets": [],
+    "verbatimThreshold": 0.9,
+    "adviceLexicon": [
+      "\\b(recommend\\w*|suggest\\w*|you (should|might want to)|diagnos\\w*|treatment plan|root canal|x-?rays?)\\b"
+    ]
+  },
+  "extraction": {
+    "domainLine": "a dental booking case",
+    "intentLine": "confirm a dental appointment and take the booking deposit",
+    "fieldGuide": null,
+    "contextKey": "booking",
+    "context": [
+      { "key": "patient", "from": "customer.fullName" },
+      { "key": "provider", "from": "fact.provider_name" },
+      { "key": "chart", "from": "fact.chart_number" }
+    ]
+  },
+  "compliance": {
+    "aiDisclosurePatterns": ["AI assistant", "not a person"],
+    "recordingNoticePattern": "recorded",
+    "neverCollect": ["card_number", "bank_account", "password", "ssn"]
+  }
+}

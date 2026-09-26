@@ -9,7 +9,8 @@ import { ev } from "./_events";
 const policy = policyOf("s01");
 const derive = (events: DerivableEvent[], ctx: Partial<Parameters<typeof deriveCaseState>[2]> = {}) =>
   deriveCaseState(policy, events, { caseId: "c1", ...ctx });
-const field = (events: DerivableEvent[], f: FieldId, ctx: Partial<Parameters<typeof deriveCaseState>[2]> = {}) => derive(events, ctx).fields[f];
+// P§4.7: `fields` is keyed by any id, so the lookup is optional; every field asked for here is a Baton field.
+const field = (events: DerivableEvent[], f: FieldId, ctx: Partial<Parameters<typeof deriveCaseState>[2]> = {}) => derive(events, ctx).fields[f]!;
 
 const ZIP = "garaging_zip" as const;
 
@@ -67,7 +68,7 @@ describe("deriveField status rules (DESIGN §5.4.2, table)", () => {
       ev({ field: ZIP, kind: "stated", party: "rep", value: "44108", t: 2000 }),
       ev({ field: ZIP, kind: "ack", party: "customer", value: null, t: 3000 }),
     ]);
-    const f = st.fields[ZIP];
+    const f = st.fields[ZIP]!;
     expect([f.status, f.reason, f.value]).toEqual(["PENDING", "conflict", "44108"]);
     expect(f.conflict?.values).toEqual(["44107", "44108"]);
     expect(st.conflicts).toHaveLength(1);
@@ -251,9 +252,9 @@ describe("deriveCaseState", () => {
     expect(bad.fields.driver_dob).toMatchObject({ status: "PENDING", reason: "conflict" });
     expect(bad.conflicts.some((c) => c.field === "driver_age")).toBe(true);
     const aiAge = derive([dob, rb, ev({ field: "driver_age", kind: "tool_update", party: "ai", value: "19", t: 1500 })]);
-    expect(aiAge.fields.driver_dob.status).toBe("VERIFIED");
+    expect(aiAge.fields.driver_dob?.status).toBe("VERIFIED");
     const pendingDob = derive([dob]);
-    expect(pendingDob.fields.driver_age.status).toBe("MISSING");
+    expect(pendingDob.fields.driver_age?.status).toBe("MISSING");
   });
 });
 

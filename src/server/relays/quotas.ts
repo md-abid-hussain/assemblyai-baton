@@ -4,6 +4,8 @@ import { BatonError } from "../../core/contracts/errors";
 import { RELAY_QUOTAS } from "../../core/contracts/ext/wp14b-relays";
 import type { CreateRelayRequest } from "../../core/contracts/v2";
 import { enforceRates, type RateSpec } from "../limits/rate-limiter";
+import { getEntitlements } from "../saas/ports";
+import { tenancyMode } from "../saas/principal";
 import type { RelaysDeps, RelaysVisitor } from "./index";
 
 /**
@@ -29,13 +31,33 @@ export async function enforceCreateQuota(d: RelaysDeps, visitor: RelaysVisitor, 
     // a clone of something this visitor can only read (a gallery relay or preset, someone's unlisted relay) is exempt
     if (src && d.registry.accessOf(src.row, ws) === "reader") return;
   }
-  if ((await d.registry.countLive(ws)) >= RELAY_QUOTAS.liveRelaysPerVisitor) {
-    throw new BatonError("E_RATE_LIMITED", `You have ${RELAY_QUOTAS.liveRelaysPerVisitor} relays; delete one to add another.`);
-  }
+  await enforceRelayCount(d, ws);
   await enforceRates(d.rateLimiter(), [
     { spec: RELAY_RATES.createVisitor, key: visitor.visitorId, message: "You have created 10 relays today. Try again tomorrow, or clone from the gallery." },
     { spec: RELAY_RATES.createIp, key: visitor.ipKey, message: "Too many relays created from this network today. Clone from the gallery instead." },
   ]);
+}
+
+/**
+ * How many relays a workspace may hold (WP14b·4).
+ *
+ * **Which limit applies is decided by the tenancy mode, not by both at once.** Under `TENANCY_MODE=legacy` there
+ * are no orgs and no plans in force, so it is the v2 cap (`RELAY_QUOTAS.liveRelaysPerVisitor` = 5) with the v2
+ * `E_RATE_LIMITED` message, byte for byte — that is what keeps the v2 route tests passing unchanged. Under `orgs`
+ * it is the plan's `relays` limit (SAAS §4.2), which answers 402 `E_PLAN_LIMIT` with the upgrade payload the
+ * Studio renders as a card.
+ *
+ * Running both would mean the guest plan's 3 silently overrode the v2 5 the moment this unit landed, which is a
+ * behaviour change smuggled in under a refactor.
+ */
+export async function enforceRelayCount(d: RelaysDeps, ws: string): Promise<void> {
+  if (tenancyMode() === "orgs") {
+    await getEntitlements().assertCount(ws, "relays");
+    return;
+  }
+  if ((await d.registry.countLive(ws)) >= RELAY_QUOTAS.liveRelaysPerVisitor) {
+    throw new BatonError("E_RATE_LIMITED", `You have ${RELAY_QUOTAS.liveRelaysPerVisitor} relays; delete one to add another.`);
+  }
 }
 
 export async function enforceSaveQuota(d: RelaysDeps, visitor: RelaysVisitor): Promise<void> {

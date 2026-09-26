@@ -1,10 +1,11 @@
 import "server-only";
 
-import type { NewFactEvent } from "../../core/contracts/case";
+import type { NewFactEvent, PolicyRecord } from "../../core/contracts/case";
 import type { CachedFactEvent, ExtractCacheFile } from "../../core/contracts/eval";
 import type { TurnInput } from "../../core/contracts/turns";
 import { cachedFinalTurns, type CaseDataSource } from "../data";
 import { log } from "../log";
+import type { CaseEngine } from "./engine";
 import type { ExtractStatus } from "./repository";
 
 /**
@@ -73,4 +74,67 @@ export async function buildPrefill(
     plan.events.push(...servedEvents(i.caseId, turn, entry.events));
   }
   return plan;
+}
+
+// ============================================================================================ re-extraction (WP14b·3)
+
+/** P§7.5: the whole Express window goes to luna in ONE call, so a preset's prefill costs one request, not one per turn. */
+export const REEXTRACT_MAX_TURNS = 16;
+
+export interface ReextractDeps {
+  /** The `Extractor` port; the per-case `engine` key selects the relay's prompt, schema and spec (WP14b·3). */
+  extractor: { extractTurn(i: never): Promise<{ events: NewFactEvent[]; ms: number; usd?: number; coveredTurnIds?: string[] }> };
+  engine: Pick<CaseEngine, "emptyCaseState" | "extractor">;
+  recordSpend?: (e: { caseId: string; usd: number; action: string }) => Promise<void>;
+}
+
+/**
+ * Express on a relay whose extractor is not the one that wrote the cache (P§7.5): "Prefill uses the cached fact events
+ * when the extractor `versionId` matches; otherwise (e.g. a preset or edit that adds a field) it re-extracts the
+ * cached turns in one batched luna call at case creation (≈ $0.002, ≤ 5 s, shown as 'Preparing')."
+ *
+ * This is exactly the case the **"add a field" preset** hits: `insurance_carrier` is not in the gallery relay's
+ * schema, so the committed `pc_ctx` events cannot contain it, and serving them would show the judge an empty new
+ * field that the human half plainly answered. One call with every cached final as NEW TURNS fixes that; the events
+ * come back under the relay's own field ids because the patch is post-processed with the relay's spec.
+ *
+ * It never throws and never fails the case: an upstream failure leaves the turns in the plan as `skipped`, which is
+ * the same degraded state a missing cache produces, and the live half still runs.
+ */
+export async function reextractPrefill(
+  d: ReextractDeps,
+  plan: PrefillPlan,
+  i: { caseId: string; policy: PolicyRecord; callDate: string },
+): Promise<PrefillPlan> {
+  const turns = plan.turns.slice(0, REEXTRACT_MAX_TURNS).map((t) => t.turn);
+  if (!turns.length) return plan;
+  const dropped = plan.turns.length - turns.length;
+  if (dropped > 0) prefillLog.warn("prefill re-extraction capped", { caseId: i.caseId, dropped, cap: REEXTRACT_MAX_TURNS });
+  const t0 = Date.now();
+  let out: { events: NewFactEvent[]; ms: number; usd?: number; coveredTurnIds?: string[] };
+  try {
+    out = await d.extractor.extractTurn({
+      caseId: i.caseId, policy: i.policy, callDate: i.callDate, state: d.engine.emptyCaseState(i.caseId),
+      recent: [], newTurns: turns, engine: d.engine,
+    } as never);
+  } catch (err) {
+    prefillLog.warn("prefill re-extraction failed; turns inserted without events", { caseId: i.caseId, err });
+    return plan;
+  }
+  const covered = new Set(out.coveredTurnIds ?? turns.map((t) => t.turnId));
+  const ms = out.ms || Date.now() - t0;
+  prefillLog.info("prefill re-extracted", {
+    caseId: i.caseId, turns: turns.length, events: out.events.length, ms: Math.round(ms), version: d.engine.extractor.version,
+  });
+  if (d.recordSpend && (out.usd ?? 0) > 0) {
+    await d.recordSpend({ caseId: i.caseId, usd: out.usd!, action: "extract" }).catch(() => undefined);
+  }
+  return {
+    ...plan,
+    events: out.events,
+    uncovered: plan.turns.map((t) => t.turn.turnId).filter((id) => !covered.has(id)),
+    turns: plan.turns.map((t) =>
+      covered.has(t.turn.turnId) ? { ...t, status: "done" as const, extractMs: Math.round(ms) } : { ...t, status: "skipped" as const, extractMs: null },
+    ),
+  };
 }

@@ -20,7 +20,12 @@ namespace D {
   export type Channel = "rep" | "customer";
   export type Party = Channel | "ai" | "policy" | "verifier";
   export type FieldStatus = "VERIFIED" | "PENDING" | "MISSING";
-  export type FieldId =
+  /**
+   * PLATFORM §4.7 (the one widening commit) replaced the literal union with the id grammar, so one kernel serves
+   * every relay. DESIGN §4.1's vocabulary lives on as `BatonFieldId` and is still asserted below.
+   */
+  export type FieldId = string;
+  export type BatonFieldId =
     | "driver_full_name" | "driver_dob" | "driver_age" | "driver_relation"
     | "license_state" | "license_status" | "license_number" | "incidents_3y"
     | "vehicle_assignment" | "operator_type" | "garaging_zip" | "effective_date"
@@ -70,9 +75,9 @@ namespace D {
     currentMonthlyPremiumUsd: number; callDate: string;
   }
   export interface CaseState {
-    caseId: string; intent: "add_driver"; version: number; callClockMs: number;
+    caseId: string; intent: "add_driver" | "relay"; version: number; callClockMs: number;   // P§4.7: `cases.intent` gains "relay"
     fields: Record<FieldId, FieldState>; readiness: Readiness; conflicts: ConflictCard[];
-    stage: Stage | null; disclosuresGiven: ("premium_change" | "esign_consent")[];
+    stage: Stage | null; disclosuresGiven: string[];   // P§4.7: a relay declares its own disclosures
     payment: { id: string; status: PaymentStatus; amountCents: number; totalAmountCents: number | null;
                provider: "polar" | "mock"; simulated: boolean } | null;
     confirmationNumber: string | null;
@@ -160,7 +165,7 @@ namespace D {
   export type FallbackKind = "cached_turn_replay" | "recorded_ai_session" | "typed_tts" | "mock_payment" | "hosted_checkout";
   export interface QaResult {
     provisional: boolean; reAsked: number; newlyAsked: number; pendingConfirmed: number; verifiedReconfirmed: number;
-    disclosures: { kind: "premium_change" | "esign_consent"; similarity: number; ok: boolean; missingCritical: string[] }[];
+    disclosures: { kind: string; similarity: number; ok: boolean; missingCritical: string[] }[];   // P§4.7
     clickToFirstAudibleMs: number | null; deadAirAfterRepMs: number | null; turnLatencyP50Ms: number | null;
     payment: "verified_webhook" | "verified_poll" | "simulated" | "unpaid"; handedBack: boolean; aiSeconds: number;
     adviceFlags: number;
@@ -176,7 +181,9 @@ namespace D {
     | "E_BAD_REQUEST" | "E_FORBIDDEN" | "E_NOT_FOUND";  // G0: the §4.4 400/403/404 conventions
   export interface ApiError { error: { code: ErrorCode; message: string; retryAfterMs?: number; fallback?: FallbackKind } }
   // ── contracts/tools.ts ──
-  export type ToolName = "confirm_effective_date" | "get_disclosure" | "send_esign_and_pay_link" | "send_confirmation"
+  /** P§4.7: widened to the id grammar; the six built-ins stay as `BatonToolName`. */
+  export type ToolName = string;
+  export type BatonToolName = "confirm_effective_date" | "get_disclosure" | "send_esign_and_pay_link" | "send_confirmation"
     | "update_case_field" | "hand_back_to_rep";
   export interface VaFunctionTool { type: "function"; name: ToolName; description: string; parameters: Record<string, unknown>;
     execution_mode: "interactive" | "hold"; timeout_seconds: number }
@@ -221,6 +228,7 @@ same<Same<C.Channel, D.Channel>>();
 same<Same<C.Party, D.Party>>();
 same<Same<C.FieldStatus, D.FieldStatus>>();
 same<Same<C.FieldId, D.FieldId>>();
+same<Same<C.BatonFieldId, D.BatonFieldId>>();       // P§4.7: DESIGN §4.1's vocabulary, unchanged
 same<Same<C.StatusReason, D.StatusReason>>();
 same<Same<C.Evidence, D.Evidence>>();
 same<Same<C.FactKind, D.FactKind>>();
@@ -249,6 +257,7 @@ same<Same<C.QaResult, D.QaResult>>();
 same<Same<C.ErrorCode, D.ErrorCode>>();
 same<Same<C.ApiError, D.ApiError>>();
 same<Same<C.ToolName, D.ToolName>>();
+same<Same<C.BatonToolName, D.BatonToolName>>();     // P§4.7: the six built-ins, unchanged
 same<Same<C.VaFunctionTool, D.VaFunctionTool>>();
 same<Same<C.DrainReport, D.DrainReport>>();
 same<Same<C.TranscriptionMode, D.TranscriptionMode>>();

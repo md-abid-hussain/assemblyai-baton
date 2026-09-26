@@ -6,7 +6,7 @@
  * scenario states and checks them against the spec of that scenario's intent. A new blueprint registers one spec.
  */
 import type { FieldId, PolicyRecord } from "../contracts/case";
-import { FIELD_IDS, FIELD_LABEL, REQUIRED_FIELDS, isFieldId } from "../intents/add-driver.fields";
+import { FIELD_IDS, REQUIRED_FIELDS, fieldLabelOf, isFieldId } from "../intents/add-driver.fields";
 import { normalizeField } from "../intents/add-driver";
 
 export interface IntentSpec {
@@ -29,7 +29,7 @@ export const ADD_DRIVER_SPEC: IntentSpec = {
   fieldIds: FIELD_IDS,
   isField: (x: string): x is FieldId => isFieldId(x),
   requiredFields: REQUIRED_FIELDS,
-  label: (f) => FIELD_LABEL[f],
+  label: (f) => fieldLabelOf(f),
   normalize: (f, raw, ctx) => normalizeField(f, raw, ctx)?.norm ?? null,
   ratingFields: {
     newMonthly: "premium_new_monthly_usd",

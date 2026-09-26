@@ -1,0 +1,53 @@
+{
+  "schema": "changeover.presets/1",
+  "relay": "dental-deposit",
+  "presets": [
+    {
+      "id": "add_insurance_carrier",
+      "label": "Add a required field",
+      "summary": "The AI also has to ask which dental insurance the patient has, and confirm it back.",
+      "patch": [
+        {
+          "op": "add",
+          "path": "/fields/4",
+          "value": {
+            "id": "insurance_carrier",
+            "label": "Dental insurance",
+            "description": "The patient's dental insurance plan, as spoken.",
+            "type": "text",
+            "normalizer": "text",
+            "required": true,
+            "setBy": "ai_allowed",
+            "adviceDomain": false,
+            "promptVisibility": "always",
+            "validation": {},
+            "examples": ["BrightSmile Plus"],
+            "compare": "token_subset",
+            "display": "title",
+            "capture": { "priority": 5, "mode": "balanced", "entity": true },
+            "phrases": {
+              "ask": "which dental insurance you have",
+              "confirm": "your dental insurance is {f.insurance_carrier|title}"
+            },
+            "qa": {
+              "ask": ["\\b(which (dental )?insurance|insurance (carrier|plan|do you have)|are you insured)\\b"],
+              "weak": ["\\binsurance\\b"]
+            },
+            "ui": { "group": "Patient", "hidden": false }
+          }
+        },
+        { "op": "add", "path": "/listening/keyterms/-", "value": "dental insurance" }
+      ],
+      "sim": {
+        "answers": [{ "field": "insurance_carrier", "spoken": "It's BrightSmile Plus." }]
+      }
+    },
+    {
+      "id": "deposit_seventy_five",
+      "label": "Change the deposit",
+      "summary": "The booking deposit goes from $50 to $75, everywhere the AI says it.",
+      "patch": [{ "op": "replace", "path": "/values/0/ref/value", "value": "75" }],
+      "sim": { "answers": [] }
+    }
+  ]
+}

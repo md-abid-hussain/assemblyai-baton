@@ -27,7 +27,7 @@ import { takeAudioOf } from "../../src/core/scenario/assets";
 import { planCalls, type PlannedCall } from "../../src/core/scenario/build";
 import { cacheMeta, isCompleteCache, serializeSttCacheRecord } from "../../src/core/scenario/stt-cache";
 import { downmixUlaw, estimateSttUsd, paramsHashOf, runSttCache, type OpenedChannel, type OpenedSessions, type RunnerSession } from "../../src/core/scenario/stt-run";
-import { loadKit, parseFlags, PILOT_SCENARIOS, readSplit, readSttCache, resolvePaths, str, sttCachePath, type PipelinePaths } from "../calls/lib/kit-io";
+import { loadKit, parseFlags, PILOT_SCENARIOS, readSplit, readSttCache, resolvePaths, str, sttCachePath, takeDirOf, type PipelinePaths } from "../calls/lib/kit-io";
 
 
 export interface CacheTarget {
@@ -80,7 +80,7 @@ function paramsFor(scenario: Scenario, entry: PlannedCall["entry"], variant: Stt
 async function runOne(paths: PipelinePaths, t: CacheTarget, o: { speed: number }): Promise<{ usd: number; billed: number }> {
   const { openStreaming, openStreamingPair, STT_USD_PER_SEC } = await import("../lib/aai-open");
   const e = t.call.entry;
-  const pcm = readSplit(paths.callsDir, e.callId);
+  const pcm = readSplit(takeDirOf(paths, t.call.sidecar), e.callId);
   if (!pcm) throw new Error(`${e.callId}: split WAVs missing`);
   const audio = takeAudioOf(pcm);
   const params = paramsFor(t.call.scenario, e, t.variant);
@@ -150,9 +150,9 @@ async function runOne(paths: PipelinePaths, t: CacheTarget, o: { speed: number }
 async function main(): Promise<void> {
   const f = parseFlags(process.argv.slice(2), {
     calls: "string", variants: "string", "max-usd": "string", speed: "string", force: "boolean", "dry-run": "boolean", "refresh-stale": "boolean",
-    "calls-dir": "string", "scenarios-dir": "string", "data-root": "string",
+    "calls-dir": "string", "sim-takes-dir": "string", "scenarios-dir": "string", "data-root": "string",
   });
-  const paths = resolvePaths({ callsDir: str(f["calls-dir"]), scenariosDir: str(f["scenarios-dir"]), dataRoot: str(f["data-root"]) });
+  const paths = resolvePaths({ callsDir: str(f["calls-dir"]), simTakesDir: str(f["sim-takes-dir"]), scenariosDir: str(f["scenarios-dir"]), dataRoot: str(f["data-root"]) });
   const variants = (str(f.variants) ?? "pc_ctx,pc_noctx").split(",").map((v) => v.trim()) as SttVariant[];
   for (const v of variants) if (!(STT_VARIANTS as readonly string[]).includes(v)) throw new Error(`unknown variant ${v}`);
   const maxUsd = Number(str(f["max-usd"]) ?? "0.5");
@@ -162,7 +162,7 @@ async function main(): Promise<void> {
   const kit = loadKit(paths);
   const durations = new Map<string, number>();
   const takes = kit.sidecars.filter((s) => s.state === "downloaded").flatMap((sc) => {
-    const pcm = readSplit(paths.callsDir, sc.base);
+    const pcm = readSplit(takeDirOf(paths, sc), sc.base);
     if (!pcm) return [];
     const d = takeAudioOf(pcm).durationMs;
     durations.set(sc.base, d);

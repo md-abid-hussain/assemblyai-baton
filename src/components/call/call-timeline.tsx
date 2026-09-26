@@ -6,7 +6,7 @@
 import { useMemo } from "react";
 
 import { useBaton } from "@/client/store/hooks";
-import { caseRows, fieldLabel, formatCallClock, formatMmSs, names } from "@/client/store/selectors";
+import { caseRows, fieldLabels, formatCallClock, formatMmSs, names } from "@/client/store/selectors";
 import type { Peaks } from "@/core/contracts/scenario";
 import { cn } from "@/lib/utils";
 
@@ -53,13 +53,15 @@ export function CallTimeline({ className }: { className?: string }) {
   const cs = useBaton((s) => s.caseState);
   const tArm = useBaton((s) => s.takeover.tArmMs);
   const started = useBaton((s) => s.started);
+  const rows = useBaton(caseRows, (a, b) => a.length === b.length && a.every((x, i) => x === b[i]));
+  const label = useBaton(fieldLabels);
   const rep = useBaton((s) => names(s).rep);
   const dur = ctx?.durationMs ?? 0;
   const peaks: Peaks | null = ctx?.peaks ?? null;
   const waves = useMemo(() => (peaks ? { rep: wavePath(bucket(peaks.rep, BARS), 1), customer: wavePath(bucket(peaks.customer, BARS), -1) } : null), [peaks]);
   if (!ctx || dur <= 0) return <div className={cn("h-[86px]", className)} />;
   const pct = (ms: number) => `${Math.min(100, Math.max(0, (ms / dur) * 100))}%`;
-  const markers = caseRows(cs)
+  const markers = rows
     .filter((f) => f.evidence[0] && f.evidence[0].channel !== "ai" && f.evidence[0].channel !== "customer_ai")
     .map((f) => ({ field: f.field, kind: chipKindOf(f), at: f.evidence[f.evidence.length - 1]?.startMs ?? 0 }));
   const prefillTo = started?.kind === "express" ? started.startOffsetMs : 0;
@@ -99,7 +101,7 @@ export function CallTimeline({ className }: { className?: string }) {
         {markers.map((m) => (
           <span
             key={m.field}
-            title={`${fieldLabel(m.field)}: ${m.kind.toLowerCase()}`}
+            title={`${label(m.field)}: ${m.kind.toLowerCase()}`}
             className={cn("absolute top-1/2 size-2.5 -translate-x-1/2 -translate-y-1/2 rotate-45 rounded-[2px] ring-2 ring-(--bt-panel)", DIAMOND[m.kind])}
             style={{ left: pct(m.at) }}
           />

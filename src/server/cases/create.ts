@@ -3,8 +3,9 @@ import "server-only";
 import type { CallManifestEntry } from "../../core/contracts/scenario";
 import type { CreateCaseResponse } from "../../core/contracts/api";
 import { BatonError } from "../../core/contracts/errors";
-import { workspaceOf, type CreateCaseRequestV2, type CreateCaseResponseV2 } from "../../core/contracts/v2";
+import { workspaceOf, type AccountRecord, type CreateCaseRequestV2, type CreateCaseResponseV2 } from "../../core/contracts/v2";
 import type { CaseDataSource } from "../data";
+import { FLAGSHIP_SLUG, relayEngineMode } from "../engine/mode";
 import { manifestEntryOf, prepareRelayRun, relayRunFields, runAccount, type RelayRunDeps } from "../engine/run";
 import { log } from "../log";
 import type { CasesPlatform, CasesVisitor } from "./platform";
@@ -22,9 +23,10 @@ import type { PgCaseRepository } from "./repository";
  * `sim_call_id`. A Baton request without either keeps its v1 behaviour and gains the v2 fields only when the kernel is
  * bound (best effort: a failure there never fails a Baton run).
  *
- * Only the flagship relay (Baton) creates a case today: the case engine is Baton's until the contract widening and
- * spec injection land (P§4.7, WP14a·3), so another relay answers 503 E_MAINTENANCE after its access, moderation and
- * compile checks (WP14b·3 lifts this).
+ * WP14b·3: **every** relay creates a case now. The gate that answered 503 for a non-flagship relay is gone, because
+ * P§4.7 (WP14a·4) opened `CaseState.fields` and WP14a·3's spec injection made the core functions spec-driven. A
+ * non-flagship case stores its `AccountRecord` in `cases.policy` and `intent:"relay"`, and reads resolve the engine
+ * from `cases.relay_version_id` (`relay-engine.ts`). `policy` is null in that response (v2 `CreateCaseResponseV2`).
  */
 
 /** Scenario for a case without a call (the golden demo scenario). */
@@ -32,6 +34,16 @@ export const DEFAULT_SCENARIO_ID = "s01";
 const NO_ASSETS = { rep: "", customer: "", peaks: "" } as const;
 
 const createLog = log.child({ component: "cases-create" });
+
+/**
+ * WP14b·4 (SAAS §7): who a case belongs to, when anyone is signed in. `POST /api/cases` stays a **device** route
+ * — the `/call` demo path must keep working with no session at all — so both fields are optional and the v2
+ * behaviour with neither of them is byte for byte what it was.
+ */
+export interface CaseTenant {
+  orgId?: string | null;
+  userId?: string | null;
+}
 
 export interface CreateCaseDeps {
   repo: PgCaseRepository;
@@ -45,11 +57,14 @@ export async function createCase(
   d: CreateCaseDeps,
   body: CreateCaseRequestV2,
   visitor: CasesVisitor,
+  tenant: CaseTenant = {},
 ): Promise<CreateCaseResponse | CreateCaseResponseV2> {
-  if (body.relayId || body.relayVersionId) return createRelayCase(d, body, visitor);
+  if (body.relayId || body.relayVersionId) return createRelayCase(d, body, visitor, tenant);
+  const pinned = await kernelPinnedBaton(d, body, visitor, tenant);
+  if (pinned) return pinned;
   const call = body.callId ? await d.data.getCall(body.callId) : body.mode === "watch" ? await d.data.featuredCall() : null;
   if (body.callId && !call) throw new BatonError("E_NOT_FOUND", "Unknown call.");
-  const base = await createForCall(d, body, visitor, call, {});
+  const base = await createForCall(d, body, visitor, call, {}, tenant);
   const v2 = await batonV2Fields(d, base);
   return v2 ? { ...base, ...v2 } : base;
 }
@@ -59,7 +74,8 @@ async function createForCall(
   body: CreateCaseRequestV2,
   visitor: CasesVisitor,
   call: CallManifestEntry | null,
-  relay: { relayVersionId?: string; simCallId?: string | null },
+  relay: { relayVersionId?: string; simCallId?: string | null; account?: AccountRecord },
+  tenant: CaseTenant,
 ): Promise<CreateCaseResponse> {
   if (body.mode === "watch") {
     if (!call) throw new BatonError("E_NOT_FOUND", "There is no call to watch yet.");
@@ -75,6 +91,9 @@ async function createForCall(
     ...(body.prefillUntilMs !== undefined ? { prefillUntilMs: body.prefillUntilMs } : {}),
     ...(relay.relayVersionId ? { relayVersionId: relay.relayVersionId } : {}),
     ...(relay.simCallId ? { simCallId: relay.simCallId } : {}),
+    ...(relay.account ? { account: relay.account } : {}),
+    orgId: tenant.orgId ?? null,
+    createdByUserId: tenant.userId ?? null,
   });
   const caseToken = await d.platform.issueCaseToken({ caseId: created.caseId, visitorId: visitor.visitorId });
   return {
@@ -89,20 +108,58 @@ async function createForCall(
   };
 }
 
-/** A relay run (`relayId` / `relayVersionId`): resolve, moderate, compile, then create the case. */
-async function createRelayCase(d: CreateCaseDeps, body: CreateCaseRequestV2, visitor: CasesVisitor): Promise<CreateCaseResponseV2> {
+/**
+ * A relay run (`relayId` / `relayVersionId`): resolve, moderate, compile, then create the case (WP14b·3).
+ *
+ * The flagship keeps the v1 row exactly as it was — a `PolicyRecord` in `cases.policy`, a scenario, `intent` unchanged
+ * — because Baton's takes, caches and parity corpus are pinned to it. **Any other relay** stores its `AccountRecord`
+ * instead (`$kind:"account"`, P§4.2) and `intent:"relay"`, and every later read of that case picks the relay version's
+ * engine out of `cases.relay_version_id`: its `IntentSpec` decides the fields and readiness, its dynamic extractor
+ * decides the prompt and the `<intent>_patch` strict schema. Nothing about a Dental case flows through Baton's field
+ * set any more, which is what the gate here used to prevent (it is gone; P§4.7 landed with WP14a·4).
+ */
+async function createRelayCase(d: CreateCaseDeps, body: CreateCaseRequestV2, visitor: CasesVisitor, tenant: CaseTenant = {}): Promise<CreateCaseResponseV2> {
   if (!d.relays) throw new BatonError("E_MAINTENANCE", "Relay runs are not available on this server yet. Baton still runs.");
+  // The relay is resolved in the caller's OWN workspace: the org when there is one, the device workspace
+  // otherwise. Passing the org here is what stops one tenant running another tenant's private relay.
   const p = await prepareRelayRun(d.relays(), {
-    ws: workspaceOf(visitor.visitorId), relayId: body.relayId, relayVersionId: body.relayVersionId, callId: body.callId,
+    ws: tenant.orgId ?? workspaceOf(visitor.visitorId), relayId: body.relayId, relayVersionId: body.relayVersionId, callId: body.callId,
   });
-  if (!p.run.flagship) {
-    throw new BatonError("E_MAINTENANCE", "This relay compiles, but relay runs other than Baton open with the next engine update. Try the Baton relay meanwhile.");
-  }
   const call = p.call ? manifestEntryOf(p.call) : body.mode === "watch" ? await d.data.featuredCall() : null;
-  const base = await createForCall(d, body, visitor, call, { relayVersionId: p.run.versionId, simCallId: p.call?.simCallId ?? null });
   const simulated = p.call?.simulated ?? false;
-  const account = simulated ? runAccount(p.run, p.call) : p.binding.policyToAccount(base.policy);
-  return { ...base, ...relayRunFields(p.compiled, account, simulated) };
+  const relay = { relayVersionId: p.run.versionId, simCallId: p.call?.simCallId ?? null };
+
+  if (p.run.flagship) {
+    const base = await createForCall(d, body, visitor, call, relay, tenant);
+    const account = simulated ? runAccount(p.run, p.call) : p.binding.policyToAccount(base.policy);
+    return { ...base, ...relayRunFields(p.compiled, account, simulated) };
+  }
+
+  // A non-flagship relay: the account IS the row. `p.call.account` is the sim's own sample when WP17 resolved one,
+  // else the run version's sample at the sim's index (a preset that edits sample data runs on its own numbers).
+  const account = p.call?.account ?? runAccount(p.run, p.call);
+  const base = await createForCall(d, body, visitor, call, { ...relay, account }, tenant);
+  return { ...base, policy: null, ...relayRunFields(p.compiled, account, simulated) };
+}
+
+/**
+ * `RELAY_ENGINE=kernel` (P§4.6): a plain Baton run is pinned to the seeded flagship version, so the case records
+ * `relay_version_id` and every later engine call passes `compiled.spec`. The row is otherwise a normal Baton row —
+ * a `PolicyRecord` in `cases.policy`, `intent` unchanged — because the parity suite's whole claim is that the
+ * blueprint reproduces the flagship, not that it replaces its data.
+ *
+ * Returns null under the default `legacy`, and also whenever the pin cannot be made (no relay graph, no kernel bound,
+ * the gallery not seeded, a compile failure): the caller then runs the unchanged legacy path. The flagship never fails
+ * because a P3 switch is misconfigured — the reason is logged instead.
+ */
+async function kernelPinnedBaton(d: CreateCaseDeps, body: CreateCaseRequestV2, visitor: CasesVisitor, tenant: CaseTenant): Promise<CreateCaseResponseV2 | null> {
+  if (relayEngineMode() !== "kernel" || !d.relays) return null;
+  try {
+    return await createRelayCase(d, { ...body, relayId: FLAGSHIP_SLUG }, visitor, tenant);
+  } catch (err) {
+    createLog.warn("RELAY_ENGINE=kernel could not pin the flagship version; running legacy", { err });
+    return null;
+  }
 }
 
 /** The v2 fields for a plain Baton run: the flagship compiled with `forVersion(null)`, when the kernel is bound. */

@@ -7,12 +7,14 @@ import type { TakeoverClientView, TakeoverControllerExt } from "@/core/contracts
 import type { RunPlan } from "@/core/contracts/run";
 import type { CallManifestEntry } from "@/core/contracts/scenario";
 import type { CallPlayback, CallTick, CaseSync } from "@/core/contracts/services";
+import type { CompiledListening, UiSpec } from "@/core/contracts/v2/relay";
 import type { TurnInput } from "@/core/contracts/turns";
 import { fixtureLog } from "@/client/fixtures";
 import { emptyCaseState, S01_POLICY } from "@/client/fixtures/builder";
 import type { SessionApi } from "@/client/session/api";
 import { CallSession, type LifecycleLike, type SessionContext, type SessionControllers, type SttManagerLike } from "@/client/session/orchestrator";
-import { softNotice } from "@/client/store/selectors";
+import { qaVerifiedCopy, softNotice } from "@/client/store/selectors";
+import { BATON_UI_SPEC } from "@/client/store/ui-spec";
 import { createConsoleStore } from "@/client/store/store";
 
 const CALL: CallManifestEntry = {
@@ -39,7 +41,15 @@ const QA: QaResult = {
   deadAirAfterRepMs: 420, turnLatencyP50Ms: 2300, payment: "simulated", handedBack: false, aiSeconds: 90, adviceFlags: 0, details: [],
 };
 
-function fakeApi(plan: Partial<RunPlan> = {}, o: { cached?: boolean; verification?: "completed" | "404" } = {}) {
+/** The v2 fields a relay-aware server sends with the case (`CreateCaseResponseV2`); a v1 server sends none. */
+const V2_LISTENING: CompiledListening = {
+  keyterms: ["Cedar Hollow Dental", "periodontal scaling"],
+  prompt: "A dental receptionist takes a booking deposit.",
+  languageCodes: ["en"],
+  tuning: "telephony_8k",
+};
+
+function fakeApi(plan: Partial<RunPlan> = {}, o: { cached?: boolean; verification?: "completed" | "404"; relay?: UiSpec } = {}) {
   const log: string[] = [];
   let n = 0;
   const api: SessionApi = {
@@ -52,7 +62,8 @@ function fakeApi(plan: Partial<RunPlan> = {}, o: { cached?: boolean; verificatio
         assets: CALL.assets as NonNullable<CallManifestEntry["assets"]>, cachedTurnsUrl: "/data/cached-turns/s01-take2.json",
         ...(n === 1 ? { visitorToken: "vt1" } : {}),
       };
-      return res;
+      // A relay-aware server also states the run's relay and its compiled listening (a v1 server sends neither).
+      return o.relay ? { ...res, relay: o.relay, listening: V2_LISTENING } : res;
     },
     async startRun(req: StartRunRequest, token: string) {
       log.push(`startRun ${req.caseId} express=${req.express} ${token}`);
@@ -138,8 +149,10 @@ function fakeControllers(o: { sttResult?: "live" | "queued" | "denied"; whenRunn
     playSpan: async (ch: string, a: number, b: number) => void log.push(`span ${ch} ${a} ${b}`),
     playHandoffClip: async () => ({ endCtxMs: 0 }),
   } as unknown as CallPlayback;
+  const sttOpens: { startOffsetMs: number; listening?: unknown }[] = [];
   const stt = {
-    open: async (p: { startOffsetMs: number; seedAgentContext?: string }) => {
+    open: async (p: { startOffsetMs: number; seedAgentContext?: string; listening?: unknown }) => {
+      sttOpens.push({ startOffsetMs: p.startOffsetMs, listening: p.listening });
       log.push(`stt.open ${p.startOffsetMs}${p.seedAgentContext ? ` seed="${p.seedAgentContext}"` : ""}`);
       const r = o.sttResult ?? "live";
       const st = r === "live" ? "open" : r === "denied" ? "cached" : "queued";
@@ -201,7 +214,7 @@ function fakeControllers(o: { sttResult?: "live" | "queued" | "denied"; whenRunn
     },
   };
   return {
-    controllers, log, takeover, sttStatus,
+    controllers, log, takeover, sttStatus, sttOpens,
     tick: (t: CallTick) => tickCb?.(t),
     end: () => endedCb?.(),
     emit: (ev: BatonEvent) => sink?.emit(ev),
@@ -262,6 +275,56 @@ describe("CallSession orchestrator (real-controller seams)", () => {
     // a second click does nothing
     s.start("express");
     expect(f.log.filter((l) => l === "unlockSync")).toHaveLength(1);
+  });
+
+  it("a generated take is never labelled a recording: call-provenance.json overrides the server's human half (G2b §6.1)", async () => {
+    const store = createConsoleStore();
+    const { api } = fakeApi({}, { cached: true, relay: BATON_UI_SPEC });
+    const f = fakeControllers();
+    const detail = "Simulated audio: script by gpt-6-luna, voices by gpt-4o-mini-tts. Fictional people.";
+    const s = new CallSession({
+      callId: "s01-take2", call: CALL, api, store, controllers: f.controllers, now: () => 5,
+      callProvenance: { humanHalf: "simulated", detail },
+    });
+    await s.prepare();
+    const p = store.getState().provenance;
+    expect(p?.humanHalf).toBe("simulated");
+    expect(p?.detail).toBe(detail);
+    // A simulated human half has no recorded customer to answer the AI.
+    expect(p?.customerInAiHalf).toBe("synthetic");
+    // And the QA card must not claim a recording it does not have.
+    expect(qaVerifiedCopy(store.getState()).badge).toContain("customer audio simulated");
+  });
+
+  it("a real recorded take keeps the server's strip untouched", async () => {
+    const store = createConsoleStore();
+    const { api } = fakeApi({}, { cached: true, relay: BATON_UI_SPEC });
+    const f = fakeControllers();
+    const s = new CallSession({
+      callId: "s01-take2", call: CALL, api, store, controllers: f.controllers, now: () => 5,
+      callProvenance: { humanHalf: "recorded", detail: "" },
+    });
+    await s.prepare();
+    expect(store.getState().provenance?.humanHalf).toBe("recorded");
+    expect(qaVerifiedCopy(store.getState()).badge).toBe("Verified from recording");
+  });
+
+  it("a non-flagship relay is transcribed with its own listening; the flagship (and a v1 server) is not", async () => {
+    // WP7·3 / PLATFORM §7.6: the server states `listening` per relay, and only a relay other than Baton overrides
+    // route #5's params with it — the flagship's human half must stay exactly what it was before relays existed.
+    const dental: UiSpec = { ...BATON_UI_SPEC, relay: { ...BATON_UI_SPEC.relay, slug: "dental-deposit", title: "Dental · booking deposit", flagship: false } };
+    const run = async (relay?: UiSpec) => {
+      const f = fakeControllers();
+      const { api } = fakeApi({}, { cached: true, ...(relay ? { relay } : {}) });
+      const s = new CallSession({ callId: "s01-take2", call: CALL, api, store: createConsoleStore(), controllers: f.controllers, now: () => 5 });
+      await s.prepare();
+      s.start("express");
+      await flush();
+      return f.sttOpens;
+    };
+    expect((await run(dental))[0]?.listening).toMatchObject({ prompt: "A dental receptionist takes a booking deposit." });
+    expect((await run(BATON_UI_SPEC))[0]?.listening).toBeUndefined();
+    expect((await run())[0]?.listening).toBeUndefined(); // a v1 server sends no v2 fields at all
   });
 
   it("every stt.final reaches the store AND TakeoverController.noteFinal (the cut-turn marker)", async () => {

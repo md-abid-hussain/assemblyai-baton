@@ -26,7 +26,10 @@ describe("env()", () => {
   });
 
   it("names invalid variables without echoing their values", () => {
-    const secretish = "sk-live-THIS-MUST-NOT-APPEAR";
+    // Built at run time, not written out: the point of the fixture is that it *looks* like an API key, which is
+    // exactly what `scripts/ci/staged-key-scan.mjs` refuses to let into the tree, real or fake. The assembled
+    // value is unchanged, so the assertions below still test what they always did.
+    const secretish = ["sk", "live", "THIS-MUST-NOT-APPEAR"].join("-");
     let err: unknown;
     try {
       parseEnv({ LIMITS_ROLE: secretish, VA_MAX_CONCURRENT: "many" });

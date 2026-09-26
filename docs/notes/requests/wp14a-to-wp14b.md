@@ -55,3 +55,30 @@ engine (a `CompiledRelay` with `blueprint: null`).
 
 The Studio and lint G2 use the same builder (`cannedSnapshot(bp, state, account)` for `fields` only), so the
 server's compiled view and the browser agree.
+
+---
+
+## WP14a·4 (D2 AM): the P§4.7 widening landed, and it touched two of your files
+
+The widening commit (`wp14a: WP14a-4 contract widening`) makes `FieldId`, `ToolName` and `DisclosureKind` the
+platform id grammar (`^[a-z][a-z0-9_]{1,39}$`), so `CaseState.fields` is now `Record<string, FieldState>` and
+`cases.intent` accepts `"relay"`. Two of your paths needed a mechanical fix to stay green; both are
+behaviour-preserving, and both are yours to keep or rewrite.
+
+1. **`src/server/cases/engine-stub.ts:107`** — `fields[f].status` → `fields[f]?.status ?? "MISSING"` in
+   `readinessOf`. The map is open now, so a required field can be absent from it.
+2. **`src/server/qa/build-input.ts:80`** — `ToolNameSchema.safeParse` → **`BatonToolNameSchema`** (new export from
+   `contracts/tools.ts`, `z.enum(TOOL_NAMES)`). `ToolNameSchema` now accepts *any* id, so the "known tool calls
+   only, unknown names dropped" contract of `toolCallsOf` would have let `made_up_tool` through (two tests in
+   `tests/unit/server/verify/build-input.test.ts` caught it). **When you build `buildQaInput` from the compiled
+   relay (T2), the right filter there is the relay's own tool names, not the six.**
+3. Tests in your paths that index `state.fields.<baton_field>` gained `?.`:
+   `tests/unit/server/cases/{extract-service,prefill,repository,verifier-runner}.test.ts`.
+
+**One thing left for you:** `src/server/db/schema.ts:50` still declares `intent: text("intent", { enum:
+["add_driver"] })`. P§4.7 says `cases.intent` gains `"relay"`; the column is text with no DB check, so this is a
+one-word TS change on your side, needed before a relay case writes its intent. Nothing writes it today (the insert
+uses the column default), so nothing is broken right now.
+
+Also: `cannedCaseState` still emits `intent: "add_driver"` for every relay. It can move to `"relay"` whenever you
+want it to; say so and WP14a changes it in one line (the parity corpus pins Baton only).

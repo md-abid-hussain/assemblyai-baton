@@ -268,7 +268,13 @@ export class PgRelayRegistry implements RelayRegistry {
     return this.detailOf(row, ws);
   }
 
-  async create(ws: string, from: CreateFrom): Promise<RelayDetail> {
+  /**
+   * `opts.createdByUserId` stamps `relays.created_by_user_id` (SAAS §5.1 table). It is **provenance, never
+   * authorization**: who may touch the relay is decided by `workspace_id` and the principal's permission, exactly
+   * as §6.1 requires of api keys, so a creator who later leaves the org changes nothing about access. Optional
+   * because the device path (`TENANCY_MODE=legacy`) and the gallery seed have no user to name.
+   */
+  async create(ws: string, from: CreateFrom, opts: { createdByUserId?: string | null } = {}): Promise<RelayDetail> {
     let bp: Blueprint;
     let origin: RelayRow["origin"];
     switch (from.kind) {
@@ -314,6 +320,7 @@ export class PgRelayRegistry implements RelayRegistry {
           draftRev: 0,
           lint: parsed.issues,
           origin,
+          createdByUserId: opts.createdByUserId ?? null,
           createdAt: now,
           updatedAt: now,
           lastUsedAt: now,

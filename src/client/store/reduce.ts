@@ -37,6 +37,9 @@ export function initialUiState(): UiState {
     flowPhase: "preflight",
     t: 0,
     context: null,
+    relay: null,
+    provenance: null,
+    account: null,
     plan: null,
     started: null,
     mode: "live",
@@ -462,6 +465,8 @@ export function reduceUi(s: UiState, a: UiAction): UiState {
   switch (a.type) {
     case "ui.context":
       return { ...s, t, context: a.context };
+    case "ui.relay":
+      return { ...s, t, relay: a.relay, provenance: a.provenance, account: a.account };
     case "ui.start":
       return {
         ...s,
@@ -489,7 +494,7 @@ export function reduceUi(s: UiState, a: UiAction): UiState {
     case "ui.notice":
       return { ...s, t, notice: a.message };
     case "ui.reset":
-      return { ...initialUiState(), context: s.context };
+      return { ...initialUiState(), context: s.context, relay: s.relay, provenance: s.provenance, account: s.account };
     default: {
       const never: never = a;
       void never;

@@ -35,3 +35,15 @@ test-results/
 
 # Per-work-package git worktrees for parallel agents
 .wt/
+
+# Local QA screenshots/reports (shared with the user, never committed)
+qa-artifacts/
+
+# Devtools output (WP23): self-hosted Monaco, and the CLI/SDK tarballs served from the app.
+# `public/schemas/` stays committed.
+public/vendor/monaco/
+public/cli/
+public/sdk/
+
+# Orchestrator handover notes (local only)
+.handover/

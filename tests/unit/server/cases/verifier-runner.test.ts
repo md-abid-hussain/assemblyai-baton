@@ -37,16 +37,16 @@ describe.skipIf(!HAS_DB)("VerifierRunner (F2)", () => {
     const caseId = await newCase(h, { callId: null });
     for (const f of dialog.turns.slice(0, 8)) await h.service.handle(turnOf(caseId, f)); // customer-3 stated, not read back yet
     const before = (await h.repo.loadRow(caseId))!.state;
-    expect(before.fields.vehicle_assignment.status).toBe("PENDING");
-    expect(before.fields.license_number.status).toBe("MISSING");
+    expect(before.fields.vehicle_assignment?.status).toBe("PENDING");
+    expect(before.fields.license_number?.status).toBe("MISSING");
     const r = await h.runner.maybeRun(caseId);
     expect(r).toMatchObject({ ran: true, applied: true });
     const after = (await h.repo.loadRow(caseId))!.state;
-    expect(after.fields.vehicle_assignment.status).toBe("PENDING");
-    expect(after.fields.garaging_zip.status).toBe("PENDING");
-    expect(after.fields.license_number.status).not.toBe("VERIFIED");
+    expect(after.fields.vehicle_assignment?.status).toBe("PENDING");
+    expect(after.fields.garaging_zip?.status).toBe("PENDING");
+    expect(after.fields.license_number?.status).not.toBe("VERIFIED");
     for (const f of Object.keys(after.fields) as (keyof typeof after.fields)[]) {
-      if (before.fields[f].status !== "VERIFIED") expect(after.fields[f].status).not.toBe("VERIFIED");
+      if (before.fields[f]!.status !== "VERIFIED") expect(after.fields[f]!.status).not.toBe("VERIFIED");
     }
     const [run] = await t.db.select().from(verifierRuns).where(eq(verifierRuns.caseId, caseId));
     expect(run).toBeDefined();
@@ -62,12 +62,12 @@ describe.skipIf(!HAS_DB)("VerifierRunner (F2)", () => {
     });
     const caseId = await newCase(h, { callId: null });
     for (const f of dialog.turns.slice(0, 7)) await h.service.handle(turnOf(caseId, f));
-    expect((await h.repo.loadRow(caseId))!.state.fields.driver_dob.status).toBe("VERIFIED");
+    expect((await h.repo.loadRow(caseId))!.state.fields.driver_dob?.status).toBe("VERIFIED");
     await h.runner.maybeRun(caseId);
     const after = (await h.repo.loadRow(caseId))!.state;
-    expect(after.fields.driver_dob.status).toBe("PENDING");
-    expect(after.fields.driver_dob.reason).toBe("verifier_disagrees");
-    expect(after.fields.license_state.status).toBe("VERIFIED");
+    expect(after.fields.driver_dob?.status).toBe("PENDING");
+    expect(after.fields.driver_dob?.reason).toBe("verifier_disagrees");
+    expect(after.fields.license_state?.status).toBe("VERIFIED");
     const facts = (await h.repo.listFacts(caseId)).filter((e) => e.kind === "verifier");
     expect(facts.map((e) => e.field)).toEqual(["driver_dob"]);
     expect(facts[0]).toMatchObject({ party: "verifier", extractor: "sol", turnId: null, confidence: "medium" });
@@ -129,12 +129,12 @@ describe.skipIf(!HAS_DB)("VerifierRunner (F2)", () => {
     expect(await running).toMatchObject({ ran: true, applied: false, disagreements: 0 });
     const row = (await h.repo.loadRow(caseId))!;
     expect(row.state).toEqual(snap);
-    expect(row.state.fields.driver_dob.status).toBe("VERIFIED");
+    expect(row.state.fields.driver_dob?.status).toBe("VERIFIED");
     const [run] = await t.db.select().from(verifierRuns).where(eq(verifierRuns.caseId, caseId));
     expect((run!.result as { applied?: boolean }).applied).toBe(false);
     // a later re-derive (e.g. an AI-half tool update) must not pick the late run up either
     const again = await h.repo.recompute(caseId);
-    expect(again.fields.driver_dob.status).toBe("VERIFIED");
+    expect(again.fields.driver_dob?.status).toBe("VERIFIED");
   });
 
   it("the OpenAI budget gate: a refused reservation skips the run; a run settles its actual cost", async () => {

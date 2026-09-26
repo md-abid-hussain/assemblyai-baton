@@ -8,7 +8,7 @@ import { emptyCaseState, S01_POLICY, setField } from "@/client/fixtures/builder"
 import { phaseSpans, resolveAt } from "@/client/fixtures/player";
 import { initialUiState, parseQueueDetail, percentile, reduceEntry, replayLog } from "@/client/store/reduce";
 import {
-  formatCallClock, formatCallDate, formatMmSs, modeBadge, narrator, passEstimate, passState, protocolSteps, separatorText,
+  formatCallClock, formatCallDate, formatMmSs, narrator, passEstimate, passState, protocolSteps, provenance, separatorText,
 } from "@/client/store/selectors";
 import { createConsoleStore } from "@/client/store/store";
 
@@ -130,14 +130,15 @@ describe("selectors and copy", () => {
     const p = passState(early);
     expect(p.enabled).toBe(false);
     expect(p.reason).toBe("Live AI is unavailable right now: the recorded AI session starts at Daniel's handoff line (01:50).");
-    expect(modeBadge(s).label).toBe("RECORDED AI SESSION");
+    // The stacked RECORDED AI SESSION badge is gone (WP7 acceptance 4): the provenance strip's AI segment says it.
+    expect(provenance(s, { customerInput: "synthetic" }).segments.find((g) => g.key === "ai")?.tag).toBe("RECORDED");
   });
 
   it("estimates the AI's remaining work from the case", () => {
     let cs = emptyCaseState("c");
-    expect(passEstimate(cs).facts).toBe(9); // 10 required minus the server-resolvable premium
+    expect(passEstimate({ caseState: cs, relay: null }).facts).toBe(9); // 10 required minus the server-resolvable premium
     cs = setField(cs, "driver_full_name", { status: "VERIFIED", reason: "read_back", value: "Maya" }, 1000);
-    expect(passEstimate(cs).text).toBe("Pass now: the AI will need to collect 8 facts, about 4 min.");
+    expect(passEstimate({ caseState: cs, relay: null }).text).toBe("Pass now: the AI will need to collect 8 facts, about 4 min.");
   });
 
   it("shows the protocol steps with ms and the separator row", () => {

@@ -58,7 +58,7 @@ describe.skipIf(!HAS_DB)("relay runs: POST /api/cases + GET /api/relays/:id/comp
     });
     moderator = new FakeModerator();
     rd = setRelaysDeps({
-      db: t.db, gallery: new MemoryGallerySource(galleryEntries()), moderator, binding: () => bound, deployId: () => "dev-wp14b",
+      db: t.db, gallery: new MemoryGallerySource(galleryEntries()), moderator, binding: () => bound, deployId: () => "test-relay-runs-env",
       calls: { getCall: (id) => data.getCall(id) },
       sims: () => ({ resolveCall: async (id) => sims.get(id) ?? null }),
     })!;
@@ -142,16 +142,24 @@ describe.skipIf(!HAS_DB)("relay runs: POST /api/cases + GET /api/relays/:id/comp
     expect((await run(v.h, { relayVersionId: "rv_nope" })).status).toBe(404);
   });
 
-  it("a gallery preset version resolves, is pre-cleared by its seed moderation, compiles, then waits for the Dental path (503)", async () => {
+  it("a gallery preset version runs (WP14b·3): pre-cleared by its seed moderation, compiled, and the case stores the account", async () => {
     const v = visitor();
     const dental = (await rd.registry.get((await galleryRow("dental-deposit")).id, v.ws))!;
     const preset = dental.presets.find((p) => p.id === "add_insurer")!;
     const before = moderator.calls.length;
     const r = await run(v.h, { relayVersionId: preset.versionId });
-    expect(r.status).toBe(503);
-    expect((await errOf(r)).message).toMatch(/other than Baton/);
+    expect(r.status).toBe(200);
+    const body = CreateCaseResponseV2Schema.parse(await r.json());
+    expect(body.policy).toBeNull();                                   // a relay case has no PolicyRecord
+    expect(body.relay.relay).toMatchObject({ slug: "dental-deposit", flagship: false, versionId: preset.versionId });
+    expect(body.relay.fields.map((f) => f.id)).toContain("insurer");   // the preset's extra field is in the UiSpec
+    expect(body.account).toEqual(dental.draft.context.samples[0]);
     expect(kernel.compiles.map((c) => c.versionId)).toEqual([preset.versionId]);
     expect(moderator.calls.length).toBe(before); // seeded text is never sent out
+    const [row] = await t.db.select({ intent: cases.intent, policy: cases.policy, rv: cases.relayVersionId }).from(cases).where(eq(cases.id, body.caseId));
+    expect(row!.intent).toBe("relay");
+    expect(row!.rv).toBe(preset.versionId);
+    expect((row!.policy as { $kind?: string }).$kind).toBe("account");
     // relayId + a version of another relay → 404
     expect((await run(v.h, { relayId: "baton-add-driver", relayVersionId: preset.versionId })).status).toBe(404);
   });
@@ -179,7 +187,7 @@ describe.skipIf(!HAS_DB)("relay runs: POST /api/cases + GET /api/relays/:id/comp
       bp.meta.title = "Brightwater front desk";
     });
     const open = await run(v.h, { relayId: clone.id });
-    expect(open.status).toBe(503); // passed moderation (fail open) and compiled; the non-Baton gate answers
+    expect(open.status).toBe(200); // passed moderation (fail open), compiled, and now runs (WP14b·3)
     expect(kernel.compiles.map((x) => x.relayId)).toEqual([clone.id]);
     const blank = await rd.registry.create(v.ws, { kind: "blank", industry: "other" });
     kernel.compiles.length = 0;
@@ -200,7 +208,7 @@ describe.skipIf(!HAS_DB)("relay runs: POST /api/cases + GET /api/relays/:id/comp
     expect((await run(b.h, { relayId: c.id })).status).toBe(404);
     expect((await run(b.h, { relayVersionId: vid })).status).toBe(404);
     await rd.registry.setVisibility(c.id, a.ws, "unlisted");
-    expect((await run(b.h, { relayVersionId: vid })).status).toBe(503); // visible now; non-Baton gate
+    expect((await run(b.h, { relayVersionId: vid })).status).toBe(200); // visible now, and it runs (WP14b·3)
     expect(kernel.compiles.map((x) => x.versionId)).toEqual([vid]);
   });
 
@@ -260,7 +268,7 @@ describe.skipIf(!HAS_DB)("relay runs: POST /api/cases + GET /api/relays/:id/comp
       expect(lintDeps.engine.cachedKeys()).toEqual([]);
     } finally {
       rd = setRelaysDeps({
-        db: t.db, gallery: new MemoryGallerySource(galleryEntries()), moderator, binding: () => bound, deployId: () => "dev-wp14b",
+        db: t.db, gallery: new MemoryGallerySource(galleryEntries()), moderator, binding: () => bound, deployId: () => "test-relay-runs-env",
         sims: () => ({ resolveCall: async (id) => sims.get(id) ?? null }),
       })!;
     }

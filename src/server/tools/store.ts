@@ -30,6 +30,35 @@ export interface DisclosureRecord {
   at: string;
 }
 
+/**
+ * WP16·2: the same `metrics.disclosures[<id>]` slot for a GENERIC relay, whose disclosure ids are blueprint ids,
+ * not the two Baton kinds. It is a superset of `DisclosureRecord` minus the insurance-only sources, so WP8's
+ * verbatim check (`wp8-to-wp6` item 1) keeps reading `text` and `criticalTokens` on either path, and `monthlyUsd` /
+ * `dueTodayUsd` stay filled from the relay's named money values (see `relay-tool-service.ts`).
+ */
+export interface RelayDisclosureRecord {
+  id: string;
+  kind: string;
+  text: string;
+  criticalTokens: string[];
+  monthlyUsd: string;
+  dueTodayUsd: string;
+  premiumSource: string;
+  dueSource: string;
+  at: string;
+  /** Every named value as it resolved when the disclosure was read (the owner-facing audit of the numbers spoken). */
+  values?: Record<string, string | null>;
+}
+
+/** WP16·2: a connector that SUCCEEDED in this takeover (`metrics.connectors[<connectorId>]`). */
+export interface ConnectorSuccessRecord {
+  connectorId: string;
+  toolName: string;
+  at: string;
+  /** `payment_link`: the payment row it created, so a replay reuses it instead of opening a second checkout. */
+  paymentId?: string;
+}
+
 export interface ToolFlowMetrics {
   /** update_case_field attempts per field in this takeover (the conflict flow's "first attempt"). */
   fieldAttempts?: Record<string, number>;
@@ -46,6 +75,10 @@ export interface TakeoverRecord {
   phase: string;
   outcome: string | null;
   disclosures: Partial<Record<DisclosureKind, DisclosureRecord>>;
+  /** WP16·2: the SAME `metrics.disclosures` map read by blueprint id (a superset of `disclosures`). */
+  relayDisclosures: Record<string, RelayDisclosureRecord>;
+  /** WP16·2: `metrics.connectors`, the connectors that succeeded in this takeover. */
+  connectors: Record<string, ConnectorSuccessRecord>;
   confirmationNumber: string | null;
   toolFlow: ToolFlowMetrics;
 }
@@ -58,6 +91,10 @@ export interface ToolStore {
   getTakeover(id: string): Promise<TakeoverRecord | null>;
   setStage(id: string, stage: Stage): Promise<void>;
   putDisclosure(id: string, d: DisclosureRecord): Promise<void>;
+  /** WP16·2: the same slot for a generic relay disclosure id. */
+  putRelayDisclosure(id: string, d: RelayDisclosureRecord): Promise<void>;
+  /** WP16·2: record a connector success (idempotent; the first write wins, so a replay keeps its payment id). */
+  markConnector(id: string, r: ConnectorSuccessRecord): Promise<ConnectorSuccessRecord>;
   /** Set the confirmation number once; returns the stored one (first writer wins). */
   putConfirmationNumber(id: string, n: string): Promise<string>;
   mergeToolFlow(id: string, patch: ToolFlowMetrics): Promise<void>;
@@ -83,6 +120,8 @@ function toTakeoverRecord(r: TkoRow): TakeoverRecord {
     phase: r.phase,
     outcome: r.outcome ?? null,
     disclosures: (m.disclosures ?? {}) as TakeoverRecord["disclosures"],
+    relayDisclosures: (m.disclosures ?? {}) as Record<string, RelayDisclosureRecord>,
+    connectors: (m.connectors ?? {}) as Record<string, ConnectorSuccessRecord>,
     confirmationNumber: typeof m.confirmationNumber === "string" ? m.confirmationNumber : null,
     toolFlow: (m.toolFlow ?? {}) as ToolFlowMetrics,
   };
@@ -108,6 +147,29 @@ export class DbToolStore implements ToolStore {
           coalesce(${takeovers.metrics}->'disclosures', '{}'::jsonb) || jsonb_build_object(${d.kind}::text, ${JSON.stringify(d)}::jsonb))`,
       })
       .where(eq(takeovers.id, id));
+  }
+
+  async putRelayDisclosure(id: string, d: RelayDisclosureRecord): Promise<void> {
+    await this.db
+      .update(takeovers)
+      .set({
+        metrics: sql`coalesce(${takeovers.metrics}, '{}'::jsonb) || jsonb_build_object('disclosures',
+          coalesce(${takeovers.metrics}->'disclosures', '{}'::jsonb) || jsonb_build_object(${d.kind}::text, ${JSON.stringify(d)}::jsonb))`,
+      })
+      .where(eq(takeovers.id, id));
+  }
+
+  /** First writer wins: the existing row is kept, so a replayed `payment_link` reuses its payment id. */
+  async markConnector(id: string, r: ConnectorSuccessRecord): Promise<ConnectorSuccessRecord> {
+    await this.db
+      .update(takeovers)
+      .set({
+        metrics: sql`coalesce(${takeovers.metrics}, '{}'::jsonb) || jsonb_build_object('connectors',
+          jsonb_build_object(${r.connectorId}::text, ${JSON.stringify(r)}::jsonb) || coalesce(${takeovers.metrics}->'connectors', '{}'::jsonb))`,
+      })
+      .where(eq(takeovers.id, id));
+    const cur = await this.getTakeover(id);
+    return cur?.connectors[r.connectorId] ?? r;
   }
 
   async putConfirmationNumber(id: string, n: string): Promise<string> {
@@ -196,6 +258,25 @@ export function flowCtxOf(t: TakeoverRecord | null, p: PaymentRecord | null): Fl
     disclosuresGiven: t ? order.filter((k) => t.disclosures[k] !== undefined) : [],
     payment: casePaymentOf(p),
     confirmationNumber: t?.confirmationNumber ?? null,
+  };
+}
+
+/** WP16·2: `FlowCtx` plus the connectors that succeeded, which a relay's `nextStage` exits read. */
+export interface RelayFlowCtx extends FlowCtx {
+  connectorsSucceeded: string[];
+}
+
+/**
+ * WP16·2: the flow context of a generic relay takeover. `order` is the blueprint's disclosure order, so
+ * `disclosuresGiven` is deterministic (the Baton order is a special case of it).
+ */
+export function relayFlowCtxOf(order: readonly string[], t: TakeoverRecord | null, p: PaymentRecord | null): RelayFlowCtx {
+  return {
+    stage: t?.stage ?? null,
+    disclosuresGiven: (t ? order.filter((id) => t.relayDisclosures[id] !== undefined) : []) as DisclosureKind[],
+    payment: casePaymentOf(p),
+    confirmationNumber: t?.confirmationNumber ?? null,
+    connectorsSucceeded: t ? Object.keys(t.connectors) : [],
   };
 }
 

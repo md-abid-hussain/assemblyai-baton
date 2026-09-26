@@ -24,6 +24,28 @@ export async function register(): Promise<void> {
     } catch (err) {
       log.child({ component: "boot" }).error("call lookup failed to register", { err });
     }
+    // [WIRE-PUBLISHING] wired at G2b. `installPublishing()` registers WP18's `livePublications` count source with the
+    // v3 entitlements registry (`setOrgCounter`), which is what enforces the guest plan's 1 live publication before
+    // WP21 exists (docs/notes/wp18.md "What the integrator must do" §2). It only stores a closure, so it stays cheap
+    // at boot and opens no database connection.
+    try {
+      const { installPublishing } = await import("./server/publish");
+      installPublishing();
+    } catch (err) {
+      log.child({ component: "boot" }).error("publishing failed to install", { err });
+    }
+    // [WIRE-RELAY-SAAS] wired at G3. `installRelaySaasPorts()` points WP19's v3 port registry at WP14b's real
+    // `GuestSeeder`, `RelaySourceStore` and relay counter (docs/notes/wp14b.md, `src/server/relays/index.ts`).
+    // It has to happen at boot rather than lazily because `/api/guest/start` never touches the relay graph: in a
+    // cold container whose first request is a guest start — the judge path — the registry would still hold the
+    // C3b no-op seeder and the guest would land with no "Dental deposit (your copy)". It builds the graph but
+    // opens no connection (the `pg` Pool is lazy), so it stays cheap here.
+    try {
+      const { installRelaySaasPorts } = await import("./server/relays");
+      installRelaySaasPorts();
+    } catch (err) {
+      log.child({ component: "boot" }).error("relay saas ports failed to install", { err });
+    }
     if (inprocWorker) {
       // [WIRE-INPROC-WORKER] wired at G1. startInprocWorker() is idempotent per process (globalThis guard), so a
       // second instrumentation run in the same process is harmless.

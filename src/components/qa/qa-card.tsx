@@ -7,10 +7,10 @@ import { CheckCircle2Icon, ChevronRightIcon, ClipboardCheckIcon, Loader2Icon, Sh
 import { Popover as PopoverPrimitive } from "radix-ui";
 
 import { useBaton } from "@/client/store/hooks";
-import { formatMmSs, formatMsExact, names } from "@/client/store/selectors";
+import { fieldLabels, formatMmSs, formatMsExact, names, qaVerifiedCopy } from "@/client/store/selectors";
+import { specOf } from "@/client/store/ui-spec";
 import type { QaResult } from "@/core/contracts/events";
 import type { Wp7UiState } from "@/core/contracts/ext/wp7-ui";
-import { FIELD_LABEL } from "@/core/intents/add-driver.fields";
 import { cn } from "@/lib/utils";
 
 import { useConsoleEnv, useNow } from "../common/console-context";
@@ -27,6 +27,7 @@ const CLASS_LABEL: Record<Detail["classification"], string> = {
 };
 
 function Details({ items, empty }: { items: Detail[]; empty: string }) {
+  const label = useBaton(fieldLabels);
   if (!items.length) return <p className="px-1 pt-1 text-xs text-(--bt-muted)">{empty}</p>;
   return (
     <ul className="space-y-1.5 pt-1.5">
@@ -35,7 +36,7 @@ function Details({ items, empty }: { items: Detail[]; empty: string }) {
           <p className="text-(--bt-ink)">“{d.sentence}”</p>
           <p className="mt-0.5 text-(--bt-muted)">
             <span className="bt-mono">{formatMmSs(d.atMs)}</span> · {CLASS_LABEL[d.classification]}
-            {d.field ? ` · ${FIELD_LABEL[d.field]}` : ""}
+            {d.field ? ` · ${label(d.field)}` : ""}
           </p>
         </li>
       ))}
@@ -69,7 +70,7 @@ function PlainMetric({ label, value, sub, tone }: { label: string; value: string
   );
 }
 
-function DisclosureMetric({ d, s }: { d: QaResult["disclosures"][number]; s: Pick<Wp7UiState, "tools" | "ai"> }) {
+function DisclosureMetric({ d, s, title }: { d: QaResult["disclosures"][number]; s: Pick<Wp7UiState, "tools" | "ai">; title: string }) {
   const tool = s.tools.find((x) => x.name === "get_disclosure" && (x.args as { kind?: string } | null)?.kind === d.kind);
   const required = (tool?.result as { text?: string } | null)?.text ?? null;
   const spokenLine = required
@@ -79,7 +80,7 @@ function DisclosureMetric({ d, s }: { d: QaResult["disclosures"][number]; s: Pic
         .sort((a, b) => b.score - a.score)[0]?.l
     : undefined;
   const spoken = required && spokenLine ? bestWindow(required, spokenLine.text) : null;
-  const label = d.kind === "premium_change" ? "Premium disclosure verbatim" : "E-sign consent verbatim";
+  const label = `${title} verbatim`;
   return (
     <div className="rounded-xl border border-(--bt-line) bg-(--bt-panel) px-3 py-2">
       <div className="bt-eyebrow">{label}</div>
@@ -126,7 +127,11 @@ export function QaCardBody() {
   const tools = useBaton((s) => s.tools);
   const ai = useBaton((s) => s.ai);
   const rep = useBaton((s) => names(s).rep);
+  const spec = useBaton(specOf);
+  const copy = useBaton(qaVerifiedCopy, (a, b) => a.badge === b.badge);
   const env = useConsoleEnv();
+  /** The disclosure's own title from the relay's `UiSpec` ("Premium change", "Deposit terms", …). */
+  const disclosureTitle = (kind: string): string => spec.disclosures.find((x) => x.id === kind)?.title ?? kind.replace(/_/g, " ");
   const waiting = !qa.verified && qa.status !== "failed";
   useNow(waiting, 1000);
   const r = qa.verified ?? qa.provisional;
@@ -137,7 +142,7 @@ export function QaCardBody() {
       <div className="flex flex-wrap items-center gap-2">
         {qa.verified ? (
           <span className="inline-flex items-center gap-1.5 rounded-full bg-(--verified-bg) px-3 py-1 text-sm font-bold text-(--verified-fg)">
-            <ShieldCheckIcon className="size-4" aria-hidden="true" /> Verified from recording
+            <ShieldCheckIcon className="size-4 shrink-0" aria-hidden="true" /> {copy.badge}
           </span>
         ) : qa.status === "failed" ? (
           <span className="inline-flex items-center gap-1.5 rounded-full bg-(--pending-bg) px-3 py-1 text-sm font-bold text-(--pending-fg)">
@@ -155,7 +160,7 @@ export function QaCardBody() {
       </div>
       {qa.status === "failed" ? (
         <p role="status" className="rounded-lg border border-(--pending)/50 bg-(--pending-bg) px-3 py-2 text-xs text-(--pending-fg)">
-          Couldn&apos;t verify from recording ({qa.reason ?? "unknown reason"}). Provisional numbers shown.
+          Couldn&apos;t verify from the agent&apos;s recording ({qa.reason ?? "unknown reason"}). Provisional numbers shown.
         </p>
       ) : null}
       {r ? (
@@ -166,7 +171,7 @@ export function QaCardBody() {
           {r.verifiedReconfirmed > 0 ? <CountMetric label="Verified reconfirmed" n={r.verifiedReconfirmed} items={by("verified_reconfirm")} emptyText="" /> : null}
           <PlainMetric label="Advice flags" value={String(r.adviceFlags)} sub="target 0" tone={r.adviceFlags === 0 ? "good" : "warn"} />
           {r.disclosures.map((d) => (
-            <DisclosureMetric key={d.kind} d={d} s={{ tools, ai }} />
+            <DisclosureMetric key={d.kind} d={d} s={{ tools, ai }} title={disclosureTitle(d.kind)} />
           ))}
           <PlainMetric label="Click → first audible" value={formatMsExact(r.clickToFirstAudibleMs)} sub={`includes ${rep}'s ≈3.5 s handoff line`} />
           <PlainMetric label={`Dead air after ${rep}'s line`} value={formatMsExact(r.deadAirAfterRepMs)} />
@@ -181,9 +186,7 @@ export function QaCardBody() {
         </div>
       )}
       <p className="text-[11px] text-(--bt-muted)">
-        {qa.verified
-          ? "Computed deterministically from the AssemblyAI async multichannel transcript of the agent's own recording (channel 2). "
-          : "Provisional: computed from the Voice Agent's live transcript. The verified figures replace these when the recording is analysed. "}
+        {qa.verified ? copy.how : "Provisional: computed from the Voice Agent's live transcript. The verified figures replace these when the recording is analysed. "}
         <a href={env.links.about} className="font-medium text-(--rep-fg) underline underline-offset-2">
           How →
         </a>

@@ -8,9 +8,10 @@ import type { CaseState, FieldId, FieldState } from "@/core/contracts/case";
 import type { ProtocolStepView, TranscriptLine, UiPhase } from "@/core/contracts/ext/wp7-ui";
 import { PROTOCOL_STEPS } from "@/core/contracts/ext/wp7-ui";
 import { TAKEOVER_TIMING } from "@/core/contracts/takeover";
-import { FIELD_LABEL, REQUIRED_FIELDS, SERVER_RESOLVABLE_SET } from "@/core/intents/add-driver.fields";
-
+import type { ProvenanceStrip } from "@/core/contracts/v2/api";
+import type { UiSpec } from "@/core/contracts/v2/relay";
 import { isTerminalPayment, type UiState } from "./reduce";
+import { agentNameOf, groupsOf, labelsOf, paySteps, requiredOf, specOf } from "./ui-spec";
 
 // ------------------------------------------------------------------------------------------------ formatting
 
@@ -62,12 +63,26 @@ export const formatUsd = (cents: number | null | undefined): string =>
 
 // ------------------------------------------------------------------------------------------------ people
 
-export function names(s: Pick<UiState, "context">): { rep: string; customer: string; customerFull: string } {
+/**
+ * Who the two people are. The run's `AccountRecord` (any relay) wins; a fixture log or a server without the v2
+ * fields falls back to the Baton policy record.
+ */
+export function names(s: Pick<UiState, "context" | "account">): { rep: string; customer: string; customerFull: string; org: string } {
+  const a = s.account;
   const p = s.context?.policy;
+  if (a) {
+    return {
+      rep: a.org.repFirstName || "the rep",
+      customer: a.customer.firstName || "the customer",
+      customerFull: `${a.customer.firstName} ${a.customer.lastName}`.trim() || "the customer",
+      org: a.org.name || "the business",
+    };
+  }
   return {
     rep: p?.repFirstName || "the rep",
     customer: p?.policyholder.firstName || "the customer",
     customerFull: p ? `${p.policyholder.firstName} ${p.policyholder.lastName}` : "the customer",
+    org: p?.agencyName || "the business",
   };
 }
 
@@ -105,13 +120,18 @@ export function passState(s: UiState): PassState {
 }
 
 /**
- * "Pass now: the AI will need to collect 4 facts, about 2 min". Facts = required fields that are not VERIFIED,
- * minus the server-resolvable premium (get_disclosure supplies it). Time model: ≈75 s for disclose + pay + close,
- * plus ≈20 s per fact to confirm or ask (from the s01/s02 dev runs; a rough, labelled estimate).
+ * "Pass now: the AI will need to collect 4 facts, about 2 min". Facts = required fields that are not VERIFIED and
+ * that the AI would actually have to ask for: a required **`repOnly`** field is supplied by the rep or by the relay's
+ * own tools (Baton's `premium_new_monthly_usd` comes back from `get_disclosure`), never asked of the customer. Taking
+ * that from the `UiSpec` rather than Baton's `SERVER_RESOLVABLE` keeps the estimate right for any relay — and it is
+ * the same field on Baton, so the flagship's number does not move. Time model: ≈75 s for disclose + pay + close, plus
+ * ≈20 s per fact to confirm or ask (from the s01/s02 dev runs; a rough, labelled estimate).
  */
-export function passEstimate(cs: CaseState | null): { facts: number; minutes: number; text: string } {
+export function passEstimate(s: Pick<UiState, "caseState" | "relay">): { facts: number; minutes: number; text: string } {
+  const cs = s.caseState;
   if (!cs) return { facts: 0, minutes: 0, text: "Pass any time: the AI inherits whatever the case holds." };
-  const facts = REQUIRED_FIELDS.filter((f) => !SERVER_RESOLVABLE_SET.has(f) && cs.fields[f]?.status !== "VERIFIED").length;
+  const asked = new Set(specOf(s).fields.filter((f) => !f.repOnly).map((f) => f.id));
+  const facts = requiredFields(s).filter((f) => asked.has(f) && cs.fields[f as FieldId]?.status !== "VERIFIED").length;
   const minutes = Math.max(1, Math.round((75 + 20 * facts) / 60));
   const what = facts === 0 ? "only confirm, disclose and take payment" : `need to collect ${facts} fact${facts === 1 ? "" : "s"}`;
   return { facts, minutes, text: `Pass now: the AI will ${what}, about ${minutes} min.` };
@@ -130,6 +150,9 @@ export function phaseCopy(s: UiState): PhaseCopy {
   const q = s.queue;
   const per = s.context?.sttOpensPerMin ?? 5;
   const lastFallback = s.fallbacks[s.fallbacks.length - 1];
+  // Relay-agnostic copy: what the AI is called, and which steps this relay's phone actually asks of the customer.
+  const agent = agentNameOf(specOf(s));
+  const pay = paySteps(specOf(s));
   const map: Record<UiPhase, PhaseCopy> = {
     preflight: {
       title: "Ready when you are",
@@ -142,7 +165,7 @@ export function phaseCopy(s: UiState): PhaseCopy {
     connecting: { title: "Opening 2 live transcription sessions…", body: "One AssemblyAI Universal-3.5 Pro session per speaker (rep and customer)." },
     shadowing: {
       title: "Human half",
-      body: `Baton is listening silently; watch facts turn green. Pass the baton any time.`,
+      body: `${agent} is listening silently; watch facts turn green. Pass the baton any time.`,
     },
     arming: { title: "Arming", body: `Waiting ≤1.5 s for the current turn to end, then ${rep} hands off.` },
     sealing: { title: "Sealing", body: `${rep}'s handoff line plays while the last words are finalized.` },
@@ -152,7 +175,12 @@ export function phaseCopy(s: UiState): PhaseCopy {
     "ai-listening": { title: "AI half: listening", body: `You are ${customer}. Let Autopilot answer, click a reply, or type anything.` },
     "ai-thinking": { title: s.va.checking ? "AI half: checking…" : "AI half: thinking…", body: "From the end of the customer's speech to the first audible reply." },
     "ai-speaking": { title: "AI half: speaking", body: "Captions follow the audio; the HUD shows the last latency." },
-    paying: { title: "Your turn: tap the text on the phone", body: "Sign, then pay with the Polar sandbox test card or skip with a simulated payment." },
+    paying: {
+      title: "Your turn: tap the text on the phone",
+      body: pay.esign
+        ? "Sign, then pay with the Polar sandbox test card or skip with a simulated payment."
+        : "Pay with the Polar sandbox test card, or skip with a simulated payment.",
+    },
     paused: {
       title: "Paused: tap to resume",
       body: s.paused?.reason === "audio_interrupted" ? "The audio was interrupted (another app or a call took over)." : "The tab went to the background or the screen locked.",
@@ -200,7 +228,7 @@ export function narrator(s: UiState): { text: string; tone: "neutral" | "human" 
       return { text: phaseCopy(s).title, tone: "neutral" };
     case "shadowing":
       if (s.callEnded) return { text: "The call ended without a baton pass. Open the Explorer to try any second.", tone: "neutral" };
-      return { text: "Human half: Baton is listening silently; watch facts turn green", tone: "human" };
+      return { text: `Human half: ${agentNameOf(specOf(s))} is listening silently; watch facts turn green`, tone: "human" };
     case "arming":
     case "sealing":
     case "draining":
@@ -215,8 +243,8 @@ export function narrator(s: UiState): { text: string; tone: "neutral" | "human" 
         : { text: `AI half: you are ${customer}; let Autopilot answer or type anything`, tone: "ai" };
     case "paying":
       return recorded
-        ? { text: "AI half (recorded session): the customer signs and pays on the phone", tone: "action" }
-        : { text: "Your turn: tap the text on the phone to sign and pay", tone: "action" };
+        ? { text: `AI half (recorded session): the customer ${paySteps(specOf(s)).verbs} on the phone`, tone: "action" }
+        : { text: `Your turn: tap the text on the phone to ${paySteps(specOf(s)).verb}`, tone: "action" };
     case "completed":
       return { text: "Done: this QA card is computed from the AI's own recording", tone: "done" };
     case "handed-back":
@@ -231,26 +259,7 @@ export function narrator(s: UiState): { text: string; tone: "neutral" | "human" 
   }
 }
 
-// ------------------------------------------------------------------------------------------------ mode badge + notice
-
-export function modeBadge(s: UiState): { label: string; tone: "live" | "cached" | "recorded"; tooltip: string } {
-  const date = s.context?.cachedTranscribedAt ? formatCallDate(s.context.cachedTranscribedAt) : "an earlier day";
-  if (s.mode === "recorded_ai" || (s.plan?.aiHalf === "recorded" && s.flowPhase.startsWith("ai-"))) {
-    return {
-      label: "RECORDED AI SESSION",
-      tone: "recorded",
-      tooltip: s.modeReason ?? s.plan?.reason ?? "The AI half is a labelled recording of a real Voice Agent session on this call.",
-    };
-  }
-  if (s.mode === "cached_replay") {
-    return {
-      label: "CACHED REPLAY",
-      tone: "cached",
-      tooltip: `Transcribed live by AssemblyAI on ${date}; replayed now because ${s.modeReason ?? s.plan?.reason ?? "live transcription is unavailable"}.`,
-    };
-  }
-  return { label: "LIVE STT", tone: "live", tooltip: "Two live AssemblyAI Universal-3.5 Pro streaming sessions, one per speaker." };
-}
+// ------------------------------------------------------------------------------------------------ provenance + notice
 
 /** The queue/budget notice in plain words (top bar), or null. */
 /**
@@ -261,47 +270,128 @@ export function modeBadge(s: UiState): { label: string; tone: "live" | "cached" 
 export interface ProvenanceSegment {
   key: "human" | "transcription" | "ai" | "customer";
   label: string;
+  /** The short tag the strip prints in caps: the one word a judge reads off a video frame. */
+  tag: "RECORDED" | "SIMULATED" | "DRY RUN" | "LIVE" | "CACHED" | "SYNTHETIC" | "YOU" | "NONE";
+  /** The tag in plain words ("recorded role-play", "simulated (TTS)", "live AssemblyAI", …). */
   value: string;
+  tone: "live" | "recorded" | "sim";
   tooltip: string;
 }
 
-export function provenance(s: Pick<UiState, "context" | "plan" | "mode">, o: { customerInput: "synthetic" | "mic" }): ProvenanceSegment[] {
+export interface ProvenanceView {
+  segments: ProvenanceSegment[];
+  /** The run's one-line detail (sims: "Simulated audio: script by gpt-6-luna, …"), or null. */
+  detail: string | null;
+  /** True when any half of this run is generated rather than recorded (the strip's "SIMULATED" emphasis). */
+  simulated: boolean;
+}
+
+/**
+ * The run's provenance strip (PLATFORM §7.6): four segments, one per run, replacing every stacked badge.
+ *
+ * The server states the run's strip at case creation (`CreateCaseResponseV2.provenance`, merged by the page with
+ * `src/generated/call-provenance.json` so a generated take is never called a recording). The console then updates
+ * the three segments only it knows: a cached-transcript replay, a recorded AI session, and who answers the AI.
+ */
+export function provenance(
+  s: Pick<UiState, "context" | "plan" | "mode" | "provenance">,
+  o: { customerInput: "synthetic" | "mic" },
+): ProvenanceView {
+  const p: ProvenanceStrip | null = s.provenance;
+  const human = p?.humanHalf ?? "recorded";
+  const dryRun = human === "text_dry_run";
   const phoneLine = s.context?.source === "twilio8k";
-  const cachedDate = s.context?.cachedTranscribedAt ? ` (${formatCallDate(s.context.cachedTranscribedAt)})` : "";
   const cached = s.mode === "cached_replay" || s.plan?.sttHalf === "cached";
-  const recordedAi = isRecordedAi(s);
-  return [
+  const cachedDate = s.context?.cachedTranscribedAt
+    ? formatCallDate(s.context.cachedTranscribedAt)
+    : p?.transcription.date
+      ? formatCallDate(p.transcription.date)
+      : null;
+  const recordedAi = isRecordedAi(s) || p?.aiHalf.kind === "recorded";
+  const aiDate = p?.aiHalf.date ? formatCallDate(p.aiHalf.date) : null;
+  const customer: ProvenanceStrip["customerInAiHalf"] = dryRun ? "none" : recordedAi ? "recorded" : o.customerInput === "mic" ? "mic" : "synthetic";
+  const segments: ProvenanceSegment[] = [
     {
       key: "human",
       label: "Human half",
-      value: phoneLine ? "recorded role-play, real phone line" : "recorded role-play",
-      tooltip: "A role-play call recorded by consented volunteers" + (phoneLine ? " over a real phone line (8 kHz, one channel per speaker)." : "."),
+      ...(human === "simulated"
+        ? {
+            tag: "SIMULATED" as const,
+            value: "simulated (TTS)",
+            tone: "sim" as const,
+            tooltip: "Both voices of the first half are text-to-speech reading a generated script. Fictional people; no recording of anyone.",
+          }
+        : dryRun
+          ? { tag: "DRY RUN" as const, value: "text dry run", tone: "sim" as const, tooltip: "No audio at all: the first half is typed text, used to test a relay for free." }
+          : {
+              tag: "RECORDED" as const,
+              value: phoneLine ? "recorded role-play, real phone line" : "recorded role-play",
+              tone: "recorded" as const,
+              tooltip: "A role-play call recorded by consented volunteers" + (phoneLine ? " over a real phone line (8 kHz, one channel per speaker)." : "."),
+            }),
     },
     {
       key: "transcription",
       label: "Transcription",
-      value: cached ? `cached${cachedDate}` : "live AssemblyAI",
-      tooltip: cached
-        ? "AssemblyAI transcripts made live on an earlier day, replayed now (labelled)."
-        : "Two live AssemblyAI Universal-3.5 Pro streaming sessions, one per speaker.",
+      ...(dryRun
+        ? { tag: "NONE" as const, value: "none (typed text)", tone: "sim" as const, tooltip: "A dry run has no audio to transcribe." }
+        : cached
+          ? {
+              tag: "CACHED" as const,
+              value: cachedDate ? `cached (${cachedDate})` : "cached",
+              tone: "recorded" as const,
+              tooltip: `AssemblyAI transcripts made live${cachedDate ? ` on ${cachedDate}` : " on an earlier day"}, replayed now (labelled).`,
+            }
+          : { tag: "LIVE" as const, value: "live AssemblyAI", tone: "live" as const, tooltip: "Two live AssemblyAI Universal-3.5 Pro streaming sessions, one per speaker." }),
     },
     {
       key: "ai",
       label: "AI half",
-      value: recordedAi ? "recorded session" : "live Voice Agent",
-      tooltip: recordedAi ? "A labelled recording of a real AssemblyAI Voice Agent session on this call." : "A live AssemblyAI Voice Agent session starts at the pass.",
+      ...(dryRun
+        ? { tag: "NONE" as const, value: "none (dry run)", tone: "sim" as const, tooltip: "A dry run answers in text: no Voice Agent session is opened." }
+        : recordedAi
+          ? {
+              tag: "RECORDED" as const,
+              value: aiDate ? `recorded session (${aiDate})` : "recorded session",
+              tone: "recorded" as const,
+              tooltip: "A labelled recording of a real AssemblyAI Voice Agent session on this call.",
+            }
+          : { tag: "LIVE" as const, value: "live Voice Agent", tone: "live" as const, tooltip: "A live AssemblyAI Voice Agent session starts at the pass." }),
     },
     {
       key: "customer",
       label: "Customer in the AI half",
-      value: recordedAi ? "recorded" : o.customerInput === "mic" ? "you (mic)" : "synthetic",
-      tooltip: recordedAi
-        ? "The customer's side of the recorded session."
-        : o.customerInput === "mic"
-          ? "You answer the AI as the customer, with your mic."
-          : "A synthetic stand-in voice answers for the customer (Autopilot).",
+      ...(customer === "none"
+        ? { tag: "NONE" as const, value: "none (dry run)", tone: "sim" as const, tooltip: "A dry run has no customer voice: the answers are typed." }
+        : customer === "recorded"
+          ? { tag: "RECORDED" as const, value: "recorded", tone: "recorded" as const, tooltip: "The customer's side of the recorded session." }
+          : customer === "mic"
+            ? { tag: "YOU" as const, value: "you (mic)", tone: "live" as const, tooltip: "You answer the AI as the customer, with your mic." }
+            : { tag: "SYNTHETIC" as const, value: "synthetic", tone: "sim" as const, tooltip: "A synthetic stand-in voice answers for the customer (Autopilot)." }),
     },
   ];
+  return {
+    segments,
+    detail: p?.detail ?? null,
+    simulated: segments.some((g) => g.tag === "SIMULATED" || g.tag === "SYNTHETIC" || g.tag === "DRY RUN"),
+  };
+}
+
+/**
+ * The QA card's verified wording (PLATFORM §7.6). A simulated human half is verified from the AI half's own audio,
+ * and the card says so rather than claiming a recording.
+ */
+export function qaVerifiedCopy(s: Pick<UiState, "provenance">): { badge: string; how: string } {
+  if (s.provenance?.humanHalf === "simulated") {
+    return {
+      badge: "Verified from the AI half's audio (AssemblyAI async); customer audio simulated",
+      how: "Computed deterministically from the AssemblyAI async transcript of the agent's own recording (channel 2). The customer's audio in this run is simulated. ",
+    };
+  }
+  return {
+    badge: "Verified from recording",
+    how: "Computed deterministically from the AssemblyAI async multichannel transcript of the agent's own recording (channel 2). ",
+  };
 }
 
 export function planNotice(s: UiState): string | null {
@@ -375,23 +465,51 @@ export const protocolActive = (s: UiState): boolean =>
 export const STAGE_ORDER = ["confirm", "disclose", "pay", "close"] as const;
 export const STAGE_LABEL: Record<(typeof STAGE_ORDER)[number], string> = { confirm: "Confirm", disclose: "Disclose", pay: "Pay", close: "Close" };
 
-export function stageTracker(s: UiState): { stage: (typeof STAGE_ORDER)[number]; status: "done" | "active" | "pending" }[] {
-  const cur = s.stage ? STAGE_ORDER.indexOf(s.stage) : -1;
+/** The stage strip: the relay's own stages and labels (`UiSpec.stages`), in the one legal order. */
+export function stageTracker(s: UiState): { stage: (typeof STAGE_ORDER)[number]; label: string; status: "done" | "active" | "pending" }[] {
+  const stages = specOf(s).stages;
+  const order = stages.map((x) => x.kind);
+  const cur = s.stage ? order.indexOf(s.stage) : -1;
   const finished = s.flowPhase === "completed";
-  return STAGE_ORDER.map((stage, i) => ({ stage, status: finished || i < cur ? "done" : i === cur ? "active" : "pending" }));
+  return stages.map((x, i) => ({
+    stage: x.kind,
+    label: x.label || STAGE_LABEL[x.kind],
+    status: finished || (cur >= 0 && i < cur) ? "done" : i === cur ? "active" : "pending",
+  }));
 }
 
-/** Case card rows: the 10 required fields first, then any other field with a value. */
-export function caseRows(cs: CaseState | null): FieldState[] {
+/**
+ * Case-card rows, grouped as the relay's `UiSpec` groups them: every required field, plus any other field that has
+ * a value. Fields the spec does not know (an older bundle, a widened case) come last, so nothing is ever hidden.
+ */
+export function caseGroups(s: Pick<UiState, "caseState" | "relay">): { group: string | null; rows: FieldState[] }[] {
+  const cs = s.caseState;
   if (!cs) return [];
-  const req = REQUIRED_FIELDS.map((f) => cs.fields[f]).filter((x): x is FieldState => !!x);
-  const extra = (Object.values(cs.fields) as FieldState[]).filter(
-    (f) => !(REQUIRED_FIELDS as readonly FieldId[]).includes(f.field) && f.value !== null && f.status !== "MISSING",
-  );
-  return [...req, ...extra];
+  const spec = specOf(s);
+  const byId = new Map(spec.fields.map((f) => [f.id, f]));
+  const show = (f: FieldState): boolean => {
+    const d = byId.get(f.field);
+    if (d?.hidden) return false;
+    return d?.required === true || (f.value !== null && f.status !== "MISSING");
+  };
+  const out = groupsOf(spec)
+    .map((g) => ({ group: g.group, rows: g.ids.map((id) => cs.fields[id as FieldId]).filter((f): f is FieldState => !!f && show(f)) }))
+    .filter((g) => g.rows.length > 0);
+  const extra = (Object.values(cs.fields) as FieldState[]).filter((f) => !byId.has(f.field) && f.value !== null && f.status !== "MISSING");
+  return extra.length ? [...out, { group: out.length ? "Other" : null, rows: extra }] : out;
 }
 
-export const fieldLabel = (f: FieldId): string => FIELD_LABEL[f];
+/** The same rows, flat (the timeline's fact markers and tests). */
+export const caseRows = (s: Pick<UiState, "caseState" | "relay">): FieldState[] => caseGroups(s).flatMap((g) => g.rows);
+
+/** A label lookup for this run's relay (`UiSpec.fields[].label`); the flagship's labels without a spec. */
+export const fieldLabels = (s: Pick<UiState, "relay">): ((id: string) => string) => labelsOf(specOf(s));
+
+/** The required field ids of this run's relay, in spec order (the readiness gauge). */
+export const requiredFields = (s: Pick<UiState, "relay">): string[] => requiredOf(specOf(s));
+
+/** The relay spec this run renders from. */
+export const relaySpec = (s: Pick<UiState, "relay">): UiSpec => specOf(s);
 
 export function paymentInFlight(s: UiState): boolean {
   return s.stage === "pay" && s.phone.sms.length > 0 && !isTerminalPayment(s.payment?.status);

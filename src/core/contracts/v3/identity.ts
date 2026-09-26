@@ -66,12 +66,23 @@ export interface MemberView {
   joinedAt: string;
 }
 
-/** A pending invitation; `link` is the copyable accept URL (SAAS §3.6). */
+/**
+ * A pending invitation.
+ *
+ * `link` is the copyable accept URL (SAAS §3.6). It is **optional because it is a credential**: the API returns
+ * it only to a caller holding `member:invite`. Everyone with `member:read` — down to a viewer — still sees that
+ * the invitation exists, for whom and in what role, but cannot copy the thing that joins the org. See
+ * `listInvitations` in `src/server/identity/member-store.ts` for why that separation matters while no email
+ * address is verifiable (§3.2).
+ *
+ * Narrowed from `link: string` after C3 (WP19·3). This is the one non-additive edit to a frozen v3 contract;
+ * `docs/notes/requests/wp19-to-wp20-invitation-link.md` records it, and no consumer existed at the time.
+ */
 export interface InvitationView {
   id: string;
   email: string;
   role: Role;
-  link: string;
+  link?: string;
   expiresAt: string;
   invitedBy: string;
 }

@@ -8,10 +8,11 @@
  * logs, recorded runs) a read-only preview renders the same events (phone.sms, phone.state, payment).
  */
 import { BatteryFullIcon, CheckCircle2Icon, ChevronDownIcon, CreditCardIcon, FileSignatureIcon, Loader2Icon, MessageSquareIcon, SignalIcon, SmartphoneIcon } from "lucide-react";
-import { useCallback, useEffect, useState, useSyncExternalStore, type ReactNode } from "react";
+import { Fragment, useCallback, useEffect, useState, useSyncExternalStore, type ReactNode } from "react";
 
 import { useBaton, useConsoleStore } from "@/client/store/hooks";
-import { formatUsd, names } from "@/client/store/selectors";
+import { fieldLabels, formatUsd, names } from "@/client/store/selectors";
+import { specOf } from "@/client/store/ui-spec";
 import type { PhoneState } from "@/core/contracts/services";
 import { cn } from "@/lib/utils";
 
@@ -37,8 +38,15 @@ function PhonePreview() {
   const pay = useBaton((s) => s.payment);
   const cs = useBaton((s) => s.caseState);
   const who = useBaton((s) => names(s));
-  const agency = useBaton((s) => s.context?.policy.agencyName ?? "Your agency");
+  const spec = useBaton(specOf);
+  const label = fieldLabels({ relay: spec });
+  // The sender and the steps this relay's phone has (UiSpec.phone, PLATFORM §7.6): payment, e-sign, or both.
+  const sender = spec.phone.smsSender || who.org;
   const step = STEP_COPY[phone.state];
+  /** The e-sign summary: this relay's first four required, visible fields, whatever they are called. */
+  const summary = spec.fields.filter((f) => f.required && !f.hidden).slice(0, 4);
+  /** A relay whose phone has no e-sign step says so: nothing is signed, the link only takes the payment. */
+  const smsBody = spec.phone.esign ? STEP_COPY["sms-received"]!.body : "Open the link and pay today's amount.";
   const amount = cs?.payment?.totalAmountCents ?? cs?.payment?.amountCents ?? null;
   const simulated = cs?.payment?.simulated || pay?.source === "mock";
   return (
@@ -52,9 +60,9 @@ function PhonePreview() {
       </div>
       <div className="border-b border-(--bt-line) px-4 pt-1 pb-2 text-center">
         <div className="mx-auto flex size-8 items-center justify-center rounded-full bg-(--rep-bg) text-xs font-bold text-(--rep-fg)" aria-hidden="true">
-          {agency.slice(0, 1)}
+          {sender.slice(0, 1)}
         </div>
-        <div className="mt-0.5 text-[11px] font-semibold">{agency}</div>
+        <div className="mt-0.5 text-[11px] font-semibold">{sender}</div>
       </div>
       <ol className="bt-scroll flex-1 space-y-2 px-3 py-3" aria-label={`Text messages on ${who.customer}'s phone`}>
         {phone.sms.map((m) => (
@@ -70,7 +78,12 @@ function PhonePreview() {
             )}
           </li>
         ))}
-        {!phone.sms.length ? <li className="pt-10 text-center text-[11px] text-(--bt-muted)">No messages yet. The AI texts the e-sign and pay link in the Pay stage.</li> : null}
+        {!phone.sms.length ? (
+          <li className="pt-10 text-center text-[11px] text-(--bt-muted)">
+            No messages yet. The AI texts {spec.phone.esign && spec.phone.payment ? "the e-sign and pay link" : spec.phone.payment ? "the payment link" : "the link"} in the{" "}
+            {spec.stages.find((x) => x.kind === "pay")?.label ?? "Pay"} stage.
+          </li>
+        ) : null}
       </ol>
       {step ? (
         <div className={cn("m-2 rounded-2xl border p-3", step.tone === "ok" ? "border-(--verified)/40 bg-(--verified-bg)" : step.tone === "warn" ? "border-(--pending)/50 bg-(--pending-bg)" : "border-(--ai)/35 bg-(--ai-bg)")} role="status">
@@ -78,17 +91,17 @@ function PhonePreview() {
             <step.Icon className={cn("size-4", step.Icon === Loader2Icon && "animate-spin")} aria-hidden="true" />
             {phone.state === "paid" && simulated ? "Simulated" : step.title}
           </div>
-          <p className="mt-0.5 text-[11.5px] text-(--bt-ink)">{phone.state === "paid" && simulated ? "Simulated payment (mock mode)." : step.body}</p>
+          <p className="mt-0.5 text-[11.5px] text-(--bt-ink)">
+            {phone.state === "paid" && simulated ? "Simulated payment (mock mode)." : phone.state === "sms-received" ? smsBody : step.body}
+          </p>
           {phone.state === "esign" && cs ? (
             <dl className="mt-1.5 grid grid-cols-[auto_1fr] gap-x-2 text-[11px]">
-              <dt className="text-(--bt-muted)">Driver</dt>
-              <dd>{cs.fields.driver_full_name.display ?? "—"}</dd>
-              <dt className="text-(--bt-muted)">Vehicle</dt>
-              <dd>{cs.fields.vehicle_assignment.display ?? "—"}</dd>
-              <dt className="text-(--bt-muted)">Effective</dt>
-              <dd>{cs.fields.effective_date.display ?? "—"}</dd>
-              <dt className="text-(--bt-muted)">New premium</dt>
-              <dd>{cs.fields.premium_new_monthly_usd.display ?? "—"}</dd>
+              {summary.map((f) => (
+                <Fragment key={f.id}>
+                  <dt className="truncate text-(--bt-muted)">{label(f.id)}</dt>
+                  <dd className="truncate">{cs.fields[f.id as keyof typeof cs.fields]?.display ?? "—"}</dd>
+                </Fragment>
+              ))}
             </dl>
           ) : null}
           {amount !== null && (phone.state.startsWith("checkout") || phone.state === "processing" || phone.state === "paid") ? (

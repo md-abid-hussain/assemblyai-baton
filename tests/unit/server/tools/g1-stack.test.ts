@@ -178,7 +178,7 @@ describe.skipIf(!HAS_DB)("WP6 on the G1 stack (WP1 core, WP3 repository, WP2 aut
     expect(c!.state.payment).toMatchObject({ id: paymentId, status: "succeeded", simulated: true });
     expect(c!.state.confirmationNumber).toBe(conf.body.result.confirmation_number);
     expect(c!.state.readiness.ready).toBe(true);
-    for (const [f] of fields) expect(c!.state.fields[f].status, f).toBe("VERIFIED");
+    for (const [f] of fields) expect(c!.state.fields[f]!.status, f).toBe("VERIFIED");
 
     // wp8-to-wp6 item 2: status_source is set on the transition to succeeded.
     const [prow] = await t.db.select().from(schema.payments).where(eq(schema.payments.id, paymentId));

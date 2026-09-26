@@ -8,13 +8,24 @@
 import { z } from "zod";
 import { AI_SETTABLE } from "../intents/add-driver.fields";
 import type { FieldId } from "./case";
-import { DisclosureKindSchema, FieldIdSchema, FieldStatusSchema, StageSchema } from "./case";
+import { BatonDisclosureKindSchema, FieldIdSchema, FieldStatusSchema, ID_RE, StageSchema } from "./case";
 
+/** The six built-in and Baton tools. A relay adds its own (connector tools, P§6). */
 export const TOOL_NAMES = [
   "confirm_effective_date", "get_disclosure", "send_esign_and_pay_link", "send_confirmation",
   "update_case_field", "hand_back_to_rep",
 ] as const;
-export const ToolNameSchema = z.enum(TOOL_NAMES);
+/** The literal union of the six. `ToolArgs`, `ToolArgsSchemas` and `ToolResultSchemas` stay keyed by it. */
+export type BatonToolName = (typeof TOOL_NAMES)[number];
+
+/**
+ * P§4.7: widened from `z.enum(TOOL_NAMES)` to the id grammar, so a relay's tool name is a `ToolName`. Generic
+ * args are validated against the blueprint's restricted JSON-schema subset by `validateToolArgs`
+ * (core/relay/tool-args.ts), never by `ToolArgsSchemas`.
+ */
+/** The six built-ins only: what the v1 Baton paths (route #14, the QA timeline filter) validate against. */
+export const BatonToolNameSchema = z.enum(TOOL_NAMES);
+export const ToolNameSchema = z.string().regex(ID_RE);
 export type ToolName = z.infer<typeof ToolNameSchema>;
 
 export const EXECUTION_MODES = ["interactive", "hold"] as const;
@@ -38,8 +49,15 @@ export const HAND_BACK_REASONS = [
 ] as const;
 export type HandBackReason = (typeof HAND_BACK_REASONS)[number];
 
-/** Tool arguments by name (DESIGN §4.1, verbatim). */
+/**
+ * Tool arguments by name (DESIGN §4.1, verbatim for the six).
+ *
+ * P§4.7: the index signature is the widening. A relay's tool name is any id, and its args are an object the
+ * blueprint's `parameters` describe, so `ToolArgs[<any id>]` is `Record<string, unknown>` - checked at runtime by
+ * `validateToolArgs`. The six keep their exact shapes, so every existing call site keeps its types.
+ */
 export interface ToolArgs {
+  [name: string]: Record<string, unknown>;
   confirm_effective_date: { date: string; customer_words: string };
   get_disclosure: { kind: "premium_change" | "esign_consent" };
   send_esign_and_pay_link: { customer_agreed_to_text: boolean; paper_copy_requested: boolean; customer_words: string };
@@ -59,7 +77,7 @@ export interface ToolArgs {
  */
 export const ToolArgsSchemas = {
   confirm_effective_date: z.object({ date: z.string(), customer_words: z.string() }),
-  get_disclosure: z.object({ kind: DisclosureKindSchema }),
+  get_disclosure: z.object({ kind: BatonDisclosureKindSchema }),
   send_esign_and_pay_link: z.object({
     customer_agreed_to_text: z.boolean(),
     paper_copy_requested: z.boolean(),
@@ -74,11 +92,18 @@ export const ToolArgsSchemas = {
   hand_back_to_rep: z
     .object({ reason: z.enum(HAND_BACK_REASONS).catch("other"), summary: z.string().catch("") })
     .catch({ reason: "other", summary: "" }),
-} satisfies { [K in ToolName]: z.ZodType<ToolArgs[K], unknown> };
+} satisfies { [K in BatonToolName]: z.ZodType<ToolArgs[K], unknown> };
+
+/**
+ * P§4.7: the lookup is by string, because `name` may be a relay's tool. An unknown name falls back to "an object"
+ * - the blueprint's `parameters` are what actually check it, in `validateToolArgs`.
+ */
+const ARGS_SCHEMA_BY_NAME = ToolArgsSchemas as Record<string, z.ZodType | undefined>;
+const GenericToolArgsSchema = z.record(z.string(), z.unknown());
 
 /** Parse the args of a named tool (throws a ZodError on invalid input). */
 export function parseToolArgs<N extends ToolName>(name: N, args: unknown): ToolArgs[N] {
-  return (ToolArgsSchemas[name] as unknown as z.ZodType<ToolArgs[N], unknown>).parse(args);
+  return (ARGS_SCHEMA_BY_NAME[name] ?? GenericToolArgsSchema).parse(args) as ToolArgs[N];
 }
 
 // ------------------------------------------------------------------------------------------ results (§5.8)
@@ -133,9 +158,9 @@ export const ToolResultSchemas = {
   send_confirmation: SendConfirmationResultSchema,
   update_case_field: UpdateCaseFieldResultSchema,
   hand_back_to_rep: HandBackToRepResultSchema,
-} as const satisfies { [K in ToolName]: z.ZodType };
+} as const satisfies { [K in BatonToolName]: z.ZodType };
 
-export type ToolResults = { [K in ToolName]: z.infer<(typeof ToolResultSchemas)[K]> };
+export type ToolResults = { [K in BatonToolName]: z.infer<(typeof ToolResultSchemas)[K]> };
 
 /**
  * G0: the `result` route #14 returns with HTTP 200 when the model's arguments fail `ToolArgsSchemas` (§5.8
@@ -148,15 +173,15 @@ export const INVALID_ARGS_RESULTS = {
   send_esign_and_pay_link: { status: "not_sent", reason: "invalid_args" },
   send_confirmation: { ok: false, reason: "invalid_args" },
   update_case_field: { result: "rejected", reason: "invalid_args" },
-} as const satisfies { [K in Exclude<ToolName, "hand_back_to_rep">]: ToolResults[K] };
+} as const satisfies { [K in Exclude<BatonToolName, "hand_back_to_rep">]: ToolResults[K] };
 
 /** Non-throwing parse for route #14: either the typed args, or the 200 `result` to answer with. */
 export function safeParseToolArgs<N extends ToolName>(
   name: N,
   args: unknown,
 ): { ok: true; args: ToolArgs[N] } | { ok: false; result: Record<string, unknown>; issues: string[] } {
-  const r = (ToolArgsSchemas[name] as unknown as z.ZodType<ToolArgs[N], unknown>).safeParse(args);
-  if (r.success) return { ok: true, args: r.data };
+  const r = (ARGS_SCHEMA_BY_NAME[name] ?? GenericToolArgsSchema).safeParse(args);
+  if (r.success) return { ok: true, args: r.data as ToolArgs[N] };
   const result = (INVALID_ARGS_RESULTS as Partial<Record<ToolName, Record<string, unknown>>>)[name] ?? { ok: false, reason: "invalid_args" };
   return { ok: false, result: { ...result }, issues: r.error.issues.map((i) => `${i.path.join(".") || "(root)"}: ${i.message}`) };
 }
