@@ -2,11 +2,12 @@ import "server-only";
 
 import type { z } from "zod";
 
-import { apiError, BatonError, ERROR_HTTP_STATUS } from "../../core/contracts/errors";
+import { apiError, BatonError, ERROR_HTTP_STATUS, isBatonError } from "../../core/contracts/errors";
 import type { RateLimiter } from "../../core/contracts/services";
 import { EnvError } from "../env";
 import { log } from "../log";
-import { RelayError, relayErrorResponse } from "../relays/http";
+import { isRelayError, RelayError, relayErrorResponse } from "../relays/http";
+import { isSaasError, saasErrorResponse } from "../saas/errors";
 
 /**
  * Route plumbing for WP3's handlers (#3, #4, #8): the same conventions as WP2's `src/server/auth/http.ts`
@@ -67,9 +68,15 @@ export function route<C>(name: string, fn: (req: Request, ctx: C) => Promise<Res
     try {
       return await fn(req, ctx);
     } catch (e) {
-      if (e instanceof BatonError) return errorOf(e);
+      // QA-FIX: a v3 `SaasError` reaches this v2 wrapper too — `requirePrincipal` (and its same-origin check)
+      // raises one, and `POST /api/cases` calls it. Without this branch a cross-origin `POST /api/cases` answered
+      // **500 E_INTERNAL** while the log showed the correct `E_CSRF`, and a foreign `relayId` did the same. The
+      // §6.3 envelope is a superset of the v2 one, and this is the ruling `src/server/relays/http.ts` already took.
+      if (isSaasError(e)) return saasErrorResponse(e);
+      // QA-FIX: predicates, not `instanceof` — see `isBatonError` on why one process holds two copies.
+      if (isBatonError(e)) return errorOf(e);
       // v2 codes (relay runs on #3: E_LINT, E_MODERATION_FLAGGED), as `ApiErrorV2` bodies.
-      if (e instanceof RelayError) return relayErrorResponse(e);
+      if (isRelayError(e)) return relayErrorResponse(e);
       if (e instanceof EnvError) {
         httpLog.error("route misconfigured", { route: name, err: e });
         return json(apiError("E_INTERNAL", "The server is missing configuration."), { status: 503 });

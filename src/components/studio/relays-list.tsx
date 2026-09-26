@@ -106,10 +106,10 @@ export function RelaysList({ env }: { env: StudioEnvProps }) {
 
   if (error && !data) {
     return (
-      <main className="mx-auto max-w-2xl px-4 py-12">
+      <div className="mx-auto max-w-2xl px-4 py-12">
         <h1 className="text-lg font-semibold">Your relays could not be loaded</h1>
         <p className="text-muted-foreground mt-2 text-sm">{error}</p>
-      </main>
+      </div>
     );
   }
   if (!data) return <p className="text-muted-foreground p-6 text-sm">Loading your relays…</p>;
@@ -118,7 +118,7 @@ export function RelaysList({ env }: { env: StudioEnvProps }) {
   const templates = data.gallery.filter((r) => !r.flagship);
 
   return (
-    <main className="mx-auto w-full max-w-5xl px-4 py-6">
+    <div className="mx-auto w-full max-w-5xl px-4 py-6">
       <div className="flex flex-wrap items-center gap-3">
         <h1 className="text-xl font-semibold">Relays</h1>
         <p className="text-muted-foreground text-sm">Changeover Studio</p>
@@ -233,6 +233,6 @@ export function RelaysList({ env }: { env: StudioEnvProps }) {
           open(created.id);
         }}
       />
-    </main>
+    </div>
   );
 }

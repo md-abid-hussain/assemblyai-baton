@@ -12,11 +12,12 @@ import "server-only";
 import { and, eq, sql } from "drizzle-orm";
 
 import { AaiWebhookBodySchema, VerificationViewSchema, type VerificationView } from "../../core/contracts/api";
-import { apiError, BatonError, ERROR_HTTP_STATUS, type ErrorCode } from "../../core/contracts/errors";
+import { apiError, BatonError, ERROR_HTTP_STATUS, isBatonError, type ErrorCode } from "../../core/contracts/errors";
 import { verifyWebhookHeader } from "../aai/async";
 import { artifactUrl, VaRestError } from "../aai/va-rest";
 import { jobs, takeovers, webhookEvents } from "../db/schema";
 import { EnvError } from "../env";
+import { isSaasError, saasErrorResponse } from "../saas/errors";
 import { log, scrub } from "../log";
 import { normalizeVerifyState, reasonText, stripUrlQueries, WEBHOOK_HEADER } from "../jobs/verify-takeover";
 import { bearerToken } from "./auth";
@@ -54,7 +55,10 @@ export async function guarded(name: string, fn: () => Promise<Response>): Promis
   try {
     return await fn();
   } catch (e) {
-    if (e instanceof BatonError) {
+    // QA-FIX: a v3 `SaasError` must keep its own status rather than becoming a 500.
+    if (isSaasError(e)) return saasErrorResponse(e);
+    // QA-FIX: predicate, not `instanceof` — see `isBatonError`.
+    if (isBatonError(e)) {
       return errorResponse(e.code, e.message, e.retryAfterMs !== undefined ? { retryAfterSec: e.retryAfterMs / 1000 } : {});
     }
     if (e instanceof EnvError) {

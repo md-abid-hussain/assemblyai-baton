@@ -57,7 +57,7 @@ export function NewRelay({ env }: { env: StudioEnvProps }) {
 
   if (config.mode === "readonly") {
     return (
-      <main className="mx-auto max-w-2xl px-4 py-12">
+      <div className="mx-auto max-w-2xl px-4 py-12">
         <h1 className="text-lg font-semibold">New relays are off on this deployment</h1>
         <p className="text-muted-foreground mt-2 text-sm">
           You can still read, preview and download every relay.{" "}
@@ -65,12 +65,12 @@ export function NewRelay({ env }: { env: StudioEnvProps }) {
             Back to relays
           </Link>
         </p>
-      </main>
+      </div>
     );
   }
 
   return (
-    <main className="mx-auto w-full max-w-3xl px-4 py-6">
+    <div className="mx-auto w-full max-w-3xl px-4 py-6">
       <nav aria-label="Breadcrumb" className="text-muted-foreground text-sm">
         <Link href="/app/relays" className="underline underline-offset-4">
           Changeover Studio
@@ -121,6 +121,6 @@ export function NewRelay({ env }: { env: StudioEnvProps }) {
           </Button>
         </div>
       </section>
-    </main>
+    </div>
   );
 }

@@ -17,7 +17,7 @@ import type { Metadata } from "next";
 import { AcceptInviteButton } from "@/components/auth/accept-invite";
 import { AuthCard } from "@/components/auth/auth-card";
 import { formatUtcDate, ROLE_HINT, ROLE_LABEL } from "@/core/contracts/ext/wp20-app";
-import { visitorAuthState } from "@/server/read-models/app-guard";
+import { ensureOwnWorkspace, visitorAuthState } from "@/server/read-models/app-guard";
 import { emailOfUser, loadInvite } from "@/server/read-models/invite";
 
 export const metadata: Metadata = {
@@ -83,6 +83,10 @@ export default async function AcceptInvitePage({ params }: { params: Promise<{ i
   }
 
   const state = await visitorAuthState("/accept-invite");
+  // QA-FIX: a second account that signs up *through* this link would otherwise never get a workspace of its own
+  // — it holds the inviter's org the moment it accepts, so `/app`'s "no org" branch never fires and the switcher
+  // shows one workspace instead of two. Idempotent, and a no-op for a guest (their guest org carries over).
+  if (state.signedIn) await ensureOwnWorkspace(state.userId);
   const myEmail = state.signedIn ? await emailOfUser(state.userId).catch(() => null) : null;
   const matches =
     myEmail !== null && myEmail.trim().toLowerCase() === invite.emailPrefill.trim().toLowerCase();

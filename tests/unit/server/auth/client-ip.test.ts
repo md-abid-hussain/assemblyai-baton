@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 
-import { addrClass, clientHop, describeForwarding, ipKeyMode, ipPrefix, rightmostForwardedFor } from "@/server/auth/client-ip";
+import {
+  addrClass, clientHop, describeForwarding, ipKeyMode, ipPrefix, rightmostForwardedFor, trustsForwardedFor,
+} from "@/server/auth/client-ip";
 
 const h = (o: Record<string, string>) => new Headers(o);
 
@@ -46,11 +48,33 @@ describe("clientHop (the balancer-set hop; PLATFORM v2.1 §10.2)", () => {
     }
   });
 
-  it("real-ip mode prefers X-Real-IP, then the rightmost XFF entry, then unknown", () => {
+  it("real-ip mode prefers X-Real-IP and otherwise answers unknown (QA-FIX: no client-controlled XFF fallback)", () => {
     expect(clientHop(h({ "x-real-ip": "198.51.100.4", "x-forwarded-for": "192.0.2.9" }), { mode: "real-ip" })).toBe("198.51.100.0/24");
-    expect(clientHop(h({ "x-real-ip": "nonsense", "x-forwarded-for": "1.1.1.1, 192.0.2.9" }), { mode: "real-ip" })).toBe("192.0.2.0/24");
-    expect(clientHop(h({ "x-forwarded-for": "1.1.1.1, 192.0.2.9, " }), { mode: "real-ip" })).toBe("192.0.2.0/24");
+    // Without a proxy in front, every one of these is attacker-typed, so none of them may mint a fresh bucket.
+    expect(clientHop(h({ "x-real-ip": "nonsense", "x-forwarded-for": "1.1.1.1, 192.0.2.9" }), { mode: "real-ip" })).toBe("unknown");
+    expect(clientHop(h({ "x-forwarded-for": "1.1.1.1, 192.0.2.9, " }), { mode: "real-ip" })).toBe("unknown");
     expect(clientHop(h({}), { mode: "real-ip" })).toBe("unknown");
+  });
+
+  it("real-ip mode reads the rightmost XFF entry only when an operator vouches for the proxy (IPKEY_TRUST_XFF=1)", () => {
+    const opts = { mode: "real-ip", trustXff: true } as const;
+    expect(clientHop(h({ "x-real-ip": "nonsense", "x-forwarded-for": "1.1.1.1, 192.0.2.9" }), opts)).toBe("192.0.2.0/24");
+    expect(clientHop(h({ "x-forwarded-for": "1.1.1.1, 192.0.2.9, " }), opts)).toBe("192.0.2.0/24");
+    // X-Real-IP still wins when it parses, trusted or not.
+    expect(clientHop(h({ "x-real-ip": "198.51.100.4", "x-forwarded-for": "192.0.2.9" }), opts)).toBe("198.51.100.0/24");
+    expect(trustsForwardedFor("1")).toBe(true);
+    for (const raw of [undefined, "", "0", "true", "yes"]) expect(trustsForwardedFor(raw)).toBe(false);
+  });
+
+  it("a spoofed X-Forwarded-For cannot mint fresh ipKey buckets (QA-FIX: the guest-start limiter bypass)", () => {
+    // The break-it pass sent 10 requests with 10 attacker-chosen XFF values after tripping ipkey_hour, and all
+    // 10 got through. Untrusted, they must all collapse onto one key.
+    const keys = new Set(
+      ["203.0.113.1", "203.0.113.2", "198.18.0.9", "1.2.3.4", "8.8.8.8"].map((ip) =>
+        clientHop(h({ "x-forwarded-for": ip }), { mode: "real-ip" }),
+      ),
+    );
+    expect([...keys]).toEqual(["unknown"]);
   });
 
   it("xff-right mode prefers the rightmost XFF entry", () => {

@@ -51,10 +51,20 @@ describe.skipIf(!HAS_DB)("status, cron, admin routes (+ acceptance 6 through a r
   });
 
   it("GET /api/status is rate limited at 60/min per IP", async () => {
-    for (let i = 0; i < 60; i++) await call(statusGet, { method: "GET", headers: { "x-forwarded-for": "192.0.2.99" } });
-    const r = await call(statusGet, { method: "GET", headers: { "x-forwarded-for": "192.0.2.99" } });
+    // QA-FIX: the buckets key on the balancer-set `X-Real-IP`. A bare `X-Forwarded-For` is client-controlled
+    // and no longer buys a bucket of its own — which is the whole point of the fix, and is asserted below.
+    for (let i = 0; i < 60; i++) await call(statusGet, { method: "GET", headers: { "x-real-ip": "192.0.2.99" } });
+    const r = await call(statusGet, { method: "GET", headers: { "x-real-ip": "192.0.2.99" } });
     expect(r.status).toBe(429);
-    expect((await call(statusGet, { method: "GET", headers: { "x-forwarded-for": "198.51.100.100" } })).status).toBe(200); // another /24
+    expect((await call(statusGet, { method: "GET", headers: { "x-real-ip": "198.51.100.100" } })).status).toBe(200); // another /24
+  });
+
+  it("QA-FIX: a rotated X-Forwarded-For cannot escape a tripped status bucket", async () => {
+    for (let i = 0; i < 61; i++) await call(statusGet, { method: "GET", headers: { "x-forwarded-for": `203.0.113.${i % 250}` } });
+    // Every one of those requests keyed on the same "unknown" hop, so the bucket is spent for all of them.
+    for (const spoof of ["198.18.0.9", "1.2.3.4", "8.8.8.8"]) {
+      expect((await call(statusGet, { method: "GET", headers: { "x-forwarded-for": spoof } })).status).toBe(429);
+    }
   });
 
   it("P-0: rotating a spoofed leftmost X-Forwarded-For entry does not escape the status bucket; the probe logs classes only", async () => {

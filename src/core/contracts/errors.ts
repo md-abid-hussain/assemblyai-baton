@@ -101,4 +101,21 @@ export class BatonError extends Error {
   }
 }
 
-export const isBatonError = (e: unknown): e is BatonError => e instanceof BatonError;
+/**
+ * "This is a `BatonError`" recognised by **name + code, not by `instanceof` alone** (QA-FIX, docs/notes/qa-fix.md).
+ *
+ * Next loads a module graph more than once (the server-component graph, each route's chunk, dev reloads), so
+ * `src/core/contracts/errors` can exist as two classes in one process: an error thrown by a helper bundled into one
+ * chunk then fails `instanceof` against the class the *route* imported. `src/server/read-models/app-guard.ts`
+ * already had to learn this for `SaasError`; the relay routes learnt it the expensive way, turning a cross-tenant
+ * `PUT`/`DELETE` into a 500 instead of the 404 the code had correctly thrown.
+ *
+ * The duck check is narrow on purpose: the `name` the constructor sets **and** a code this contract knows. A plain
+ * `Error` with a stray `code` (`ENOENT`, a pg error) is not one of ours and still becomes a logged 500.
+ */
+export const isBatonError = (e: unknown): e is BatonError => {
+  if (e instanceof BatonError) return true;
+  if (typeof e !== "object" || e === null) return false;
+  const { name, code, message } = e as { name?: unknown; code?: unknown; message?: unknown };
+  return name === "BatonError" && typeof message === "string" && typeof code === "string" && Object.hasOwn(ERROR_HTTP_STATUS, code);
+};

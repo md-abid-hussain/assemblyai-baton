@@ -75,6 +75,9 @@ export function AppShell({
         </div>
       </header>
 
+      {/* QA-FIX: the notice sits between the header and the main region, so it needs a landmark of its own or
+          axe's `region` rule (correctly) reports content no screen reader can navigate to. */}
+      <aside aria-label="Workspace notice">
       {degraded ? (
         <p className="bg-muted/60 border-b px-[var(--cx-gutter)] py-2 text-center text-sm text-pretty">
           Continuing without a saved workspace — the demo works the same.{" "}
@@ -86,6 +89,7 @@ export function AppShell({
       ) : viewer.isGuest ? (
         <GuestBanner next={currentPath} />
       ) : null}
+      </aside>
 
       <div className="mx-auto flex max-w-[84rem] gap-6 px-[var(--cx-gutter)]">
         <aside className="hidden w-[var(--cx-nav-w)] shrink-0 py-6 lg:block">

@@ -218,6 +218,9 @@ export function setCaseDataSource(s: CaseDataSource | null): void {
  * (`registerCallLookup((id) => getCaseDataSource().getCall(id))`).
  */
 export function registerGeneratedData(d: { calls?: unknown[]; scenarios?: unknown[] }): void {
-  const s = getCaseDataSource();
-  if (s instanceof FsCaseDataSource) s.register(d);
+  // QA-FIX: duck-typed, never `instanceof`. Next can load this module twice in one process, so the singleton on
+  // `globalThis` may be an instance of the *other* copy of `FsCaseDataSource`; `instanceof` then silently dropped
+  // the registration and `getPolicy("s01")` fell back to an fs read that has no file in the deploy bundle.
+  const s = getCaseDataSource() as CaseDataSource & { register?: (d: { calls?: unknown[]; scenarios?: unknown[] }) => void };
+  if (typeof s.register === "function") s.register(d);
 }

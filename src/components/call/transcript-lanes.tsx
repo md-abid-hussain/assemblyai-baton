@@ -154,13 +154,17 @@ export function TranscriptLanes() {
             Both speakers will appear here as the recording plays: one live AssemblyAI session per channel.
           </p>
         ) : null}
-        <ol role="log" aria-label="Human half" className={cn("space-y-2 transition-[filter,opacity]", greyed && "bt-greyed")}>
+        {/* QA-FIX: `role="log"` is not an allowed role for `<ol>` (axe `aria-allowed-role`). The live region
+            moves to a wrapper so the list keeps its list semantics and the log keeps its announcements. */}
+        <div role="log" aria-label="Human half">
+        <ol className={cn("space-y-2 transition-[filter,opacity]", greyed && "bt-greyed")}>
           {human.map((l) => (
             <HumanLine key={l.id} l={l} who={l.lane === "rep" ? who.rep : who.customer} />
           ))}
           {partials.rep ? <Partial lane="rep" text={partials.rep.text} who={who.rep} /> : null}
           {partials.customer ? <Partial lane="customer" text={partials.customer.text} who={who.customer} /> : null}
         </ol>
+        </div>
         {greyed && human.length ? <p className="mt-1 text-center text-[11px] text-(--bt-muted)">Your shadow transcript is greyed: the AI half below is the recorded session.</p> : null}
         {sep ? (
           <div role="separator" aria-label={sep} className="my-4 flex items-center gap-2">
@@ -170,7 +174,8 @@ export function TranscriptLanes() {
           </div>
         ) : null}
         {ai.length || userPartial || phase.startsWith("ai-") ? (
-          <ol role="log" aria-label="AI half" className="space-y-2">
+          <div role="log" aria-label="AI half">
+          <ol className="space-y-2">
             {ai.map((l) => (
               <AiLine key={l.id} l={l} who={l.lane === "ai" ? (recorded ? "AI assistant (recorded)" : "AI assistant") : who.customer} />
             ))}
@@ -199,6 +204,7 @@ export function TranscriptLanes() {
               </li>
             ) : null}
           </ol>
+          </div>
         ) : null}
       </div>
       {!pinned ? (

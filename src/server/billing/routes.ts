@@ -24,8 +24,8 @@ import { readRow, viewOf } from "../entitlements/store";
 import { log } from "../log";
 import { isSaasError, SaasError, saasErrorResponse } from "../saas/errors";
 import { requirePrincipal } from "../saas/principal";
-import { billingMode, isPaidPlan, PAID_PLANS, type PaidPlan } from "./config";
-import { getBilling } from "./register";
+import { isPaidPlan, PAID_PLANS, type PaidPlan } from "./config";
+import { effectiveBillingMode, getBilling } from "./register";
 import { confirmSimulated, isOwnerOf, SYNC_STALE_MS } from "./provider";
 
 const routeLog = log.child({ component: "billing" });
@@ -110,7 +110,10 @@ function upgradesFor(plan: EntitlementView["plan"]): BillingView["upgrades"] {
 
 export function billingViewOf(view: EntitlementView, canManage: boolean, unavailable: boolean): BillingView {
   return {
-    mode: billingMode(),
+    // QA-FIX: the mode the provider can actually run, not the one the environment asks for. They disagreed
+    // whenever Polar was configured but the plugin was not mounted, and the page then offered a checkout that
+    // could not complete in either mode. See `effectiveBillingMode`.
+    mode: effectiveBillingMode(),
     orgId: view.orgId,
     plan: view.plan,
     planName: PLANS[view.plan].name,
@@ -192,7 +195,7 @@ export async function postCheckout(req: Request): Promise<Response> {
       plan,
       headers: req.headers,
     });
-    return json(200, { url, mode: billingMode() });
+    return json(200, { url, mode: effectiveBillingMode() });
   });
 }
 
@@ -203,7 +206,10 @@ export async function postSimulatedConfirm(req: Request): Promise<Response> {
     const p = await requirePrincipal(req, { perm: "billing:manage", account: true });
     const plan = planFrom(await readJson(req));
     if (!p.orgId || !p.userId) throw new SaasError("E_AUTH_REQUIRED", "Sign in to upgrade.");
-    if (billingMode() !== "simulated") {
+    // QA-FIX: the *effective* mode. Gating on `billingMode()` (pure env) sealed the dead end described on
+    // `effectiveBillingMode`: a deployment configured for Polar whose plugin was not mounted sent the upgrade to
+    // the simulated checkout and then refused to honour it.
+    if (effectiveBillingMode() !== "simulated") {
       throw new SaasError("E_CONFLICT", "Billing is configured on this deployment; use the real checkout.");
     }
     // `billing:manage` is owner-only in the §3.7 matrix, but the row write is the one place a wrong answer is

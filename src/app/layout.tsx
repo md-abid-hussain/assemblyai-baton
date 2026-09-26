@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import type * as React from "react";
 
+import { ZodJitless } from "@/components/common/zod-jitless";
 import { Toaster } from "@/components/ui/sonner";
 
 import "./globals.css";
@@ -25,6 +26,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="min-h-dvh">
+        <ZodJitless />
         {children}
         <Toaster position="top-center" />
       </body>

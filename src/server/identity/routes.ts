@@ -9,7 +9,7 @@ import "server-only";
  */
 import { toNextJsHandler } from "better-auth/next-js";
 
-import { SaasError, saasErrorResponse } from "../saas/errors";
+import { isSaasError, SaasError, saasErrorResponse } from "../saas/errors";
 import { log } from "../log";
 import { getAuth } from "./auth";
 import { isBlockedClientAuthPath } from "./blocked-paths";
@@ -72,7 +72,8 @@ export async function guestStart(req: Request): Promise<Response> {
     if ("setCookie" in r) for (const c of r.setCookie) headers.append("set-cookie", c);
     return new Response(JSON.stringify(r.body), { status: r.status, headers });
   } catch (err) {
-    if (err instanceof SaasError) return saasErrorResponse(err);
+    // QA-FIX: predicate, not `instanceof` — see `isSaasError`.
+    if (isSaasError(err)) return saasErrorResponse(err);
     routeLog.error("guest start failed", { err });
     // Never an outage-shaped answer on the judged URL: the caller keeps the user where they are.
     return json(200, { orgId: null, degraded: true, reason: "start_failed" });

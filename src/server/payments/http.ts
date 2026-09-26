@@ -2,8 +2,9 @@ import "server-only";
 
 import type { z } from "zod";
 
-import { apiError, BatonError, ERROR_HTTP_STATUS, type ErrorCode } from "../../core/contracts/errors";
+import { apiError, BatonError, ERROR_HTTP_STATUS, isBatonError, type ErrorCode } from "../../core/contracts/errors";
 import { EnvError } from "../env";
+import { isSaasError, saasErrorResponse } from "../saas/errors";
 import { log } from "../log";
 
 /**
@@ -59,7 +60,10 @@ export function route<P extends Record<string, string>>(
     try {
       return await fn(req, ctx);
     } catch (e) {
-      if (e instanceof BatonError) {
+      // QA-FIX: a v3 `SaasError` (`requirePrincipal`, the same-origin check) must keep its own status here too.
+      if (isSaasError(e)) return saasErrorResponse(e);
+      // QA-FIX: predicate, not `instanceof` — see `isBatonError`.
+      if (isBatonError(e)) {
         const retry = e.retryAfterMs !== undefined ? { retryAfterSec: e.retryAfterMs / 1000 } : {};
         return errorResponse(e.code, e.message, retry);
       }

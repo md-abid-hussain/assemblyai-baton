@@ -2,8 +2,9 @@ import "server-only";
 
 import type { z } from "zod";
 
-import { apiError, BatonError, ERROR_HTTP_STATUS, type ErrorCode, type FallbackKind } from "../../core/contracts/errors";
+import { apiError, BatonError, ERROR_HTTP_STATUS, isBatonError, type ErrorCode, type FallbackKind } from "../../core/contracts/errors";
 import { EnvError } from "../env";
+import { isSaasError, saasErrorResponse } from "../saas/errors";
 import { log } from "../log";
 
 /**
@@ -77,7 +78,11 @@ export function handler<P extends Record<string, string>>(
     try {
       return await fn(req, ctx);
     } catch (e) {
-      if (e instanceof BatonError) return batonErrorResponse(e);
+      // QA-FIX: a v3 `SaasError` thrown under a v1/v2 route (`requirePrincipal`, the same-origin check) keeps
+      // its §6.3 envelope and its status instead of collapsing into a 500 that says nothing.
+      if (isSaasError(e)) return saasErrorResponse(e);
+      // QA-FIX: the predicate, not `instanceof` — one process can hold two copies of the class (see `isBatonError`).
+      if (isBatonError(e)) return batonErrorResponse(e);
       if (e instanceof EnvError) {
         httpLog.error("route misconfigured", { route: name, err: e });
         return errorResponse("E_INTERNAL", "The server is missing configuration.", { status: 503 });

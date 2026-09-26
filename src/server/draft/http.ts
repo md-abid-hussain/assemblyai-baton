@@ -10,14 +10,14 @@
  */
 import "server-only";
 
-import { BatonError } from "../../core/contracts/errors";
+import { BatonError, isBatonError } from "../../core/contracts/errors";
 import type { Principal } from "../../core/contracts/v3/identity";
 import type { Permission } from "../../core/contracts/v3/permissions";
 import { errorResponse, type RouteCtx } from "../auth/http";
 import { EnvError } from "../env";
 import { log } from "../log";
 import { isRelayError, relayErrorResponse } from "../relays/http";
-import { saasErrorResponse, SaasError } from "../saas/errors";
+import { isSaasError, SaasError, saasErrorResponse } from "../saas/errors";
 import { requirePrincipal } from "../saas/principal";
 
 const httpLog = log.child({ component: "wp17-http" });
@@ -47,9 +47,10 @@ export function wp17Route<P extends Record<string, string>>(
     try {
       return await fn(req, ctx);
     } catch (e) {
-      if (e instanceof SaasError) return saasErrorResponse(e);
+      // QA-FIX: predicates, not `instanceof` — see `isBatonError`.
+      if (isSaasError(e)) return saasErrorResponse(e);
       if (isRelayError(e)) return relayErrorResponse(e);
-      if (e instanceof BatonError) {
+      if (isBatonError(e)) {
         return errorResponse(e.code, e.message, {
           ...(e.retryAfterMs !== undefined ? { retryAfterSec: e.retryAfterMs / 1000 } : {}),
           ...(e.fallback !== undefined ? { fallback: e.fallback } : {}),

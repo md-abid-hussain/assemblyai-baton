@@ -70,7 +70,7 @@ export function EditorShell({ relayId, tab, env }: EditorShellProps) {
 
   if (error) {
     return (
-      <main className="mx-auto max-w-2xl px-4 py-12">
+      <div className="mx-auto max-w-2xl px-4 py-12">
         <h1 className="text-lg font-semibold">This relay could not be opened</h1>
         <p className="text-muted-foreground mt-2 text-sm">{error}</p>
         <p className="mt-4 text-sm">
@@ -78,7 +78,7 @@ export function EditorShell({ relayId, tab, env }: EditorShellProps) {
             Back to your relays
           </Link>
         </p>
-      </main>
+      </div>
     );
   }
   if (!detail || !storeRef.current) {

@@ -31,7 +31,7 @@ import { requirePrincipal } from "../saas/principal";
 import type { Principal } from "../../core/contracts/v3/identity";
 import { installConnectorPorts } from "../connectors/install";
 import { getSecretStore } from "./index";
-import { SecretError } from "./store";
+import { isSecretError } from "./store";
 
 const routeLog = log.child({ component: "secrets-http" });
 
@@ -56,7 +56,8 @@ function secretsRoute<P extends Record<string, string>>(
       return await fn(req, ctx);
     } catch (e) {
       if (isSaasError(e)) return saasErrorResponse(e);
-      if (e instanceof SecretError) {
+      // QA-FIX: name-checked, not `instanceof` — see `isBatonError` on the duplicate module graph.
+      if (isSecretError(e)) {
         // The v2 envelope with the v2 status (`V2_ERROR_STATUS`): 429 for the count, 400 for a name or a size.
         const status = e.code === "E_SECRET_LIMIT" ? V2_ERROR_STATUS.E_SECRET_LIMIT : 400;
         return json({ error: { code: e.code, message: e.message } }, { status });
@@ -105,7 +106,15 @@ export const putSecret = secretsRoute("secrets.put", async (req) => {
   return json(meta, { status: existing ? 200 : 201 });
 });
 
-/** DELETE /api/secrets/:id. Deleting a foreign or unknown id is a no-op with a 204: nothing is disclosed. */
+/**
+ * DELETE /api/secrets/:id. Deleting a foreign or unknown id is a no-op with a 204: nothing is disclosed.
+ *
+ * **The 204 is the contract, not an oversight** (QA-FIX: the adversarial pass flagged it as easy to misread from
+ * the status alone). `remove` is scoped to `p.orgId`, so another org's secret is simply not in this workspace and
+ * survives untouched — the response is identical whether the id existed, belonged to someone else, or never
+ * existed at all, because any difference between those three would be a free existence oracle over `sec_…` ids.
+ * A cross-tenant delete attempt is therefore a 204 *and* a no-op; `tests/tenancy` asserts the row survives.
+ */
 export const deleteSecret = secretsRoute<{ id: string }>("secrets.delete", async (req, ctx) => {
   const p = await requirePrincipal(req, { perm: "secret:write" });
   const id = (await paramsOf(ctx)).id;

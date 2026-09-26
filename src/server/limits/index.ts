@@ -63,10 +63,18 @@ export const getLimitsAuthority: GetLimitsAuthority = () => {
   return holder.authority;
 };
 
-/** The DB authority when this process IS the authority (status extras, sweeper, run planning), else null. */
+/**
+ * The DB authority when this process IS the authority (status extras, sweeper, run planning), else null.
+ *
+ * QA-FIX: brand-checked, never `instanceof` — see `DbLimitsAuthority.isDbLimitsAuthority` for the 404 that cost.
+ */
+export const isDbLimitsAuthority = (a: unknown): a is DbLimitsAuthority =>
+  a instanceof DbLimitsAuthority ||
+  (typeof a === "object" && a !== null && (a as { isDbLimitsAuthority?: unknown }).isDbLimitsAuthority === true);
+
 export function getDbAuthority(): DbLimitsAuthority | null {
   const a = getLimitsAuthority();
-  return a instanceof DbLimitsAuthority ? a : null;
+  return isDbLimitsAuthority(a) ? a : null;
 }
 
 export function getRateLimiter(): RateLimiter {

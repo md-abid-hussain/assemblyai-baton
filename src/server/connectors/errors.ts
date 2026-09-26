@@ -37,4 +37,10 @@ const DEFAULT_STATUS: Record<ConnectorErrorCode, ConnectorOutcomeStatus> = {
   E_CONN_TIMEOUT: "timeout",
 };
 
-export const isConnectorError = (e: unknown): e is ConnectorError => e instanceof ConnectorError;
+/** Recognised by name + code, never by `instanceof` alone (see `isBatonError`; QA-FIX). */
+export const isConnectorError = (e: unknown): e is ConnectorError => {
+  if (e instanceof ConnectorError) return true;
+  if (typeof e !== "object" || e === null) return false;
+  const { name, code, message } = e as { name?: unknown; code?: unknown; message?: unknown };
+  return name === "ConnectorError" && typeof message === "string" && typeof code === "string" && Object.hasOwn(DEFAULT_STATUS, code);
+};

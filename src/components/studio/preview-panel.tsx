@@ -32,8 +32,20 @@ function Section({ title, children, note }: { title: string; children: React.Rea
   );
 }
 
-const Pre = ({ children }: { children: React.ReactNode }) => (
-  <pre className="bg-muted/50 max-h-64 overflow-auto rounded-md p-2 font-mono text-xs whitespace-pre-wrap">{children}</pre>
+/**
+ * QA-FIX: a scrollable block must be reachable by keyboard (axe `scrollable-region-focusable`, serious — the
+ * same rule the break-it pass caught on `/call`). These panes hold the compiled greeting and prompt, which are
+ * exactly the text a reviewer needs to read, and they clip at 16 rem.
+ */
+const Pre = ({ children, label }: { children: React.ReactNode; label: string }) => (
+  <pre
+    className="bg-muted/50 max-h-64 overflow-auto rounded-md p-2 font-mono text-xs whitespace-pre-wrap"
+    tabIndex={0}
+    role="region"
+    aria-label={label}
+  >
+    {children}
+  </pre>
 );
 
 export function PreviewPanel({ className }: { className?: string }) {
@@ -60,7 +72,7 @@ export function PreviewPanel({ className }: { className?: string }) {
   const mismatch = serverHash !== null && hash !== null && serverHash !== hash;
 
   return (
-    <div className={cn("min-h-0 overflow-auto", className)} aria-label="Compiled preview">
+    <div className={cn("min-h-0 overflow-auto", className)} tabIndex={0} role="region" aria-label="Compiled preview">
       {mismatch ? (
         <p className="bg-destructive/10 text-destructive border-b px-3 py-2 text-xs">
           The browser and the server compiled this relay differently ({hash?.slice(0, 8)} vs {serverHash.slice(0, 8)}).
@@ -93,7 +105,7 @@ export function PreviewPanel({ className }: { className?: string }) {
             </button>
           ))}
         </div>
-        <Pre>{greeting?.text ?? "—"}</Pre>
+        <Pre label="Compiled greeting">{greeting?.text ?? "—"}</Pre>
       </Section>
 
       <Section
@@ -122,11 +134,11 @@ export function PreviewPanel({ className }: { className?: string }) {
             </button>
           ))}
         </div>
-        <Pre>{prompt?.text ?? "—"}</Pre>
+        <Pre label="Compiled prompt for this stage">{prompt?.text ?? "—"}</Pre>
       </Section>
 
       <Section title="Tools" note={<Badge variant="outline">{tools?.tools.length ?? 0} for {tools?.stage ?? "—"}</Badge>}>
-        <Pre>{JSON.stringify(tools?.tools ?? [], null, 2)}</Pre>
+        <Pre label="Tools for this stage">{JSON.stringify(tools?.tools ?? [], null, 2)}</Pre>
       </Section>
 
       <Section
@@ -143,7 +155,7 @@ export function PreviewPanel({ className }: { className?: string }) {
         <p className="text-muted-foreground mb-2 text-xs">
           Format <code>{preview.extractor.formatName}</code> · version {preview.extractor.versionId}
         </p>
-        <Pre>{JSON.stringify(preview.extractor.schema, null, 2)}</Pre>
+        <Pre label="Extractor schema">{JSON.stringify(preview.extractor.schema, null, 2)}</Pre>
       </Section>
 
       <Section

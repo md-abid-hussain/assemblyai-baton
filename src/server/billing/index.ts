@@ -16,7 +16,7 @@ export {
   activeSubscriptionsOf, confirmSimulated, createPolarBilling, createSimulatedBilling, isOwnerOf, polarDepsFrom,
   refOf, returnPath, setPlanChangeHook, SYNC_STALE_MS, writeSync, type PolarBillingDeps, type SyncPatch,
 } from "./provider";
-export { getBilling, registerBilling, resetBillingRegistration } from "./register";
+export { effectiveBillingMode, getBilling, registerBilling, resetBillingRegistration } from "./register";
 export {
   badgeFor, billingViewOf, getBillingState, isStale, loadBillingView, postCheckout, postSimulatedConfirm,
   type BillingView,

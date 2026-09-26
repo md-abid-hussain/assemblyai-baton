@@ -116,3 +116,83 @@ describe("assemble-bundle.mjs", () => {
     expect(links).toEqual([]);
   });
 });
+
+/**
+ * QA-FIX (docs/notes/qa-fix.md): two build-shape failures the adversarial pass found in the artefact itself.
+ *
+ * 1. **The guest scenario never reached the bundle.** `FsCaseDataSource.getPolicy` reads
+ *    `src/generated/scenarios.json` (and the `data/scenarios/<id>.json` kit fallback) by a *computed* relative
+ *    path, which the tracer cannot see, and neither file was listed anywhere — so `POST /api/cases` answered
+ *    `404 "Unknown scenario s01."` on the built server while `next dev` was perfect. The static import in
+ *    `[WIRE-SCENARIOS]` is the primary fix; these entries keep the fs fallback honest.
+ * 2. **`bundle/` contained itself**, ten levels deep, 235 MB of 329 MB: `next build` traces before
+ *    `assemble-bundle.mjs` deletes the previous `bundle/`.
+ */
+describe("next.config.mjs file tracing (QA-FIX)", () => {
+  const cfg = readFileSync(join(ROOT, "next.config.mjs"), "utf8");
+
+  it("excludes ./bundle/** so a previous build cannot be traced into the next one", async () => {
+    const { default: nextConfig } = await import("../../../next.config.mjs");
+    const excludes = (nextConfig as unknown as { outputFileTracingExcludes: Record<string, string[]> })
+      .outputFileTracingExcludes;
+    expect(excludes["*"]).toContain("./bundle/**");
+    expect(cfg).toContain("./bundle/**");
+  });
+
+  it("traces the scenario data the case route falls back to", async () => {
+    const { default: nextConfig } = await import("../../../next.config.mjs");
+    const includes = (nextConfig as unknown as { outputFileTracingIncludes: Record<string, string[]> })
+      .outputFileTracingIncludes;
+    expect(includes["/api/cases"]).toContain("./src/generated/scenarios.json");
+    expect(includes["/api/cases"]).toContain("./data/scenarios/*.json");
+  });
+
+  it("the build cleans bundle/ BEFORE next build, not only after it", () => {
+    const build = (JSON.parse(readFileSync(join(ROOT, "package.json"), "utf8")) as { scripts: Record<string, string> })
+      .scripts.build as string;
+    const clean = build.indexOf("assemble-bundle.mjs --clean");
+    expect(clean).toBeGreaterThanOrEqual(0);
+    expect(clean).toBeLessThan(build.indexOf("next build"));
+  });
+});
+
+describe("assemble-bundle.mjs refuses a nested bundle (QA-FIX)", () => {
+  const dir = mkdtempSync(join(tmpdir(), "baton-nest-"));
+  afterAll(() => rmSync(dir, { recursive: true, force: true }));
+
+  const scaffold = () => {
+    const w = (p: string, s = "") => {
+      mkdirSync(join(dir, p, ".."), { recursive: true });
+      writeFileSync(join(dir, p), s);
+    };
+    mkdirSync(join(dir, "scripts"), { recursive: true });
+    cpSync(join(ROOT, "scripts", "assemble-bundle.mjs"), join(dir, "scripts", "assemble-bundle.mjs"));
+    w(".next/standalone/server.js", "// server");
+    w(".next/static/chunks/a.js", "");
+    w("drizzle/0000_init.sql", "--");
+    w("dist/migrate.mjs");
+    w("dist/cron.mjs");
+    return w;
+  };
+
+  it("fails loudly when the standalone output carries a bundle/ of its own", () => {
+    const w = scaffold();
+    w(".next/standalone/bundle/server.js", "// the previous build, swept in by the tracer");
+    let failed = false;
+    try {
+      execFileSync(process.execPath, [join(dir, "scripts", "assemble-bundle.mjs")], { stdio: "pipe" });
+    } catch (e) {
+      failed = true;
+      expect(String((e as { stderr?: Buffer }).stderr)).toContain("bundle/bundle exists");
+    }
+    expect(failed, "a nested bundle must fail the build").toBe(true);
+  });
+
+  it("--clean removes bundle/ and does nothing else", () => {
+    scaffold();
+    mkdirSync(join(dir, "bundle", "stale"), { recursive: true });
+    writeFileSync(join(dir, "bundle", "stale", "old.js"), "// last build");
+    execFileSync(process.execPath, [join(dir, "scripts", "assemble-bundle.mjs"), "--clean"], { stdio: "pipe" });
+    expect(existsSync(join(dir, "bundle"))).toBe(false);
+  });
+});

@@ -45,7 +45,17 @@ export class SaasError extends Error {
   }
 }
 
-export const isSaasError = (e: unknown): e is SaasError => e instanceof SaasError;
+/**
+ * Recognised by **name + code, not by `instanceof` alone** — the same module-duplication rule as
+ * `isBatonError` (`src/core/contracts/errors.ts`) and `isNoPrincipal`
+ * (`src/server/read-models/app-guard.ts`). QA-FIX; docs/notes/qa-fix.md.
+ */
+export const isSaasError = (e: unknown): e is SaasError => {
+  if (e instanceof SaasError) return true;
+  if (typeof e !== "object" || e === null) return false;
+  const { name, code, message } = e as { name?: unknown; code?: unknown; message?: unknown };
+  return name === "SaasError" && typeof message === "string" && typeof code === "string" && Object.hasOwn(V3_ERROR_STATUS, code);
+};
 
 /** `<APP_URL>/docs/api#errors`, or the relative path when `APP_URL` is unset (local dev, tests). */
 export function errorDocsUrl(appUrl: string | undefined = process.env.APP_URL): string {
@@ -72,5 +82,7 @@ export function saasErrorResponse(e: SaasError, init: { headers?: HeadersInit; a
   if (!headers.has("content-type")) headers.set("content-type", "application/json; charset=utf-8");
   if (!headers.has("cache-control")) headers.set("cache-control", "no-store");
   if (e.retryAfterSec !== undefined) headers.set("retry-after", String(Math.max(1, Math.ceil(e.retryAfterSec))));
-  return new Response(JSON.stringify(saasErrorBody(e, init.appUrl)), { status: e.status, headers });
+  // `e.status` is set by the constructor, but `isSaasError` also accepts an instance from a duplicate module
+  // graph, so the code's own status is the authority when the field is somehow absent.
+  return new Response(JSON.stringify(saasErrorBody(e, init.appUrl)), { status: e.status ?? V3_ERROR_STATUS[e.code], headers });
 }

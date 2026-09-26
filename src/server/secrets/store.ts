@@ -41,6 +41,14 @@ export class SecretError extends Error {
   }
 }
 
+/** Recognised by name + code, never by `instanceof` alone (see `isBatonError`; QA-FIX). */
+export const isSecretError = (e: unknown): e is SecretError => {
+  if (e instanceof SecretError) return true;
+  if (typeof e !== "object" || e === null) return false;
+  const { name, code, message } = e as { name?: unknown; code?: unknown; message?: unknown };
+  return name === "SecretError" && typeof message === "string" && (code === "E_SECRET_LIMIT" || code === "E_BAD_REQUEST");
+};
+
 /** `sec_` + 16 chars of [a-z0-9] (the `SecretRefSchema` shape), unbiased. */
 export function newSecretId(): string {
   let out = "";

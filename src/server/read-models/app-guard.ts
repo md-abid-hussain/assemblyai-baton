@@ -171,6 +171,31 @@ export async function visitorAuthState(path = "/sign-in"): Promise<VisitorAuthSt
   };
 }
 
+/**
+ * Make sure a signed-in real user owns a workspace of their own, wherever they are (QA-FIX).
+ *
+ * `appContextOrNull` only reaches `ensurePersonalOrg` for a user with **no org at all**, which is the whole
+ * story for someone who signs up and lands on `/app`. It is not the story for an invited second account: they
+ * sign up from `/accept-invite/<id>`, accept, and arrive at `/app` already holding the *inviter's* org — so the
+ * "no org" branch never fires, no personal workspace is ever created, and the switcher shows one workspace
+ * where TASKS-v3 §4's G3 criterion (and SAAS §3.1's "a new account lands in its auto-created personal org")
+ * says two. Calling this from the accept-invite page closes the gap one page earlier, before the membership
+ * that hides it exists.
+ *
+ * `ensurePersonalOrg` is idempotent and refuses anonymous users, so a guest accepting an invite still carries
+ * their one guest workspace over and nobody ends up with a duplicate. Failure is never fatal: the invitation
+ * card is more useful than a 500.
+ */
+export async function ensureOwnWorkspace(userId: string | null | undefined): Promise<void> {
+  if (!userId) return;
+  try {
+    const { ensurePersonalOrg } = await import("../identity");
+    await ensurePersonalOrg(userId);
+  } catch (err) {
+    log.warn("ensure_own_workspace_failed", { err: err instanceof Error ? err.message : String(err) });
+  }
+}
+
 /** `/app/runs` + its query, for the redirect and for the guest banner's return link. */
 export function pathWithQuery(path: string, query: Record<string, string | undefined>): string {
   const qs = new URLSearchParams();

@@ -24,6 +24,21 @@ export async function register(): Promise<void> {
     } catch (err) {
       log.child({ component: "boot" }).error("call lookup failed to register", { err });
     }
+    // [WIRE-SCENARIOS] wired at QA-FIX (docs/notes/qa-fix.md). `src/generated/scenarios.json` is the scenario
+    // policies WP9 generates, and `src/server/data/index.ts` says in its own header that these files are meant to
+    // be **imported, never fs-read**, because `src/` is not in the deploy bundle — but nothing ever called
+    // `registerGeneratedData`. The fs fallback then looked for `src/generated/scenarios.json` and
+    // `data/scenarios/<id>.json` relative to the process cwd, neither of which the bundle contained, so on the
+    // built server every `POST /api/cases` answered `404 "Unknown scenario s01."` and the whole guest demo — the
+    // flagship judge path — was dead. Invisible in `next dev`, which reads both files off the live checkout.
+    // A static import travels inside the JS chunk, so it cannot depend on cwd or on file tracing at all.
+    try {
+      const { registerGeneratedData } = await import("./server/data");
+      const scenarios = (await import("./generated/scenarios.json")).default as unknown[];
+      registerGeneratedData({ scenarios });
+    } catch (err) {
+      log.child({ component: "boot" }).error("generated scenarios failed to register", { err });
+    }
     // [WIRE-PUBLISHING] wired at G2b. `installPublishing()` registers WP18's `livePublications` count source with the
     // v3 entitlements registry (`setOrgCounter`), which is what enforces the guest plan's 1 live publication before
     // WP21 exists (docs/notes/wp18.md "What the integrator must do" §2). It only stores a closure, so it stays cheap
@@ -45,6 +60,25 @@ export async function register(): Promise<void> {
       installRelaySaasPorts();
     } catch (err) {
       log.child({ component: "boot" }).error("relay saas ports failed to install", { err });
+    }
+    // [WIRE-BILLING] wired at QA-FIX (docs/notes/qa-fix.md). `registerBilling()` is the only thing that points
+    // `getBilling()` at the real Better Auth `/checkout` endpoint and the DB entitlements store, and nothing in
+    // the app ever called it. `getBilling()` therefore always fell back to the simulated provider while
+    // `billingMode()` (pure env) kept answering "polar", so a correctly configured deployment sent Upgrade to the
+    // *simulated* checkout page and then refused the simulated confirm with "use the real checkout" — no path to
+    // Pro at all. The resolver is lazy (a closure), so this opens no connection and builds no auth instance here.
+    try {
+      const { registerBilling } = await import("./server/billing");
+      const { getAuth } = await import("./server/identity/auth");
+      registerBilling(() => {
+        try {
+          return (getAuth()?.api ?? null) as { checkout?: unknown } | null;
+        } catch {
+          return null;
+        }
+      });
+    } catch (err) {
+      log.child({ component: "boot" }).error("billing failed to register", { err });
     }
     if (inprocWorker) {
       // [WIRE-INPROC-WORKER] wired at G1. startInprocWorker() is idempotent per process (globalThis guard), so a

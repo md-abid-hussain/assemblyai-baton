@@ -183,6 +183,9 @@ export type HostVerdict =
   | { ok: false; reason: "not_listed" | "plan"; message: string };
 
 export class OrgConnectorHostPolicy implements ConnectorHostPolicy {
+  /** QA-FIX: a brand, because Next can load this module twice and `instanceof` then answers false. */
+  readonly isOrgConnectorHostPolicy = true as const;
+
   constructor(private readonly deps: { store?: OrgHostStore } = {}) {}
 
   private get store(): OrgHostStore {
@@ -227,13 +230,18 @@ export class OrgConnectorHostPolicy implements ConnectorHostPolicy {
   }
 }
 
+/** QA-FIX: brand-checked, never `instanceof` (see `isBatonError` on the duplicate module graph). */
+export const isOrgConnectorHostPolicy = (p: unknown): p is OrgConnectorHostPolicy =>
+  p instanceof OrgConnectorHostPolicy ||
+  (typeof p === "object" && p !== null && (p as { isOrgConnectorHostPolicy?: unknown }).isOrgConnectorHostPolicy === true);
+
 /**
  * The check the connector runtime runs before any DNS lookup. It consults the REGISTERED port, so a test (or a
  * later WP) can swap the whole policy, and it explains a refusal when the registered policy is ours.
  */
 export async function checkConnectorHost(orgId: string, host: string): Promise<{ ok: boolean; message?: string }> {
   const policy = getConnectorHostPolicy();
-  if (policy instanceof OrgConnectorHostPolicy) {
+  if (isOrgConnectorHostPolicy(policy)) {
     const v = await policy.check(orgId, host);
     return v.ok ? { ok: true } : { ok: false, message: v.message };
   }

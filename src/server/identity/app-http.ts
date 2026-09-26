@@ -26,7 +26,7 @@ import { errorResponse, json, paramsOf, type RouteCtx } from "../auth/http";
 import { EnvError } from "../env";
 import { getRateLimiter } from "../limits";
 import { log } from "../log";
-import { SaasError, saasErrorResponse } from "../saas/errors";
+import { isSaasError, SaasError, saasErrorResponse } from "../saas/errors";
 import { requirePrincipal, startPathFor, type PrincipalNeed } from "../saas/principal";
 import { installIdentity } from "./index";
 
@@ -140,7 +140,8 @@ export function appRoute<P extends Record<string, string>>(
     try {
       return await fn(req, ctx);
     } catch (e) {
-      if (e instanceof SaasError) return saasErrorResponse(e);
+      // QA-FIX: predicate, not `instanceof` — see `isSaasError`.
+      if (isSaasError(e)) return saasErrorResponse(e);
       if (e instanceof EnvError) {
         appLog.error("route misconfigured", { route: name, err: e });
         return errorResponse("E_INTERNAL", "The server is missing configuration.", { status: 503 });

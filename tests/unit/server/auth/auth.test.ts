@@ -75,7 +75,10 @@ describe("visitor identity", () => {
     expect(a).toHaveLength(22);
     expect(a).not.toContain("198");
     expect(ipKeyOf(reqWith({ "x-real-ip": "198.51.100.4" }), { now })).toBe(a);
-    expect(ipKeyOf(reqWith({ "x-forwarded-for": "198.51.100.4" }), { now })).toBe(a);
+    // QA-FIX: X-Forwarded-For alone is client-controlled, so by default it keys on nothing ("unknown"). An
+    // operator who has vouched for the proxy chain (`IPKEY_TRUST_XFF=1`) still gets the balancer's hop.
+    expect(ipKeyOf(reqWith({ "x-forwarded-for": "198.51.100.4" }), { now })).not.toBe(a);
+    expect(ipKeyOf(reqWith({ "x-forwarded-for": "198.51.100.4" }), { now, mode: "xff-right" })).toBe(a);
     expect(ipKeyOf(reqWith({ "x-real-ip": "198.51.100.77" }), { now })).toBe(a); // same /24
     expect(ipKeyOf(reqWith({ "x-real-ip": "198.51.101.4" }), { now })).not.toBe(a);
     expect(ipKeyOf(reqWith({ "x-real-ip": "198.51.100.4" }), { now: now + 86_400_000 })).not.toBe(a);

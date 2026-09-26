@@ -56,15 +56,26 @@ const nextConfig = {
   turbopack: { root: ROOT },
   // Keep spikes, tools, research and private call audio out of the traced server bundle. Paths are anchored
   // with "./": an unanchored "dist/**" also matched node_modules/pg-protocol/dist and broke pg at runtime.
+  // `./bundle/**` (QA-FIX): `next build` traces *before* `scripts/assemble-bundle.mjs` does its `rm -rf bundle`,
+  // so a `bundle/` left by the previous build was swept into `.next/standalone` and copied into the new one. It
+  // compounded on every unclean rebuild — 10 levels of `bundle/bundle/…`, 235 MB of 329 MB — and made the build
+  // non-idempotent. `assemble-bundle.mjs` now fails loudly if a nested copy ever reappears.
   outputFileTracingExcludes: {
-    "*": ["./spikes/**", "./tools/**", "./research/**", "./data/calls/**", "./node_modules/sharp/**", "./node_modules/@img/**"],
+    "*": ["./spikes/**", "./tools/**", "./research/**", "./data/calls/**", "./bundle/**", "./node_modules/sharp/**", "./node_modules/@img/**"],
   },
   // G1 (wp3-to-integrator §3): the Express prefill and cached-replay events read WP9's extraction cache with fs at
   // run time; `data/` is not traced otherwise. Matches nothing until WP9 writes data/cache/extract/**.
   // G2-finish (wp14b-to-wp12 §2): the gallery seed reads data/relays/*.json with fs at run time (FsGallerySource),
   // and /api/cases resolves relay versions. Without these the deployed gallery is silently empty.
+  // QA-FIX: the scenario policies. `src/instrumentation.ts`'s `[WIRE-SCENARIOS]` step statically imports
+  // `src/generated/scenarios.json`, which is the primary path and needs no tracing at all; these entries keep the
+  // `FsCaseDataSource` **fallback** honest, because it reads both files by a computed relative path that the
+  // tracer cannot see. Without either, `POST /api/cases` answered `404 "Unknown scenario s01."` on the built
+  // server and the guest demo was dead (the kit files are ~10 small JSON documents).
   outputFileTracingIncludes: {
-    "/api/cases": ["./data/cache/extract/**", "./data/relays/*.json"],
+    "/api/cases": [
+      "./data/cache/extract/**", "./data/relays/*.json", "./data/scenarios/*.json", "./src/generated/scenarios.json",
+    ],
     "/api/extract": ["./data/cache/extract/**"],
     "/api/relays": ["./data/relays/*.json"],
     "/api/relays/[id]": ["./data/relays/*.json"],

@@ -16,6 +16,26 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
 const out = p("bundle");
 
+/**
+ * `--clean` (QA-FIX): remove `bundle/` and stop. `npm run build` runs this BEFORE `next build`, because Next
+ * traces the working tree before this script's own `rm -rf bundle` ever runs: a `bundle/` left by the previous
+ * build was traced into `.next/standalone` and copied into the new `bundle/`, nesting one level deeper on every
+ * unclean rebuild (10 levels, 235 MB of 329 MB, measured). `outputFileTracingExcludes` now also lists
+ * `./bundle/**`; this is the second lock, and the assertion at the end of this file is the alarm.
+ */
+if (process.argv.includes("--clean")) {
+  // A warning, never a failure: on Windows a running `node bundle/server.js` (or a virus scanner) holds the
+  // directory and `rmSync` throws EBUSY. Refusing to build over that would be worse than building — the
+  // post-assembly `bundle/bundle` assertion at the end of this file is the check that actually matters.
+  try {
+    rmSync(out, { recursive: true, force: true });
+    console.log("[assemble-bundle] cleaned bundle/ before the build");
+  } catch (err) {
+    console.warn(`[assemble-bundle] could not clean bundle/ (${err.code ?? err.message}); is a server still running?`);
+  }
+  process.exit(0);
+}
+
 function fail(msg) {
   console.error(`[assemble-bundle] ${msg}`);
   process.exit(1);
@@ -44,6 +64,12 @@ for (const f of ["migrate.mjs", "cron.mjs"]) copy(p("dist", f), join(out, f));
 for (const f of readdirSync(out)) if (/^\.env(\..*)?$/.test(f) && f !== ".env.example") rmSync(join(out, f), { force: true });
 
 if (!existsSync(join(out, "server.js"))) fail("bundle/server.js not found (standalone output nested under another root?)");
+
+// QA-FIX: a previous build's artefact must never be inside this one. If this fires, `./bundle/**` has fallen out
+// of `outputFileTracingExcludes` in next.config.mjs (or the build ran without the `--clean` step).
+if (existsSync(join(out, "bundle"))) {
+  fail("bundle/bundle exists: a previous build was traced into this one (next.config.mjs outputFileTracingExcludes must list ./bundle/**)");
+}
 
 /**
  * Turbopack loads `serverExternalPackages` (pg, ws) through hashed aliases, `.next/node_modules/<pkg>-<hash>`, which are

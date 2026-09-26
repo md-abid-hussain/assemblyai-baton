@@ -26,6 +26,30 @@ export interface EditorTopBarProps {
   onSaveVersion?: () => void;
 }
 
+/**
+ * `asChild` renders the `<a>` *instead of* the `<button>`, and `disabled` means nothing on an anchor — so a
+ * lint-blocked Test/Publish has to stay a real disabled button, not a styled link that still navigates.
+ */
+function TabButton({ label, href, blocked, variant }: {
+  label: string;
+  href: string;
+  blocked: boolean;
+  variant: "secondary" | "default";
+}) {
+  if (blocked) {
+    return (
+      <Button type="button" size="sm" variant={variant} disabled title="Fix the errors in the blueprint first.">
+        {label}
+      </Button>
+    );
+  }
+  return (
+    <Button size="sm" variant={variant} asChild>
+      <Link href={href}>{label}</Link>
+    </Button>
+  );
+}
+
 export function EditorTopBar({ relayId, slug, title, caps, onSaveVersion }: EditorTopBarProps) {
   const status = useSource((s) => s.status);
   const rev = useSource((s) => s.rev);
@@ -36,6 +60,8 @@ export function EditorTopBar({ relayId, slug, title, caps, onSaveVersion }: Edit
   const counts = diagnosticCounts(diagnostics);
   const label = savedStateLabel({ status, rev, diagnostics });
   const lintBlocked = counts.errors > 0;
+
+  const tabHref = (tab: "test" | "publish") => `/app/relays/${encodeURIComponent(relayId)}/${tab}`;
 
   const copyCli = () => {
     const command = `changeover pull ${relayId} -o ${slug || "relay"}.yaml`;
@@ -96,16 +122,15 @@ export function EditorTopBar({ relayId, slug, title, caps, onSaveVersion }: Edit
             Save version
           </Button>
         ) : null}
-        {caps.canTest ? (
-          <Button type="button" size="sm" variant="secondary" disabled={lintBlocked} asChild={false}>
-            Test
-          </Button>
-        ) : null}
-        {caps.canPublish ? (
-          <Button type="button" size="sm" disabled={lintBlocked}>
-            Publish
-          </Button>
-        ) : null}
+        {/*
+          QA-FIX: Test and Publish were enabled-looking buttons with no `onClick` at all — a click produced no
+          request, no dialog and no toast, which is the one thing worse than a feature that has not shipped. The
+          run/publish actions themselves are WP15·3's; their **tabs** already exist and already say so honestly.
+          So the buttons now go there: the control does what it looks like it does, and the honest message is one
+          click away instead of nowhere. When WP15·3 lands it replaces the hrefs with its own handlers.
+        */}
+        {caps.canTest ? <TabButton label="Test" variant="secondary" blocked={lintBlocked} href={tabHref("test")} /> : null}
+        {caps.canPublish ? <TabButton label="Publish" variant="default" blocked={lintBlocked} href={tabHref("publish")} /> : null}
       </div>
     </header>
   );

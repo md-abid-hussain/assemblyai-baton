@@ -269,7 +269,41 @@ describe.skipIf(!HAS_DB)("WP21·1 billing routes", () => {
       expect((await m.store.readRow(mine.orgId)).plan).toBe("free");
     });
 
-    it("it is refused outright once Polar is really configured", async () => {
+    /**
+     * QA-FIX (docs/notes/qa-fix.md): "really configured" means the **provider can actually run Polar**, not that
+     * the environment names a product id. Gating this on `billingMode()` (pure env) was half of a dead end on a
+     * real deployment: Upgrade sent the owner to the simulated checkout and this route then refused to honour
+     * it, so no plan change was reachable at all. The guard now reads `effectiveBillingMode()`, the same value
+     * the page renders — so the refusal happens exactly when a real checkout exists to be used instead.
+     */
+    it("it is refused outright once Polar is really configured (a mounted checkout, not just env)", async () => {
+      const { orgId, userId } = await makeOrg();
+      stubPrincipal(principal({ orgId, userId }));
+      process.env.POLAR_ACCESS_TOKEN = FAKE_TOKEN;
+      process.env.POLAR_PRODUCT_PRO = PRO_PRODUCT;
+      process.env.POLAR_PRODUCT_BUSINESS = BIZ_PRODUCT;
+      m.register.registerBilling(() => ({ checkout: async () => ({ url: "https://sandbox.polar.sh/checkout/x" }) }));
+      try {
+        expect(m.register.effectiveBillingMode()).toBe("polar");
+        const res = await m.routes.postSimulatedConfirm(
+          req("/api/app/billing/simulated", { method: "POST", body: '{"plan":"pro"}' }),
+        );
+        expect(res.status).toBe(409);
+        expect(await codeOf(res)).toBe("E_CONFLICT");
+        expect((await m.store.readRow(orgId)).plan).toBe("free");
+      } finally {
+        m.register.registerBilling(() => null);
+        delete process.env.POLAR_ACCESS_TOKEN;
+        delete process.env.POLAR_PRODUCT_PRO;
+        delete process.env.POLAR_PRODUCT_BUSINESS;
+      }
+    });
+
+    /**
+     * The other half: a deployment whose env says Polar but whose plugin is not mounted must still be able to
+     * sell (§4.7's labelled fallback). Before the fix this combination refused *both* paths.
+     */
+    it("stays usable when the env says polar but no checkout is mounted (§4.7's labelled fallback)", async () => {
       const { orgId, userId } = await makeOrg();
       stubPrincipal(principal({ orgId, userId }));
       process.env.POLAR_ACCESS_TOKEN = FAKE_TOKEN;
@@ -279,8 +313,9 @@ describe.skipIf(!HAS_DB)("WP21·1 billing routes", () => {
         const res = await m.routes.postSimulatedConfirm(
           req("/api/app/billing/simulated", { method: "POST", body: '{"plan":"pro"}' }),
         );
-        expect(res.status).toBe(409);
-        expect(await codeOf(res)).toBe("E_CONFLICT");
+        expect(res.status).toBe(200);
+        // Labelled, always: nobody is told they bought something real.
+        expect(await body(res)).toMatchObject({ plan: "pro", source: "simulated", badge: "Pro · simulated" });
       } finally {
         delete process.env.POLAR_ACCESS_TOKEN;
         delete process.env.POLAR_PRODUCT_PRO;

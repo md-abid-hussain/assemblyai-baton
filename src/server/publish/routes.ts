@@ -15,7 +15,7 @@ import "server-only";
  *
  * The gateway is authenticated by the publication key instead: AssemblyAI's servers carry no cookie and no session.
  */
-import { BatonError } from "../../core/contracts/errors";
+import { BatonError, isBatonError } from "../../core/contracts/errors";
 import { ID_PREFIXES, type PublicationPageView, type PublishResponse } from "../../core/contracts/v2";
 import type { UiSpec } from "../../core/contracts/v2/relay";
 import { batonErrorResponse, errorResponse, json, paramsOf, type RouteCtx } from "../auth/http";
@@ -51,7 +51,8 @@ export function publishRoute<P extends Record<string, string>>(
     } catch (e) {
       if (isSaasError(e)) return saasErrorResponse(e);
       if (isRelayError(e)) return relayErrorResponse(e);
-      if (e instanceof BatonError) return batonErrorResponse(e);
+      // QA-FIX: predicate, not `instanceof` — see `isBatonError`.
+      if (isBatonError(e)) return batonErrorResponse(e);
       if (e instanceof EnvError) {
         routeLog.error("route misconfigured", { route: name, err: e });
         return errorResponse("E_INTERNAL", "The server is missing configuration.", { status: 503 });

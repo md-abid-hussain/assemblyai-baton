@@ -196,7 +196,12 @@ export function CaseCard() {
         </div>
         <ReadinessGauge fields={cs?.fields ?? null} required={requiredIds} />
       </header>
-      <div className="bt-scroll min-h-0 flex-1 px-2 py-2">
+      {/*
+        QA-FIX: a scrollable region must be reachable by keyboard (axe `scrollable-region-focusable`, serious).
+        `transcript-lanes.tsx` already does exactly this; the case card is the other scroller on /call and was
+        missed. Someone who cannot use a mouse could not read past the fold of their own case.
+      */}
+      <div className="bt-scroll min-h-0 flex-1 px-2 py-2" tabIndex={0} role="region" aria-label="Case facts">
         {cs?.conflicts.length ? (
           <div className="mb-2 space-y-2 px-2">
             {cs.conflicts.map((c) => (

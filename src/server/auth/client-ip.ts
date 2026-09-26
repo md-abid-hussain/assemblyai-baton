@@ -8,10 +8,20 @@ import "server-only";
  * headers") sets `X-Real-IP` to the client address, OVERWRITING any client value, and APPENDS the client address to
  * `X-Forwarded-For`; it strips `Forwarded`. Vercel (the remote mirror) also sets `x-real-ip` itself. So:
  *
- *   mode `real-ip` (default)  `X-Real-IP` → else the RIGHTMOST `X-Forwarded-For` entry → else "unknown"
+ *   mode `real-ip` (default)  `X-Real-IP` → else "unknown"  (→ else the rightmost XFF with `IPKEY_TRUST_XFF=1`)
  *   mode `xff-right`          the rightmost `X-Forwarded-For` entry → else `X-Real-IP` → else "unknown"
  *   mode `off`                no trustworthy hop: a fresh random key per request, so per-ipKey buckets never bind
  *                             and only the per-visitor buckets and the global caps apply (P9)
+ *
+ * **QA-FIX: `real-ip` no longer falls back to `X-Forwarded-For` on its own.** The rightmost XFF entry is only the
+ * balancer's hop when a balancer actually appended it; with nothing in front, the whole header is attacker-typed,
+ * and a burst that had just tripped `ipkey_hour` walked straight through it — 10 requests, 10 different
+ * `X-Forwarded-For` values, 10 fresh buckets, 10 × 200. Nothing in the process can tell an appended hop from a
+ * forged one, so the fallback is now an explicit operator assertion (`IPKEY_TRUST_XFF=1`, or the `xff-right`
+ * mode, which says the same thing by name) rather than the default. Both supported edges — Zerops's L7 balancer
+ * and Vercel — set `X-Real-IP` themselves and overwrite any client value, so the default path is unchanged for
+ * every real deployment; what changes is what an *unproxied* process is willing to believe. The safe failure is
+ * "unknown": one shared bucket, exactly what a header-less request already got.
  *
  * The hop is grouped by /24 for IPv4 and /48 for IPv6 (IPv4-mapped IPv6 counts as IPv4), so one household or office
  * shares a bucket and rotating through a /64 buys nothing. Unparseable values become "unknown" (bounded key space).
@@ -32,6 +42,14 @@ export function ipKeyMode(raw: string | undefined = process.env.IPKEY_MODE): IpK
   const v = raw?.trim().toLowerCase();
   return (IPKEY_MODES as readonly string[]).includes(v ?? "") ? (v as IpKeyMode) : "real-ip";
 }
+
+/**
+ * `IPKEY_TRUST_XFF=1`: an operator asserting that a trusted proxy appends to `X-Forwarded-For` and strips what
+ * the client sent. Only then may `real-ip` mode read the rightmost XFF entry when `X-Real-IP` is absent. Off by
+ * default — see the header note. Anything other than `1` is off.
+ */
+export const trustsForwardedFor = (raw: string | undefined = process.env.IPKEY_TRUST_XFF): boolean =>
+  raw?.trim() === "1";
 
 const V4_RE = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/;
 const HEXTET_RE = /^[0-9a-f]{1,4}$/i;
@@ -129,12 +147,14 @@ function randomKey(): string {
  * The ipKey material for a request: a /24 or /48 prefix, "unknown", or (mode `off`) `off:<random>`.
  * Callers hmac it with the day; the raw IP never leaves this function.
  */
-export function clientHop(headers: Headers, opts: { mode?: IpKeyMode } = {}): string {
+export function clientHop(headers: Headers, opts: { mode?: IpKeyMode; trustXff?: boolean } = {}): string {
   const mode = opts.mode ?? ipKeyMode();
   if (mode === "off") return `off:${randomKey()}`;
   const realIp = headers.get("x-real-ip")?.trim() || null;
   const right = rightmostForwardedFor(headers);
-  const order = mode === "xff-right" ? [right, realIp] : [realIp, right];
+  // QA-FIX: in `real-ip` mode the XFF entry is read only when an operator has vouched for the proxy chain.
+  const trustXff = opts.trustXff ?? trustsForwardedFor();
+  const order = mode === "xff-right" ? [right, realIp] : [realIp, ...(trustXff ? [right] : [])];
   for (const candidate of order) {
     if (!candidate) continue;
     const p = ipPrefix(candidate);
@@ -196,15 +216,19 @@ export interface ForwardingSummary {
  * `xffRight:"public"`, `realIpEqualsXffRight:true`, `forwardedHeaderPresent:false`. `realIp:"testnet"` → the client
  * value survived (use `IPKEY_MODE=xff-right`); a private/cgnat `realIp` and `xffRight` → an inner hop (`IPKEY_MODE=off`).
  */
-export function describeForwarding(headers: Headers, opts: { mode?: IpKeyMode } = {}): ForwardingSummary {
+export function describeForwarding(headers: Headers, opts: { mode?: IpKeyMode; trustXff?: boolean } = {}): ForwardingSummary {
   const mode = opts.mode ?? ipKeyMode();
+  const trustXff = opts.trustXff ?? trustsForwardedFor();
   const xff = (headers.get("x-forwarded-for") ?? "").split(",").map((p) => p.trim()).filter(Boolean);
   const realIp = headers.get("x-real-ip")?.trim() || null;
   const right = xff.length ? xff[xff.length - 1]! : null;
   let keyedOn = "unknown";
   if (mode === "off") keyedOn = "off";
   else {
-    const order: [string, string | null][] = mode === "xff-right" ? [["xff-right", right], ["x-real-ip", realIp]] : [["x-real-ip", realIp], ["xff-right", right]];
+    const order: [string, string | null][] =
+      mode === "xff-right"
+        ? [["xff-right", right], ["x-real-ip", realIp]]
+        : [["x-real-ip", realIp], ...(trustXff ? ([["xff-right", right]] as [string, string | null][]) : [])];
     keyedOn = order.find(([, v]) => v && ipPrefix(v))?.[0] ?? "unknown";
   }
   return {

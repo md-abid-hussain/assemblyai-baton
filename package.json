@@ -11,7 +11,7 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "node scripts/devtools/copy-monaco.mjs && next build && npm run bundle:scripts && node scripts/assemble-bundle.mjs",
+    "build": "node scripts/assemble-bundle.mjs --clean && node scripts/devtools/copy-monaco.mjs && next build && npm run bundle:scripts && node scripts/assemble-bundle.mjs",
     "build:vercel": "next build",
     "bundle:scripts": "node scripts/lib/bundle-scripts.mjs",
     "start": "node bundle/server.js",

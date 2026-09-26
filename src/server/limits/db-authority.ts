@@ -68,6 +68,16 @@ const newTicket = (reconnect: boolean, nowMs: number): string =>
   `${reconnect ? "tr" : "tq"}_${nowMs.toString(36).padStart(9, "0")}${(ticketSeq++ % 1_679_616).toString(36).padStart(4, "0")}_${newId().slice(0, 10)}`;
 
 export class DbLimitsAuthority implements LimitsAuthority {
+  /**
+   * QA-FIX: the brand `getDbAuthority()` tests, instead of `instanceof`.
+   *
+   * Next can load this module twice in one process (the route chunk, the server-component graph, the in-process
+   * worker), so the singleton on `globalThis` may be an instance of the *other* copy of this class. `instanceof`
+   * then answered false and `POST /api/internal/limits/*` replied `404 "Not the limits authority."` on the very
+   * process that IS the authority — the documented remote kill-switch path, dead, while `/api/admin/ledger` in the
+   * same process worked. A brand is stable across copies; the class identity is not.
+   */
+  readonly isDbLimitsAuthority = true as const;
   readonly db: Db;
   readonly cfg: LimitsConfig;
   readonly now: Clock;
